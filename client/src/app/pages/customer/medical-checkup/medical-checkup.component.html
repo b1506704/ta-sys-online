@@ -1,0 +1,246 @@
+<dx-toolbar [ngStyle]="{ paddingLeft: '25px', paddingRight: '25px' }">
+  <dxi-item [location]="'before'" [text]="'Medical Checkups'"> </dxi-item>
+  <dxi-item location="after" locateInMenu="auto">
+    <dx-button
+      icon="arrowright"
+      type="outline"
+      text="Health Condition"
+      hint="Navigate to Health Condition"
+      (onClick)="navigateToHealthCondition()"
+    >
+    </dx-button>
+  </dxi-item>
+</dx-toolbar>
+<div class="checkup-container">
+  <div class="box-shadow">
+    <p class="sortable-header">Pending</p>
+    <dx-toolbar style="padding-left: 10px; padding-right: 10px">
+      <dxi-item
+        widget="dxTextBox"
+        [options]="searchPendingBoxOptions"
+        location="before"
+      >
+      </dxi-item>
+      <dxi-item
+        widget="dxButton"
+        [options]="refreshPendingButtonOptions"
+        location="after"
+        locateInMenu="auto"
+      >
+      </dxi-item>
+    </dx-toolbar>
+    <div id="kanban">
+      <dx-scroll-view
+        [direction]="'vertical'"
+        [pulledDownText]="'...Fetching'"
+        [showScrollbar]="true"
+        [reachBottomText]="'Loading...'"
+        [scrollByContent]="true"
+        [height]="'40vh'"
+        (onPullDown)="updatePendingTopContent($event)"
+        (onReachBottom)="updatePendingBottomContent($event)"
+        [scrollByThumb]="true"
+      >
+        <dx-sortable
+          class="sortable-cards"
+          [allowReordering]="true"
+          (onDragStart)="onTaskDragStart($event)"
+          (onReorder)="onTaskDrop($event)"
+          [data]="pendingList"
+        >
+          <div
+            class="card dx-card dx-theme-text-color dx-theme-background-color"
+            *ngFor="let item of pendingList"
+          >
+            <ng-container *ngIf="item">
+              <div
+                class="card-priority"
+                [ngClass]="'priority-' + item?.priority"
+              ></div>
+              <div class="card-subject">{{ item?.purpose }}</div>
+              <div class="card-assignee">
+                {{ item?.startDate | date: "fullDate" }}
+              </div>
+            </ng-container>
+          </div>
+        </dx-sortable>
+      </dx-scroll-view>
+    </div>
+  </div>
+  <div class="box-shadow">
+    <p class="sortable-header">Complete</p>
+    <dx-toolbar style="padding-left: 10px; padding-right: 10px">
+      <dxi-item
+        widget="dxTextBox"
+        [options]="searchCompleteBoxOptions"
+        location="before"
+      >
+      </dxi-item>
+      <dxi-item
+        widget="dxButton"
+        [options]="refreshCompleteButtonOptions"
+        location="after"
+        locateInMenu="auto"
+      >
+      </dxi-item>
+    </dx-toolbar>
+    <div id="kanban">
+      <dx-scroll-view
+        [direction]="'vertical'"
+        [pulledDownText]="'...Fetching'"
+        [showScrollbar]="true"
+        [reachBottomText]="'Loading...'"
+        [scrollByContent]="true"
+        [scrollByThumb]="true"
+        [height]="'40vh'"
+        (onPullDown)="updateCompleteTopContent($event)"
+        (onReachBottom)="updateCompleteBottomContent($event)"
+      >
+        <dx-sortable
+          class="sortable-cards"
+          [allowReordering]="false"
+          [data]="completeList"
+        >
+          <div
+            class="card dx-card dx-theme-text-color dx-theme-background-color"
+            *ngFor="let item of completeList"
+          >
+            <ng-container *ngIf="item">
+              <div
+                class="card-priority"
+                [ngClass]="'priority-' + item?.priority"
+              ></div>
+              <div class="card-subject">{{ item?.purpose }}</div>
+              <div class="card-assignee">
+                {{ item?.startDate | date: "fullDate" }}
+              </div>
+              <dx-toolbar>
+                <dxi-item location="center">
+                  <dx-button
+                    icon="edit"
+                    type="normal"
+                    text="Detail"
+                    hint="View prescription report"
+                    (onClick)="selectPrescription(item)"
+                  >
+                  </dx-button>
+                </dxi-item>
+              </dx-toolbar>
+            </ng-container>
+          </div>
+        </dx-sortable>
+      </dx-scroll-view>
+    </div>
+  </div>
+  <div class="html-editor-container">
+    <ng-container *ngIf="checkUpDetail">
+      <app-prescription-view
+        [selectedPrescription]="selectedPrescription"
+        [customerID]="checkUpDetail?.customerID"
+      ></app-prescription-view>
+    </ng-container>
+  </div>
+</div>
+<dx-speed-dial-action
+  icon="like"
+  label="Request Checkup"
+  [index]="1"
+  (onClick)="newCheckup()"
+>
+</dx-speed-dial-action>
+<dx-popup
+  [width]="'80%'"
+  [height]="'80%'"
+  [showTitle]="true"
+  [shading]="true"
+  [title]="'Checkup Information'"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="false"
+  [showCloseButton]="true"
+  [(visible)]="isCheckUpPopupVisible"
+  [position]="'center'"
+  [classList]="['popup']"
+>
+  <div *dxTemplate="let data of 'content'">
+    <dx-scroll-view
+      width="100%"
+      height="100%"
+      [bounceEnabled]="true"
+      [scrollByContent]="true"
+      [scrollByThumb]="true"
+    >
+      <form
+        id="form-container"
+        (submit)="onSignupSubmit($event)"
+        [classList]="['checkup-form']"
+      >
+        <dx-form
+          id="form"
+          [formData]="checkUpDetail"
+          [showValidationSummary]="true"
+          validationGroup="checkUpData"
+        >
+          <dxi-item
+            dataField="customerName"
+            [label]="{ text: 'Patient Name' }"
+            editorType="dxTextBox"
+            [editorOptions]="{ disabled: true }"
+          >
+          </dxi-item>
+          <dxi-item
+            dataField="purpose"
+            [label]="{ text: 'Purpose' }"
+            editorType="dxTextBox"
+          >
+            <dxi-validation-rule type="required" message="Purpose is required">
+            </dxi-validation-rule>
+          </dxi-item>
+          <dxi-item
+            dataField="startDate"
+            [label]="{ text: 'Checkup Date' }"
+            editorType="dxDateBox"
+          >
+            <dxi-validation-rule type="required" message="Date is required">
+            </dxi-validation-rule>
+          </dxi-item>
+          <dxi-item
+            dataField="healthInsurance"
+            [label]="{ text: 'Health Insurance' }"
+            editorType="dxSelectBox"
+            [editorOptions]="healthInsurance"
+          >
+            <dxi-validation-rule
+              type="required"
+              message="Health Insurance is required"
+            >
+            </dxi-validation-rule>
+          </dxi-item>
+          <dxi-item
+            dataField="location"
+            [label]="{ text: 'Doctor Room' }"
+            editorType="dxSelectBox"
+            [editorOptions]="location"
+          >
+            <dxi-validation-rule type="required" message="Location is required">
+            </dxi-validation-rule>
+          </dxi-item>
+
+          <dxi-item itemType="group" [colCount]="2" [cssClass]="'buttonGroup'">
+            <dxi-item
+              itemType="button"
+              horizontalAlignment="center"
+              [buttonOptions]="submitButtonOptions"
+            >
+            </dxi-item>
+            <dxi-item
+              itemType="button"
+              horizontalAlignment="center"
+              [buttonOptions]="resetButtonOptions"
+            >
+            </dxi-item>
+          </dxi-item>
+        </dx-form>
+      </form>
+    </dx-scroll-view>
+  </div>
+</dx-popup>

@@ -1,0 +1,22 @@
+{
+  "name": "ng_health_care_demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "heroku-postbuild": "cd client && npm install && npm run build"
+  },
+  "dependencies": {
+    "@types/socket.io": "^3.0.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.13.1",
+    "mongoose-paginate-v2": "^1.3.18",
+    "socket.io": "^4.1.3"
+  }
+}

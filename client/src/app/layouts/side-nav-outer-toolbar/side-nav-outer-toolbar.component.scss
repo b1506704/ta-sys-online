@@ -1,0 +1,49 @@
+@import "../../../dx-styles.scss";
+:host {
+  flex-direction: column;
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+.menu {
+  visibility: visible;
+  background-color: rgba(3, 2, 0, 0.9);
+}
+
+@supports (
+  (-webkit-backdrop-filter: blur(2em)) or (backdrop-filter: blur(2em))
+) {
+  .menu {
+    visibility: visible;
+    background-color: rgba(3, 2, 0, 0.5);
+    backdrop-filter: blur(2em);
+    -webkit-backdrop-filter: blur(2em);
+  }
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.layout-header {
+  z-index: 1501;
+}
+
+.layout-body {
+  flex: 1;
+  min-height: 0;
+}
+
+.content {
+  flex-grow: 1;
+}
+::ng-deep .dx-toast-custom {
+  background-color: rgb(210, 154, 255);
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+  z-index: 999;
+  display: flex;
+  width: auto;
+  justify-content: center;
+  align-items: center;
+}

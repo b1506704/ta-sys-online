@@ -1,0 +1,98 @@
+<header class="trans-menu">
+  <dx-toolbar class="header-toolbar">
+    <ng-container *ngIf="isLoggedIn">
+      <dxi-item
+        *ngIf="menuToggleEnabled"
+        location="before"
+        widget="dxButton"
+        cssClass="menu-button"
+        [options]="{
+          icon: 'menu',
+          stylingMode: 'text',
+          onClick: toggleMenu
+        }"
+      >
+      </dxi-item>
+    </ng-container>
+    <dxi-item location="before">
+      <div *dxTemplate="let data of 'item'">
+        <dx-button icon="like" type="normal"> </dx-button>
+      </div>
+    </dxi-item>
+    <dxi-item location="before" class="neon-header" *ngIf="title">
+      <div *dxTemplate>
+        <div class="neon-header">{{ title }}</div>
+      </div>
+    </dxi-item>
+    <dxi-item location="center">
+      <div *dxTemplate="let data of 'item'">
+        <dx-load-indicator
+          [visible]="isLoadIndicatorVisible"
+          [height]="20"
+          [width]="20"
+        >
+        </dx-load-indicator>
+      </div>
+    </dxi-item>
+    <dxi-item location="after" locateInMenu="auto" [visible]="!isLoggedIn">
+      <div *dxTemplate="let data of 'item'">
+        <dx-button
+          icon="export"
+          type="normal"
+          text="Login"
+          (onClick)="onLogin()"
+        >
+        </dx-button>
+        <dx-button
+          icon="key"
+          type="normal"
+          text="Signup"
+          (onClick)="onSignup()"
+        >
+        </dx-button>
+      </div>
+    </dxi-item>
+    <dxi-item location="after" locateInMenu="auto" [visible]="isLoggedIn">
+      <div *dxTemplate="let data of 'item'">
+        <dx-button
+          icon="key"
+          type="normal"
+          text="Logout"
+          (onClick)="onLogout()"
+        >
+        </dx-button>
+      </div>
+    </dxi-item>
+
+    <dxi-item
+      location="after"
+      locateInMenu="auto"
+      menuItemTemplate="menuItem"
+      [visible]="isLoggedIn"
+    >
+      <div *dxTemplate="let data of 'item'">
+        <dx-button
+          class="user-button authorization"
+          width="210px"
+          height="100%"
+          stylingMode="text"
+        >
+          <!-- [user]="user" -->
+          <div *dxTemplate="let data of 'content'">
+            <app-user-panel
+              [menuItems]="userMenuItems"
+              menuMode="context"
+            ></app-user-panel>
+          </div>
+        </dx-button>
+      </div>
+    </dxi-item>
+    <!-- [user]="user" -->
+    <div *dxTemplate="let data of 'menuItem'">
+      <app-user-panel
+        [menuItems]="userMenuItems"
+        menuMode="list"
+      ></app-user-panel>
+    </div>
+  </dx-toolbar>
+</header>
