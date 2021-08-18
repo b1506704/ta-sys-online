@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ng-health-care-demo": {
+    "ta-sys-online": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -36,7 +36,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/ng-health-care-demo",
+            "outputPath": "dist/ta-sys-online",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -115,10 +115,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "ng-health-care-demo:build:production"
+              "browserTarget": "ta-sys-online:build:production"
             },
             "development": {
-              "browserTarget": "ng-health-care-demo:build:development"
+              "browserTarget": "ta-sys-online:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -126,7 +126,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ng-health-care-demo:build"
+            "browserTarget": "ta-sys-online:build"
           }
         },
         "test": {
@@ -145,5 +145,5 @@
       }
     }
   },
-  "defaultProject": "ng-health-care-demo"
+  "defaultProject": "ta-sys-online"
 }
