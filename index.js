@@ -21,7 +21,9 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 80;
-const dbUri = process.env.MONGODB_URI;
+const dbUri =
+  process.env.MONGODB_URI ||
+  "mongodb+srv://b1506704:5969_Dante@cluster0.ca6vp.mongodb.net/HealthCareDB?retryWrites=true&w=majority";
 
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
