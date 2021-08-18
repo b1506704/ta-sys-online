@@ -25,8 +25,8 @@ jobs:
 
     - name: npm install, build, and test
       run: |
-        cd client && npm install && npm run aot
-        # npm install
+        cd client && npm install && npm run build
+        cd .. && npm install && npm run start
         # npm run start --if-present        
 
     - name: Run Azure webapp deploy action using publish profile credentials
