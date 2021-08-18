@@ -20,7 +20,7 @@ import customerRoutes from "./routes/customers.js";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 302;
+const PORT = process.env.PORT || 1377;
 const dbUri =
   process.env.MONGODB_URI ||
   "mongodb+srv://b1506704:5969_Dante@cluster0.ca6vp.mongodb.net/HealthCareDB?retryWrites=true&w=majority";
