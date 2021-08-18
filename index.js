@@ -20,7 +20,7 @@ import customerRoutes from "./routes/customers.js";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 302;
 const dbUri =
   process.env.MONGODB_URI ||
   "mongodb+srv://b1506704:5969_Dante@cluster0.ca6vp.mongodb.net/HealthCareDB?retryWrites=true&w=majority";
@@ -180,8 +180,8 @@ io.on("connection", (socket) => {
   console.log(`Socket ${socket.id} has connected`);
 });
 
-app.use(express.static("./client/dist/ng-health-care-demo"));
+app.use(express.static("./client/dist/ta-sys-online"));
 
 app.get("/*", function (req, res) {
-  res.sendFile("index.html", { root: "./client/dist/ng-health-care-demo" });
+  res.sendFile("index.html", { root: "./client/dist/ta-sys-online" });
 });
