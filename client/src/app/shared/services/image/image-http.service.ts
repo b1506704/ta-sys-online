@@ -10,22 +10,11 @@ import { Image } from '../../models/image';
 export class ImageHttpService {
   constructor(private http: HttpClient) {}
   apiImageUrl =
-    'https://testazure20210818213157.azurewebsites.net/WeatherForecast';
+    'https://testazure20210818213157.azurewebsites.net';
   // apiImageUrl = 'http://localhost/images';
 
-  testApi(msg: Object): Observable<Object> {
-    return this.http.post<Object>(
-      this.apiImageUrl,
-      { msg },
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
   testGetApi(): Observable<any> {
-    return this.http.get<any>(this.apiImageUrl, {
+    return this.http.get<any>(this.apiImageUrl + '/all', {
       reportProgress: true,
       observe: 'body',
     });

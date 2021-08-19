@@ -41,31 +41,16 @@ export class ImageStore extends StateService<ImageState> {
     super(initialState);
   }
 
-  testApi() {
-    this.store.setIsLoading(true);
-    this.imageService
-      .testApi({ id: 0, mess: 'test message' })
-      .subscribe((data: any) => {
-        this.store.setIsLoading(false);
-        if (data !== null) {
-          this.setState({ responseMsg: data });
-          console.log(this.state.responseMsg);
-          console.log(data);
-        }
-      });
-  }
   testGetApi() {
     this.store.setIsLoading(true);
-    this.imageService
-      .testGetApi()
-      .subscribe((data: any) => {
-        this.store.setIsLoading(false);
-        if (data !== null) {
-          this.setState({ responseMsg: data });
-          console.log(this.state.responseMsg);
-          console.log(data);
-        }
-      });
+    this.imageService.testGetApi().subscribe((data: any) => {
+      this.store.setIsLoading(false);
+      if (data !== null) {
+        this.setState({ responseMsg: data });
+        console.log(this.state.responseMsg);
+        console.log(data);
+      }
+    });
   }
   /**
    * This is a function which fills the items received from pagination in a specific store's state variable.
