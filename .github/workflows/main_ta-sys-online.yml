@@ -22,9 +22,8 @@ jobs:
         node-version: '14.x'
 
     - name: npm install, build, and test
-      run: |
-        cd client && npm install && npm run build
-        cd .. && npm install        
+      run: |        
+        npm install        
 
     - name: Upload artifact for deployment job
       uses: actions/upload-artifact@v2
