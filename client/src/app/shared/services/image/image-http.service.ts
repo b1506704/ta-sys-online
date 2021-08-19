@@ -1,5 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AnyCnameRecord } from 'dns';
 import { Observable } from 'rxjs';
 import { Image } from '../../models/image';
 
@@ -8,7 +9,8 @@ import { Image } from '../../models/image';
 })
 export class ImageHttpService {
   constructor(private http: HttpClient) {}
-  apiImageUrl = 'https://testazure20210818213157.azurewebsites.net/WeatherForecast';
+  apiImageUrl =
+    'https://testazure20210818213157.azurewebsites.net/WeatherForecast';
   // apiImageUrl = 'http://localhost/images';
 
   testApi(msg: Object): Observable<Object> {
@@ -20,6 +22,13 @@ export class ImageHttpService {
         observe: 'body',
       }
     );
+  }
+
+  testGetApi(): Observable<any> {
+    return this.http.get<any>(this.apiImageUrl, {
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
   fetchImage(page: number, size: number): Observable<Image> {

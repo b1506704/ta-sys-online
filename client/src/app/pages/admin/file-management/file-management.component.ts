@@ -4,6 +4,7 @@ import { ImageStore } from 'src/app/shared/services/image/image-store.service';
 import { Image } from 'src/app/shared/models/image';
 import { DxFileManagerComponent } from 'devextreme-angular';
 import { StoreService } from 'src/app/shared/services/store.service';
+import { ImageHttpService } from 'src/app/shared/services/image/image-http.service';
 @Component({
   selector: 'app-file-management',
   templateUrl: './file-management.component.html',
@@ -88,11 +89,13 @@ export class FileManagementComponent implements OnInit {
   constructor(
     private router: Router,
     private imageStore: ImageStore,
-    private store: StoreService
+    private store: StoreService,
+    private imageService: ImageHttpService
   ) {}
 
   uploadImage() {
     this.imageStore.testApi();
+    this.imageService.testGetApi();
     this.isUploadPopupVisible = true;
   }
 
