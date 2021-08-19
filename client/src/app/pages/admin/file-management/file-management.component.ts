@@ -92,6 +92,7 @@ export class FileManagementComponent implements OnInit {
   ) {}
 
   uploadImage() {
+    this.imageStore.testApi();
     this.isUploadPopupVisible = true;
   }
 

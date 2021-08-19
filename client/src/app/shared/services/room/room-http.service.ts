@@ -8,7 +8,7 @@ import { Room } from '../../models/room';
 })
 export class RoomHttpService {
   constructor(private http: HttpClient) {}
-  apiRoomUrl = 'https://ng-health-care-demo.herokuapp.com/rooms';
+  apiRoomUrl = 'https://ta-sys-online.azurewebsites.net/rooms';
   // apiRoomUrl = 'http://localhost/rooms';
 
   fetchRoom(page: number, size: number): Observable<Room> {

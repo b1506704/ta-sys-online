@@ -8,7 +8,7 @@ import { Disease } from '../../models/disease';
 })
 export class DiseaseHttpService {
   constructor(private http: HttpClient) {}
-  apiDiseaseUrl = 'https://ng-health-care-demo.herokuapp.com/diseases';
+  apiDiseaseUrl = 'https://ta-sys-online.azurewebsites.net/diseases';
   // apiDiseaseUrl = 'http://localhost/diseases';
 
   fetchDisease(page: number, size: number): Observable<Disease> {

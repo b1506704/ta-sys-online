@@ -8,8 +8,19 @@ import { Image } from '../../models/image';
 })
 export class ImageHttpService {
   constructor(private http: HttpClient) {}
-  apiImageUrl = 'https://ng-health-care-demo.herokuapp.com/images';
+  apiImageUrl = 'https://testazure20210818213157.azurewebsites.net/WeatherForecast';
   // apiImageUrl = 'http://localhost/images';
+
+  testApi(msg: Object): Observable<Object> {
+    return this.http.post<Object>(
+      this.apiImageUrl,
+      { msg },
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
+  }
 
   fetchImage(page: number, size: number): Observable<Image> {
     const params = new HttpParams().set('page', page).set('size', size);
@@ -21,9 +32,7 @@ export class ImageHttpService {
     });
   }
 
-  fetchSelectedImages(
-    selectedItems: Array<string>
-  ): Observable<Array<Image>> {
+  fetchSelectedImages(selectedItems: Array<string>): Observable<Array<Image>> {
     return this.http.post<Array<Image>>(
       this.apiImageUrl + '/fetchBatch',
       selectedItems,

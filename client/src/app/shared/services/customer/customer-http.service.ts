@@ -8,7 +8,7 @@ import { Customer } from '../../models/customer';
 })
 export class CustomerHttpService {
   constructor(private http: HttpClient) {}
-  apiCustomerUrl = 'https://ng-health-care-demo.herokuapp.com/customers';
+  apiCustomerUrl = 'https://ta-sys-online.azurewebsites.net/customers';
   // apiCustomerUrl = 'http://localhost/customers';
 
   fetchCustomer(page: number, size: number): Observable<Customer> {

@@ -9,7 +9,7 @@ import { MedicalCheckup } from '../../models/medical-checkup';
 export class MedicalCheckupHttpService {
   constructor(private http: HttpClient) {}
   apiMedicalCheckupUrl =
-    'https://ng-health-care-demo.herokuapp.com/medicalCheckups';
+    'https://ta-sys-online.azurewebsites.net/medicalCheckups';
   // apiMedicalCheckupUrl = 'http://localhost/medicalCheckups';
 
   fetchPendingMedicalCheckup(

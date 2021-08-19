@@ -8,7 +8,7 @@ import { Bill } from '../../models/bill';
 })
 export class BillHttpService {
   constructor(private http: HttpClient) {}
-  apiBillUrl = 'https://ng-health-care-demo.herokuapp.com/bills';
+  apiBillUrl = 'https://ta-sys-online.azurewebsites.net/bills';
   // apiBillUrl = 'http://localhost/bills';
 
   fetchBill(page: number, size: number): Observable<Bill> {

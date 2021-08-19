@@ -8,7 +8,7 @@ import { Prescription } from '../../models/prescription';
 })
 export class PrescriptionHttpService {
   constructor(private http: HttpClient) {}
-  apiPrescriptionUrl = 'https://ng-health-care-demo.herokuapp.com/prescriptions';
+  apiPrescriptionUrl = 'https://ta-sys-online.azurewebsites.net/prescriptions';
   // apiPrescriptionUrl = 'http://localhost/prescriptions';
 
   fetchPrescription(page: number, size: number): Observable<Prescription> {
