@@ -17,7 +17,7 @@ export class SignUpComponent implements OnInit {
   };
   user: User;
   bloodType: Array<String> = ['A', 'B', 'O'];
-  isCustomerInfoVisible: boolean = false;
+  isLearnerInfoVisible: boolean = false;
   checkBoxOptions: any;
   signupButtonOptions: any = {
     text: 'Signup',
@@ -52,13 +52,13 @@ export class SignUpComponent implements OnInit {
       text: 'Additional Information',
       value: false,
       onValueChanged: (e: any) => {
-        this.isCustomerInfoVisible = e.component.option('value');
+        this.isLearnerInfoVisible = e.component.option('value');
       },
     };
     this.user = {
       userName: '',
       passWord: '',
-      role: 'Customer',
+      role: 'Learner',
     };
   }
 }

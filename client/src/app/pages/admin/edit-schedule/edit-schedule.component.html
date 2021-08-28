@@ -105,7 +105,7 @@
   </dxo-pager>
   <dxo-load-panel [enabled]="true"></dxo-load-panel>
 
-  <dxi-column dataField="doctorID" [width]="150">
+  <dxi-column dataField="instructorID" [width]="150">
     <dxi-validation-rule type="required"></dxi-validation-rule>
   </dxi-column>
 
@@ -117,9 +117,9 @@
     <dxi-validation-rule type="required"></dxi-validation-rule>
   </dxi-column>
 
-  <dxi-column dataField="doctorName" [caption]="'Doctor Name'">
+  <dxi-column dataField="instructorName" [caption]="'Instructor Name'">
     <dxi-validation-rule type="required"></dxi-validation-rule>
-    <dxo-lookup [dataSource]="doctorList" displayExpr="name" valueExpr="name">
+    <dxo-lookup [dataSource]="instructorList" displayExpr="name" valueExpr="name">
     </dxo-lookup>
   </dxi-column>
 

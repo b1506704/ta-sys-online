@@ -23,9 +23,9 @@ export class EditUserListComponent implements OnInit, OnDestroy {
   userList!: Array<User>;
   roleList: Array<Object> = [
     { name: '(NONE)' },
-    { name: 'Customer' },
+    { name: 'Learner' },
     { name: 'Admin' },
-    { name: 'Doctor' },
+    { name: 'Instructor' },
   ];
   selectedRows: string[];
   isSelectInfoVisible: boolean;
@@ -679,8 +679,8 @@ export class EditUserListComponent implements OnInit, OnDestroy {
     this.userStore.deleteAllUsers();
   }
 
-  navigateToEditCustomer() {
-    this.router.navigate(['/edit_customer_list']);
+  navigateToEditLearner() {
+    this.router.navigate(['/edit_learner_list']);
   }
 
   sourceDataListener() {

@@ -1,7 +1,7 @@
-export const navigationCustomer = [
+export const navigationLearner = [
   {
     text: 'Home',
-    path: '/customer_home',
+    path: '/learner_home',
     icon: 'home',
   },
   {
@@ -9,19 +9,19 @@ export const navigationCustomer = [
     icon: 'help',
     items: [
       {
-        text: 'Doctor',
-        path: '/doctor_list',
+        text: 'Instructor',
+        path: '/instructor_list',
       },
       {
-        text: 'Medicine',
-        path: '/medicine_list',
+        text: 'Test',
+        path: '/test_list',
       },
     ],
   },
   {
-    text: 'Doctor Schedule',
+    text: 'Instructor Schedule',
     icon: 'event',
-    path: '/doctor_schedule',
+    path: '/instructor_schedule',
   },
   {
     text: 'Heath Care',
@@ -39,10 +39,10 @@ export const navigationCustomer = [
   },
 ];
 
-export const navigationDoctor = [
+export const navigationInstructor = [
   {
     text: 'Home',
-    path: '/doctor_home',
+    path: '/instructor_home',
     icon: 'home',
   },
   {
@@ -50,12 +50,12 @@ export const navigationDoctor = [
     icon: 'filter',
     items: [
       {
-        text: 'Edit Medicine',
-        path: '/edit_medicine_list',
+        text: 'Edit Test',
+        path: '/edit_test_list',
       },
       {
-        text: 'Edit Disease',
-        path: '/edit_disease_list',
+        text: 'Edit Lesson',
+        path: '/edit_lesson_list',
       },
     ],
   },
@@ -94,12 +94,12 @@ export const navigationAdmin = [
         path: '/edit_user_list',
       },
       {
-        text: 'Edit Customer',
-        path: '/edit_customer_list',
+        text: 'Edit Learner',
+        path: '/edit_learner_list',
       },
       {
-        text: 'Edit Doctor',
-        path: '/edit_doctor_list',
+        text: 'Edit Instructor',
+        path: '/edit_instructor_list',
       },
     ],
   },

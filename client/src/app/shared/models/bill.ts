@@ -1,7 +1,6 @@
 export interface Bill {
   _id: String;
-  prescriptionID: String;
-  customerID: String;
+  courseID: String;
+  userID: String;
   totalCost: Number;
-  healthInsurance: String;
 }

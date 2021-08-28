@@ -107,14 +107,14 @@ export class UploadToolComponent implements OnInit, OnDestroy, OnChanges {
 
   setImageCategory() {
     switch (this.directory) {
-      case 'Images/Doctors':
-        this.imageData.category = 'doctor';
+      case 'Images/Instructors':
+        this.imageData.category = 'instructor';
         break;
-      case 'Images/Customers':
-        this.imageData.category = 'customer';
+      case 'Images/Learners':
+        this.imageData.category = 'learner';
         break;
-      case 'Images/Medicines':
-        this.imageData.category = 'medicine';
+      case 'Images/Tests':
+        this.imageData.category = 'test';
         break;
       default:
         break;

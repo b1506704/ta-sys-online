@@ -70,14 +70,14 @@ export class HeaderComponent implements OnInit {
             case 'admin':
               this.router.navigate(['/admin_home']);
               break;
-            case 'doctor':
-              this.router.navigate(['/doctor_home']);
+            case 'instructor':
+              this.router.navigate(['/instructor_home']);
               break;
-            case 'customer':
-              this.router.navigate(['/customer_home']);
+            case 'learner':
+              this.router.navigate(['/learner_home']);
               break;
             default:
-              this.router.navigate(['/doctor_home']);
+              this.router.navigate(['/instructor_home']);
               break;
           }
         });

@@ -44,7 +44,7 @@
             [label]="{ text: 'Role' }"
             editorType="dxSelectBox"
             [editorOptions]="{
-              items: ['Customer', 'Doctor', 'Admin'],
+              items: ['Learner', 'Instructor', 'Admin'],
               value: currentRole,
               disabled: true
             }"
@@ -71,17 +71,17 @@
       <dxi-item itemType="group"></dxi-item>
     </dx-form>
   </form>
-  <ng-container *ngIf="currentRole === 'Customer'">
+  <ng-container *ngIf="currentRole === 'Learner'">
     <form
-      id="customer-form-container"
-      (submit)="onCustomerSubmit($event)"
+      id="learner-form-container"
+      (submit)="onLearnerSubmit($event)"
       [classList]="['signupForm']"
     >
       <dx-form
-        id="customer-form"
-        [formData]="customerData"
+        id="learner-form"
+        [formData]="learnerData"
         [showValidationSummary]="true"
-        validationGroup="customerData"
+        validationGroup="learnerData"
       >
         <dxi-item itemType="group">
           <dxi-item itemType="group" caption="Personal Information">
@@ -122,7 +122,7 @@
               editorType="dxSelectBox"
               [editorOptions]="{
                 items: ['Male', 'Female'],
-                value: customerData?.gender
+                value: learnerData?.gender
               }"
             >
               <dxi-validation-rule type="required" message="Gender is required">
@@ -142,19 +142,19 @@
               >
               </dxi-validation-rule>
             </dxi-item>
-            <dxi-item
+            <!-- <dxi-item
               dataField="bloodType"
               [label]="{ text: 'Gender' }"
               editorType="dxSelectBox"
               [editorOptions]="{
                 items: ['O', 'A', 'B'],
-                value: customerData?.bloodType
+                value: learnerData?.bloodType
               }"
             >
               <dxi-validation-rule type="required" message="Gender is required">
               </dxi-validation-rule>
-            </dxi-item>
-            <dxi-item
+            </dxi-item> -->
+            <!-- <dxi-item
               dataField="height"
               [label]="{ text: 'Height' }"
               editorType="dxNumberBox"
@@ -195,7 +195,7 @@
                 [min]="1"
               >
               </dxi-validation-rule>
-            </dxi-item>
+            </dxi-item> -->
             <dxi-item
               dataField="address"
               [label]="{ text: 'Address' }"
@@ -221,13 +221,13 @@
               <dxi-item
                 itemType="button"
                 horizontalAlignment="center"
-                [buttonOptions]="submitCustomerButtonOptions"
+                [buttonOptions]="submitLearnerButtonOptions"
               >
               </dxi-item>
               <dxi-item
                 itemType="button"
                 horizontalAlignment="center"
-                [buttonOptions]="resetCustomerButtonOptions"
+                [buttonOptions]="resetLearnerButtonOptions"
               >
               </dxi-item>
             </dxi-item>
@@ -236,17 +236,17 @@
       </dx-form>
     </form>
   </ng-container>
-  <ng-container *ngIf="currentRole === 'Doctor'">
+  <ng-container *ngIf="currentRole === 'Instructor'">
     <form
-      id="doctor-form-container"
-      (submit)="onDoctorSubmit($event)"
+      id="instructor-form-container"
+      (submit)="onInstructorSubmit($event)"
       [classList]="['signupForm']"
     >
       <dx-form
-        id="doctor-form"
-        [formData]="doctorData"
+        id="instructor-form"
+        [formData]="instructorData"
         [showValidationSummary]="true"
-        validationGroup="doctorData"
+        validationGroup="instructorData"
       >
         <dxi-item itemType="group">
           <dxi-item itemType="group" caption="Personal Information">
@@ -287,7 +287,7 @@
               editorType="dxSelectBox"
               [editorOptions]="{
                 items: ['Male', 'Female'],
-                value: doctorData?.gender
+                value: instructorData?.gender
               }"
             >
               <dxi-validation-rule type="required" message="Gender is required">
@@ -312,8 +312,8 @@
               [label]="{ text: 'Role' }"
               editorType="dxSelectBox"
               [editorOptions]="{
-                items: ['Doctor', 'Nurses', 'Assistants'],
-                value: doctorData?.role
+                items: ['Instructor', 'Nurses', 'Assistants'],
+                value: instructorData?.role
               }"
             >
               <dxi-validation-rule type="required" message="Role is required">
@@ -335,7 +335,7 @@
                   'Infectious',
                   'Ophthalmology'
                 ],
-                value: doctorData?.department
+                value: instructorData?.department
               }"
             >
               <dxi-validation-rule
@@ -386,13 +386,13 @@
               <dxi-item
                 itemType="button"
                 horizontalAlignment="center"
-                [buttonOptions]="submitDoctorButtonOptions"
+                [buttonOptions]="submitInstructorButtonOptions"
               >
               </dxi-item>
               <dxi-item
                 itemType="button"
                 horizontalAlignment="center"
-                [buttonOptions]="resetDoctorButtonOptions"
+                [buttonOptions]="resetInstructorButtonOptions"
               >
               </dxi-item>
             </dxi-item>

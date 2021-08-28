@@ -5,102 +5,101 @@ import { AuthGuardService } from './shared/services/auth-guard.service';
 
 const routes: Routes = [
   {
-    path: 'customer_home',
+    path: 'learner_home',
     loadChildren: () =>
-      import('./pages/customer/customer_home/customer-home.module').then(
-        (m) => m.CustomerHomeModule
+      import('./pages/learner/learner_home/learner-home.module').then(
+        (m) => m.LearnerHomeModule
       ),
   },
   {
-    path: 'doctor_list',
+    path: 'instructor_list',
     loadChildren: () =>
-      import('./pages/customer/doctor-list/doctor-list.module').then(
-        (m) => m.DoctorListModule
+      import('./pages/learner/instructor-list/instructor-list.module').then(
+        (m) => m.InstructorListModule
       ),
   },
   {
-    path: 'medicine_list',
+    path: 'test_list',
     loadChildren: () =>
-      import('./pages/customer/medicine-list/medicine-list.module').then(
-        (m) => m.MedicineListModule
+      import('./pages/learner/test-list/test-list.module').then(
+        (m) => m.TestListModule
       ),
   },
+  // {
+  //   path: 'health_condition',
+  //   loadChildren: () =>
+  //     import('./pages/learner/health-condition/health-condition.module').then(
+  //       (m) => m.HealthConditionModule
+  //     ),
+  //   canActivate: [AuthGuardService],
+  // },
+  // {
+  //   path: 'medical_checkup',
+  //   loadChildren: () =>
+  //     import('./pages/learner/medical-checkup/medical-checkup.module').then(
+  //       (m) => m.MedicalCheckupModule
+  //     ),
+  //   canActivate: [AuthGuardService],
+  // },
   {
-    path: 'health_condition',
+    path: 'instructor_schedule',
     loadChildren: () =>
-      import('./pages/customer/health-condition/health-condition.module').then(
-        (m) => m.HealthConditionModule
-      ),
-    canActivate: [AuthGuardService],
-  },
-  {
-    path: 'medical_checkup',
-    loadChildren: () =>
-      import('./pages/customer/medical-checkup/medical-checkup.module').then(
-        (m) => m.MedicalCheckupModule
-      ),
-    canActivate: [AuthGuardService],
-  },
-  {
-    path: 'doctor_schedule',
-    loadChildren: () =>
-      import('./pages/customer/schedule-list/schedule-list.module').then(
+      import('./pages/learner/schedule-list/schedule-list.module').then(
         (m) => m.ScheduleListModule
       ),
     canActivate: [AuthGuardService],
   },
-  // doctor route
+  // instructor route
   {
-    path: 'doctor_home',
+    path: 'instructor_home',
     loadChildren: () =>
-      import('./pages/doctor/doctor_home/doctor-home.module').then(
-        (m) => m.DoctorHomeModule
+      import('./pages/instructor/instructor_home/instructor-home.module').then(
+        (m) => m.InstructorHomeModule
       ),
   },
-  {
-    path: 'edit_medicine_list',
-    loadChildren: () =>
-      import(
-        './pages/doctor/edit-medicine-list/edit-medicine-list.module'
-      ).then((m) => m.EditMedicineListModule),
-    canActivate: [AuthGuardService],
-  },
-  {
-    path: 'edit_disease_list',
-    loadChildren: () =>
-      import('./pages/doctor/edit-disease-list/edit-disease-list.module').then(
-        (m) => m.EditDiseaseListModule
-      ),
-    canActivate: [AuthGuardService],
-  },
-  {
-    path: 'room_monitor',
-    loadChildren: () =>
-      import('./pages/doctor/room-monitor/room-monitor.module').then(
-        (m) => m.RoomMonitorModule
-      ),
-    canActivate: [AuthGuardService],
-  },
-  {
-    path: 'room/:id',
-    loadChildren: () =>
-      import(
-        './pages/doctor/edit-health-condition-list/edit-health-condition-list.module'
-      ).then((m) => m.EditHealthConditionModule),
-  },
-
-  {
-    path: 'edit_medical_checkup_list',
-    loadChildren: () =>
-      import(
-        './pages/doctor/edit-medical-checkup-list/edit-medical-checkup-list.module'
-      ).then((m) => m.EditMedicalCheckupListModule),
-    canActivate: [AuthGuardService],
-  },
+  // {
+  //   path: 'edit_test_list',
+  //   loadChildren: () =>
+  //     import(
+  //       './pages/instructor/edit-test-list/edit-test-list.module'
+  //     ).then((m) => m.EditTestListModule),
+  //   canActivate: [AuthGuardService],
+  // },
+  // {
+  //   path: 'edit_lesson_list',
+  //   loadChildren: () =>
+  //     import('./pages/instructor/edit-lesson-list/edit-lesson-list.module').then(
+  //       (m) => m.EditLessonListModule
+  //     ),
+  //   canActivate: [AuthGuardService],
+  // },
+  // {
+  //   path: 'room_monitor',
+  //   loadChildren: () =>
+  //     import('./pages/instructor/room-monitor/room-monitor.module').then(
+  //       (m) => m.RoomMonitorModule
+  //     ),
+  //   canActivate: [AuthGuardService],
+  // },
+  // {
+  //   path: 'room/:id',
+  //   loadChildren: () =>
+  //     import(
+  //       './pages/instructor/edit-health-condition-list/edit-health-condition-list.module'
+  //     ).then((m) => m.EditHealthConditionModule),
+  // },
+  // {
+  //   path: 'edit_medical_checkup_list',
+  //   loadChildren: () =>
+  //     import(
+  //       './pages/instructor/edit-medical-checkup-list/edit-medical-checkup-list.module'
+  //     ).then((m) => m.EditMedicalCheckupListModule),
+  //   canActivate: [AuthGuardService],
+  // },
   {
     path: 'schedule_list',
     loadChildren: () =>
-      import('./pages/doctor/schedule-list/schedule-list.module').then(
+      import('./pages/instructor/schedule-list/schedule-list.module').then(
         (m) => m.ScheduleListModule
       ),
     canActivate: [AuthGuardService],
@@ -123,18 +122,18 @@ const routes: Routes = [
     canActivate: [AuthGuardService],
   },
   {
-    path: 'edit_customer_list',
+    path: 'edit_learner_list',
     loadChildren: () =>
-      import('./pages/admin/edit-customer-list/edit-customer-list.module').then(
-        (m) => m.EditCustomerModule
+      import('./pages/admin/edit-learner-list/edit-learner-list.module').then(
+        (m) => m.EditLearnerModule
       ),
     canActivate: [AuthGuardService],
   },
   {
-    path: 'edit_doctor_list',
+    path: 'edit_instructor_list',
     loadChildren: () =>
-      import('./pages/admin/edit-doctor-list/edit-doctor-list.module').then(
-        (m) => m.EditDoctorListModule
+      import('./pages/admin/edit-instructor-list/edit-instructor-list.module').then(
+        (m) => m.EditInstructorListModule
       ),
     canActivate: [AuthGuardService],
   },
@@ -210,7 +209,7 @@ const routes: Routes = [
   // {
   //   path: '',
   //   pathMatch: 'full',
-  //   redirectTo: 'doctor_home',
+  //   redirectTo: 'instructor_home',
   // },
   {
     path: '**',

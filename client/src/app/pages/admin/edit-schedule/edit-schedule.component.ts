@@ -21,7 +21,7 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
   @ViewChild(DxDataGridComponent, { static: false })
   dataGrid: DxDataGridComponent;
   scheduleList!: Array<Schedule>;
-  doctorList: Array<Object> = [
+  instructorList: Array<Object> = [
     { name: '(NONE)' },
     { name: 'Dr. Strange Clone' },
     { name: 'Dr. Alpha Clone' },
@@ -144,11 +144,11 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
         locateInMenu: 'auto',
         widget: 'dxSelectBox',
         options: {
-          items: this.doctorList,
+          items: this.instructorList,
           valueExpr: 'name',
           // searchExpr: 'name',
           displayExpr: 'name',
-          placeholder: 'Filter with doctor name',
+          placeholder: 'Filter with instructor name',
           // searchEnabled: true,
           onValueChanged: this.onFilterChange.bind(this),
         },

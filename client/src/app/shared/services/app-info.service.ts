@@ -5,7 +5,7 @@ export class AppInfoService {
   constructor() {}
 
   public get title() {
-    return 'Tesla Clinic';
+    return 'TASysOnline';
   }
 
   public get currentYear() {

@@ -7,9 +7,9 @@ import { StoreService } from '../../services/store.service';
 import { User } from '../../models/user';
 import { Image } from '../../models/image';
 import { ImageStore } from '../../services/image/image-store.service';
-import { Customer } from '../../models/customer';
-import { CustomerStore } from '../../services/customer/customer-store.service';
-import { DoctorStore } from '../../services/doctor/doctor-store.service';
+import { Learner } from '../../models/learner';
+import { LearnerStore } from '../../services/learner/learner-store.service';
+import { InstructorStore } from '../../services/instructor/instructor-store.service';
 
 @Component({
   selector: 'app-user-panel',
@@ -23,8 +23,8 @@ export class UserPanelComponent implements OnInit, OnDestroy {
   @Input()
   menuMode!: string;
   // user!: any;
-  customerData!: Customer;
-  doctorData!: any;
+  learnerData!: Learner;
+  instructorData!: any;
   currentUser!: User;
   currentRole!: string;
   userImage: Image = {
@@ -39,8 +39,8 @@ export class UserPanelComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: StoreService,
-    private customerStore: CustomerStore,
-    private doctorStore: DoctorStore,
+    private learnerStore: LearnerStore,
+    private instructorStore: InstructorStore,
     private imageStore: ImageStore
   ) {}
 
@@ -58,10 +58,10 @@ export class UserPanelComponent implements OnInit, OnDestroy {
     });
   }
 
-  customerDataListener() {
-    return this.customerStore.$customerInstance.subscribe((data: any) => {
+  learnerDataListener() {
+    return this.learnerStore.$learnerInstance.subscribe((data: any) => {
       if (data !== undefined) {
-        this.customerData = data;
+        this.learnerData = data;
         this.imageStore.getImageBySourceID(data._id).then(() => {
           this.imageDataListener();
         });
@@ -69,10 +69,10 @@ export class UserPanelComponent implements OnInit, OnDestroy {
     });
   }
 
-  doctorDataListener() {
-    return this.doctorStore.$doctorInstance.subscribe((data: any) => {
+  instructorDataListener() {
+    return this.instructorStore.$instructorInstance.subscribe((data: any) => {
       if (data !== undefined) {
-        this.doctorData = data;
+        this.instructorData = data;
         this.imageStore.getImageBySourceID(data._id).then(() => {
           this.imageDataListener();
         });
@@ -92,18 +92,18 @@ export class UserPanelComponent implements OnInit, OnDestroy {
 
   renderSourceData() {
     switch (this.currentRole) {
-      case 'Customer':
-        this.customerStore
-          .getCustomerByUserName(this.currentUser.userName)
+      case 'Learner':
+        this.learnerStore
+          .getLearnerByUserName(this.currentUser.userName)
           .then(() => {
-            this.customerDataListener();
+            this.learnerDataListener();
           });
         break;
-      case 'Doctor':
-        this.doctorStore
-          .getDoctorByUserName(this.currentUser.userName)
+      case 'Instructor':
+        this.instructorStore
+          .getInstructorByUserName(this.currentUser.userName)
           .then(() => {
-            this.doctorDataListener();
+            this.instructorDataListener();
           });
         break;
       default:

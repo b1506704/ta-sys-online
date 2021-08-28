@@ -25,7 +25,7 @@ export class AdminHomeComponent implements OnInit {
       subTitle:
         'Fully functioned editor with office plugin to export PDF and XLSX',
       imgUrl: this.baseImgUrl + 'landing_page_admin_2.jfif',
-      link: 'edit_customer_list',
+      link: 'edit_learner_list',
     },
     {
       title: 'SCHEDULE AND BILL EDITOR',

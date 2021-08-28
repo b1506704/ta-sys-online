@@ -3,7 +3,7 @@ export interface Room {
   number: String;
   vacancyStatus: String;
   totalSlot: Number;
-  customerID: Array<String>;
+  userID: Array<String>;
   admissionDate: Date;
   dischargeDate: Date;
 }

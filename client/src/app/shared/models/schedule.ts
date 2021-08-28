@@ -1,7 +1,7 @@
 export interface Schedule {
     _id: String,
-    doctorID: String,
-    doctorName: String,
+    instructorID: String,
+    instructorName: String,
     startDate: String,
     endDate: String,
     room: Number

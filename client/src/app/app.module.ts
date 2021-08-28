@@ -7,8 +7,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { ScreenService } from './shared/services/screen.service';
 import { AppInfoService } from './shared/services/app-info.service';
 import { HttpClientModule } from '@angular/common/http';
-import { RouteReuseStrategy } from '@angular/router';
-import { CustomReuseStrategy } from './pages/doctor/edit-health-condition-list/edit-health-condition-list.component';
+// import { RouteReuseStrategy } from '@angular/router';
+// import { CustomReuseStrategy } from './pages/instructor/edit-health-condition-list/edit-health-condition-list.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -18,7 +18,11 @@ import { CustomReuseStrategy } from './pages/doctor/edit-health-condition-list/e
     AppRoutingModule,
     HttpClientModule,
   ],
-  providers: [ScreenService, AppInfoService, { provide: RouteReuseStrategy, useClass: CustomReuseStrategy}],
+  providers: [
+    ScreenService,
+    AppInfoService,
+    // { provide: RouteReuseStrategy, useClass: CustomReuseStrategy}
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

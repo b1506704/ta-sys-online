@@ -8,17 +8,17 @@ const routes: Routes = [
     component: StatisticsComponent,
     children: [
       {
-        path: 'customer',
+        path: 'learner',
         loadChildren: () =>
-          import('./customer-statistics/customer-statistics.module').then(
-            (m) => m.CustomerStatisticsModule
+          import('./learner-statistics/learner-statistics.module').then(
+            (m) => m.LearnerStatisticsModule
           ),
       },
       {
-        path: 'doctor',
+        path: 'instructor',
         loadChildren: () =>
-          import('./doctor-statistics/doctor-statistics.module').then(
-            (m) => m.DoctorStatisticsModule
+          import('./instructor-statistics/instructor-statistics.module').then(
+            (m) => m.InstructorStatisticsModule
           ),
       },
     ],

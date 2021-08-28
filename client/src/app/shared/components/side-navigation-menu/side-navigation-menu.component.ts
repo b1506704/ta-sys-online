@@ -16,9 +16,9 @@ import {
   DxTreeViewComponent,
 } from 'devextreme-angular/ui/tree-view';
 import {
-  navigationCustomer,
+  navigationLearner,
   navigationAdmin,
-  navigationDoctor,
+  navigationInstructor,
   navigationNonUser,
 } from '../../../app-navigation';
 
@@ -70,16 +70,16 @@ export class SideNavigationMenuComponent
   renderItemMenu() {
     this.store.$currentRole.subscribe((data: string) => {
       switch (data.trim().toLocaleLowerCase()) {
-        case 'customer':
-          this._items = navigationCustomer.map((item) => {
+        case 'learner':
+          this._items = navigationLearner.map((item) => {
             if (item.path && !/^\//.test(item.path)) {
               item.path = `/${item.path}`;
             }
             return { ...item, expanded: !this._compactMode };
           });
           break;
-        case 'doctor':
-          this._items = navigationDoctor.map((item) => {
+        case 'instructor':
+          this._items = navigationInstructor.map((item) => {
             if (item.path && !/^\//.test(item.path)) {
               item.path = `/${item.path}`;
             }
@@ -113,10 +113,10 @@ export class SideNavigationMenuComponent
         return;
       }
       switch (data.trim().toLocaleLowerCase()) {
-        case 'customer':
+        case 'learner':
           this.menu.instance.option(
             'items',
-            navigationCustomer.map((item) => {
+            navigationLearner.map((item) => {
               if (item.path && !/^\//.test(item.path)) {
                 item.path = `/${item.path}`;
               }
@@ -135,10 +135,10 @@ export class SideNavigationMenuComponent
             })
           );
           break;
-        case 'doctor':
+        case 'instructor':
           this.menu.instance.option(
             'items',
-            navigationDoctor.map((item) => {
+            navigationInstructor.map((item) => {
               if (item.path && !/^\//.test(item.path)) {
                 item.path = `/${item.path}`;
               }

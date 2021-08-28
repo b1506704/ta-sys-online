@@ -2,9 +2,9 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { StoreService } from '../../services/store.service';
 import { User } from '../../models/user';
 import { DxFormComponent } from 'devextreme-angular';
-import { CustomerStore } from '../../services/customer/customer-store.service';
-import { DoctorStore } from '../../services/doctor/doctor-store.service';
-import { Customer } from '../../models/customer';
+import { LearnerStore } from '../../services/learner/learner-store.service';
+import { InstructorStore } from '../../services/instructor/instructor-store.service';
+import { Learner } from '../../models/learner';
 import { ImageStore } from '../../services/image/image-store.service';
 import { Image } from '../../models/image';
 @Component({
@@ -30,13 +30,13 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       this.form.instance.getEditor('userName').focus();
     },
   };
-  submitCustomerButtonOptions: any = {
+  submitLearnerButtonOptions: any = {
     text: 'Submit',
     icon: 'save',
     type: 'normal',
     useSubmitBehavior: true,
   };
-  resetCustomerButtonOptions: any = {
+  resetLearnerButtonOptions: any = {
     text: 'Reset',
     icon: 'refresh',
     type: 'normal',
@@ -46,13 +46,13 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       this.imageData.url = '../../../../assets/imgs/profile.png';
     },
   };
-  submitDoctorButtonOptions: any = {
+  submitInstructorButtonOptions: any = {
     text: 'Submit',
     icon: 'save',
     type: 'normal',
     useSubmitBehavior: true,
   };
-  resetDoctorButtonOptions: any = {
+  resetInstructorButtonOptions: any = {
     text: 'Reset',
     icon: 'refresh',
     type: 'normal',
@@ -63,8 +63,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     },
   };
   user!: any;
-  customerData!: Customer;
-  doctorData!: any;
+  learnerData!: Learner;
+  instructorData!: any;
   currentUser!: User;
   currentRole!: string;
   imageData: Image = {
@@ -79,8 +79,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: StoreService,
-    private customerStore: CustomerStore,
-    private doctorStore: DoctorStore,
+    private learnerStore: LearnerStore,
+    private instructorStore: InstructorStore,
     private imageStore: ImageStore
   ) {}
 
@@ -94,27 +94,27 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     e.preventDefault();
   };
 
-  onCustomerSubmit = (e: any) => {
+  onLearnerSubmit = (e: any) => {
     e.preventDefault();
-    this.imageData.sourceID = this.customerData._id;
-    this.imageData.category = 'customer';
-    this.imageData.title = this.customerData.fullName;
-    this.imageStore.uploadImage(this.imageData, 0, 5);
-    this.customerStore.updateCustomer(
-      this.customerData,
-      this.customerData._id,
+    // this.imageData.sourceID = this.learnerData._id;
+    // this.imageData.category = 'learner';
+    // this.imageData.title = this.learnerData.fullName;
+    // this.imageStore.uploadImage(this.imageData, 0, 5);
+    this.learnerStore.updateLearner(
+      this.learnerData,
+      this.learnerData._id,
       0,
       5
     );
   };
 
-  onDoctorSubmit = (e: any) => {
+  onInstructorSubmit = (e: any) => {
     e.preventDefault();
-    this.imageData.sourceID = this.doctorData._id;
-    this.imageData.category = 'doctor';
-    this.imageData.title = this.doctorData.fullName;
-    this.imageStore.uploadImage(this.imageData, 0, 5);
-    this.doctorStore.updateDoctor(this.doctorData, this.doctorData._id, 0, 5);
+    // this.imageData.sourceID = this.instructorData._id;
+    // this.imageData.category = 'instructor';
+    // this.imageData.title = this.instructorData.fullName;
+    // this.imageStore.uploadImage(this.imageData, 0, 5);
+    this.instructorStore.updateInstructor(this.instructorData, this.instructorData._id, 0, 5);
   };
 
   handleInputChange(e: any) {
@@ -163,10 +163,10 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     });
   }
 
-  customerDataListener() {
-    return this.customerStore.$customerInstance.subscribe((data: any) => {
+  learnerDataListener() {
+    return this.learnerStore.$learnerInstance.subscribe((data: any) => {
       if (data !== undefined) {
-        this.customerData = data;
+        this.learnerData = data;
         this.imageStore.getImageBySourceID(data._id).then(() => {
           this.imageDataListener();
         });
@@ -174,10 +174,10 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     });
   }
 
-  doctorDataListener() {
-    return this.doctorStore.$doctorInstance.subscribe((data: any) => {
+  instructorDataListener() {
+    return this.instructorStore.$instructorInstance.subscribe((data: any) => {
       if (data !== undefined) {
-        this.doctorData = data;
+        this.instructorData = data;
         this.imageStore.getImageBySourceID(data._id).then(() => {
           this.imageDataListener();
         });
@@ -198,11 +198,11 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   renderSourceData() {
     this.user = this.currentUser;
     switch (this.currentRole) {
-      case 'Customer':
-        this.customerStore
-          .getCustomerByUserName(this.currentUser.userName)
+      case 'Learner':
+        this.learnerStore
+          .getLearnerByUserName(this.currentUser.userName)
           .then(() => {
-            this.customerDataListener();
+            this.learnerDataListener();
           });
         this.user = {
           userName: this.user.userName,
@@ -210,11 +210,11 @@ export class UserProfileComponent implements OnInit, OnDestroy {
           role: this.user.role,
         };
         break;
-      case 'Doctor':
-        this.doctorStore
-          .getDoctorByUserName(this.currentUser.userName)
+      case 'Instructor':
+        this.instructorStore
+          .getInstructorByUserName(this.currentUser.userName)
           .then(() => {
-            this.doctorDataListener();
+            this.instructorDataListener();
           });
         this.user = {
           userName: this.user.userName,

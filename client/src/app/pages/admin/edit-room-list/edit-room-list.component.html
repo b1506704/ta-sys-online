@@ -109,7 +109,7 @@
     <dxi-validation-rule type="required"></dxi-validation-rule>
   </dxi-column>
 
-  <!-- <dxi-column dataField="customerID" [width]="150">
+  <!-- <dxi-column dataField="learnerID" [width]="150">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column> -->
 
@@ -126,10 +126,10 @@
   </dxi-column>
 
   <dxi-column
-    dataField="customerID"
+    dataField="learnerID"
     [width]="150"
-    [calculateDisplayValue]="getTotalCustomer"
-    [caption]="'Total Customers'"
+    [calculateDisplayValue]="getTotalLearner"
+    [caption]="'Total Learners'"
     [allowEditing]="false"
   >
   </dxi-column>

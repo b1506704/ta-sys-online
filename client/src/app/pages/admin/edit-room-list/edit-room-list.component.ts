@@ -183,8 +183,8 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
     );
   }
 
-  getTotalCustomer(rowData: any) {
-    if (rowData.customerID) return rowData.customerID.length;
+  getTotalLearner(rowData: any) {
+    if (rowData.learnerID) return rowData.learnerID.length;
   }
 
   onSearchKeyupHandler(e: any) {

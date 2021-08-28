@@ -21,17 +21,17 @@ export class FileManagementComponent implements OnInit {
       isDirectory: true,
       items: [
         {
-          name: 'Customers',
+          name: 'Learners',
           isDirectory: true,
           items: [],
         },
         {
-          name: 'Doctors',
+          name: 'Instructors',
           isDirectory: true,
           items: [],
         },
         {
-          name: 'Medicines',
+          name: 'Tests',
           isDirectory: true,
           items: [],
         },
@@ -138,26 +138,26 @@ export class FileManagementComponent implements OnInit {
 
   refresh() {
     switch (this.currentDirectory) {
-      case 'Images/Doctors':
+      case 'Images/Instructors':
         this.isDirectory = false;
         this.imageStore
-          .initInfiniteFilterByCategoryData('doctor', 0, this.pageSize)
+          .initInfiniteFilterByCategoryData('instructor', 0, this.pageSize)
           .then(() => {
             this.mapImageByCategory();
           });
         break;
-      case 'Images/Customers':
+      case 'Images/Learners':
         this.isDirectory = false;
         this.imageStore
-          .initInfiniteFilterByCategoryData('customer', 0, this.pageSize)
+          .initInfiniteFilterByCategoryData('learner', 0, this.pageSize)
           .then(() => {
             this.mapImageByCategory();
           });
         break;
-      case 'Images/Medicines':
+      case 'Images/Tests':
         this.isDirectory = false;
         this.imageStore
-          .initInfiniteFilterByCategoryData('medicine', 0, this.pageSize)
+          .initInfiniteFilterByCategoryData('test', 0, this.pageSize)
           .then(() => {
             this.mapImageByCategory();
           });
@@ -252,7 +252,7 @@ export class FileManagementComponent implements OnInit {
       for (let i = 0; i < this.imageList.length; i++) {
         const image = this.imageList[i];
         switch (image?.category) {
-          case 'customer':
+          case 'learner':
             this.fileItems[0].items[0].items.push({
               type: image.fileType,
               category: image.category,
@@ -264,7 +264,7 @@ export class FileManagementComponent implements OnInit {
               thumbnail: image.url,
             });
             break;
-          case 'doctor':
+          case 'instructor':
             this.fileItems[0].items[1].items.push({
               type: image.fileType,
               category: image.category,
@@ -276,7 +276,7 @@ export class FileManagementComponent implements OnInit {
               thumbnail: image.url,
             });
             break;
-          case 'medicine':
+          case 'test':
             this.fileItems[0].items[2].items.push({
               type: image.fileType,
               category: image.category,

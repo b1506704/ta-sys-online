@@ -5,7 +5,6 @@ import { StateService } from '../state.service';
 import { StoreService } from '../store.service';
 import { ImageHttpService } from './image-http.service';
 import { confirm } from 'devextreme/ui/dialog';
-import { MedicalCheckupStore } from '../medical-checkup/medical-checkup-store.service';
 
 interface ImageState {
   imageList: Array<Image>;
@@ -36,7 +35,6 @@ export class ImageStore extends StateService<ImageState> {
   constructor(
     private imageService: ImageHttpService,
     private store: StoreService,
-    private medicalCheckupService: MedicalCheckupStore
   ) {
     super(initialState);
   }
@@ -418,7 +416,6 @@ export class ImageStore extends StateService<ImageState> {
             this.setState({ responseMsg: data });
             console.log(data);
             this.loadDataAsync(page, size);
-            this.medicalCheckupService.initCompleteInfiniteData(page, size);
             this.setIsLoading(false);
             this.store.showNotif(data.message, 'custom');
           },
