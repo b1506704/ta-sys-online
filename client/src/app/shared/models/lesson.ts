@@ -1,5 +1,4 @@
 export interface Lesson {
-    _id: String,
-    name: String,
-    description: String
+  name: string;
+  description: string;
 }

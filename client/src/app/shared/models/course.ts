@@ -1,12 +1,14 @@
-import { Lesson } from "./lesson";
-import { Test } from "./test";
-
 export interface Course {
-  id: string;
-  instructorID: String;
-  instructorName: String;
-  learnerID: String;
-  learnerName: String;
-  lessonList: Array<Lesson>;
-  testList: Array<Test>;
+  name: string;
+  summary: string;
+  duration: number;
+  description: string;
+  availableSlot: number;
+  maxSlot: number;
+  rating: number;
+  feedback: string;
+  ratingCount: number;
+  cost: number;
+  subjectId: string;
+  instructorId: string;
 }

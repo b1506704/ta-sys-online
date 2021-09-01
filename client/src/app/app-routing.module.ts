@@ -25,22 +25,6 @@ const routes: Routes = [
         (m) => m.TestListModule
       ),
   },
-  // {
-  //   path: 'health_condition',
-  //   loadChildren: () =>
-  //     import('./pages/learner/health-condition/health-condition.module').then(
-  //       (m) => m.HealthConditionModule
-  //     ),
-  //   canActivate: [AuthGuardService],
-  // },
-  // {
-  //   path: 'medical_checkup',
-  //   loadChildren: () =>
-  //     import('./pages/learner/medical-checkup/medical-checkup.module').then(
-  //       (m) => m.MedicalCheckupModule
-  //     ),
-  //   canActivate: [AuthGuardService],
-  // },
   {
     path: 'instructor_schedule',
     loadChildren: () =>
@@ -57,45 +41,6 @@ const routes: Routes = [
         (m) => m.InstructorHomeModule
       ),
   },
-  // {
-  //   path: 'edit_test_list',
-  //   loadChildren: () =>
-  //     import(
-  //       './pages/instructor/edit-test-list/edit-test-list.module'
-  //     ).then((m) => m.EditTestListModule),
-  //   canActivate: [AuthGuardService],
-  // },
-  // {
-  //   path: 'edit_lesson_list',
-  //   loadChildren: () =>
-  //     import('./pages/instructor/edit-lesson-list/edit-lesson-list.module').then(
-  //       (m) => m.EditLessonListModule
-  //     ),
-  //   canActivate: [AuthGuardService],
-  // },
-  // {
-  //   path: 'room_monitor',
-  //   loadChildren: () =>
-  //     import('./pages/instructor/room-monitor/room-monitor.module').then(
-  //       (m) => m.RoomMonitorModule
-  //     ),
-  //   canActivate: [AuthGuardService],
-  // },
-  // {
-  //   path: 'room/:id',
-  //   loadChildren: () =>
-  //     import(
-  //       './pages/instructor/edit-health-condition-list/edit-health-condition-list.module'
-  //     ).then((m) => m.EditHealthConditionModule),
-  // },
-  // {
-  //   path: 'edit_medical_checkup_list',
-  //   loadChildren: () =>
-  //     import(
-  //       './pages/instructor/edit-medical-checkup-list/edit-medical-checkup-list.module'
-  //     ).then((m) => m.EditMedicalCheckupListModule),
-  //   canActivate: [AuthGuardService],
-  // },
   {
     path: 'schedule_list',
     loadChildren: () =>
@@ -132,9 +77,9 @@ const routes: Routes = [
   {
     path: 'edit_instructor_list',
     loadChildren: () =>
-      import('./pages/admin/edit-instructor-list/edit-instructor-list.module').then(
-        (m) => m.EditInstructorListModule
-      ),
+      import(
+        './pages/admin/edit-instructor-list/edit-instructor-list.module'
+      ).then((m) => m.EditInstructorListModule),
     canActivate: [AuthGuardService],
   },
   {
@@ -150,6 +95,22 @@ const routes: Routes = [
     loadChildren: () =>
       import('./pages/admin/edit-bill-list/edit-bill-list.module').then(
         (m) => m.EditBillListModule
+      ),
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'edit_subject_list',
+    loadChildren: () =>
+      import('./pages/admin/edit-subject-list/edit-subject-list.module').then(
+        (m) => m.EditSubjectListModule
+      ),
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'edit_course_list',
+    loadChildren: () =>
+      import('./pages/admin/edit-course-list/edit-course-list.module').then(
+        (m) => m.EditCourseListModule
       ),
     canActivate: [AuthGuardService],
   },
@@ -206,11 +167,6 @@ const routes: Routes = [
         (m) => m.UserProfileModule
       ),
   },
-  // {
-  //   path: '',
-  //   pathMatch: 'full',
-  //   redirectTo: 'instructor_home',
-  // },
   {
     path: '**',
     redirectTo: 'not_found',

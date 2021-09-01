@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { Test } from 'src/app/shared/models/test';
 import { TestStore } from 'src/app/shared/services/test/test-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
-import brandList from 'src/app/shared/services/test/mock-brand';
 import { DxScrollViewComponent } from 'devextreme-angular';
 
 @Component({
@@ -15,7 +14,6 @@ export class TestListComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   scrollView: DxScrollViewComponent;
   testList!: Array<Test>;
-  brandList: Array<Object> = brandList();
   currentTestID!: string;
   // item loaded per pull down event
   pageSize: number = 10;
@@ -52,7 +50,7 @@ export class TestListComponent implements OnInit, OnDestroy {
   };
 
   filterSelectBoxOptions: any = {
-    items: this.brandList,
+    items: [],
     valueExpr: 'name',
     displayExpr: 'name',
     placeholder: 'Filter with brand',

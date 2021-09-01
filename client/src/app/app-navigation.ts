@@ -13,8 +13,8 @@ export const navigationLearner = [
         path: '/instructor_list',
       },
       {
-        text: 'Test',
-        path: '/test_list',
+        text: 'Subject',
+        path: '/subject_list',
       },
     ],
   },
@@ -24,16 +24,16 @@ export const navigationLearner = [
     path: '/instructor_schedule',
   },
   {
-    text: 'Heath Care',
+    text: 'TASys Network',
     icon: 'like',
     items: [
       {
-        text: 'Health Condition',
-        path: '/health_condition',
+        text: 'Sub menu 1',
+        path: '/bbbbbbb',
       },
       {
-        text: 'Medical Checkup',
-        path: '/medical_checkup',
+        text: 'Sub menu 2',
+        path: '/ddddddd',
       },
     ],
   },
@@ -46,8 +46,8 @@ export const navigationInstructor = [
     icon: 'home',
   },
   {
-    text: 'Medical',
-    icon: 'filter',
+    text: 'Manage Course',
+    icon: 'edit',
     items: [
       {
         text: 'Edit Test',
@@ -60,16 +60,16 @@ export const navigationInstructor = [
     ],
   },
   {
-    text: 'Heath Care',
+    text: 'Menu 2',
     icon: 'like',
     items: [
       {
-        text: 'Monitor Patient',
-        path: '/room_monitor',
+        text: 'Sub menu 1',
+        path: '/aaa',
       },
       {
-        text: 'Edit Medical Checkup',
-        path: '/edit_medical_checkup_list',
+        text: 'Sub menu 2',
+        path: '/bbb',
       },
     ],
   },
@@ -119,7 +119,17 @@ export const navigationAdmin = [
     icon: 'cart',
   },
   {
-    text: 'Image Storage',
+    text: 'Edit Subject',
+    path: '/edit_subject_list',
+    icon: 'paste',
+  },
+  {
+    text: 'Edit Course',
+    path: '/edit_course_list',
+    icon: 'copy',
+  },
+  {
+    text: 'File Storage',
     path: '/file_management',
     icon: 'file',
   },

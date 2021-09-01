@@ -8,13 +8,12 @@ import { Learner } from '../../models/learner';
 })
 export class LearnerHttpService {
   constructor(private http: HttpClient) {}
-  apiLearnerUrl = 'https://ta-sys-online.azurewebsites.net/learners';
-  // apiLearnerUrl = 'http://localhost/learners';
+  apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Learner';
 
   fetchLearner(page: number, size: number): Observable<Learner> {
     const params = new HttpParams().set('page', page).set('size', size);
     console.log(params.toString());
-    return this.http.get<Learner>(this.apiLearnerUrl, {
+    return this.http.get<Learner>(this.apiUrl, {
       params: params,
       reportProgress: true,
       observe: 'body',
@@ -32,7 +31,7 @@ export class LearnerHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Learner>(
-      this.apiLearnerUrl + '/searchByName',
+      this.apiUrl + '/searchByName',
       {},
       {
         params: params,
@@ -55,7 +54,7 @@ export class LearnerHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Learner>(
-      this.apiLearnerUrl,
+      this.apiUrl,
       {},
       {
         params: params,
@@ -76,7 +75,7 @@ export class LearnerHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Learner>(
-      this.apiLearnerUrl + '/filterByCategory',
+      this.apiUrl + '/filterByCategory',
       {},
       {
         params: params,
@@ -97,7 +96,7 @@ export class LearnerHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Learner>(
-      this.apiLearnerUrl + '/filterByJob',
+      this.apiUrl + '/filterByJob',
       {},
       {
         params: params,
@@ -118,7 +117,7 @@ export class LearnerHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Learner>(
-      this.apiLearnerUrl + '/filterByGender',
+      this.apiUrl + '/filterByGender',
       {},
       {
         params: params,
@@ -139,7 +138,7 @@ export class LearnerHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Learner>(
-      this.apiLearnerUrl + '/sortByName',
+      this.apiUrl + '/sortByName',
       {},
       {
         params: params,
@@ -160,7 +159,7 @@ export class LearnerHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Learner>(
-      this.apiLearnerUrl + '/sortByPrice',
+      this.apiUrl + '/sortByPrice',
       {},
       {
         params: params,
@@ -171,7 +170,7 @@ export class LearnerHttpService {
   }
 
   uploadLearner(learner: Learner): Observable<Learner> {
-    return this.http.post<Learner>(this.apiLearnerUrl, learner, {
+    return this.http.post<Learner>(this.apiUrl, learner, {
       reportProgress: true,
       observe: 'body',
     });
@@ -179,7 +178,7 @@ export class LearnerHttpService {
 
   generateRandomLearner(): Observable<Learner> {
     return this.http.post<Learner>(
-      this.apiLearnerUrl + '/randomLearner',
+      this.apiUrl + '/randomLearner',
       {},
       {
         reportProgress: true,
@@ -190,7 +189,7 @@ export class LearnerHttpService {
 
   deleteAllLearners(): Observable<Learner> {
     return this.http.post<Learner>(
-      this.apiLearnerUrl + '/deleteAll',
+      this.apiUrl + '/deleteAll',
       {},
       {
         reportProgress: true,
@@ -200,24 +199,24 @@ export class LearnerHttpService {
   }
 
   deleteLearner(id: string): Observable<ArrayBuffer> {
-    return this.http.delete<ArrayBuffer>(this.apiLearnerUrl + `/${id}`, {
+    return this.http.delete<ArrayBuffer>(this.apiUrl + `/${id}`, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   getLearner(id: string): Observable<Learner> {
-    return this.http.get<Learner>(this.apiLearnerUrl + `/${id}`, {
+    return this.http.get<Learner>(this.apiUrl + `/${id}`, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
-  getLearnerByUserName(userName: string): Observable<Learner> {
-    const params = new HttpParams().set('userName', userName);
+  getLearnerByUserName(username: string): Observable<Learner> {
+    const params = new HttpParams().set('username', username);
     console.log(params.toString());
     return this.http.post<Learner>(
-      this.apiLearnerUrl + '/byUserName',
+      this.apiUrl + '/byUserName',
       {},
       {
         params: params,
@@ -228,10 +227,10 @@ export class LearnerHttpService {
   }
 
   deleteSelectedLearners(
-    selectedItems: Array<String>
-  ): Observable<Array<String>> {
-    return this.http.post<Array<String>>(
-      this.apiLearnerUrl + '/batch',
+    selectedItems: Array<string>
+  ): Observable<Array<string>> {
+    return this.http.post<Array<string>>(
+      this.apiUrl + '/batch',
       selectedItems,
       {
         reportProgress: true,
@@ -242,7 +241,7 @@ export class LearnerHttpService {
 
   updateLearner(learner: Learner, key: string): Observable<Learner> {
     return this.http.post<Learner>(
-      this.apiLearnerUrl + `/updateLearner/${key}`,
+      this.apiUrl + `/updateLearner/${key}`,
       learner,
       {
         reportProgress: true,
@@ -253,7 +252,7 @@ export class LearnerHttpService {
 
   fetchAll(): Observable<Learner> {
     return this.http.post<Learner>(
-      this.apiLearnerUrl + `/fetchAll`,
+      this.apiUrl + `/fetchAll`,
       {},
       {
         reportProgress: true,

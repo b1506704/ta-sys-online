@@ -17,14 +17,14 @@
       <dxi-item itemType="group">
         <dxi-item itemType="group" caption="Account Information">
           <dxi-item
-            dataField="userName"
+            dataField="username"
             [label]="{ text: 'Username' }"
             editorType="dxTextBox"
             [editorOptions]="{ disabled: true }"
           >
           </dxi-item>
           <dxi-item
-            dataField="passWord"
+            dataField="password"
             [label]="{ text: 'Password' }"
             editorType="dxTextBox"
             [editorOptions]="{ mode: 'password' }"
@@ -45,7 +45,7 @@
             editorType="dxSelectBox"
             [editorOptions]="{
               items: ['Learner', 'Instructor', 'Admin'],
-              value: currentRole,
+              value: currentRoleId,
               disabled: true
             }"
           >
@@ -71,7 +71,7 @@
       <dxi-item itemType="group"></dxi-item>
     </dx-form>
   </form>
-  <ng-container *ngIf="currentRole === 'Learner'">
+  <ng-container *ngIf="currentRoleId === 'Learner'">
     <form
       id="learner-form-container"
       (submit)="onLearnerSubmit($event)"
@@ -236,7 +236,7 @@
       </dx-form>
     </form>
   </ng-container>
-  <ng-container *ngIf="currentRole === 'Instructor'">
+  <ng-container *ngIf="currentRoleId === 'Instructor'">
     <form
       id="instructor-form-container"
       (submit)="onInstructorSubmit($event)"

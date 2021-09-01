@@ -15,7 +15,7 @@ interface RoomState {
   totalPages: number;
   currentPage: number;
   totalItems: number;
-  responseMsg: String;
+  responseMsg: string;
 }
 const initialState: RoomState = {
   roomList: [],
@@ -136,7 +136,7 @@ export class RoomStore extends StateService<RoomState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -304,7 +304,7 @@ export class RoomStore extends StateService<RoomState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -329,13 +329,13 @@ export class RoomStore extends StateService<RoomState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
   }
 
-  setIsLoading(_isLoading: Boolean) {
+  setIsLoading(_isLoading: boolean) {
     this.store.setIsLoading(_isLoading);
   }
 
@@ -368,11 +368,11 @@ export class RoomStore extends StateService<RoomState> {
             console.log(data);
             this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -390,11 +390,11 @@ export class RoomStore extends StateService<RoomState> {
             console.log(data);
             this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -424,11 +424,11 @@ export class RoomStore extends StateService<RoomState> {
             this.loadDataAsync(page, size);
             console.log(this.state.roomList);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -449,11 +449,11 @@ export class RoomStore extends StateService<RoomState> {
             this.setState({ totalItems: 0 });
             console.log(data);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -472,11 +472,11 @@ export class RoomStore extends StateService<RoomState> {
             console.log(data);
             this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -532,7 +532,7 @@ export class RoomStore extends StateService<RoomState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -556,7 +556,7 @@ export class RoomStore extends StateService<RoomState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -580,7 +580,7 @@ export class RoomStore extends StateService<RoomState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -604,7 +604,7 @@ export class RoomStore extends StateService<RoomState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -632,7 +632,7 @@ export class RoomStore extends StateService<RoomState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -657,7 +657,7 @@ export class RoomStore extends StateService<RoomState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -681,7 +681,7 @@ export class RoomStore extends StateService<RoomState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -706,7 +706,7 @@ export class RoomStore extends StateService<RoomState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });

@@ -27,7 +27,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     useSubmitBehavior: false,
     onClick: () => {
       this.form.instance.resetValues();
-      this.form.instance.getEditor('userName').focus();
+      this.form.instance.getEditor('username').focus();
     },
   };
   submitLearnerButtonOptions: any = {
@@ -66,7 +66,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   learnerData!: Learner;
   instructorData!: any;
   currentUser!: User;
-  currentRole!: string;
+  currentRoleId!: string;
   imageData: Image = {
     sourceID: '',
     category: '',
@@ -86,7 +86,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   onFormShown(e: any) {
     setTimeout(() => {
-      this.form.instance.getEditor('userName').focus();
+      this.form.instance.getEditor('username').focus();
     }, 200);
   }
 
@@ -102,7 +102,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     // this.imageStore.uploadImage(this.imageData, 0, 5);
     this.learnerStore.updateLearner(
       this.learnerData,
-      this.learnerData._id,
+      this.learnerData.username,
       0,
       5
     );
@@ -158,8 +158,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   userRoleListener() {
-    return this.store.$currentRole.subscribe((data: any) => {
-      this.currentRole = data;
+    return this.store.$currentRoleName.subscribe((data: any) => {
+      this.currentRoleId = data;
     });
   }
 
@@ -197,28 +197,28 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   renderSourceData() {
     this.user = this.currentUser;
-    switch (this.currentRole) {
+    switch (this.currentRoleId) {
       case 'Learner':
         this.learnerStore
-          .getLearnerByUserName(this.currentUser.userName)
+          .getLearnerByUserName(this.currentUser.username)
           .then(() => {
             this.learnerDataListener();
           });
         this.user = {
-          userName: this.user.userName,
-          passWord: this.user.passWord,
+          username: this.user.username,
+          password: this.user.password,
           role: this.user.role,
         };
         break;
       case 'Instructor':
         this.instructorStore
-          .getInstructorByUserName(this.currentUser.userName)
+          .getInstructorByUserName(this.currentUser.username)
           .then(() => {
             this.instructorDataListener();
           });
         this.user = {
-          userName: this.user.userName,
-          passWord: this.user.passWord,
+          username: this.user.username,
+          password: this.user.password,
           role: this.user.role,
         };
         break;
@@ -230,12 +230,12 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.userDataListener();
     this.userRoleListener();
-    this.renderSourceData();
+    // this.renderSourceData();
   }
 
   ngOnDestroy(): void {
     this.userDataListener().unsubscribe();
     this.userRoleListener().unsubscribe();
-    this.imageDataListener().unsubscribe();
+    // this.imageDataListener().unsubscribe();
   }
 }

@@ -22,15 +22,13 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
   @ViewChild(DxDataGridComponent, { static: false })
   dataGrid: DxDataGridComponent;
   learnerList!: Array<Learner>;
-  // bloodTypeList: Array<Object> = bloodTypeList();
   selectedRows: string[];
   isSelectInfoVisible: boolean;
-  selectInfoText: String;
+  selectInfoText: string;
   selectedCellRow: Object;
   pageSize: number = 5;
   allowedPageSizes: Array<number | string> = [5, 10, 15];
   scrollingMode: string = 'standard';
-  // standard | virtual | infinite
   currentIndexFromServer: number;
   isSearchingByName: boolean;
   isFilteringByCategory: boolean;
@@ -628,26 +626,6 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
         }
       });
   }
-
-  // default export with selected row
-  // onExporting(e: any) {
-  //   const workbook = new ExcelJS.Workbook();
-  //   const worksheet = workbook.addWorksheet('Learner List');
-
-  //   exportDataGrid({
-  //     component: e.component,
-  //     worksheet: worksheet,
-  //     autoFilterEnabled: true,
-  //   }).then(() => {
-  //     workbook.xlsx.writeBuffer().then((buffer) => {
-  //       saveAs(
-  //         new Blob([buffer], { type: 'application/octet-stream' }),
-  //         'Learner_List.xlsx'
-  //       );
-  //     });
-  //   });
-  //   e.cancel = true;
-  // }
 
   exportGridToPdf(e: any) {
     this.learnerStore

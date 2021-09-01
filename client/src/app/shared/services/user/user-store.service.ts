@@ -7,17 +7,19 @@ import { UserHttpService } from './user-http.service';
 import { confirm } from 'devextreme/ui/dialog';
 interface UserState {
   userList: Array<User>;
+  roleList: Array<any>;
   selectedUser: Object;
   userInstance: User;
   exportData: Array<User>;
   totalPages: number;
   currentPage: number;
   totalItems: number;
-  responseMsg: String;
-  isLoggedIn: Boolean;
+  responseMsg: string;
+  isLoggedIn: boolean;
 }
 const initialState: UserState = {
   userList: [],
+  roleList: [],
   selectedUser: {},
   userInstance: undefined,
   exportData: [],
@@ -36,12 +38,18 @@ export class UserStore extends StateService<UserState> {
     private store: StoreService
   ) {
     super(initialState);
-    // this.initData(0, 5);
 
     this.$isLoggedIn.subscribe((data: any) => {
       if (data === true) {
-        this.store.setCurrentUser(this.parseJwt(this.getToken())._doc);
-        this.store.setCurrentUserRole(this.parseJwt(this.getToken())._doc.role);
+        this.store.setCurrentUser(this.getUsername());
+        this.store.setCurrentUserRoleId(this.getRoleId());
+        this.getRole().then(() => {
+          const roleName = this.state.roleList.find(
+            (e: any) => e.id === this.getRoleId()
+          )?.name;
+          this.store.setCurrentUserRoleName(roleName);
+          console.log(roleName);
+        });
       }
     });
   }
@@ -86,6 +94,18 @@ export class UserStore extends StateService<UserState> {
     console.log('Filled array result');
     console.log(result);
     return result;
+  }
+
+  getRole() {
+    return this.userService
+      .fetchRole()
+      .toPromise()
+      .then((data: any) => {
+        this.setState({
+          roleList: data,
+        });
+        console.log(data);
+      });
   }
 
   initData(page: number, size: number) {
@@ -205,7 +225,7 @@ export class UserStore extends StateService<UserState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -230,15 +250,17 @@ export class UserStore extends StateService<UserState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
   }
 
-  $isLoggedIn: Observable<Boolean> = this.select((state) => state.isLoggedIn);
+  $isLoggedIn: Observable<boolean> = this.select((state) => state.isLoggedIn);
 
   $userList: Observable<Array<User>> = this.select((state) => state.userList);
+
+  $roleList: Observable<Array<any>> = this.select((state) => state.roleList);
 
   $exportData: Observable<Array<User>> = this.select(
     (state) => state.exportData
@@ -265,13 +287,13 @@ export class UserStore extends StateService<UserState> {
             this.setState({ responseMsg: data });
             this.setTotalItems(this.state.totalItems + 1);
             console.log(data);
-            this.loadDataAsync(page, size);
+            // this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -289,11 +311,11 @@ export class UserStore extends StateService<UserState> {
             console.log(data);
             this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -323,11 +345,11 @@ export class UserStore extends StateService<UserState> {
             this.loadDataAsync(page, size);
             console.log(this.state.userList);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -348,11 +370,11 @@ export class UserStore extends StateService<UserState> {
             this.setState({ totalItems: 0 });
             console.log(data);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -371,11 +393,11 @@ export class UserStore extends StateService<UserState> {
             console.log(data);
             this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -431,7 +453,7 @@ export class UserStore extends StateService<UserState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -455,7 +477,7 @@ export class UserStore extends StateService<UserState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -479,7 +501,7 @@ export class UserStore extends StateService<UserState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -504,7 +526,7 @@ export class UserStore extends StateService<UserState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -529,7 +551,7 @@ export class UserStore extends StateService<UserState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -541,13 +563,20 @@ export class UserStore extends StateService<UserState> {
 
   // general obs & functions
 
-  setIsLoading(_isLoading: Boolean) {
+  setIsLoading(_isLoading: boolean) {
     this.store.setIsLoading(_isLoading);
   }
 
   getToken() {
-    // console.log(localStorage.getItem('access_token'));
     return localStorage.getItem('access_token');
+  }
+
+  getRoleId() {
+    return localStorage.getItem('roleId');
+  }
+
+  getUsername() {
+    return localStorage.getItem('username');
   }
 
   isLoggedIn() {
@@ -570,44 +599,50 @@ export class UserStore extends StateService<UserState> {
     return JSON.parse(jsonPayload);
   }
 
-  loginUser(user: User) {
+  loginUser(user: any) {
     this.setIsLoading(true);
     this.userService.loginUser(user).subscribe({
       next: (data: any) => {
-        this.setState({ responseMsg: data.message });
+        this.setState({ responseMsg: data.responseMessage });
         localStorage.setItem('access_token', data.token);
-        const parseToken = this.parseJwt(data.token);
-        this.store.setCurrentUser(parseToken._doc);
-        this.store.setCurrentUserRole(parseToken._doc.role);
+        localStorage.setItem('username', data.username);
+        localStorage.setItem('roleId', data.roleId);
+        localStorage.setItem('expiration', data.expiration);
+        this.store.setCurrentUser(data.username);
+        this.store.setCurrentUserRoleId(data.roleId);
         this.setState({ isLoggedIn: true });
         this.setIsLoading(false);
-        this.store.showNotif(data.message, 'custom');
+        this.store.showNotif(data.responseMessage, 'custom');
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
   }
 
   logoutUser(user: User) {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('roleId');
+    localStorage.removeItem('expiration');
     this.setIsLoading(true);
-    this.userService.logoutUser(user).subscribe({
-      next: (data: any) => {
-        this.setState({ responseMsg: data });
-        this.store.setCurrentUser(null);
-        this.store.setCurrentUserRole('');
-        this.setIsLoading(false);
-        localStorage.removeItem('access_token');
-        this.setState({ isLoggedIn: false });
-        this.store.showNotif(data.message, 'custom');
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
-        console.log(data);
-      },
-    });
+    // this.userService.logoutUser(user).subscribe({
+    //   next: (data: any) => {
+    //     this.setState({ responseMsg: data });
+    this.store.setCurrentUser(null);
+    this.store.setCurrentUserRoleId('');
+    this.setIsLoading(false);
+    //     localStorage.removeItem('access_token');
+    this.setState({ isLoggedIn: false });
+    this.store.showNotif('Logout successfully', 'custom');
+    //   },
+    //   error: (data: any) => {
+    //     this.setIsLoading(false);
+    //     this.store.showNotif(data.error.responseMessage, 'error');
+    //     console.log(data);
+    //   },
+    // });
   }
 }

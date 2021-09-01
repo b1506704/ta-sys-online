@@ -4,16 +4,16 @@ export default function formatCurrency(
 ) {
   const integerNum = amount.toFixed(2).split('.')[0];
   const decimalNum = amount.toFixed(2).split('.')[1];
-  const reverseString = integerNum.split('').reverse();
+  const reversestring = integerNum.split('').reverse();
   let count = 0;
-  let tempString = '';
-  for (let i = 0; i < reverseString.length; i++) {
+  let tempstring = '';
+  for (let i = 0; i < reversestring.length; i++) {
     count++;
     if (count % 3 === 1 && count != 1) {
-      tempString = reverseString[i] + ',' + tempString;
+      tempstring = reversestring[i] + ',' + tempstring;
     } else {
-      tempString = reverseString[i] + tempString;
+      tempstring = reversestring[i] + tempstring;
     }
   }
-  return tempString + '.' + decimalNum + currency;
+  return tempstring + '.' + decimalNum + currency;
 }

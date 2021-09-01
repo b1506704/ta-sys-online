@@ -8,13 +8,12 @@ import { Lesson } from '../../models/lesson';
 })
 export class LessonHttpService {
   constructor(private http: HttpClient) {}
-  apiLessonUrl = 'https://ta-sys-online.azurewebsites.net/lessons';
-  // apiLessonUrl = 'http://localhost/lessons';
+  apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Lesson';
 
   fetchLesson(page: number, size: number): Observable<Lesson> {
     const params = new HttpParams().set('page', page).set('size', size);
     console.log(params.toString());
-    return this.http.get<Lesson>(this.apiLessonUrl, {
+    return this.http.get<Lesson>(this.apiUrl, {
       params: params,
       reportProgress: true,
       observe: 'body',
@@ -32,7 +31,7 @@ export class LessonHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Lesson>(
-      this.apiLessonUrl + '/searchByName',
+      this.apiUrl + '/searchByName',
       {},
       {
         params: params,
@@ -55,7 +54,7 @@ export class LessonHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Lesson>(
-      this.apiLessonUrl,
+      this.apiUrl,
       {},
       {
         params: params,
@@ -76,7 +75,7 @@ export class LessonHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Lesson>(
-      this.apiLessonUrl + '/filterByCategory',
+      this.apiUrl + '/filterByCategory',
       {},
       {
         params: params,
@@ -97,7 +96,7 @@ export class LessonHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Lesson>(
-      this.apiLessonUrl + '/sortByName',
+      this.apiUrl + '/sortByName',
       {},
       {
         params: params,
@@ -118,7 +117,7 @@ export class LessonHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Lesson>(
-      this.apiLessonUrl + '/sortByPrice',
+      this.apiUrl + '/sortByPrice',
       {},
       {
         params: params,
@@ -129,45 +128,45 @@ export class LessonHttpService {
   }
 
   uploadLesson(lesson: Lesson): Observable<Lesson> {
-    return this.http.post<Lesson>(this.apiLessonUrl, lesson, {
+    return this.http.post<Lesson>(this.apiUrl, lesson, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   generateRandomLesson(): Observable<Lesson> {
-    return this.http.post<Lesson>(this.apiLessonUrl + '/randomLesson', {
+    return this.http.post<Lesson>(this.apiUrl + '/randomLesson', {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   deleteAllLessons(): Observable<Lesson> {
-    return this.http.post<Lesson>(this.apiLessonUrl + '/deleteAll', {
+    return this.http.post<Lesson>(this.apiUrl + '/deleteAll', {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   deleteLesson(id: string): Observable<ArrayBuffer> {
-    return this.http.delete<ArrayBuffer>(this.apiLessonUrl + `/${id}`, {
+    return this.http.delete<ArrayBuffer>(this.apiUrl + `/${id}`, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   getLesson(id: string): Observable<Lesson> {
-    return this.http.get<Lesson>(this.apiLessonUrl + `/${id}`, {
+    return this.http.get<Lesson>(this.apiUrl + `/${id}`, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   deleteSelectedLessons(
-    selectedItems: Array<String>
-  ): Observable<Array<String>> {
-    return this.http.post<Array<String>>(
-      this.apiLessonUrl + '/batch',
+    selectedItems: Array<string>
+  ): Observable<Array<string>> {
+    return this.http.post<Array<string>>(
+      this.apiUrl + '/batch',
       selectedItems,
       {
         reportProgress: true,
@@ -178,7 +177,7 @@ export class LessonHttpService {
 
   updateLesson(lesson: Lesson, key: string): Observable<Lesson> {
     return this.http.post<Lesson>(
-      this.apiLessonUrl + `/updateLesson/${key}`,
+      this.apiUrl + `/updateLesson/${key}`,
       lesson,
       {
         reportProgress: true,
@@ -189,7 +188,7 @@ export class LessonHttpService {
 
   fetchAll(): Observable<Lesson> {
     return this.http.post<Lesson>(
-      this.apiLessonUrl + `/fetchAll`,
+      this.apiUrl + `/fetchAll`,
       {},
       {
         reportProgress: true,

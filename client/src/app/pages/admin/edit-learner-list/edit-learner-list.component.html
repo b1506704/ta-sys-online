@@ -48,17 +48,6 @@
   (onEditCanceled)="onEditCanceled()"
   (onToolbarPreparing)="onToolbarPreparing($event)"
 >
-  <!-- (onExporting)="onExporting($event)" -->
-  <!-- [allowColumnResizing]="true"
-      [allowColumnReordering]="true" -->
-  <!-- (onCellClick)="onCellClick($event)" -->
-  <!-- [focusedRowEnabled]="true" -->
-  <!-- (onFocusedRowChanged)="onFocusedRowChanged($event)" -->
-  <!-- (onFocusedRowChanging)="onFocusedRowChanging($event)"
-      [(autoNavigateToFocusedRow)]="autoNavigateToFocusedRow"
-      [(focusedRowKey)]="focusedRowKey" -->
-  <!-- (onRowInserted)="$event.component.navigateToRow($event.key)" -->
-  <!-- [refreshMode]="'full'" -->
   <dxo-editing
     [allowUpdating]="true"
     [allowDeleting]="true"
@@ -105,8 +94,7 @@
   </dxo-pager>
   <dxo-load-panel [enabled]="true"></dxo-load-panel>
 
-  <dxi-column dataField="userName" [width]="100" [allowEditing]="false">
-    
+  <dxi-column dataField="username" [width]="100" [allowEditing]="false">
   </dxi-column>
 
   <dxi-column dataField="fullName">
@@ -130,11 +118,7 @@
 
   <dxi-column dataField="bloodType" [width]="65" [caption]="'B.Type'">
     <dxi-validation-rule type="required"></dxi-validation-rule>
-    <dxo-lookup
-      [dataSource]="[]"
-      displayExpr="name"
-      valueExpr="name"
-    >
+    <dxo-lookup [dataSource]="[]" displayExpr="name" valueExpr="name">
     </dxo-lookup>
   </dxi-column>
 

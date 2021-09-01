@@ -14,7 +14,7 @@ interface BillState {
   totalPages: number;
   currentPage: number;
   totalItems: number;
-  responseMsg: String;
+  responseMsg: string;
 }
 const initialState: BillState = {
   billList: [],
@@ -201,7 +201,7 @@ export class BillStore extends StateService<BillState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -231,13 +231,13 @@ export class BillStore extends StateService<BillState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
   }
 
-  setIsLoading(_isLoading: Boolean) {
+  setIsLoading(_isLoading: boolean) {
     this.store.setIsLoading(_isLoading);
   }
 
@@ -270,11 +270,11 @@ export class BillStore extends StateService<BillState> {
             console.log(data);
             this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -292,11 +292,11 @@ export class BillStore extends StateService<BillState> {
             console.log(data);
             this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -328,11 +328,11 @@ export class BillStore extends StateService<BillState> {
               this.loadDataAsync(page, size);
               console.log(this.state.billList);
               this.setIsLoading(false);
-              this.store.showNotif(data.message, 'custom');
+              this.store.showNotif(data.responseMessage, 'custom');
             },
             error: (data: any) => {
               this.setIsLoading(false);
-              this.store.showNotif(data.error.errorMessage, 'error');
+              this.store.showNotif(data.error.responseMessage, 'error');
               console.log(data);
             },
           });
@@ -353,11 +353,11 @@ export class BillStore extends StateService<BillState> {
             this.setState({ totalItems: 0 });
             console.log(data);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -376,11 +376,11 @@ export class BillStore extends StateService<BillState> {
             console.log(data);
             this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -402,16 +402,7 @@ export class BillStore extends StateService<BillState> {
 
   setCurrentPage(_currentPage: number) {
     this.setState({ currentPage: _currentPage });
-  }
-
-  getBill(id: string | number) {
-    return this.$billList.pipe(
-      map(
-        (bills: Array<Bill>) =>
-          bills.find((bill) => bill._id === id)!
-      )
-    );
-  }
+  }  
 
   filterBillByPrice(
     criteria: string,
@@ -440,7 +431,7 @@ export class BillStore extends StateService<BillState> {
         },
         error: (data: any) => {
           this.setIsLoading(false);
-          this.store.showNotif(data.error.errorMessage, 'error');
+          this.store.showNotif(data.error.responseMessage, 'error');
           console.log(data);
         },
       });
@@ -469,7 +460,7 @@ export class BillStore extends StateService<BillState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -498,7 +489,7 @@ export class BillStore extends StateService<BillState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -528,7 +519,7 @@ export class BillStore extends StateService<BillState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -558,7 +549,7 @@ export class BillStore extends StateService<BillState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });

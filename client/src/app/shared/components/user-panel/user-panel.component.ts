@@ -26,7 +26,7 @@ export class UserPanelComponent implements OnInit, OnDestroy {
   learnerData!: Learner;
   instructorData!: any;
   currentUser!: User;
-  currentRole!: string;
+  currentRoleName!: string;
   userImage: Image = {
     sourceID: '',
     category: '',
@@ -53,8 +53,8 @@ export class UserPanelComponent implements OnInit, OnDestroy {
   }
 
   userRoleListener() {
-    return this.store.$currentRole.subscribe((data: any) => {
-      this.currentRole = data;
+    return this.store.$currentRoleName.subscribe((data: string) => {
+      this.currentRoleName = data;
     });
   }
 
@@ -91,17 +91,17 @@ export class UserPanelComponent implements OnInit, OnDestroy {
   }
 
   renderSourceData() {
-    switch (this.currentRole) {
+    switch (this.currentRoleName) {
       case 'Learner':
         this.learnerStore
-          .getLearnerByUserName(this.currentUser.userName)
+          .getLearnerByUserName(this.currentUser.username)
           .then(() => {
             this.learnerDataListener();
           });
         break;
       case 'Instructor':
         this.instructorStore
-          .getInstructorByUserName(this.currentUser.userName)
+          .getInstructorByUserName(this.currentUser.username)
           .then(() => {
             this.instructorDataListener();
           });
@@ -113,12 +113,12 @@ export class UserPanelComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.userDataListener();
     this.userRoleListener();
-    this.renderSourceData();
+    // this.renderSourceData();
   }
   ngOnDestroy(): void {
     this.userDataListener().unsubscribe();
     this.userRoleListener().unsubscribe();
-    this.imageDataListener().unsubscribe();
+    // this.imageDataListener().unsubscribe();
   }
 }
 

@@ -43,14 +43,54 @@ export class HeaderComponent implements OnInit {
   ];
 
   isLoadIndicatorVisible!: boolean;
-  isLoggedIn!: boolean ;
+  isLoggedIn!: boolean;
   currentUser!: User;
+  roleList: Array<any> = [];
 
   constructor(
     private router: Router,
     private store: StoreService,
     private userStore: UserStore
   ) {}
+
+  roleDataListener() {
+    this.store.$currentRoleName.subscribe((data: string) => {
+      switch (data) {
+        case 'Admin':
+          this.router.navigate(['/admin_home']);
+          break;
+        case 'Instructor':
+          this.router.navigate(['/instructor_home']);
+          break;
+        case 'Learner':
+          this.router.navigate(['/learner_home']);
+          break;
+        default:
+          this.router.navigate(['/learner_home']);
+          break;
+      }
+    });
+    // this.userStore.$roleList.subscribe((data: any) => {
+    //   this.roleList = data;
+    //   this.store.$currentRoleId.subscribe((data: string) => {
+    //     const roleName = this.roleList.find((e: any) => e.id === data)?.name;
+    //     switch (roleName) {
+    //       case 'Admin':
+    //         this.router.navigate(['/admin_home']);
+    //         break;
+    //       case 'Instructor':
+    //         this.router.navigate(['/instructor_home']);
+    //         break;
+    //       case 'Learner':
+    //         this.router.navigate(['/learner_home']);
+    //         break;
+    //       default:
+    //         this.router.navigate(['/instructor_home']);
+    //         break;
+    //     }
+    //   });
+    // });
+  }
 
   ngOnInit() {
     this.store.$isLoading.subscribe((data: any) => {
@@ -65,22 +105,10 @@ export class HeaderComponent implements OnInit {
     this.userStore.$isLoggedIn.subscribe((data: any) => {
       this.isLoggedIn = data;
       if (this.isLoggedIn) {
-        this.store.$currentRole.subscribe((data: string) => {
-          switch (data.trim().toLocaleLowerCase()) {
-            case 'admin':
-              this.router.navigate(['/admin_home']);
-              break;
-            case 'instructor':
-              this.router.navigate(['/instructor_home']);
-              break;
-            case 'learner':
-              this.router.navigate(['/learner_home']);
-              break;
-            default:
-              this.router.navigate(['/instructor_home']);
-              break;
-          }
-        });
+        // this.userStore.getRole().then(() => {
+        //   this.roleDataListener();
+        // });
+        this.roleDataListener();
       } else {
         this.onLogin();
       }

@@ -1,5 +1,4 @@
 export interface Test {
-    _id: String,
-    name: String,
-    description: String
+    name: string,
+    description: string
 }

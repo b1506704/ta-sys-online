@@ -14,7 +14,7 @@ interface TestState {
   totalPages: number;
   currentPage: number;
   totalItems: number;
-  responseMsg: String;
+  responseMsg: string;
 }
 const initialState: TestState = {
   testList: [],
@@ -116,7 +116,7 @@ export class TestStore extends StateService<TestState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -288,7 +288,7 @@ export class TestStore extends StateService<TestState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -318,13 +318,13 @@ export class TestStore extends StateService<TestState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
   }
 
-  setIsLoading(_isLoading: Boolean) {
+  setIsLoading(_isLoading: boolean) {
     this.store.setIsLoading(_isLoading);
   }
 
@@ -361,11 +361,11 @@ export class TestStore extends StateService<TestState> {
             console.log(data);
             this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -383,11 +383,11 @@ export class TestStore extends StateService<TestState> {
             console.log(data);
             this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -419,11 +419,11 @@ export class TestStore extends StateService<TestState> {
               this.loadDataAsync(page, size);
               console.log(this.state.testList);
               this.setIsLoading(false);
-              this.store.showNotif(data.message, 'custom');
+              this.store.showNotif(data.responseMessage, 'custom');
             },
             error: (data: any) => {
               this.setIsLoading(false);
-              this.store.showNotif(data.error.errorMessage, 'error');
+              this.store.showNotif(data.error.responseMessage, 'error');
               console.log(data);
             },
           });
@@ -444,11 +444,11 @@ export class TestStore extends StateService<TestState> {
             this.setState({ totalItems: 0 });
             console.log(data);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -467,11 +467,11 @@ export class TestStore extends StateService<TestState> {
             console.log(data);
             this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -534,7 +534,7 @@ export class TestStore extends StateService<TestState> {
         },
         error: (data: any) => {
           this.setIsLoading(false);
-          this.store.showNotif(data.error.errorMessage, 'error');
+          this.store.showNotif(data.error.responseMessage, 'error');
           console.log(data);
         },
       });
@@ -563,7 +563,7 @@ export class TestStore extends StateService<TestState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -587,7 +587,7 @@ export class TestStore extends StateService<TestState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -620,7 +620,7 @@ export class TestStore extends StateService<TestState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -648,7 +648,7 @@ export class TestStore extends StateService<TestState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -678,7 +678,7 @@ export class TestStore extends StateService<TestState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -708,7 +708,7 @@ export class TestStore extends StateService<TestState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -732,7 +732,7 @@ export class TestStore extends StateService<TestState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });

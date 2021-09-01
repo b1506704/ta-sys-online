@@ -1,11 +1,8 @@
 export interface Instructor {
-  _id: string;
-  userName: String;
-  fullName: String;
+  username: string;
+  fullName: string;
   age: Number;
-  gender: String;
-  department: String;
-  description: String;
-  role: String;
-  yearsOfExperience: Number;
+  gender: string;
+  department: string;
+  description: string;
 }

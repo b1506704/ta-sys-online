@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { DxFormComponent } from 'devextreme-angular';
 import { User } from '../../models/user';
 import { AuthService } from '../../services/auth.service';
+import { UserStore } from '../../services/user/user-store.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -16,7 +17,14 @@ export class SignUpComponent implements OnInit {
     value: this.password,
   };
   user: User;
-  bloodType: Array<String> = ['A', 'B', 'O'];
+  roleList: Array<any> = [];
+  roleSelectBoxOptions: any = {
+    items: this.roleList,
+    valueExpr: 'id',
+    displayExpr: 'name',
+    placeholder: 'Select role',
+    onValueChanged: this.onRoleChange.bind(this),
+  };
   isLearnerInfoVisible: boolean = false;
   checkBoxOptions: any;
   signupButtonOptions: any = {
@@ -30,15 +38,19 @@ export class SignUpComponent implements OnInit {
     useSubmitBehavior: false,
     onClick: () => {
       this.form.instance.resetValues();
-      this.form.instance.getEditor('userName').focus();
+      this.form.instance.getEditor('username').focus();
     },
   };
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private userStore: UserStore) {}
 
   onFormShown(e: any) {
     setTimeout(() => {
-      this.form.instance.getEditor('userName').focus();
+      this.form.instance.getEditor('username').focus();
     }, 200);
+  }
+
+  onRoleChange(e: any) {
+    this.user.roleId = e.value;
   }
 
   onSignupSubmit = (e: any) => {
@@ -47,7 +59,16 @@ export class SignUpComponent implements OnInit {
     this.authService.sendRegisterRequest(this.user);
   };
 
+  roleDataListener() {
+    this.userStore.$roleList.subscribe((data: any) => {
+      this.roleList = data;
+    });
+  }
+
   ngOnInit(): void {
+    this.userStore.getRole().then(() => {
+      this.roleDataListener();
+    });
     this.checkBoxOptions = {
       text: 'Additional Information',
       value: false,
@@ -56,9 +77,9 @@ export class SignUpComponent implements OnInit {
       },
     };
     this.user = {
-      userName: '',
-      passWord: '',
-      role: 'Learner',
+      username: '',
+      password: '',
+      roleId: this.roleList[0],
     };
   }
 }

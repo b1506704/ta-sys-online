@@ -17,7 +17,7 @@
       <dxi-item itemType="group">
         <dxi-item itemType="group" caption="Account Information">
           <dxi-item
-            dataField="userName"
+            dataField="username"
             [label]="{ text: 'Username' }"
             editorType="dxTextBox"
           >
@@ -32,7 +32,7 @@
             </dxi-validation-rule>
           </dxi-item>
           <dxi-item
-            dataField="passWord"
+            dataField="password"
             [label]="{ text: 'Password' }"
             editorType="dxTextBox"
             [editorOptions]="{ mode: 'password' }"
@@ -47,18 +47,17 @@
             >
             </dxi-validation-rule>
           </dxi-item>
-          <dxi-item
-            dataField="role"
-            [label]="{ text: 'Role' }"
-            editorType="dxSelectBox"
-            [editorOptions]="{
-              items: ['Learner', 'Instructor', 'Admin'],
-              value: 'Learner'
-            }"
-          >
-            <dxi-validation-rule type="required" message="Role is required">
-            </dxi-validation-rule>
-          </dxi-item>
+          <dxi-item name="description">
+            <dxo-label text="Description"></dxo-label>
+            <dx-select-box
+              (onValueChanged)="onRoleChange($event)"
+              [displayExpr]="'name'"
+              [valueExpr]="'id'"
+              [dataSource]="roleList"
+              [value]="roleList[0]"
+            >
+            </dx-select-box>
+          </dxi-item>         
           <dxi-item itemType="group" [colCount]="2" [cssClass]="'buttonGroup'">
             <dxi-item
               itemType="button"

@@ -8,13 +8,12 @@ import { Room } from '../../models/room';
 })
 export class RoomHttpService {
   constructor(private http: HttpClient) {}
-  apiRoomUrl = 'https://ta-sys-online.azurewebsites.net/rooms';
-  // apiRoomUrl = 'http://localhost/rooms';
+  apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Room';
 
   fetchRoom(page: number, size: number): Observable<Room> {
     const params = new HttpParams().set('page', page).set('size', size);
     console.log(params.toString());
-    return this.http.get<Room>(this.apiRoomUrl, {
+    return this.http.get<Room>(this.apiUrl, {
       params: params,
       reportProgress: true,
       observe: 'body',
@@ -32,7 +31,7 @@ export class RoomHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Room>(
-      this.apiRoomUrl + '/searchByName',
+      this.apiUrl + '/searchByName',
       {},
       {
         params: params,
@@ -55,7 +54,7 @@ export class RoomHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Room>(
-      this.apiRoomUrl,
+      this.apiUrl,
       {},
       {
         params: params,
@@ -76,7 +75,7 @@ export class RoomHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Room>(
-      this.apiRoomUrl + '/filterByCategory',
+      this.apiUrl + '/filterByCategory',
       {},
       {
         params: params,
@@ -86,18 +85,14 @@ export class RoomHttpService {
     );
   }
 
-  sortRoomByName(
-    value: string,
-    page: number,
-    size: number
-  ): Observable<Room> {
+  sortRoomByName(value: string, page: number, size: number): Observable<Room> {
     const params = new HttpParams()
       .set('value', value)
       .set('page', page)
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Room>(
-      this.apiRoomUrl + '/sortByName',
+      this.apiUrl + '/sortByName',
       {},
       {
         params: params,
@@ -107,18 +102,14 @@ export class RoomHttpService {
     );
   }
 
-  sortRoomByPrice(
-    value: string,
-    page: number,
-    size: number
-  ): Observable<Room> {
+  sortRoomByPrice(value: string, page: number, size: number): Observable<Room> {
     const params = new HttpParams()
       .set('value', value)
       .set('page', page)
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Room>(
-      this.apiRoomUrl + '/sortByPrice',
+      this.apiUrl + '/sortByPrice',
       {},
       {
         params: params,
@@ -129,7 +120,7 @@ export class RoomHttpService {
   }
 
   uploadRoom(room: Room): Observable<Room> {
-    return this.http.post<Room>(this.apiRoomUrl, room, {
+    return this.http.post<Room>(this.apiUrl, room, {
       reportProgress: true,
       observe: 'body',
     });
@@ -137,7 +128,7 @@ export class RoomHttpService {
 
   generateRandomRoom(): Observable<Room> {
     return this.http.post<Room>(
-      this.apiRoomUrl + '/randomRoom',
+      this.apiUrl + '/randomRoom',
       {},
       {
         reportProgress: true,
@@ -147,31 +138,33 @@ export class RoomHttpService {
   }
 
   deleteAllRooms(): Observable<Room> {
-    return this.http.post<Room>(this.apiRoomUrl + '/deleteAll',{}, {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<Room>(
+      this.apiUrl + '/deleteAll',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deleteRoom(id: string): Observable<ArrayBuffer> {
-    return this.http.delete<ArrayBuffer>(this.apiRoomUrl + `/${id}`, {
+    return this.http.delete<ArrayBuffer>(this.apiUrl + `/${id}`, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   getRoom(id: string): Observable<Room> {
-    return this.http.get<Room>(this.apiRoomUrl + `/${id}`, {
+    return this.http.get<Room>(this.apiUrl + `/${id}`, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
-  deleteSelectedRooms(
-    selectedItems: Array<String>
-  ): Observable<Array<String>> {
-    return this.http.post<Array<String>>(
-      this.apiRoomUrl + '/batch',
+  deleteSelectedRooms(selectedItems: Array<string>): Observable<Array<string>> {
+    return this.http.post<Array<string>>(
+      this.apiUrl + '/batch',
       selectedItems,
       {
         reportProgress: true,
@@ -181,19 +174,15 @@ export class RoomHttpService {
   }
 
   updateRoom(room: Room, key: string): Observable<Room> {
-    return this.http.post<Room>(
-      this.apiRoomUrl + `/updateRoom/${key}`,
-      room,
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.post<Room>(this.apiUrl + `/updateRoom/${key}`, room, {
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
   fetchAll(): Observable<Room> {
     return this.http.post<Room>(
-      this.apiRoomUrl + `/fetchAll`,
+      this.apiUrl + `/fetchAll`,
       {},
       {
         reportProgress: true,

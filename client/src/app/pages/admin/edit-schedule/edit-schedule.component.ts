@@ -31,7 +31,7 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
   ];
   selectedRows: string[];
   isSelectInfoVisible: boolean;
-  selectInfoText: String;
+  selectInfoText: string;
   selectedCellRow: Object;
   pageSize: number = 5;
   allowedPageSizes: Array<number | string> = [5, 10, 15];

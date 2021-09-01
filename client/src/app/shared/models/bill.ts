@@ -1,6 +1,5 @@
 export interface Bill {
-  _id: String;
-  courseID: String;
-  userID: String;
+  courseID: string;
+  userID: string;
   totalCost: Number;
 }

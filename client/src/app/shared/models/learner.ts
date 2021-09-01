@@ -1,12 +1,9 @@
 export interface Learner {
-  _id: string;
-  userName: string;
-  fullName: string;
+  username: string;
+  fullname: string;
   age: number;
   gender: string;
-  occupation: string;
+  email: string;
+  phonenumber: string;
   address: string;
-  bloodType: string;
-  height: number;
-  weight: number;
 }

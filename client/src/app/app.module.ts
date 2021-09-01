@@ -6,7 +6,8 @@ import { SideNavOuterToolbarModule } from './layouts';
 import { AppRoutingModule } from './app-routing.module';
 import { ScreenService } from './shared/services/screen.service';
 import { AppInfoService } from './shared/services/app-info.service';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from './shared/services/auth-interceptor.service';
 // import { RouteReuseStrategy } from '@angular/router';
 // import { CustomReuseStrategy } from './pages/instructor/edit-health-condition-list/edit-health-condition-list.component';
 
@@ -21,7 +22,7 @@ import { HttpClientModule } from '@angular/common/http';
   providers: [
     ScreenService,
     AppInfoService,
-    // { provide: RouteReuseStrategy, useClass: CustomReuseStrategy}
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
 })

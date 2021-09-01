@@ -9,14 +9,20 @@ import { User } from '../../models/user';
 })
 export class UserHttpService {
   constructor(private http: HttpClient) {}
-  apiUserUrl = 'https://ta-sys-online.azurewebsites.net/users';
-  // apiUserUrl = 'http://localhost/users';
+  apiUserUrl = 'https://ta-sys-online-server.azurewebsites.net';
 
   fetchUser(page: number, size: number): Observable<User> {
     const params = new HttpParams().set('page', page).set('size', size);
     console.log(params.toString());
     return this.http.get<User>(this.apiUserUrl, {
       params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
+  }
+
+  fetchRole(): Observable<any> {
+    return this.http.get<any>(this.apiUserUrl + '/api/Role', {
       reportProgress: true,
       observe: 'body',
     });
@@ -160,10 +166,14 @@ export class UserHttpService {
   }
 
   uploadUser(user: User): Observable<User> {
-    return this.http.post<User>(this.apiUserUrl, user, {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<User>(
+      this.apiUserUrl + '/api/Authenticate/Register',
+      user,
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   generateRandomUser(): Observable<User> {
@@ -202,8 +212,8 @@ export class UserHttpService {
     });
   }
 
-  deleteSelectedUsers(selectedItems: Array<String>): Observable<Array<String>> {
-    return this.http.post<Array<String>>(
+  deleteSelectedUsers(selectedItems: Array<string>): Observable<Array<string>> {
+    return this.http.post<Array<string>>(
       this.apiUserUrl + '/batch',
       selectedItems,
       {
@@ -233,7 +243,7 @@ export class UserHttpService {
 
   loginUser(user: User): Observable<User> {
     return this.http
-      .post<User>(this.apiUserUrl + '/login', user, {
+      .post<User>(this.apiUserUrl + '/api/Authenticate/login', user, {
         reportProgress: true,
         observe: 'body',
       })

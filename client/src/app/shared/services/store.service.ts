@@ -2,15 +2,15 @@ import { Injectable } from '@angular/core';
 import notify from 'devextreme/ui/notify';
 import { Observable } from 'rxjs';
 import { User } from '../models/user';
-import { NotificationService } from './notification.service';
 import { StateService } from './state.service';
 
 interface StoreState {
   userList: Array<User>;
   selectedUser: Object;
   currentUser: Object;
-  currentRole: String;
-  isLoading: Boolean;
+  currentRoleId: string;
+  currentRoleName: string;
+  isLoading: boolean;
   notifType: string;
   responseMsg: string;
 }
@@ -18,7 +18,8 @@ const initialState: StoreState = {
   userList: [],
   selectedUser: {},
   currentUser: {},
-  currentRole: '',
+  currentRoleId: '',
+  currentRoleName: '',
   isLoading: false,
   responseMsg: '',
   notifType: '',
@@ -27,24 +28,26 @@ const initialState: StoreState = {
   providedIn: 'root',
 })
 export class StoreService extends StateService<StoreState> {
-  constructor(private notifService: NotificationService) {
+  constructor() {
     super(initialState);
     this.loadDataAsync();
   }
 
-  $isLoading: Observable<Boolean> = this.select((state) => state.isLoading);
+  $isLoading: Observable<boolean> = this.select((state) => state.isLoading);
 
-  $responseMsg: Observable<String> = this.select((state) => state.responseMsg);
+  $responseMsg: Observable<string> = this.select((state) => state.responseMsg);
 
-  $notifType: Observable<String> = this.select((state) => state.notifType);
+  $notifType: Observable<string> = this.select((state) => state.notifType);
 
   $currentUser: Observable<Object> = this.select((state) => state.currentUser);
 
-  $currentRole: Observable<String> = this.select((state) => state.currentRole);
+  $currentRoleId: Observable<string> = this.select((state) => state.currentRoleId);
+
+  $currentRoleName: Observable<string> = this.select((state) => state.currentRoleName);
 
   loadDataAsync() {}
 
-  setIsLoading(_isLoading: Boolean) {
+  setIsLoading(_isLoading: boolean) {
     this.setState({ isLoading: _isLoading });
   }
 
@@ -61,8 +64,12 @@ export class StoreService extends StateService<StoreState> {
     this.setState({ currentUser: _user });
   }
 
-  setCurrentUserRole(role: String) {
-    this.setState({ currentRole: role });
+  setCurrentUserRoleId(id: string) {
+    this.setState({ currentRoleId: id });
+  }
+
+  setCurrentUserRoleName(role: string) {
+    this.setState({ currentRoleName: role });
   }
 
   showNotif(message: string, type: string) {

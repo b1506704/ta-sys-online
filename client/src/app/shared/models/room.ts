@@ -1,9 +1,6 @@
 export interface Room {
-  _id: String;
-  number: String;
-  vacancyStatus: String;
+  number: string;
+  vacancyStatus: string;
   totalSlot: Number;
-  userID: Array<String>;
-  admissionDate: Date;
-  dischargeDate: Date;
+  userID: Array<string>;
 }

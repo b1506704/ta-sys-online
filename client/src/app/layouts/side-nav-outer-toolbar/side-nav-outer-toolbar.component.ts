@@ -28,9 +28,9 @@ export class SideNavOuterToolbarComponent implements OnInit {
 
   menuOpened: boolean = false;
 
-  isNotifVisible!: Boolean;
+  isNotifVisible!: boolean;
   notifType: string = 'info';
-  responseMsg: String = 'OK';
+  responseMsg: string = 'OK';
   isSideMenuVisible: boolean = false;
 
   temporaryMenuOpened = false;

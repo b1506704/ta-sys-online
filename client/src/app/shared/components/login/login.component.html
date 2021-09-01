@@ -14,12 +14,12 @@
       validationGroup="userData"
     >
       <dxi-item itemType="group" caption="Account Information">
-        <dxi-item dataField="userName" [label]="{ text: 'Username' }">
+        <dxi-item dataField="username" [label]="{ text: 'Username' }">
           <dxi-validation-rule type="required" message="Username is required">
           </dxi-validation-rule>
         </dxi-item>
         <dxi-item
-          dataField="passWord"
+          dataField="password"
           [label]="{ text: 'Password' }"
           [editorOptions]="{ mode: 'password' }"
         >

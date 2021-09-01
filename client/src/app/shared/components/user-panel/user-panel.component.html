@@ -3,7 +3,7 @@
     <div class="image-container">
       <img class="user-image" [src]="userImage.url" alt="..." />
     </div>
-    <div class="user-name">{{ currentUser?.userName }}</div>
+    <div class="user-name">{{ currentUser }}</div>
   </div>
   <dx-context-menu
     *ngIf="menuMode === 'context'"

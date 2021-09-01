@@ -7,7 +7,7 @@ import { UserStore } from './user/user-store.service';
 })
 export class AuthService {
   constructor(private userService: UserStore) {}
-  sendLoginRequest(user: User) {
+  sendLoginRequest(user: any) {
     this.userService.loginUser(user);
   }
   sendRegisterRequest(user: User) {

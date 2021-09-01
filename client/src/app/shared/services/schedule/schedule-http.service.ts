@@ -8,13 +8,12 @@ import { Schedule } from '../../models/schedule';
 })
 export class ScheduleHttpService {
   constructor(private http: HttpClient) {}
-  apiScheduleUrl = 'https://ta-sys-online.azurewebsites.net/schedules';
-  // apiScheduleUrl = 'http://localhost/schedules';
+  apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Schedule';
 
   fetchSchedule(page: number, size: number): Observable<Schedule> {
     const params = new HttpParams().set('page', page).set('size', size);
     console.log(params.toString());
-    return this.http.get<Schedule>(this.apiScheduleUrl, {
+    return this.http.get<Schedule>(this.apiUrl, {
       params: params,
       reportProgress: true,
       observe: 'body',
@@ -32,7 +31,7 @@ export class ScheduleHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Schedule>(
-      this.apiScheduleUrl + '/searchByName',
+      this.apiUrl + '/searchByName',
       {},
       {
         params: params,
@@ -55,7 +54,7 @@ export class ScheduleHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Schedule>(
-      this.apiScheduleUrl,
+      this.apiUrl,
       {},
       {
         params: params,
@@ -76,7 +75,7 @@ export class ScheduleHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Schedule>(
-      this.apiScheduleUrl + '/filterByCategory',
+      this.apiUrl + '/filterByCategory',
       {},
       {
         params: params,
@@ -97,7 +96,7 @@ export class ScheduleHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Schedule>(
-      this.apiScheduleUrl + '/sortByName',
+      this.apiUrl + '/sortByName',
       {},
       {
         params: params,
@@ -118,7 +117,7 @@ export class ScheduleHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Schedule>(
-      this.apiScheduleUrl + '/sortByPrice',
+      this.apiUrl + '/sortByPrice',
       {},
       {
         params: params,
@@ -129,7 +128,7 @@ export class ScheduleHttpService {
   }
 
   uploadSchedule(schedule: Schedule): Observable<Schedule> {
-    return this.http.post<Schedule>(this.apiScheduleUrl, schedule, {
+    return this.http.post<Schedule>(this.apiUrl, schedule, {
       reportProgress: true,
       observe: 'body',
     });
@@ -137,7 +136,7 @@ export class ScheduleHttpService {
 
   generateRandomSchedule(): Observable<Schedule> {
     return this.http.post<Schedule>(
-      this.apiScheduleUrl + '/randomSchedule',
+      this.apiUrl + '/randomSchedule',
       {},
       {
         reportProgress: true,
@@ -147,31 +146,35 @@ export class ScheduleHttpService {
   }
 
   deleteAllSchedules(): Observable<Schedule> {
-    return this.http.post<Schedule>(this.apiScheduleUrl + '/deleteAll',{}, {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<Schedule>(
+      this.apiUrl + '/deleteAll',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deleteSchedule(id: string): Observable<ArrayBuffer> {
-    return this.http.delete<ArrayBuffer>(this.apiScheduleUrl + `/${id}`, {
+    return this.http.delete<ArrayBuffer>(this.apiUrl + `/${id}`, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   getSchedule(id: string): Observable<Schedule> {
-    return this.http.get<Schedule>(this.apiScheduleUrl + `/${id}`, {
+    return this.http.get<Schedule>(this.apiUrl + `/${id}`, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   deleteSelectedSchedules(
-    selectedItems: Array<String>
-  ): Observable<Array<String>> {
-    return this.http.post<Array<String>>(
-      this.apiScheduleUrl + '/batch',
+    selectedItems: Array<string>
+  ): Observable<Array<string>> {
+    return this.http.post<Array<string>>(
+      this.apiUrl + '/batch',
       selectedItems,
       {
         reportProgress: true,
@@ -182,7 +185,7 @@ export class ScheduleHttpService {
 
   updateSchedule(schedule: Schedule, key: string): Observable<Schedule> {
     return this.http.post<Schedule>(
-      this.apiScheduleUrl + `/updateSchedule/${key}`,
+      this.apiUrl + `/updateSchedule/${key}`,
       schedule,
       {
         reportProgress: true,
@@ -193,7 +196,7 @@ export class ScheduleHttpService {
 
   fetchAll(): Observable<Schedule> {
     return this.http.post<Schedule>(
-      this.apiScheduleUrl + `/fetchAll`,
+      this.apiUrl + `/fetchAll`,
       {},
       {
         reportProgress: true,

@@ -53,9 +53,9 @@ export class SideNavigationMenuComponent
     this.selectedItemChanged.emit(event);
   }
 
-  private _selectedItem!: String;
+  private _selectedItem!: string;
   @Input()
-  set selectedItem(value: String) {
+  set selectedItem(value: string) {
     this._selectedItem = value;
     if (!this.menu.instance) {
       return;
@@ -68,9 +68,9 @@ export class SideNavigationMenuComponent
   items: Array<any>;
 
   renderItemMenu() {
-    this.store.$currentRole.subscribe((data: string) => {
-      switch (data.trim().toLocaleLowerCase()) {
-        case 'learner':
+    this.store.$currentRoleName.subscribe((data: string) => {
+      switch (data) {
+        case 'Learner':
           this._items = navigationLearner.map((item) => {
             if (item.path && !/^\//.test(item.path)) {
               item.path = `/${item.path}`;
@@ -78,7 +78,7 @@ export class SideNavigationMenuComponent
             return { ...item, expanded: !this._compactMode };
           });
           break;
-        case 'instructor':
+        case 'Instructor':
           this._items = navigationInstructor.map((item) => {
             if (item.path && !/^\//.test(item.path)) {
               item.path = `/${item.path}`;
@@ -86,7 +86,7 @@ export class SideNavigationMenuComponent
             return { ...item, expanded: !this._compactMode };
           });
           break;
-        case 'admin':
+        case 'Admin':
           this._items = navigationAdmin.map((item) => {
             if (item.path && !/^\//.test(item.path)) {
               item.path = `/${item.path}`;
@@ -108,12 +108,12 @@ export class SideNavigationMenuComponent
   }
 
   userRoleListener() {
-    this.store.$currentRole.subscribe((data: string) => {
+    this.store.$currentRoleName.subscribe((data: string) => {
       if (!this.menu.instance) {
         return;
       }
-      switch (data.trim().toLocaleLowerCase()) {
-        case 'learner':
+      switch (data) {
+        case 'Learner':
           this.menu.instance.option(
             'items',
             navigationLearner.map((item) => {
@@ -124,7 +124,7 @@ export class SideNavigationMenuComponent
             })
           );
           break;
-        case 'admin':
+        case 'Admin':
           this.menu.instance.option(
             'items',
             navigationAdmin.map((item) => {
@@ -135,7 +135,7 @@ export class SideNavigationMenuComponent
             })
           );
           break;
-        case 'instructor':
+        case 'Instructor':
           this.menu.instance.option(
             'items',
             navigationInstructor.map((item) => {

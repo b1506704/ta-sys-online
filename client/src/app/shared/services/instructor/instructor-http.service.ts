@@ -8,13 +8,12 @@ import { Instructor } from '../../models/instructor';
 })
 export class InstructorHttpService {
   constructor(private http: HttpClient) {}
-  apiInstructorUrl = 'https://ta-sys-online.azurewebsites.net/instructors';
-  // apiInstructorUrl = 'http://localhost/instructors';
+  apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Instructor';
 
   fetchInstructor(page: number, size: number): Observable<Instructor> {
     const params = new HttpParams().set('page', page).set('size', size);
     console.log(params.toString());
-    return this.http.get<Instructor>(this.apiInstructorUrl, {
+    return this.http.get<Instructor>(this.apiUrl, {
       params: params,
       reportProgress: true,
       observe: 'body',
@@ -32,7 +31,7 @@ export class InstructorHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Instructor>(
-      this.apiInstructorUrl + '/searchByName',
+      this.apiUrl + '/searchByName',
       {},
       {
         params: params,
@@ -55,7 +54,7 @@ export class InstructorHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Instructor>(
-      this.apiInstructorUrl,
+      this.apiUrl,
       {},
       {
         params: params,
@@ -76,7 +75,7 @@ export class InstructorHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Instructor>(
-      this.apiInstructorUrl + '/filterByCategory',
+      this.apiUrl + '/filterByCategory',
       {},
       {
         params: params,
@@ -97,7 +96,7 @@ export class InstructorHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Instructor>(
-      this.apiInstructorUrl + '/filterByRole',
+      this.apiUrl + '/filterByRole',
       {},
       {
         params: params,
@@ -118,7 +117,7 @@ export class InstructorHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Instructor>(
-      this.apiInstructorUrl + '/filterByAge',
+      this.apiUrl + '/filterByAge',
       {},
       {
         params: params,
@@ -139,7 +138,7 @@ export class InstructorHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Instructor>(
-      this.apiInstructorUrl + '/filterByGender',
+      this.apiUrl + '/filterByGender',
       {},
       {
         params: params,
@@ -160,7 +159,7 @@ export class InstructorHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Instructor>(
-      this.apiInstructorUrl + '/sortByName',
+      this.apiUrl + '/sortByName',
       {},
       {
         params: params,
@@ -181,7 +180,7 @@ export class InstructorHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Instructor>(
-      this.apiInstructorUrl + '/sortByPrice',
+      this.apiUrl + '/sortByPrice',
       {},
       {
         params: params,
@@ -192,7 +191,7 @@ export class InstructorHttpService {
   }
 
   uploadInstructor(instructor: Instructor): Observable<Instructor> {
-    return this.http.post<Instructor>(this.apiInstructorUrl, instructor, {
+    return this.http.post<Instructor>(this.apiUrl, instructor, {
       reportProgress: true,
       observe: 'body',
     });
@@ -200,7 +199,7 @@ export class InstructorHttpService {
 
   generateRandomInstructor(): Observable<Instructor> {
     return this.http.post<Instructor>(
-      this.apiInstructorUrl + '/randomInstructor',
+      this.apiUrl + '/randomInstructor',
       {},
       {
         reportProgress: true,
@@ -211,7 +210,7 @@ export class InstructorHttpService {
 
   deleteAllInstructors(): Observable<Instructor> {
     return this.http.post<Instructor>(
-      this.apiInstructorUrl + '/deleteAll',
+      this.apiUrl + '/deleteAll',
       {},
       {
         reportProgress: true,
@@ -221,24 +220,24 @@ export class InstructorHttpService {
   }
 
   deleteInstructor(id: string): Observable<ArrayBuffer> {
-    return this.http.delete<ArrayBuffer>(this.apiInstructorUrl + `/${id}`, {
+    return this.http.delete<ArrayBuffer>(this.apiUrl + `/${id}`, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   getInstructor(id: string): Observable<Instructor> {
-    return this.http.get<Instructor>(this.apiInstructorUrl + `/${id}`, {
+    return this.http.get<Instructor>(this.apiUrl + `/${id}`, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
-  getInstructorByUserName(userName: string): Observable<Instructor> {
-    const params = new HttpParams().set('userName', userName);
+  getInstructorByUserName(username: string): Observable<Instructor> {
+    const params = new HttpParams().set('username', username);
     console.log(params.toString());
     return this.http.post<Instructor>(
-      this.apiInstructorUrl + '/byUserName',
+      this.apiUrl + '/byUserName',
       {},
       {
         params: params,
@@ -249,10 +248,10 @@ export class InstructorHttpService {
   }
 
   deleteSelectedInstructors(
-    selectedItems: Array<String>
-  ): Observable<Array<String>> {
-    return this.http.post<Array<String>>(
-      this.apiInstructorUrl + '/batch',
+    selectedItems: Array<string>
+  ): Observable<Array<string>> {
+    return this.http.post<Array<string>>(
+      this.apiUrl + '/batch',
       selectedItems,
       {
         reportProgress: true,
@@ -261,9 +260,12 @@ export class InstructorHttpService {
     );
   }
 
-  updateInstructor(instructor: Instructor, key: string): Observable<Instructor> {
+  updateInstructor(
+    instructor: Instructor,
+    key: string
+  ): Observable<Instructor> {
     return this.http.post<Instructor>(
-      this.apiInstructorUrl + `/updateInstructor/${key}`,
+      this.apiUrl + `/updateInstructor/${key}`,
       instructor,
       {
         reportProgress: true,
@@ -274,7 +276,7 @@ export class InstructorHttpService {
 
   fetchAll(): Observable<Instructor> {
     return this.http.post<Instructor>(
-      this.apiInstructorUrl + `/fetchAll`,
+      this.apiUrl + `/fetchAll`,
       {},
       {
         reportProgress: true,

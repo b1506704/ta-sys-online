@@ -5,7 +5,6 @@ import { StateService } from '../state.service';
 import { StoreService } from '../store.service';
 import { CourseHttpService } from './course-http.service';
 import { confirm } from 'devextreme/ui/dialog';
-import { MedicalCheckupStore } from '../medical-checkup/medical-checkup-store.service';
 
 interface CourseState {
   courseList: Array<Course>;
@@ -15,7 +14,7 @@ interface CourseState {
   totalPages: number;
   currentPage: number;
   totalItems: number;
-  responseMsg: String;
+  responseMsg: string;
 }
 const initialState: CourseState = {
   courseList: [],
@@ -33,8 +32,7 @@ const initialState: CourseState = {
 export class CourseStore extends StateService<CourseState> {
   constructor(
     private courseService: CourseHttpService,
-    private store: StoreService,
-    private medicalCheckupService: MedicalCheckupStore
+    private store: StoreService
   ) {
     super(initialState);
   }
@@ -54,7 +52,7 @@ export class CourseStore extends StateService<CourseState> {
               page,
               size,
               this.state.pendingCheckupList,
-              data.items
+              data
             ),
           });
    */
@@ -65,7 +63,9 @@ export class CourseStore extends StateService<CourseState> {
     addedArray: Array<Course>
   ): Array<Course> {
     let result: Array<Course> = sourceArray;
+    console.log('FILL INDEX');
     let fillIndex = startIndex * endIndex;
+    console.log(fillIndex);
     for (var j = 0; j < addedArray.length; j++) {
       result[fillIndex] = addedArray[j];
       fillIndex++;
@@ -97,9 +97,9 @@ export class CourseStore extends StateService<CourseState> {
         }
         console.log('Current flag: infite list');
         console.log(this.state.courseList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
         this.loadDataAsync(page, size);
@@ -111,20 +111,20 @@ export class CourseStore extends StateService<CourseState> {
     this.courseService.fetchCourse(page, size).subscribe({
       next: (data: any) => {
         this.setState({
-          courseList: this.state.courseList.concat(data.items),
+          courseList: this.state.courseList.concat(data),
         });
         console.log('Infinite list');
         console.log(this.state.courseList);
         console.log('Server response');
         console.log(data);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
         this.setIsLoading(false);
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -132,52 +132,41 @@ export class CourseStore extends StateService<CourseState> {
 
   loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
     this.setIsLoading(true);
-    this.courseService
-      .fetchCourseByLearnerID(page, size, learnerID)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({
-            courseList: this.fillEmpty(
-              page,
-              size,
-              this.state.courseList,
-              data.items
-            ),
-          });
-          console.log('Pure list');
-          console.log(this.state.courseList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalItems });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.currentPage });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.errorMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.courseService.fetchCourseByLearnerID(page, size, learnerID).subscribe({
+      next: (data: any) => {
+        this.setState({
+          courseList: this.fillEmpty(page, size, this.state.courseList, data),
+        });
+        console.log('Pure list');
+        console.log(this.state.courseList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
-  initInfiniteDataByLearnerID(
-    page: number,
-    size: number,
-    learnerID: string
-  ) {
+  initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
     return this.courseService
       .fetchCourseByLearnerID(page, size, learnerID)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          courseList: new Array<Course>(data.items.length),
+          courseList: new Array<Course>(data.length),
         });
         console.log('Current flag: infite list');
         console.log(this.state.courseList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
         this.loadDataAsyncByLearnerID(page, size, learnerID);
@@ -190,28 +179,26 @@ export class CourseStore extends StateService<CourseState> {
     learnerID: string
   ) {
     this.setIsLoading(true);
-    this.courseService
-      .fetchCourseByLearnerID(page, size, learnerID)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({
-            courseList: this.state.courseList.concat(data.items),
-          });
-          console.log('Infinite list');
-          console.log(this.state.courseList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalItems });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.currentPage });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.errorMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.courseService.fetchCourseByLearnerID(page, size, learnerID).subscribe({
+      next: (data: any) => {
+        this.setState({
+          courseList: this.state.courseList.concat(data),
+        });
+        console.log('Infinite list');
+        console.log(this.state.courseList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
   initData(page: number, size: number) {
@@ -220,13 +207,13 @@ export class CourseStore extends StateService<CourseState> {
       .toPromise()
       .then((data: any) => {
         this.setState({
-          courseList: new Array<Course>(data.totalItems),
+          courseList: new Array<Course>(data.totalRecords),
         });
         console.log('Current flag: pure list');
         console.log(this.state.courseList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
         this.loadDataAsync(page, size);
@@ -240,13 +227,13 @@ export class CourseStore extends StateService<CourseState> {
       .toPromise()
       .then((data: any) => {
         this.setState({
-          courseList: new Array<Course>(data.totalItems),
+          courseList: new Array<Course>(data.totalRecords),
         });
         console.log('Current flag: filtered list');
         console.log(this.state.courseList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
         this.filterCourseByCategory(value, page, size);
@@ -264,9 +251,9 @@ export class CourseStore extends StateService<CourseState> {
         });
         console.log('Current flag: infinite filtered list');
         console.log(this.state.courseList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
         this.filterCourseByCategory(value, page, size);
@@ -280,13 +267,13 @@ export class CourseStore extends StateService<CourseState> {
       .toPromise()
       .then((data: any) => {
         this.setState({
-          courseList: new Array<Course>(data.totalItems),
+          courseList: new Array<Course>(data.totalRecords),
         });
         console.log('Current flag: searched list');
         console.log(this.state.courseList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
         this.searchCourseByName(value, page, size);
@@ -299,7 +286,7 @@ export class CourseStore extends StateService<CourseState> {
       .searchCourseByName(value, page, size)
       .toPromise()
       .then((data: any) => {
-        if (data.totalItems !== 0) {
+        if (data.totalRecords !== 0) {
           this.setState({
             courseList: new Array<Course>(size),
           });
@@ -308,9 +295,9 @@ export class CourseStore extends StateService<CourseState> {
         }
         console.log('Current flag: infitite searched list');
         console.log(this.state.courseList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
         this.searchCourseByName(value, page, size);
@@ -324,13 +311,13 @@ export class CourseStore extends StateService<CourseState> {
       .toPromise()
       .then((data: any) => {
         this.setState({
-          courseList: new Array<Course>(data.totalItems),
+          courseList: new Array<Course>(data.totalRecords),
         });
         console.log('Current flag: sort list');
         console.log(this.state.courseList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
         this.sortCourseByPrice(value, page, size);
@@ -348,9 +335,9 @@ export class CourseStore extends StateService<CourseState> {
         });
         console.log('Current flag: sort list');
         console.log(this.state.courseList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
         this.sortCourseByPrice(value, page, size);
@@ -363,24 +350,24 @@ export class CourseStore extends StateService<CourseState> {
       next: (data: any) => {
         this.setState({
           courseList: this.fillEmpty(
-            page,
+            page - 1,
             size,
             this.state.courseList,
-            data.items
+            data.data
           ),
         });
         console.log('Pure list');
         console.log(this.state.courseList);
         console.log('Server response');
         console.log(data);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
         this.setIsLoading(false);
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -391,16 +378,11 @@ export class CourseStore extends StateService<CourseState> {
     this.courseService.fetchCourse(page, size).subscribe({
       next: (data: any) => {
         this.setState({
-          courseList: this.fillEmpty(
-            page,
-            size,
-            this.state.courseList,
-            data.items
-          ),
+          courseList: this.fillEmpty(page, size, this.state.courseList, data),
         });
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
         console.log('Pure list');
         console.log(this.state.courseList);
         console.log('Server response');
@@ -410,13 +392,13 @@ export class CourseStore extends StateService<CourseState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
   }
 
-  setIsLoading(_isLoading: Boolean) {
+  setIsLoading(_isLoading: boolean) {
     this.store.setIsLoading(_isLoading);
   }
 
@@ -452,17 +434,12 @@ export class CourseStore extends StateService<CourseState> {
             this.setTotalItems(this.state.totalItems + 1);
             console.log(data);
             this.loadDataAsync(page, size);
-            this.medicalCheckupService
-              .initCompleteInfiniteData(page, size)
-              .then(() => {
-                // this.medicalCheckupService.setIsCourseDone(true);
-              });
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -470,32 +447,24 @@ export class CourseStore extends StateService<CourseState> {
     });
   }
 
-  updateCourse(
-    course: Course,
-    key: string,
-    page: number,
-    size: number
-  ) {
+  updateCourse(course: Course, key: string, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.courseService
-          .updateCourse(course, key)
-          .subscribe({
-            next: (data: any) => {
-              this.setState({ responseMsg: data });
-              console.log(data);
-              this.loadDataAsync(page, size);
-              this.medicalCheckupService.initCompleteInfiniteData(page, size);
-              this.setIsLoading(false);
-              this.store.showNotif(data.message, 'custom');
-            },
-            error: (data: any) => {
-              this.setIsLoading(false);
-              this.store.showNotif(data.error.errorMessage, 'error');
-              console.log(data);
-            },
-          });
+        this.courseService.updateCourse(course, key).subscribe({
+          next: (data: any) => {
+            this.setState({ responseMsg: data });
+            console.log(data);
+            this.loadDataAsync(page, size);
+            this.setIsLoading(false);
+            this.store.showNotif(data.responseMessage, 'custom');
+          },
+          error: (data: any) => {
+            this.setIsLoading(false);
+            this.store.showNotif(data.error.responseMessage, 'error');
+            console.log(data);
+          },
+        });
       }
     });
   }
@@ -515,23 +484,21 @@ export class CourseStore extends StateService<CourseState> {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.courseService
-          .deleteSelectedCourses(selectedCourses)
-          .subscribe({
-            next: (data: any) => {
-              this.setState({ responseMsg: data });
-              console.log(data);
-              this.loadDataAsync(page, size);
-              console.log(this.state.courseList);
-              this.setIsLoading(false);
-              this.store.showNotif(data.message, 'custom');
-            },
-            error: (data: any) => {
-              this.setIsLoading(false);
-              this.store.showNotif(data.error.errorMessage, 'error');
-              console.log(data);
-            },
-          });
+        this.courseService.deleteSelectedCourses(selectedCourses).subscribe({
+          next: (data: any) => {
+            this.setState({ responseMsg: data });
+            console.log(data);
+            this.loadDataAsync(page, size);
+            console.log(this.state.courseList);
+            this.setIsLoading(false);
+            this.store.showNotif(data.responseMessage, 'custom');
+          },
+          error: (data: any) => {
+            this.setIsLoading(false);
+            this.store.showNotif(data.error.responseMessage, 'error');
+            console.log(data);
+          },
+        });
       }
     });
   }
@@ -549,11 +516,11 @@ export class CourseStore extends StateService<CourseState> {
             this.setState({ totalItems: 0 });
             console.log(data);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -572,11 +539,11 @@ export class CourseStore extends StateService<CourseState> {
             console.log(data);
             this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -613,21 +580,16 @@ export class CourseStore extends StateService<CourseState> {
         next: (data: any) => {
           this.setState({ responseMsg: data });
           this.setState({
-            courseList: this.fillEmpty(
-              page,
-              size,
-              this.state.courseList,
-              data.items
-            ),
+            courseList: this.fillEmpty(page, size, this.state.courseList, data),
           });
-          this.setState({ totalItems: data.totalItems });
+          this.setState({ totalItems: data.totalRecords });
           this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.currentPage });
+          this.setState({ currentPage: data.pageNumber });
           this.setIsLoading(false);
         },
         error: (data: any) => {
           this.setIsLoading(false);
-          this.store.showNotif(data.error.errorMessage, 'error');
+          this.store.showNotif(data.error.responseMessage, 'error');
           console.log(data);
         },
       });
@@ -635,218 +597,180 @@ export class CourseStore extends StateService<CourseState> {
 
   filterCourseByCategory(value: string, page: number, size: number) {
     this.setIsLoading(true);
-    this.courseService
-      .filterCourseByCategory(value, page, size)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({
-            courseList: this.fillEmpty(
-              page,
-              size,
-              this.state.courseList,
-              data.items
-            ),
-          });
-          console.log('Filtered list');
-          console.log(this.state.courseList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalItems });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.currentPage });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.errorMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.courseService.filterCourseByCategory(value, page, size).subscribe({
+      next: (data: any) => {
+        this.setState({
+          courseList: this.fillEmpty(page, size, this.state.courseList, data),
+        });
+        console.log('Filtered list');
+        console.log(this.state.courseList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
-  filterInfiniteCourseByCategory(
-    value: string,
-    page: number,
-    size: number
-  ) {
+  filterInfiniteCourseByCategory(value: string, page: number, size: number) {
     this.setIsLoading(true);
-    this.courseService
-      .filterCourseByCategory(value, page, size)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({
-            courseList: this.state.courseList.concat(data.items),
-          });
-          console.log('Filtered list');
-          console.log(this.state.courseList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalItems });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.currentPage });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.errorMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.courseService.filterCourseByCategory(value, page, size).subscribe({
+      next: (data: any) => {
+        this.setState({
+          courseList: this.state.courseList.concat(data),
+        });
+        console.log('Filtered list');
+        console.log(this.state.courseList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
   searchCourseByName(value: string, page: number, size: number) {
     this.setIsLoading(true);
-    this.courseService
-      .searchCourseByName(value, page, size)
-      .subscribe({
-        next: (data: any) => {
-          if (data.totalItems !== 0) {
-            this.setState({
-              courseList: this.fillEmpty(
-                page,
-                size,
-                this.state.courseList,
-                data.items
-              ),
-            });
-          } else {
-            this.store.showNotif('No result found!', 'custom');
-          }
-          console.log('Searched list');
-          console.log(this.state.courseList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalItems });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.currentPage });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.errorMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.courseService.searchCourseByName(value, page, size).subscribe({
+      next: (data: any) => {
+        if (data.totalRecords !== 0) {
+          this.setState({
+            courseList: this.fillEmpty(page, size, this.state.courseList, data),
+          });
+        } else {
+          this.store.showNotif('No result found!', 'custom');
+        }
+        console.log('Searched list');
+        console.log(this.state.courseList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
   searchInfiniteCourseByName(value: string, page: number, size: number) {
     this.setIsLoading(true);
-    this.courseService
-      .searchCourseByName(value, page, size)
-      .subscribe({
-        next: (data: any) => {
-          if (data.totalItems !== 0) {
-            this.setState({
-              courseList: this.state.courseList.concat(data.items),
-            });
-          } else {
-            this.store.showNotif('No result found!', 'custome');
-          }
-          console.log('Infite searched list');
-          console.log(this.state.courseList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalItems });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.currentPage });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.errorMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.courseService.searchCourseByName(value, page, size).subscribe({
+      next: (data: any) => {
+        if (data.totalRecords !== 0) {
+          this.setState({
+            courseList: this.state.courseList.concat(data),
+          });
+        } else {
+          this.store.showNotif('No result found!', 'custome');
+        }
+        console.log('Infite searched list');
+        console.log(this.state.courseList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
   sortCourseByName(value: string, page: number, size: number) {
     this.setIsLoading(true);
-    this.courseService
-      .sortCourseByName(value, page, size)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({ responseMsg: data });
-          this.setState({
-            courseList: this.fillEmpty(
-              page,
-              size,
-              this.state.courseList,
-              data.items
-            ),
-          });
-          this.setState({ totalItems: data.totalItems });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.currentPage });
-          console.log('Sorted list');
-          console.log(this.state.courseList);
-          console.log('Server response');
-          console.log(data);
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.errorMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.courseService.sortCourseByName(value, page, size).subscribe({
+      next: (data: any) => {
+        this.setState({ responseMsg: data });
+        this.setState({
+          courseList: this.fillEmpty(page, size, this.state.courseList, data),
+        });
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        console.log('Sorted list');
+        console.log(this.state.courseList);
+        console.log('Server response');
+        console.log(data);
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
   sortCourseByPrice(value: string, page: number, size: number) {
     this.setIsLoading(true);
-    this.courseService
-      .sortCourseByPrice(value, page, size)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({ responseMsg: data });
-          this.setState({
-            courseList: this.fillEmpty(
-              page,
-              size,
-              this.state.courseList,
-              data.items
-            ),
-          });
-          this.setState({ totalItems: data.totalItems });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.currentPage });
-          console.log('Sorted list');
-          console.log(this.state.courseList);
-          console.log('Server response');
-          console.log(data);
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.errorMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.courseService.sortCourseByPrice(value, page, size).subscribe({
+      next: (data: any) => {
+        this.setState({ responseMsg: data });
+        this.setState({
+          courseList: this.fillEmpty(page, size, this.state.courseList, data),
+        });
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        console.log('Sorted list');
+        console.log(this.state.courseList);
+        console.log('Server response');
+        console.log(data);
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
   sortInfiniteCourseByPrice(value: string, page: number, size: number) {
     this.setIsLoading(true);
-    this.courseService
-      .sortCourseByPrice(value, page, size)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({
-            courseList: this.state.courseList.concat(data.items),
-          });
-          console.log('Infite sorted list');
-          console.log(this.state.courseList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalItems });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.currentPage });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.errorMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.courseService.sortCourseByPrice(value, page, size).subscribe({
+      next: (data: any) => {
+        this.setState({
+          courseList: this.state.courseList.concat(data),
+        });
+        console.log('Infite sorted list');
+        console.log(this.state.courseList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
   getCourse(id: string) {

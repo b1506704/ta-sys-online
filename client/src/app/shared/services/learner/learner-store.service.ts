@@ -17,7 +17,7 @@ interface LearnerState {
   totalPages: number;
   currentPage: number;
   totalItems: number;
-  responseMsg: String;
+  responseMsg: string;
 }
 const initialState: LearnerState = {
   learnerList: [],
@@ -296,7 +296,7 @@ export class LearnerStore extends StateService<LearnerState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -326,13 +326,13 @@ export class LearnerStore extends StateService<LearnerState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
   }
 
-  setIsLoading(_isLoading: Boolean) {
+  setIsLoading(_isLoading: boolean) {
     this.store.setIsLoading(_isLoading);
   }
 
@@ -381,11 +381,11 @@ export class LearnerStore extends StateService<LearnerState> {
             console.log(data);
             this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -403,11 +403,11 @@ export class LearnerStore extends StateService<LearnerState> {
             console.log(data);
             this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -439,11 +439,11 @@ export class LearnerStore extends StateService<LearnerState> {
               this.loadDataAsync(page, size);
               console.log(this.state.learnerList);
               this.setIsLoading(false);
-              this.store.showNotif(data.message, 'custom');
+              this.store.showNotif(data.responseMessage, 'custom');
             },
             error: (data: any) => {
               this.setIsLoading(false);
-              this.store.showNotif(data.error.errorMessage, 'error');
+              this.store.showNotif(data.error.responseMessage, 'error');
               console.log(data);
             },
           });
@@ -464,11 +464,11 @@ export class LearnerStore extends StateService<LearnerState> {
             this.setState({ totalItems: 0 });
             console.log(data);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -487,11 +487,11 @@ export class LearnerStore extends StateService<LearnerState> {
             console.log(data);
             this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -527,10 +527,10 @@ export class LearnerStore extends StateService<LearnerState> {
       });
   }
 
-  getLearnerByUserName(userName: string) {
+  getLearnerByUserName(username: string) {
     this.setIsLoading(true);
     return this.learnerService
-      .getLearnerByUserName(userName)
+      .getLearnerByUserName(username)
       .toPromise()
       .then((data: any) => {
         this.setState({ learnerInstance: data });
@@ -566,7 +566,7 @@ export class LearnerStore extends StateService<LearnerState> {
         },
         error: (data: any) => {
           this.setIsLoading(false);
-          this.store.showNotif(data.error.errorMessage, 'error');
+          this.store.showNotif(data.error.responseMessage, 'error');
           console.log(data);
         },
       });
@@ -595,7 +595,7 @@ export class LearnerStore extends StateService<LearnerState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -624,7 +624,7 @@ export class LearnerStore extends StateService<LearnerState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -654,7 +654,7 @@ export class LearnerStore extends StateService<LearnerState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
@@ -684,7 +684,7 @@ export class LearnerStore extends StateService<LearnerState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         console.log(data);
       },
     });
