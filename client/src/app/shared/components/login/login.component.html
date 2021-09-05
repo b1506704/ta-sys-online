@@ -1,5 +1,11 @@
-<div style="display: flex; justify-content: center; align-items: center">
-  <form (submit)="onLoginSubmit($event)" [classList]="['loginForm']">
+<div class="login-container">
+  <form
+    (submit)="onLoginSubmit($event)"
+    [ngClass]="{
+      corner_box_animation: isLoading === true,
+      loginForm: isLoading === false
+    }"
+  >
     <div class="long-title">
       <h3>Login</h3>
     </div>
@@ -37,7 +43,7 @@
         <dxi-item
           itemType="button"
           horizontalAlignment="center"
-          [buttonOptions]="resetButtonOptions"
+          [buttonOptions]="signupButtonOptions"
         >
         </dxi-item>
       </dxi-item>

@@ -1,7 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { DxFormComponent } from 'devextreme-angular';
 import { User } from '../../models/user';
 import { AuthService } from '../../services/auth.service';
+import { StoreService } from '../../services/store.service';
 import { UserStore } from '../../services/user/user-store.service';
 
 @Component({
@@ -9,7 +11,7 @@ import { UserStore } from '../../services/user/user-store.service';
   templateUrl: './sign-up.component.html',
   styleUrls: ['./sign-up.component.scss'],
 })
-export class SignUpComponent implements OnInit {
+export class SignUpComponent implements OnInit, OnDestroy {
   @ViewChild(DxFormComponent, { static: false }) form: DxFormComponent;
   password = '';
   passwordOptions: any = {
@@ -29,19 +31,24 @@ export class SignUpComponent implements OnInit {
   checkBoxOptions: any;
   signupButtonOptions: any = {
     text: 'Signup',
+    icon: 'export',
     type: 'normal',
     useSubmitBehavior: true,
   };
-  resetButtonOptions: any = {
-    text: 'Clear',
+  loginButtonOptions: any = {
+    text: 'To Login',
+    icon: 'key',
     type: 'normal',
     useSubmitBehavior: false,
-    onClick: () => {
-      this.form.instance.resetValues();
-      this.form.instance.getEditor('username').focus();
-    },
+    onClick: this.navigateLogin.bind(this),
   };
-  constructor(private authService: AuthService, private userStore: UserStore) {}
+  isLoading!: boolean;
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private store: StoreService,
+    private userStore: UserStore
+  ) {}
 
   onFormShown(e: any) {
     setTimeout(() => {
@@ -59,13 +66,24 @@ export class SignUpComponent implements OnInit {
     this.authService.sendRegisterRequest(this.user);
   };
 
+  navigateLogin() {
+    this.router.navigate(['/login']);
+  }
+
   roleDataListener() {
     this.userStore.$roleList.subscribe((data: any) => {
       this.roleList = data;
     });
   }
 
+  isLoadingListener() {
+    return this.store.$isLoading.subscribe((data: any) => {
+      this.isLoading = data;
+    });
+  }
+
   ngOnInit(): void {
+    this.isLoadingListener();
     this.userStore.getRole().then(() => {
       this.roleDataListener();
     });
@@ -81,5 +99,8 @@ export class SignUpComponent implements OnInit {
       password: '',
       roleId: this.roleList[0],
     };
+  }
+  ngOnDestroy(): void {
+    this.isLoadingListener().unsubscribe();
   }
 }

@@ -11,11 +11,13 @@ interface StoreState {
   currentRoleId: string;
   currentRoleName: string;
   isLoading: boolean;
+  isPreloading: boolean;
   notifType: string;
   responseMsg: string;
 }
 const initialState: StoreState = {
   userList: [],
+  isPreloading: true,
   selectedUser: {},
   currentUser: {},
   currentRoleId: '',
@@ -35,20 +37,32 @@ export class StoreService extends StateService<StoreState> {
 
   $isLoading: Observable<boolean> = this.select((state) => state.isLoading);
 
+  $isPreloading: Observable<boolean> = this.select(
+    (state) => state.isPreloading
+  );
+
   $responseMsg: Observable<string> = this.select((state) => state.responseMsg);
 
   $notifType: Observable<string> = this.select((state) => state.notifType);
 
   $currentUser: Observable<Object> = this.select((state) => state.currentUser);
 
-  $currentRoleId: Observable<string> = this.select((state) => state.currentRoleId);
+  $currentRoleId: Observable<string> = this.select(
+    (state) => state.currentRoleId
+  );
 
-  $currentRoleName: Observable<string> = this.select((state) => state.currentRoleName);
+  $currentRoleName: Observable<string> = this.select(
+    (state) => state.currentRoleName
+  );
 
   loadDataAsync() {}
 
   setIsLoading(_isLoading: boolean) {
     this.setState({ isLoading: _isLoading });
+  }
+
+  setisPreloading(_isPreloading: boolean) {
+    this.setState({ isPreloading: _isPreloading });
   }
 
   setResponseMsg(message: string) {
@@ -58,7 +72,6 @@ export class StoreService extends StateService<StoreState> {
   setNotifType(type: string) {
     this.setState({ notifType: type });
   }
-
 
   setCurrentUser(_user: Object) {
     this.setState({ currentUser: _user });

@@ -14,30 +14,10 @@ export class InstructorHomeComponent implements OnInit {
   date: Number = new Date().getFullYear();
   dataSource: Array<Object> = [
     {
-      title: 'REAL-TIME MONITORING SERVICE',
-      subTitle: 'Stable and high-quality on-bed device tracking',
+      title: '',
+      subTitle: '',
       imgUrl: this.baseImgUrl + 'landing_page_1.jpg',
-      link: 'room_monitor',
-    },
-    {
-      title: 'USER-FRIENDLY PRESCRIPTION MANAGEMENT SYSTEM',
-      subTitle:
-        'Fully functioned editor with office plugin to export PDF and XLSX',
-      imgUrl: this.baseImgUrl + 'landing_page_2.jpg',
-      link: 'edit_medical_checkup_list',
-    },
-    {
-      title: 'SCHEDULE MANAGEMENT INTERFACE',
-      subTitle: 'Provide dynamic UI to organize medical-checkups schedule',
-      imgUrl: this.baseImgUrl + 'landing_page_3.jpg',
-      link: 'schedule_list',
-    },
-    {
-      title: 'MEDICINE AND DISEASE ENCYCLOPEDIA',
-      subTitle:
-        'Provide a tool for instructors to update on-going medical changes ',
-      imgUrl: this.baseImgUrl + 'landing_page_4.jpg',
-      link: 'edit_test_list',
+      link: '',
     },
   ];
   slideshowDelay: number = 2500;

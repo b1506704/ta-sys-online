@@ -21,8 +21,8 @@
         <img class="gallery-image" src="{{ galleryItem.imgUrl }}" />
       </div>
       <div class="content-body">
-        <div class="gallery-title">{{ galleryItem.title }}</div>
-        <div class="gallery-subtitle">{{ galleryItem.subTitle }}</div>
+        <p class="gallery-title">{{ galleryItem.title }}</p>
+        <p class="gallery-subtitle">{{ galleryItem.subTitle }}</p>
         <dx-button
           icon="arrowright"
           type="normal"
@@ -35,28 +35,32 @@
   </div>
 </dx-gallery>
 <h2 class="feature-heading">Features</h2>
+
 <div class="feature-container box-shadow">
-  <div class="feature-title">DATAGRID EDITOR</div>
-  <div class="feature-body">
-    Fully functioned database management with cutting-edge tools and techniques
-  </div>
-  <div class="feature-icons">
-    <dx-button icon="splitcells" text="Row Edit"> </dx-button>
-    <dx-button icon="tableproperties" text="Column Edit"> </dx-button>
-    <dx-button icon="trash" text="Delete All"> </dx-button>
-    <dx-button icon="unselectall" text="Selective Remove"> </dx-button>
-    <dx-button icon="xlsxfile" text="Export XLSX"> </dx-button>
-    <dx-button icon="exportpdf" text="Export PDF"> </dx-button>
-    <dx-button icon="add" text="Live Insert"> </dx-button>
-    <dx-button icon="filter" text="Filter & Sort"> </dx-button>
-    <dx-button icon="search" text="Smart Search"> </dx-button>
-    <dx-button icon="range" text="Random Generate"> </dx-button>
-    <dx-button icon="globe" text="SS Pagination"> </dx-button>
-    <dx-button icon="verticalaligncenter" text="Responsive UI"> </dx-button>
+  <div class="feature-content">
+    <div class="feature-title">DATAGRID EDITOR</div>
+    <div class="feature-body">
+      Fully functioned database management with cutting-edge tools and
+      techniques
+    </div>
+    <div class="feature-icons">
+      <dx-button icon="splitcells" text="Row Edit"> </dx-button>
+      <dx-button icon="tableproperties" text="Column Edit"> </dx-button>
+      <dx-button icon="trash" text="Delete All"> </dx-button>
+      <dx-button icon="unselectall" text="Selective Remove"> </dx-button>
+      <dx-button icon="xlsxfile" text="Export XLSX"> </dx-button>
+      <dx-button icon="exportpdf" text="Export PDF"> </dx-button>
+      <dx-button icon="add" text="Live Insert"> </dx-button>
+      <dx-button icon="filter" text="Filter & Sort"> </dx-button>
+      <dx-button icon="search" text="Smart Search"> </dx-button>
+      <dx-button icon="range" text="Random Generate"> </dx-button>
+      <dx-button icon="globe" text="SS Pagination"> </dx-button>
+      <dx-button icon="verticalaligncenter" text="Responsive UI"></dx-button>
+    </div>
   </div>
   <div class="feature-img">
     <img
-      src="../../../../assets/imgs/landing_page_7.jpg"
+      src="../../../../assets/imgs/landing_page_9.png"
       alt="..."
       style="
         height: 100%;
@@ -68,22 +72,22 @@
   </div>
 </div>
 <div class="feature-container box-shadow">
-  <div class="feature-title">MONITORING SYSTEM</div>
-  <div class="feature-body">
-    Real-time on-bed devices monitoring gauche widget with data emitted from
-    socket connection.
-  </div>
-  <div class="feature-icons">
-    <dx-button icon="info" text="Patient Interact"> </dx-button>
-    <dx-button icon="map" text="Room Monitor"> </dx-button>
-    <dx-button icon="formula" text="Auto Calculate"> </dx-button>
-    <dx-button icon="like" text="Friendly UI"> </dx-button>
-    <dx-button icon="runner" text="Emergent Alert"> </dx-button>
-    <dx-button icon="preferences" text="Remote Switch"> </dx-button>
+  <div class="feature-content">
+    <div class="feature-title">DYNAMIC STATISTICS</div>
+    <div class="feature-body">
+      Providing a variety of charts with auto-calculating function and range
+      selectors.
+    </div>
+    <div class="feature-icons">
+      <dx-button icon="splitcells" text="Range Selector"> </dx-button>
+      <dx-button icon="refresh" text="Fetch Data"> </dx-button>
+      <dx-button icon="formula" text="Auto Calculate"> </dx-button>
+      <dx-button icon="like" text="Friendly UI"> </dx-button>
+    </div>
   </div>
   <div class="feature-img">
     <img
-      src="../../../../assets/imgs/landing_page_8.jpg"
+      src="../../../../assets/imgs/landing_page_10.png"
       alt="..."
       style="
         height: 100%;
@@ -94,11 +98,12 @@
     />
   </div>
 </div>
+
 <h2 class="feature-heading">Organization</h2>
 <div class="organization-container">
   <div class="organization-img">
     <img
-      src="../../../../assets/imgs/elon_musk.jpeg"
+      src="../../../../assets/imgs/tesla_director.jpg"
       alt="..."
       style="
         height: 300px;
@@ -109,8 +114,8 @@
     />
   </div>
   <div class="organization-content">
-    <div class="feature-title">Anonymous</div>
-    <div class="feature-body">Mascot of Tesla Clinic</div>
+    <div class="feature-title">Le Bao Anh</div>
+    <div class="feature-body">Frontend Developer</div>
   </div>
 </div>
 <div class="organization-container">
@@ -127,13 +132,11 @@
     />
   </div>
   <div class="organization-content">
-    <div class="feature-title">Nicole Tesla</div>
-    <div class="feature-body">
-      Main developer, programmer, feature planner, UI, UX designer.
-    </div>
+    <div class="feature-title">Ha Tan Loc</div>
+    <div class="feature-body">Backend Developer.</div>
   </div>
 </div>
 
 <div class="footer">
-  <h2>@{{ date }}. Tesla Clinic. Developed by Le Bao Anh - B1506704.</h2>
+  <h2>@{{ date }}. T. A. S Online</h2>
 </div>

@@ -11,28 +11,6 @@ const routes: Routes = [
         (m) => m.LearnerHomeModule
       ),
   },
-  {
-    path: 'instructor_list',
-    loadChildren: () =>
-      import('./pages/learner/instructor-list/instructor-list.module').then(
-        (m) => m.InstructorListModule
-      ),
-  },
-  {
-    path: 'test_list',
-    loadChildren: () =>
-      import('./pages/learner/test-list/test-list.module').then(
-        (m) => m.TestListModule
-      ),
-  },
-  {
-    path: 'instructor_schedule',
-    loadChildren: () =>
-      import('./pages/learner/schedule-list/schedule-list.module').then(
-        (m) => m.ScheduleListModule
-      ),
-    canActivate: [AuthGuardService],
-  },
   // instructor route
   {
     path: 'instructor_home',
@@ -40,13 +18,14 @@ const routes: Routes = [
       import('./pages/instructor/instructor_home/instructor-home.module').then(
         (m) => m.InstructorHomeModule
       ),
+    canActivate: [AuthGuardService],
   },
   {
-    path: 'schedule_list',
+    path: 'instructor_streaming',
     loadChildren: () =>
-      import('./pages/instructor/schedule-list/schedule-list.module').then(
-        (m) => m.ScheduleListModule
-      ),
+      import(
+        './pages/instructor/instructor_streaming/instructor-streaming.module'
+      ).then((m) => m.InstructorStreamingModule),
     canActivate: [AuthGuardService],
   },
   // admin route
@@ -122,22 +101,7 @@ const routes: Routes = [
       ),
     canActivate: [AuthGuardService],
   },
-  {
-    path: 'file_management',
-    loadChildren: () =>
-      import('./pages/admin/file-management/file-management.module').then(
-        (m) => m.FileManagementModule
-      ),
-    canActivate: [AuthGuardService],
-  },
-  {
-    path: 'statistics',
-    loadChildren: () =>
-      import('./pages/admin/statistics/statistics.module').then(
-        (m) => m.StatisticsModule
-      ),
-    canActivate: [AuthGuardService],
-  },
+
   // other
   {
     path: 'not_found',
@@ -166,6 +130,19 @@ const routes: Routes = [
       import('./shared/components/profile/user-profile.module').then(
         (m) => m.UserProfileModule
       ),
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'splash_screen',
+    loadChildren: () =>
+      import('./shared/components/splash_screen/splash-screen.module').then(
+        (m) => m.SplashScreenModule
+      ),
+  },
+  {
+    path: '',
+    redirectTo: '/splash_screen',
+    pathMatch: 'full',
   },
   {
     path: '**',

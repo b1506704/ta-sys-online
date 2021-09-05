@@ -5,6 +5,7 @@ import { StateService } from '../state.service';
 import { StoreService } from '../store.service';
 import { UserHttpService } from './user-http.service';
 import { confirm } from 'devextreme/ui/dialog';
+import { Router } from '@angular/router';
 interface UserState {
   userList: Array<User>;
   roleList: Array<any>;
@@ -35,21 +36,16 @@ const initialState: UserState = {
 export class UserStore extends StateService<UserState> {
   constructor(
     private userService: UserHttpService,
-    private store: StoreService
+    private store: StoreService,
+    private router: Router
   ) {
     super(initialState);
-
     this.$isLoggedIn.subscribe((data: any) => {
       if (data === true) {
         this.store.setCurrentUser(this.getUsername());
         this.store.setCurrentUserRoleId(this.getRoleId());
-        this.getRole().then(() => {
-          const roleName = this.state.roleList.find(
-            (e: any) => e.id === this.getRoleId()
-          )?.name;
-          this.store.setCurrentUserRoleName(roleName);
-          console.log(roleName);
-        });
+        this.store.setisPreloading(true);
+        this.dynamicRouting();
       }
     });
   }
@@ -106,6 +102,33 @@ export class UserStore extends StateService<UserState> {
         });
         console.log(data);
       });
+  }
+
+  dynamicRouting() {
+    this.getRole().then(() => {
+      const roleName = this.state.roleList.find(
+        (e: any) => e.id === this.getRoleId()
+      )?.name;
+      this.store.setCurrentUserRoleName(roleName);
+      switch (roleName) {
+        case 'Admin':
+          this.router.navigate(['/admin_home']);
+          break;
+        case 'Instructor':
+          this.router.navigate(['/instructor_home']);
+          break;
+        case 'Learner':
+          this.router.navigate(['/learner_home']);
+          break;
+        case undefined:
+          this.router.navigate(['/login']);
+          break;
+        default:
+          break;
+      }
+      this.store.setisPreloading(false);
+      console.log(roleName);
+    });
   }
 
   initData(page: number, size: number) {
@@ -627,16 +650,18 @@ export class UserStore extends StateService<UserState> {
     localStorage.removeItem('username');
     localStorage.removeItem('roleId');
     localStorage.removeItem('expiration');
-    this.setIsLoading(true);
+    // this.setIsLoading(true);
     // this.userService.logoutUser(user).subscribe({
     //   next: (data: any) => {
     //     this.setState({ responseMsg: data });
     this.store.setCurrentUser(null);
     this.store.setCurrentUserRoleId('');
-    this.setIsLoading(false);
+    this.store.setCurrentUserRoleName('');
+    // this.setIsLoading(false);
     //     localStorage.removeItem('access_token');
     this.setState({ isLoggedIn: false });
     this.store.showNotif('Logout successfully', 'custom');
+    this.dynamicRouting();
     //   },
     //   error: (data: any) => {
     //     this.setIsLoading(false);

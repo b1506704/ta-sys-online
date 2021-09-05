@@ -25,12 +25,12 @@ export class CourseHttpService {
   fetchCourseByLearnerID(
     page: number,
     size: number,
-    learnerID: string
+    id: string
   ): Observable<Course> {
     const params = new HttpParams()
       .set('PageNumber', page)
       .set('PageSize', size)
-      .set('learnerID', learnerID);
+      .set('Id', id);
     console.log(params.toString());
     return this.http.get<Course>(this.apiUrl + '/byLearnerID', {
       params: params,
@@ -39,111 +39,61 @@ export class CourseHttpService {
     });
   }
 
-  searchCourseByName(
+  searchCourseByProperty(
+    property: string,
     value: string,
     page: number,
     size: number
   ): Observable<Course> {
     const params = new HttpParams()
-      .set('value', value)
+      .set('Property', property)
+      .set('Value', value)
       .set('PageNumber', page)
       .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<Course>(
-      this.apiUrl + '/searchByName',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Course>(this.apiUrl + '/search', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
-  filterCourseByPrice(
-    criteria: string,
-    value: number,
-    page: number,
-    size: number
-  ): Observable<Course> {
-    const params = new HttpParams()
-      .set('criteria', criteria)
-      .set('value', value)
-      .set('PageNumber', page)
-      .set('PageSize', size);
-    console.log(params.toString());
-    return this.http.post<Course>(
-      this.apiUrl,
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  filterCourseByCategory(
+  filterCourseByProperty(
+    property: string,
     value: string,
     page: number,
     size: number
   ): Observable<Course> {
     const params = new HttpParams()
-      .set('value', value)
+      .set('Value', value)
+      .set('Property', property)
       .set('PageNumber', page)
       .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<Course>(
-      this.apiUrl + '/filterByCategory',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Course>(this.apiUrl + '/filter', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
-  sortCourseByName(
+  sortCourseByProperty(
     value: string,
+    order: string,
     page: number,
     size: number
   ): Observable<Course> {
     const params = new HttpParams()
-      .set('value', value)
+      .set('SortBy', value)
+      .set('Order', order)
       .set('PageNumber', page)
       .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<Course>(
-      this.apiUrl + '/sortByName',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  sortCourseByPrice(
-    value: string,
-    page: number,
-    size: number
-  ): Observable<Course> {
-    const params = new HttpParams()
-      .set('value', value)
-      .set('PageNumber', page)
-      .set('PageSize', size);
-    console.log(params.toString());
-    return this.http.post<Course>(
-      this.apiUrl + '/sortByPrice',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Course>(this.apiUrl + '/paging', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
   uploadCourse(course: Course): Observable<Course> {
@@ -160,15 +110,15 @@ export class CourseHttpService {
     });
   }
 
-  deleteAllCourses(): Observable<Course> {
-    return this.http.post<Course>(this.apiUrl + '/deleteAll', {
+  deleteCourse(id: Array<string>): Observable<Object> {
+    return this.http.post<Object>(this.apiUrl + '/delete', id, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
-  deleteCourse(id: string): Observable<ArrayBuffer> {
-    return this.http.delete<ArrayBuffer>(this.apiUrl + `/${id}`, {
+  deleteAll(): Observable<ArrayBuffer> {
+    return this.http.delete<ArrayBuffer>(this.apiUrl, {
       reportProgress: true,
       observe: 'body',
     });
@@ -181,42 +131,11 @@ export class CourseHttpService {
     });
   }
 
-  getCourseByMedicalCheckupID(medicalCheckupID: string): Observable<Course> {
-    const params = new HttpParams().set('medicalCheckupID', medicalCheckupID);
-    console.log(params.toString());
-    return this.http.post<Course>(
-      this.apiUrl + '/byMedicalCheckupID',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  deleteSelectedCourses(
-    selectedItems: Array<string>
-  ): Observable<Array<string>> {
-    return this.http.post<Array<string>>(
-      this.apiUrl + '/batch',
-      selectedItems,
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  updateCourse(course: Course, key: string): Observable<Course> {
-    return this.http.post<Course>(
-      this.apiUrl + `/updateCourse/${key}`,
-      course,
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+  updateCourse(course: Course): Observable<Course> {
+    return this.http.put<Course>(this.apiUrl, course, {
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
   fetchAll(): Observable<Course> {

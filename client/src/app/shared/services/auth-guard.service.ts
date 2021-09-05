@@ -25,8 +25,7 @@ export class AuthGuardService implements CanActivate {
   ): Observable<boolean> | Promise<boolean> | boolean {
     this.userStoreService.$isLoggedIn.subscribe((data: any) => {
       if (data !== true) {
-        this.store.showNotif('Please log in first!', 'custom');
-        this.router.navigate(['/login']);
+        this.router.navigate(['/splash_screen']);
       }
     });
     return true;

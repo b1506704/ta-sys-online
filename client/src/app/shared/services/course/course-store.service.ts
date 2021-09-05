@@ -48,11 +48,11 @@ export class CourseStore extends StateService<CourseState> {
    * @return {Array<Object>} Return an array with filled items from ss pagination
    * @example
    * this.setState({
-            pendingCheckupList: this.fillEmpty(
-              page,
+            sourceList: this.fillEmpty(
+              page - 1,
               size,
-              this.state.pendingCheckupList,
-              data
+              this.state.sourceList,
+              arrayItemFromServer
             ),
           });
    */
@@ -72,7 +72,7 @@ export class CourseStore extends StateService<CourseState> {
     }
     // endIndex = pageSize
     // pageSize = 5
-    // 0 => 0 ,1,2,3,4,
+    // 0 => 0,1,2,3,4,
     // 1 -> 5,6,7,8,9
     // 2 -> 10,11,12,13,14
     // 17 -> 85,86,87,88,89
@@ -86,23 +86,14 @@ export class CourseStore extends StateService<CourseState> {
       .fetchCourse(page, size)
       .toPromise()
       .then((data: any) => {
-        if (page === 0) {
-          this.setState({
-            courseList: new Array<Course>(size),
-          });
-        } else {
-          this.setState({
-            courseList: new Array<Course>(page * size),
-          });
-        }
+        this.setState({
+          courseList: data.data,
+        });
         console.log('Current flag: infite list');
         console.log(this.state.courseList);
         this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
         this.setState({ currentPage: data.pageNumber });
-      })
-      .then(() => {
-        this.loadDataAsync(page, size);
       });
   }
 
@@ -111,7 +102,7 @@ export class CourseStore extends StateService<CourseState> {
     this.courseService.fetchCourse(page, size).subscribe({
       next: (data: any) => {
         this.setState({
-          courseList: this.state.courseList.concat(data),
+          courseList: this.state.courseList.concat(data.data),
         });
         console.log('Infinite list');
         console.log(this.state.courseList);
@@ -135,7 +126,12 @@ export class CourseStore extends StateService<CourseState> {
     this.courseService.fetchCourseByLearnerID(page, size, learnerID).subscribe({
       next: (data: any) => {
         this.setState({
-          courseList: this.fillEmpty(page, size, this.state.courseList, data),
+          courseList: this.fillEmpty(
+            page - 1,
+            size,
+            this.state.courseList,
+            data.data
+          ),
         });
         console.log('Pure list');
         console.log(this.state.courseList);
@@ -160,16 +156,13 @@ export class CourseStore extends StateService<CourseState> {
       .toPromise()
       .then((data: any) => {
         this.setState({
-          courseList: new Array<Course>(data.length),
+          courseList: data.data,
         });
         console.log('Current flag: infite list');
         console.log(this.state.courseList);
         this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
         this.setState({ currentPage: data.pageNumber });
-      })
-      .then(() => {
-        this.loadDataAsyncByLearnerID(page, size, learnerID);
       });
   }
 
@@ -182,7 +175,7 @@ export class CourseStore extends StateService<CourseState> {
     this.courseService.fetchCourseByLearnerID(page, size, learnerID).subscribe({
       next: (data: any) => {
         this.setState({
-          courseList: this.state.courseList.concat(data),
+          courseList: this.state.courseList.concat(data.data),
         });
         console.log('Infinite list');
         console.log(this.state.courseList);
@@ -220,10 +213,15 @@ export class CourseStore extends StateService<CourseState> {
       });
   }
 
-  initFilterByCategoryData(value: string, page: number, size: number) {
+  initFilterByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Filtered Mode On', 'custom');
     this.courseService
-      .filterCourseByCategory(value, 0, 5)
+      .filterCourseByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
@@ -236,34 +234,41 @@ export class CourseStore extends StateService<CourseState> {
         this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.filterCourseByCategory(value, page, size);
+        this.filterCourseByProperty(property, value, page, size);
       });
   }
 
-  initInfiniteFilterByCategoryData(value: string, page: number, size: number) {
+  initInfiniteFilterByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Filtered Mode On', 'custom');
     this.courseService
-      .filterCourseByCategory(value, page, size)
+      .filterCourseByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          courseList: new Array<Course>(size),
+          courseList: data.data,
         });
         console.log('Current flag: infinite filtered list');
         console.log(this.state.courseList);
         this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
         this.setState({ currentPage: data.pageNumber });
-      })
-      .then(() => {
-        this.filterCourseByCategory(value, page, size);
       });
   }
 
-  initSearchByNameData(value: string, page: number, size: number) {
+  initSearchByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Searched Mode On', 'custom');
     this.courseService
-      .searchCourseByName(value, 0, 5)
+      .searchCourseByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
@@ -276,19 +281,24 @@ export class CourseStore extends StateService<CourseState> {
         this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.searchCourseByName(value, page, size);
+        this.searchCourseByProperty(property, value, page, size);
       });
   }
 
-  initInfiniteSearchByNameData(value: string, page: number, size: number) {
+  initInfiniteSearchByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Searched Mode On', 'custom');
     this.courseService
-      .searchCourseByName(value, page, size)
+      .searchCourseByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         if (data.totalRecords !== 0) {
           this.setState({
-            courseList: new Array<Course>(size),
+            courseList: data.data,
           });
         } else {
           this.store.showNotif('No result found!', 'custom');
@@ -298,16 +308,18 @@ export class CourseStore extends StateService<CourseState> {
         this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
         this.setState({ currentPage: data.pageNumber });
-      })
-      .then(() => {
-        this.searchCourseByName(value, page, size);
       });
   }
 
-  initSortByPriceData(value: string, page: number, size: number) {
+  initSortByPropertyData(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Sort Mode On', 'custom');
     this.courseService
-      .sortCourseByPrice(value, 0, 5)
+      .sortCourseByProperty(value, order, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
@@ -320,27 +332,29 @@ export class CourseStore extends StateService<CourseState> {
         this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.sortCourseByPrice(value, page, size);
+        this.sortCourseByProperty(value, order, page, size);
       });
   }
 
-  initInfiniteSortByPriceData(value: string, page: number, size: number) {
+  initInfiniteSortByPropertyData(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Sort Mode On', 'custom');
     this.courseService
-      .sortCourseByPrice(value, page, size)
+      .sortCourseByProperty(value, order, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          courseList: new Array<Course>(size),
+          courseList: data.data,
         });
         console.log('Current flag: sort list');
         console.log(this.state.courseList);
         this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
         this.setState({ currentPage: data.pageNumber });
-      })
-      .then(() => {
-        this.sortCourseByPrice(value, page, size);
       });
   }
 
@@ -378,7 +392,12 @@ export class CourseStore extends StateService<CourseState> {
     this.courseService.fetchCourse(page, size).subscribe({
       next: (data: any) => {
         this.setState({
-          courseList: this.fillEmpty(page, size, this.state.courseList, data),
+          courseList: this.fillEmpty(
+            page - 1,
+            size,
+            this.state.courseList,
+            data.data
+          ),
         });
         this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
@@ -447,11 +466,11 @@ export class CourseStore extends StateService<CourseState> {
     });
   }
 
-  updateCourse(course: Course, key: string, page: number, size: number) {
+  updateCourse(course: Course, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.courseService.updateCourse(course, key).subscribe({
+        this.courseService.updateCourse(course).subscribe({
           next: (data: any) => {
             this.setState({ responseMsg: data });
             console.log(data);
@@ -484,7 +503,7 @@ export class CourseStore extends StateService<CourseState> {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.courseService.deleteSelectedCourses(selectedCourses).subscribe({
+        this.courseService.deleteCourse(selectedCourses).subscribe({
           next: (data: any) => {
             this.setState({ responseMsg: data });
             console.log(data);
@@ -503,17 +522,13 @@ export class CourseStore extends StateService<CourseState> {
     });
   }
 
-  deleteAllCourses() {
+  deleteAll() {
     this.confirmDialog('Delete all items?').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.courseService.deleteAllCourses().subscribe({
+        this.courseService.deleteAll().subscribe({
           next: (data: any) => {
-            this.setState({ responseMsg: data });
-            this.setState({ courseList: [] });
-            this.setState({ totalPages: 0 });
-            this.setState({ currentPage: 0 });
-            this.setState({ totalItems: 0 });
+            this.resetState();
             console.log(data);
             this.setIsLoading(false);
             this.store.showNotif(data.responseMessage, 'custom');
@@ -528,7 +543,7 @@ export class CourseStore extends StateService<CourseState> {
     });
   }
 
-  deleteCourse(id: string, page: number, size: number) {
+  deleteCourse(id: Array<string>, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
@@ -567,21 +582,62 @@ export class CourseStore extends StateService<CourseState> {
     this.setState({ currentPage: _currentPage });
   }
 
-  filterCourseByPrice(
-    criteria: string,
-    value: number,
+  filterCourseByProperty(
+    property: string,
+    value: string,
     page: number,
     size: number
   ) {
     this.setIsLoading(true);
     this.courseService
-      .filterCourseByPrice(criteria, value, page, size)
+      .filterCourseByProperty(property, value, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({ responseMsg: data });
+          if (data.totalRecords !== 0) {
+            this.setState({
+              courseList: this.fillEmpty(
+                page - 1,
+                size,
+                this.state.courseList,
+                data.data
+              ),
+            });
+            console.log('Filtered list');
+            console.log(this.state.courseList);
+            console.log('Server response');
+            console.log(data);
+            this.setState({ totalItems: data.totalRecords });
+            this.setState({ totalPages: data.totalPages });
+            this.setState({ currentPage: data.pageNumber });
+          }
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  filterInfiniteCourseByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.courseService
+      .filterCourseByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
           this.setState({
-            courseList: this.fillEmpty(page, size, this.state.courseList, data),
+            courseList: this.state.courseList.concat(data),
           });
+          console.log('Filtered list');
+          console.log(this.state.courseList);
+          console.log('Server response');
+          console.log(data);
           this.setState({ totalItems: data.totalRecords });
           this.setState({ totalPages: data.totalPages });
           this.setState({ currentPage: data.pageNumber });
@@ -595,182 +651,147 @@ export class CourseStore extends StateService<CourseState> {
       });
   }
 
-  filterCourseByCategory(value: string, page: number, size: number) {
+  searchCourseByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.setIsLoading(true);
-    this.courseService.filterCourseByCategory(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          courseList: this.fillEmpty(page, size, this.state.courseList, data),
-        });
-        console.log('Filtered list');
-        console.log(this.state.courseList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.courseService
+      .searchCourseByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            this.setState({
+              courseList: this.fillEmpty(
+                page - 1,
+                size,
+                this.state.courseList,
+                data.data
+              ),
+            });
+          } else {
+            this.store.showNotif('No result found!', 'custom');
+          }
+          console.log('Searched list');
+          console.log(this.state.courseList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
-  filterInfiniteCourseByCategory(value: string, page: number, size: number) {
+  searchInfiniteCourseByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.setIsLoading(true);
-    this.courseService.filterCourseByCategory(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          courseList: this.state.courseList.concat(data),
-        });
-        console.log('Filtered list');
-        console.log(this.state.courseList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.courseService
+      .searchCourseByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            this.setState({
+              courseList: this.state.courseList.concat(data),
+            });
+          } else {
+            this.store.showNotif('No result found!', 'custome');
+          }
+          console.log('Infite searched list');
+          console.log(this.state.courseList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
-  searchCourseByName(value: string, page: number, size: number) {
+  sortCourseByProperty(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
     this.setIsLoading(true);
-    this.courseService.searchCourseByName(value, page, size).subscribe({
-      next: (data: any) => {
-        if (data.totalRecords !== 0) {
+    this.courseService
+      .sortCourseByProperty(value, order, page, size)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({ responseMsg: data });
           this.setState({
-            courseList: this.fillEmpty(page, size, this.state.courseList, data),
+            courseList: this.fillEmpty(
+              page - 1,
+              size,
+              this.state.courseList,
+              data.data
+            ),
           });
-        } else {
-          this.store.showNotif('No result found!', 'custom');
-        }
-        console.log('Searched list');
-        console.log(this.state.courseList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          console.log('Sorted list');
+          console.log(this.state.courseList);
+          console.log('Server response');
+          console.log(data);
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
-  searchInfiniteCourseByName(value: string, page: number, size: number) {
+  sortInfiniteCourseByProperty(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
     this.setIsLoading(true);
-    this.courseService.searchCourseByName(value, page, size).subscribe({
-      next: (data: any) => {
-        if (data.totalRecords !== 0) {
+    this.courseService
+      .sortCourseByProperty(value, order, page, size)
+      .subscribe({
+        next: (data: any) => {
           this.setState({
             courseList: this.state.courseList.concat(data),
           });
-        } else {
-          this.store.showNotif('No result found!', 'custome');
-        }
-        console.log('Infite searched list');
-        console.log(this.state.courseList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  sortCourseByName(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.courseService.sortCourseByName(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({ responseMsg: data });
-        this.setState({
-          courseList: this.fillEmpty(page, size, this.state.courseList, data),
-        });
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        console.log('Sorted list');
-        console.log(this.state.courseList);
-        console.log('Server response');
-        console.log(data);
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  sortCourseByPrice(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.courseService.sortCourseByPrice(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({ responseMsg: data });
-        this.setState({
-          courseList: this.fillEmpty(page, size, this.state.courseList, data),
-        });
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        console.log('Sorted list');
-        console.log(this.state.courseList);
-        console.log('Server response');
-        console.log(data);
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  sortInfiniteCourseByPrice(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.courseService.sortCourseByPrice(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          courseList: this.state.courseList.concat(data),
-        });
-        console.log('Infite sorted list');
-        console.log(this.state.courseList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+          console.log('Infite sorted list');
+          console.log(this.state.courseList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
   getCourse(id: string) {
@@ -785,19 +806,11 @@ export class CourseStore extends StateService<CourseState> {
       });
   }
 
-  getCourseByMedicalCheckupID(id: string) {
-    this.setIsLoading(true);
-    return this.courseService
-      .getCourseByMedicalCheckupID(id)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({ courseInstance: data });
-        console.log(data);
-        this.setIsLoading(false);
-      });
-  }
-
   setExportData(array: Array<Course>) {
     this.setState({ courseList: array });
+  }
+
+  resetState() {
+    this.setState(initialState);
   }
 }

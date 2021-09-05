@@ -44,6 +44,7 @@ export class HeaderComponent implements OnInit {
 
   isLoadIndicatorVisible!: boolean;
   isLoggedIn!: boolean;
+  isRoleSelected: boolean = false;
   currentUser!: User;
   roleList: Array<any> = [];
 
@@ -53,45 +54,6 @@ export class HeaderComponent implements OnInit {
     private userStore: UserStore
   ) {}
 
-  roleDataListener() {
-    this.store.$currentRoleName.subscribe((data: string) => {
-      switch (data) {
-        case 'Admin':
-          this.router.navigate(['/admin_home']);
-          break;
-        case 'Instructor':
-          this.router.navigate(['/instructor_home']);
-          break;
-        case 'Learner':
-          this.router.navigate(['/learner_home']);
-          break;
-        default:
-          this.router.navigate(['/learner_home']);
-          break;
-      }
-    });
-    // this.userStore.$roleList.subscribe((data: any) => {
-    //   this.roleList = data;
-    //   this.store.$currentRoleId.subscribe((data: string) => {
-    //     const roleName = this.roleList.find((e: any) => e.id === data)?.name;
-    //     switch (roleName) {
-    //       case 'Admin':
-    //         this.router.navigate(['/admin_home']);
-    //         break;
-    //       case 'Instructor':
-    //         this.router.navigate(['/instructor_home']);
-    //         break;
-    //       case 'Learner':
-    //         this.router.navigate(['/learner_home']);
-    //         break;
-    //       default:
-    //         this.router.navigate(['/instructor_home']);
-    //         break;
-    //     }
-    //   });
-    // });
-  }
-
   ngOnInit() {
     this.store.$isLoading.subscribe((data: any) => {
       this.isLoadIndicatorVisible = data;
@@ -100,17 +62,15 @@ export class HeaderComponent implements OnInit {
       if (data !== null) {
         this.currentUser = data;
       }
-      // console.log(data);
     });
     this.userStore.$isLoggedIn.subscribe((data: any) => {
       this.isLoggedIn = data;
-      if (this.isLoggedIn) {
-        // this.userStore.getRole().then(() => {
-        //   this.roleDataListener();
-        // });
-        this.roleDataListener();
+    });
+    this.store.$currentRoleName.subscribe((data: any) => {
+      if (data === undefined) {
+        this.isRoleSelected = false;
       } else {
-        this.onLogin();
+        this.isRoleSelected = true;
       }
     });
   }

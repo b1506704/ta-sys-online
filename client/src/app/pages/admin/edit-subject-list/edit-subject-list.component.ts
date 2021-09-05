@@ -33,17 +33,19 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
   pageSize: number = 5;
   allowedPageSizes: Array<number | string> = [5, 10, 15];
   scrollingMode: string = 'standard';
-  // standard | virtual | infinite
   currentIndexFromServer: number;
   isSearchingByName: boolean;
   isFilteringByCategory: boolean;
   isFilteringByPrice: boolean;
   isSortingByName: boolean;
 
-  currentCategoryFilterValue: string;
+  currentFilterByPropertyValue: string;
   timeout: any;
-  currentSearchByNameValue: string;
-  currentSortByPriceValue: string;
+  currentSearchByPropertyValue: string;
+  currentSortByPropertyValue: string;
+  currentSortProperty: string = 'name';
+  currentSearchProperty: string = 'name';
+  currentFilterProperty: string = 'name';
 
   constructor(
     private subjectStore: SubjectStore,
@@ -168,14 +170,14 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
         options: {
           items: [
             {
-              _id: '-1',
+              id: '-1',
               name: '(NONE)',
             },
-            { _id: '0', name: 'ASC' },
-            { _id: '1', name: 'DESC' },
+            { id: '0', name: 'asc' },
+            { id: '1', name: 'desc' },
           ],
           valueExpr: 'name',
-          placeholder: 'Sort by total cost',
+          placeholder: 'Sort by name',
           displayExpr: 'name',
           onValueChanged: this.onSortValueChanged.bind(this),
         },
@@ -189,11 +191,12 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
       this.isSearchingByName = true;
       this.isFilteringByCategory = false;
       this.isSortingByName = false;
-      console.log(this.currentSearchByNameValue);
-      if (this.currentSearchByNameValue !== '') {
-        this.subjectStore.initSearchByNameData(
-          this.currentSearchByNameValue,
-          this.dataGrid.instance.pageIndex(),
+      console.log(this.currentSearchByPropertyValue);
+      if (this.currentSearchByPropertyValue !== '') {
+        this.subjectStore.initSearchByPropertyData(
+          this.currentSearchProperty,
+          this.currentSearchByPropertyValue,
+          this.dataGrid.instance.pageIndex() + 1,
           this.pageSize
         );
       } else {
@@ -205,18 +208,19 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
   }
 
   onSearchValueChanged(e: any) {
-    this.currentSearchByNameValue = e.value;
+    this.currentSearchByPropertyValue = e.value;
   }
 
   onSortValueChanged(e: any) {
     this.isSortingByName = true;
     this.isSearchingByName = false;
     this.isFilteringByCategory = false;
-    this.currentSortByPriceValue = e.value;
+    this.currentSortByPropertyValue = e.value;
     if (e.value !== '(NONE)') {
-      this.subjectStore.initSortByPriceData(
+      this.subjectStore.initSortByPropertyData(
+        this.currentSortProperty,
         e.value,
-        this.dataGrid.instance.pageIndex(),
+        this.dataGrid.instance.pageIndex() + 1,
         this.pageSize
       );
     } else {
@@ -230,12 +234,13 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = true;
     this.isSearchingByName = false;
     this.isSortingByName = false;
-    this.currentCategoryFilterValue = e.value;
+    this.currentFilterByPropertyValue = e.value;
     console.log(e.value);
     if (e.value !== '(NONE)') {
-      this.subjectStore.initFilterByCategoryData(
+      this.subjectStore.initFilterByPropertyData(
+        this.currentFilterProperty,
         e.value,
-        this.dataGrid.instance.pageIndex(),
+        this.dataGrid.instance.pageIndex() + 1,
         this.pageSize
       );
     } else {
@@ -282,9 +287,6 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
           break;
       }
     }
-    // todo: handle virtual scrolling when pagesize = 'all'
-    //
-    // event of page size changed by user's click
     if (e.fullName === 'paging.pageSize') {
       this.pageSize = e.value;
       console.log(`Page size changed to ${e.value}`);
@@ -294,24 +296,27 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'FILTER':
-          this.subjectStore.filterSubjectByCategory(
-            this.currentCategoryFilterValue,
+          this.subjectStore.filterSubjectByProperty(
+            this.currentFilterProperty,
+            this.currentFilterByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'SEARCH':
-          this.subjectStore.searchSubjectByName(
-            this.currentSearchByNameValue,
+          this.subjectStore.searchSubjectByProperty(
+            this.currentSearchProperty,
+            this.currentSearchByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'SORT':
-          this.subjectStore.sortSubjectByPrice(
-            this.currentSortByPriceValue,
+          this.subjectStore.sortSubjectByProperty(
+            this.currentSortProperty,
+            this.currentSortByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
@@ -325,106 +330,33 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
 
   paginatePureData(index: number) {
     this.subjectStore.loadDataAsync(index, this.pageSize);
-    // if (index === 0) {
-    //   // this.subjectStore.loadDataAsync(index + 1, this.pageSize);
-    // } else {
-    //   // this.subjectStore.loadDataAsync(index, this.pageSize);
-    //   // this.subjectStore.loadDataAsync(index + 1, this.pageSize);
-    //   // this.subjectStore.loadDataAsync(index - 1, this.pageSize);
-    // }
   }
 
   paginateFilterData(index: number) {
-    if (index === 0) {
-      this.subjectStore.filterSubjectByCategory(
-        this.currentCategoryFilterValue,
-        index,
-        this.pageSize
-      );
-      this.subjectStore.filterSubjectByCategory(
-        this.currentCategoryFilterValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.subjectStore.filterSubjectByCategory(
-        this.currentCategoryFilterValue,
-        index,
-        this.pageSize
-      );
-      this.subjectStore.filterSubjectByCategory(
-        this.currentCategoryFilterValue,
-        index + 1,
-        this.pageSize
-      );
-      this.subjectStore.filterSubjectByCategory(
-        this.currentCategoryFilterValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.subjectStore.filterSubjectByProperty(
+      this.currentFilterProperty,
+      this.currentFilterByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSearchData(index: number) {
-    if (index === 0) {
-      this.subjectStore.searchSubjectByName(
-        this.currentSearchByNameValue,
-        index,
-        this.pageSize
-      );
-      this.subjectStore.searchSubjectByName(
-        this.currentSearchByNameValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.subjectStore.searchSubjectByName(
-        this.currentSearchByNameValue,
-        index,
-        this.pageSize
-      );
-      this.subjectStore.searchSubjectByName(
-        this.currentSearchByNameValue,
-        index + 1,
-        this.pageSize
-      );
-      this.subjectStore.searchSubjectByName(
-        this.currentSearchByNameValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.subjectStore.searchSubjectByProperty(
+      this.currentSearchProperty,
+      this.currentSearchByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSortData(index: number) {
-    if (index === 0) {
-      this.subjectStore.sortSubjectByPrice(
-        this.currentSortByPriceValue,
-        index,
-        this.pageSize
-      );
-      this.subjectStore.sortSubjectByPrice(
-        this.currentSortByPriceValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.subjectStore.sortSubjectByPrice(
-        this.currentSortByPriceValue,
-        index,
-        this.pageSize
-      );
-      this.subjectStore.sortSubjectByPrice(
-        this.currentSortByPriceValue,
-        index + 1,
-        this.pageSize
-      );
-      this.subjectStore.sortSubjectByPrice(
-        this.currentSortByPriceValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.subjectStore.sortSubjectByProperty(
+      this.currentSortProperty,
+      this.currentSortByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   onEditingStart() {
@@ -444,7 +376,7 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
         case 'insert':
           this.subjectStore.uploadSubject(
             e.changes[0].data,
-            this.dataGrid.instance.pageIndex(),
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
           break;
@@ -452,15 +384,15 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
           console.log(e.changes[0]);
           this.subjectStore.updateSubject(
             e.changes[0].data,
-            e.changes[0].key,
-            this.dataGrid.instance.pageIndex(),
+            // e.changes[0].key,
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
           break;
         case 'remove':
           this.subjectStore.deleteSubject(
             e.changes[0].key,
-            this.dataGrid.instance.pageIndex(),
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
           break;
@@ -514,28 +446,31 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
               switch (editorMode) {
                 case 'NORMAL':
                   this.subjectStore.initData(
-                    this.dataGrid.instance.pageIndex(),
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'FILTER':
-                  this.subjectStore.initFilterByCategoryData(
-                    this.currentCategoryFilterValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.subjectStore.initFilterByPropertyData(
+                    this.currentFilterProperty,
+                    this.currentFilterByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'SORT':
-                  this.subjectStore.initSortByPriceData(
-                    this.currentSortByPriceValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.subjectStore.initSortByPropertyData(
+                    this.currentSortProperty,
+                    this.currentSortByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'SEARCH':
-                  this.subjectStore.initSearchByNameData(
-                    this.currentSearchByNameValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.subjectStore.initSearchByPropertyData(
+                    this.currentSearchProperty,
+                    this.currentSearchByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
@@ -580,7 +515,7 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
             .toPromise()
             .then(() => {
               this.subjectStore.initData(
-                this.dataGrid.instance.pageIndex(),
+                this.dataGrid.instance.pageIndex() + 1,
                 this.pageSize
               );
             })

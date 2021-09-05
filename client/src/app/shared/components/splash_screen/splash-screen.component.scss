@@ -1,0 +1,29 @@
+.splash-container {
+  display: flex;
+  position: fixed;
+  top: 0;
+  z-index: 999;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background-color: rgb(193, 126, 255);
+}
+.logo-container {
+  height: 75%;
+  //   width: 80%;
+}
+.logo-container img {
+  height: 100%;
+  width: 100%;
+}
+.copyright {
+  position: fixed;
+  bottom: 0;
+  justify-content: center;
+  align-items: center;
+  color: black;
+}
+
+

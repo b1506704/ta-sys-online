@@ -1,8 +1,11 @@
-<div style="display: flex; justify-content: center; align-items: center">
+<div class="signup-container">
   <form
     id="form-container"
     (submit)="onSignupSubmit($event)"
-    [classList]="['signupForm']"
+    [ngClass]="{
+      corner_box_animation: isLoading === true,
+      signupForm: isLoading === false
+    }"
   >
     <div class="long-title">
       <h3>Signup</h3>
@@ -57,7 +60,7 @@
               [value]="roleList[0]"
             >
             </dx-select-box>
-          </dxi-item>         
+          </dxi-item>
           <dxi-item itemType="group" [colCount]="2" [cssClass]="'buttonGroup'">
             <dxi-item
               itemType="button"
@@ -68,7 +71,7 @@
             <dxi-item
               itemType="button"
               horizontalAlignment="center"
-              [buttonOptions]="resetButtonOptions"
+              [buttonOptions]="loginButtonOptions"
             >
             </dxi-item>
           </dxi-item>

@@ -1,0 +1,38 @@
+<form (submit)="onSubmit($event)">
+  <dx-form [formData]="room">
+    <dxi-item
+      dataField="name"
+      [label]="{ text: 'Room Name' }"
+      editorType="dxTextBox"
+    >
+      <dxi-validation-rule type="required" message="Room name is required">
+      </dxi-validation-rule>
+      <dxi-validation-rule
+        type="stringLength"
+        message="Room name cannot lower than 1 letter!"
+        [min]="1"
+      >
+      </dxi-validation-rule>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="2" [cssClass]="'buttonGroup'">
+      <dxi-item
+        itemType="button"
+        horizontalAlignment="center"
+        [buttonOptions]="submitInstructorButtonOptions"
+      >
+      </dxi-item>
+      <dxi-item
+        itemType="button"
+        horizontalAlignment="center"
+        [buttonOptions]="resetInstructorButtonOptions"
+      >
+      </dxi-item>
+    </dxi-item>
+  </dx-form>
+</form>
+<div class="content">
+  <div class="videos">
+    <video #localVideo id="localVideo" autoplay controls></video>
+    <video #remoteVideo id="remoteVideo" autoplay controls></video>
+  </div>
+</div>

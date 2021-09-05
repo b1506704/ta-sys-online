@@ -60,12 +60,12 @@ export const navigationInstructor = [
     ],
   },
   {
-    text: 'Menu 2',
+    text: 'Live Streaming',
     icon: 'like',
     items: [
       {
-        text: 'Sub menu 1',
-        path: '/aaa',
+        text: 'Current Session',
+        path: '/instructor_streaming',
       },
       {
         text: 'Sub menu 2',

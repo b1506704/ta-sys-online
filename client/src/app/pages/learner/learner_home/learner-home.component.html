@@ -21,8 +21,8 @@
         <img class="gallery-image" src="{{ galleryItem.imgUrl }}" />
       </div>
       <div class="content-body">
-        <div class="gallery-title">{{ galleryItem.title }}</div>
-        <div class="gallery-subtitle">{{ galleryItem.subTitle }}</div>
+        <p class="gallery-title">{{ galleryItem.title }}</p>
+        <p class="gallery-subtitle">{{ galleryItem.subTitle }}</p>
         <dx-button
           icon="arrowright"
           type="normal"
@@ -35,22 +35,32 @@
   </div>
 </dx-gallery>
 <h2 class="feature-heading">Features</h2>
+
 <div class="feature-container box-shadow">
   <div class="feature-content">
-    <div class="feature-title">INFINITE SCROLLING LIST</div>
+    <div class="feature-title">DATAGRID EDITOR</div>
     <div class="feature-body">
-      Checking test and instructor information with infinite scrolling technique
+      Fully functioned database management with cutting-edge tools and
+      techniques
     </div>
     <div class="feature-icons">
-      <dx-button icon="find" text="Search"> </dx-button>
-      <dx-button icon="filter" text="Filter"> </dx-button>
-      <dx-button icon="sortdown" text="Sort"> </dx-button>
-      <dx-button icon="pulldown" text="Infinite scrolling"> </dx-button>
+      <dx-button icon="splitcells" text="Row Edit"> </dx-button>
+      <dx-button icon="tableproperties" text="Column Edit"> </dx-button>
+      <dx-button icon="trash" text="Delete All"> </dx-button>
+      <dx-button icon="unselectall" text="Selective Remove"> </dx-button>
+      <dx-button icon="xlsxfile" text="Export XLSX"> </dx-button>
+      <dx-button icon="exportpdf" text="Export PDF"> </dx-button>
+      <dx-button icon="add" text="Live Insert"> </dx-button>
+      <dx-button icon="filter" text="Filter & Sort"> </dx-button>
+      <dx-button icon="search" text="Smart Search"> </dx-button>
+      <dx-button icon="range" text="Random Generate"> </dx-button>
+      <dx-button icon="globe" text="SS Pagination"> </dx-button>
+      <dx-button icon="verticalaligncenter" text="Responsive UI"></dx-button>
     </div>
   </div>
   <div class="feature-img">
     <img
-      src="../../../../assets/imgs/landing_page_11.jpg"
+      src="../../../../assets/imgs/landing_page_9.png"
       alt="..."
       style="
         height: 100%;
@@ -63,73 +73,21 @@
 </div>
 <div class="feature-container box-shadow">
   <div class="feature-content">
-    <div class="feature-title">WORKING SCHEDULE</div>
+    <div class="feature-title">DYNAMIC STATISTICS</div>
     <div class="feature-body">
-      Providing a dynamic view to check instructor's working schedule.
+      Providing a variety of charts with auto-calculating function and range
+      selectors.
     </div>
     <div class="feature-icons">
-      <dx-button icon="event" text="Date Selector"> </dx-button>
-      <dx-button icon="like" text="Friendly UI"> </dx-button>
-      <dx-button icon="runner" text="Dynamic View"> </dx-button>
-      <dx-button icon="tags" text="Room Indicator"> </dx-button>
-    </div>
-  </div>
-  <div class="feature-img">
-    <img
-      src="../../../../assets/imgs/landing_page_12.jpg"
-      alt="..."
-      style="
-        height: 100%;
-        width: 100%;
-        border-radius: 15px;
-        box-shadow: rgba(79, 205, 255, 0.25) 0px 25px 50px -12px;
-      "
-    />
-  </div>
-</div>
-<div class="feature-container box-shadow">
-  <div class="feature-content">
-    <div class="feature-title">REQUEST CHECKUP</div>
-    <div class="feature-body">
-      Popup request checkup form, display kanban view with 2 types of request,
-      and prescription detail in tab panel.
-    </div>
-    <div class="feature-icons">
-      <dx-button icon="rename" text="Form Editor"> </dx-button>
-      <dx-button icon="columnchooser" text="Popup UI"> </dx-button>
-      <dx-button icon="find" text="Search"> </dx-button>
-      <dx-button icon="movetofolder" text="Tab Panel"> </dx-button>
-    </div>
-  </div>
-  <div class="feature-img">
-    <img
-      src="../../../../assets/imgs/landing_page_14.jpg"
-      alt="..."
-      style="
-        height: 100%;
-        width: 100%;
-        border-radius: 15px;
-        box-shadow: rgba(79, 205, 255, 0.25) 0px 25px 50px -12px;
-      "
-    />
-  </div>
-</div>
-<div class="feature-container box-shadow">
-  <div class="feature-content">
-    <div class="feature-title">HEALTH CONDITION MONITORING</div>
-    <div class="feature-body">
-      See your curren health condition and contact with instructor.
-    </div>
-    <div class="feature-icons">
-      <dx-button icon="info" text="Instructor Interact"> </dx-button>
+      <dx-button icon="splitcells" text="Range Selector"> </dx-button>
+      <dx-button icon="refresh" text="Fetch Data"> </dx-button>
       <dx-button icon="formula" text="Auto Calculate"> </dx-button>
       <dx-button icon="like" text="Friendly UI"> </dx-button>
-      <dx-button icon="runner" text="Emergent Alert"> </dx-button>
     </div>
   </div>
   <div class="feature-img">
     <img
-      src="../../../../assets/imgs/landing_page_13.jpg"
+      src="../../../../assets/imgs/landing_page_10.png"
       alt="..."
       style="
         height: 100%;
@@ -145,7 +103,7 @@
 <div class="organization-container">
   <div class="organization-img">
     <img
-      src="../../../../assets/imgs/elon_musk.jpeg"
+      src="../../../../assets/imgs/tesla_director.jpg"
       alt="..."
       style="
         height: 300px;
@@ -156,8 +114,8 @@
     />
   </div>
   <div class="organization-content">
-    <div class="feature-title">Anonymous</div>
-    <div class="feature-body">Mascot of Tesla Clinic</div>
+    <div class="feature-title">Le Bao Anh</div>
+    <div class="feature-body">Frontend Developer</div>
   </div>
 </div>
 <div class="organization-container">
@@ -174,13 +132,11 @@
     />
   </div>
   <div class="organization-content">
-    <div class="feature-title">Nicole Tesla</div>
-    <div class="feature-body">
-      Main developer, programmer, feature planner, UI, UX designer.
-    </div>
+    <div class="feature-title">Ha Tan Loc</div>
+    <div class="feature-body">Backend Developer.</div>
   </div>
 </div>
 
 <div class="footer">
-  <h2>@{{ date }}. Tesla Clinic. Developed by Le Bao Anh - B1506704.</h2>
+  <h2>@{{ date }}. T. A. S Online</h2>
 </div>

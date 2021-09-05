@@ -48,11 +48,11 @@ export class SubjectStore extends StateService<SubjectState> {
    * @return {Array<Object>} Return an array with filled items from ss pagination
    * @example
    * this.setState({
-            pendingCheckupList: this.fillEmpty(
-              page,
+            sourceList: this.fillEmpty(
+              page - 1,
               size,
-              this.state.pendingCheckupList,
-              data
+              this.state.sourceList,
+              arrayItemFromServer
             ),
           });
    */
@@ -72,7 +72,7 @@ export class SubjectStore extends StateService<SubjectState> {
     }
     // endIndex = pageSize
     // pageSize = 5
-    // 0 => 0 ,1,2,3,4,
+    // 0 => 0,1,2,3,4,
     // 1 -> 5,6,7,8,9
     // 2 -> 10,11,12,13,14
     // 17 -> 85,86,87,88,89
@@ -86,23 +86,14 @@ export class SubjectStore extends StateService<SubjectState> {
       .fetchSubject(page, size)
       .toPromise()
       .then((data: any) => {
-        if (page === 0) {
-          this.setState({
-            subjectList: new Array<Subject>(size),
-          });
-        } else {
-          this.setState({
-            subjectList: new Array<Subject>(page * size),
-          });
-        }
+        this.setState({
+          subjectList: data.data,
+        });
         console.log('Current flag: infite list');
         console.log(this.state.subjectList);
         this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
         this.setState({ currentPage: data.pageNumber });
-      })
-      .then(() => {
-        this.loadDataAsync(page, size);
       });
   }
 
@@ -111,7 +102,7 @@ export class SubjectStore extends StateService<SubjectState> {
     this.subjectService.fetchSubject(page, size).subscribe({
       next: (data: any) => {
         this.setState({
-          subjectList: this.state.subjectList.concat(data),
+          subjectList: this.state.subjectList.concat(data.data),
         });
         console.log('Infinite list');
         console.log(this.state.subjectList);
@@ -132,26 +123,33 @@ export class SubjectStore extends StateService<SubjectState> {
 
   loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
     this.setIsLoading(true);
-    this.subjectService.fetchSubjectByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          subjectList: this.fillEmpty(page, size, this.state.subjectList, data),
-        });
-        console.log('Pure list');
-        console.log(this.state.subjectList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.subjectService
+      .fetchSubjectByLearnerID(page, size, learnerID)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            subjectList: this.fillEmpty(
+              page - 1,
+              size,
+              this.state.subjectList,
+              data.data
+            ),
+          });
+          console.log('Pure list');
+          console.log(this.state.subjectList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
   initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
@@ -160,16 +158,13 @@ export class SubjectStore extends StateService<SubjectState> {
       .toPromise()
       .then((data: any) => {
         this.setState({
-          subjectList: new Array<Subject>(data.length),
+          subjectList: data.data,
         });
         console.log('Current flag: infite list');
         console.log(this.state.subjectList);
         this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
         this.setState({ currentPage: data.pageNumber });
-      })
-      .then(() => {
-        this.loadDataAsyncByLearnerID(page, size, learnerID);
       });
   }
 
@@ -179,26 +174,28 @@ export class SubjectStore extends StateService<SubjectState> {
     learnerID: string
   ) {
     this.setIsLoading(true);
-    this.subjectService.fetchSubjectByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          subjectList: this.state.subjectList.concat(data),
-        });
-        console.log('Infinite list');
-        console.log(this.state.subjectList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.subjectService
+      .fetchSubjectByLearnerID(page, size, learnerID)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            subjectList: this.state.subjectList.concat(data.data),
+          });
+          console.log('Infinite list');
+          console.log(this.state.subjectList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
   initData(page: number, size: number) {
@@ -220,10 +217,15 @@ export class SubjectStore extends StateService<SubjectState> {
       });
   }
 
-  initFilterByCategoryData(value: string, page: number, size: number) {
+  initFilterByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Filtered Mode On', 'custom');
     this.subjectService
-      .filterSubjectByCategory(value, 0, 5)
+      .filterSubjectByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
@@ -236,34 +238,41 @@ export class SubjectStore extends StateService<SubjectState> {
         this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.filterSubjectByCategory(value, page, size);
+        this.filterSubjectByProperty(property, value, page, size);
       });
   }
 
-  initInfiniteFilterByCategoryData(value: string, page: number, size: number) {
+  initInfiniteFilterByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Filtered Mode On', 'custom');
     this.subjectService
-      .filterSubjectByCategory(value, page, size)
+      .filterSubjectByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          subjectList: new Array<Subject>(size),
+          subjectList: data.data,
         });
         console.log('Current flag: infinite filtered list');
         console.log(this.state.subjectList);
         this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
         this.setState({ currentPage: data.pageNumber });
-      })
-      .then(() => {
-        this.filterSubjectByCategory(value, page, size);
       });
   }
 
-  initSearchByNameData(value: string, page: number, size: number) {
+  initSearchByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Searched Mode On', 'custom');
     this.subjectService
-      .searchSubjectByName(value, 0, 5)
+      .searchSubjectByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
@@ -276,19 +285,24 @@ export class SubjectStore extends StateService<SubjectState> {
         this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.searchSubjectByName(value, page, size);
+        this.searchSubjectByProperty(property, value, page, size);
       });
   }
 
-  initInfiniteSearchByNameData(value: string, page: number, size: number) {
+  initInfiniteSearchByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Searched Mode On', 'custom');
     this.subjectService
-      .searchSubjectByName(value, page, size)
+      .searchSubjectByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         if (data.totalRecords !== 0) {
           this.setState({
-            subjectList: new Array<Subject>(size),
+            subjectList: data.data,
           });
         } else {
           this.store.showNotif('No result found!', 'custom');
@@ -298,16 +312,18 @@ export class SubjectStore extends StateService<SubjectState> {
         this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
         this.setState({ currentPage: data.pageNumber });
-      })
-      .then(() => {
-        this.searchSubjectByName(value, page, size);
       });
   }
 
-  initSortByPriceData(value: string, page: number, size: number) {
+  initSortByPropertyData(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Sort Mode On', 'custom');
     this.subjectService
-      .sortSubjectByPrice(value, 0, 5)
+      .sortSubjectByProperty(value, order, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
@@ -320,27 +336,29 @@ export class SubjectStore extends StateService<SubjectState> {
         this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.sortSubjectByPrice(value, page, size);
+        this.sortSubjectByProperty(value, order, page, size);
       });
   }
 
-  initInfiniteSortByPriceData(value: string, page: number, size: number) {
+  initInfiniteSortByPropertyData(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Sort Mode On', 'custom');
     this.subjectService
-      .sortSubjectByPrice(value, page, size)
+      .sortSubjectByProperty(value, order, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          subjectList: new Array<Subject>(size),
+          subjectList: data.data,
         });
         console.log('Current flag: sort list');
         console.log(this.state.subjectList);
         this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
         this.setState({ currentPage: data.pageNumber });
-      })
-      .then(() => {
-        this.sortSubjectByPrice(value, page, size);
       });
   }
 
@@ -378,7 +396,12 @@ export class SubjectStore extends StateService<SubjectState> {
     this.subjectService.fetchSubject(page, size).subscribe({
       next: (data: any) => {
         this.setState({
-          subjectList: this.fillEmpty(page, size, this.state.subjectList, data),
+          subjectList: this.fillEmpty(
+            page - 1,
+            size,
+            this.state.subjectList,
+            data.data
+          ),
         });
         this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
@@ -447,11 +470,11 @@ export class SubjectStore extends StateService<SubjectState> {
     });
   }
 
-  updateSubject(subject: Subject, key: string, page: number, size: number) {
+  updateSubject(subject: Subject, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.subjectService.updateSubject(subject, key).subscribe({
+        this.subjectService.updateSubject(subject).subscribe({
           next: (data: any) => {
             this.setState({ responseMsg: data });
             console.log(data);
@@ -567,21 +590,29 @@ export class SubjectStore extends StateService<SubjectState> {
     this.setState({ currentPage: _currentPage });
   }
 
-  filterSubjectByPrice(
-    criteria: string,
-    value: number,
+  filterSubjectByProperty(
+    property: string,
+    value: string,
     page: number,
     size: number
   ) {
     this.setIsLoading(true);
     this.subjectService
-      .filterSubjectByPrice(criteria, value, page, size)
+      .filterSubjectByProperty(property, value, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({ responseMsg: data });
           this.setState({
-            subjectList: this.fillEmpty(page, size, this.state.subjectList, data),
+            subjectList: this.fillEmpty(
+              page - 1,
+              size,
+              this.state.subjectList,
+              data.data
+            ),
           });
+          console.log('Filtered list');
+          console.log(this.state.subjectList);
+          console.log('Server response');
+          console.log(data);
           this.setState({ totalItems: data.totalRecords });
           this.setState({ totalPages: data.totalPages });
           this.setState({ currentPage: data.pageNumber });
@@ -595,182 +626,178 @@ export class SubjectStore extends StateService<SubjectState> {
       });
   }
 
-  filterSubjectByCategory(value: string, page: number, size: number) {
+  filterInfiniteSubjectByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.setIsLoading(true);
-    this.subjectService.filterSubjectByCategory(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          subjectList: this.fillEmpty(page, size, this.state.subjectList, data),
-        });
-        console.log('Filtered list');
-        console.log(this.state.subjectList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  filterInfiniteSubjectByCategory(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.subjectService.filterSubjectByCategory(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          subjectList: this.state.subjectList.concat(data),
-        });
-        console.log('Filtered list');
-        console.log(this.state.subjectList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  searchSubjectByName(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.subjectService.searchSubjectByName(value, page, size).subscribe({
-      next: (data: any) => {
-        if (data.totalRecords !== 0) {
-          this.setState({
-            subjectList: this.fillEmpty(page, size, this.state.subjectList, data),
-          });
-        } else {
-          this.store.showNotif('No result found!', 'custom');
-        }
-        console.log('Searched list');
-        console.log(this.state.subjectList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  searchInfiniteSubjectByName(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.subjectService.searchSubjectByName(value, page, size).subscribe({
-      next: (data: any) => {
-        if (data.totalRecords !== 0) {
+    this.subjectService
+      .filterSubjectByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
           this.setState({
             subjectList: this.state.subjectList.concat(data),
           });
-        } else {
-          this.store.showNotif('No result found!', 'custome');
-        }
-        console.log('Infite searched list');
-        console.log(this.state.subjectList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+          console.log('Filtered list');
+          console.log(this.state.subjectList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
-  sortSubjectByName(value: string, page: number, size: number) {
+  searchSubjectByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.setIsLoading(true);
-    this.subjectService.sortSubjectByName(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({ responseMsg: data });
-        this.setState({
-          subjectList: this.fillEmpty(page, size, this.state.subjectList, data),
-        });
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        console.log('Sorted list');
-        console.log(this.state.subjectList);
-        console.log('Server response');
-        console.log(data);
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.subjectService
+      .searchSubjectByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            this.setState({
+              subjectList: this.fillEmpty(
+                page - 1,
+                size,
+                this.state.subjectList,
+                data.data
+              ),
+            });
+          } else {
+            this.store.showNotif('No result found!', 'custom');
+          }
+          console.log('Searched list');
+          console.log(this.state.subjectList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
-  sortSubjectByPrice(value: string, page: number, size: number) {
+  searchInfiniteSubjectByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.setIsLoading(true);
-    this.subjectService.sortSubjectByPrice(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({ responseMsg: data });
-        this.setState({
-          subjectList: this.fillEmpty(page, size, this.state.subjectList, data),
-        });
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        console.log('Sorted list');
-        console.log(this.state.subjectList);
-        console.log('Server response');
-        console.log(data);
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.subjectService
+      .searchSubjectByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            this.setState({
+              subjectList: this.state.subjectList.concat(data),
+            });
+          } else {
+            this.store.showNotif('No result found!', 'custome');
+          }
+          console.log('Infite searched list');
+          console.log(this.state.subjectList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
-  sortInfiniteSubjectByPrice(value: string, page: number, size: number) {
+  sortSubjectByProperty(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
     this.setIsLoading(true);
-    this.subjectService.sortSubjectByPrice(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          subjectList: this.state.subjectList.concat(data),
-        });
-        console.log('Infite sorted list');
-        console.log(this.state.subjectList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.subjectService
+      .sortSubjectByProperty(value, order, page, size)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({ responseMsg: data });
+          this.setState({
+            subjectList: this.fillEmpty(
+              page - 1,
+              size,
+              this.state.subjectList,
+              data.data
+            ),
+          });
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          console.log('Sorted list');
+          console.log(this.state.subjectList);
+          console.log('Server response');
+          console.log(data);
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  sortInfiniteSubjectByProperty(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.subjectService
+      .sortSubjectByProperty(value, order, page, size)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            subjectList: this.state.subjectList.concat(data),
+          });
+          console.log('Infite sorted list');
+          console.log(this.state.subjectList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
   getSubject(id: string) {
@@ -785,16 +812,8 @@ export class SubjectStore extends StateService<SubjectState> {
       });
   }
 
-  getSubjectByMedicalCheckupID(id: string) {
-    this.setIsLoading(true);
-    return this.subjectService
-      .getSubjectByMedicalCheckupID(id)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({ subjectInstance: data });
-        console.log(data);
-        this.setIsLoading(false);
-      });
+  fetchAll() {
+    return this.subjectService.fetchAll().toPromise();
   }
 
   setExportData(array: Array<Subject>) {

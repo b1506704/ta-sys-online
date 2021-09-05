@@ -25,12 +25,12 @@ export class SubjectHttpService {
   fetchSubjectByLearnerID(
     page: number,
     size: number,
-    learnerID: string
+    id: string
   ): Observable<Subject> {
     const params = new HttpParams()
       .set('PageNumber', page)
       .set('PageSize', size)
-      .set('learnerID', learnerID);
+      .set('Id', id);
     console.log(params.toString());
     return this.http.get<Subject>(this.apiUrl + '/byLearnerID', {
       params: params,
@@ -39,111 +39,61 @@ export class SubjectHttpService {
     });
   }
 
-  searchSubjectByName(
+  searchSubjectByProperty(
+    property: string,
     value: string,
     page: number,
     size: number
   ): Observable<Subject> {
     const params = new HttpParams()
-      .set('value', value)
+      .set('Property', property)
+      .set('Value', value)
       .set('PageNumber', page)
       .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<Subject>(
-      this.apiUrl + '/searchByName',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Subject>(this.apiUrl + '/search', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
-  filterSubjectByPrice(
-    criteria: string,
-    value: number,
-    page: number,
-    size: number
-  ): Observable<Subject> {
-    const params = new HttpParams()
-      .set('criteria', criteria)
-      .set('value', value)
-      .set('PageNumber', page)
-      .set('PageSize', size);
-    console.log(params.toString());
-    return this.http.post<Subject>(
-      this.apiUrl,
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  filterSubjectByCategory(
+  filterSubjectByProperty(
+    property: string,
     value: string,
     page: number,
     size: number
   ): Observable<Subject> {
     const params = new HttpParams()
-      .set('value', value)
+      .set('Property', property)
+      .set('Value', value)
       .set('PageNumber', page)
       .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<Subject>(
-      this.apiUrl + '/filterByCategory',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Subject>(this.apiUrl, {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
-  sortSubjectByName(
+  sortSubjectByProperty(
     value: string,
+    order: string,
     page: number,
     size: number
   ): Observable<Subject> {
     const params = new HttpParams()
-      .set('value', value)
+      .set('SortBy', value)
+      .set('Order', order)
       .set('PageNumber', page)
       .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<Subject>(
-      this.apiUrl + '/sortByName',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  sortSubjectByPrice(
-    value: string,
-    page: number,
-    size: number
-  ): Observable<Subject> {
-    const params = new HttpParams()
-      .set('value', value)
-      .set('PageNumber', page)
-      .set('PageSize', size);
-    console.log(params.toString());
-    return this.http.post<Subject>(
-      this.apiUrl + '/sortByPrice',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Subject>(this.apiUrl + '/paging', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
   uploadSubject(subject: Subject): Observable<Subject> {
@@ -167,9 +117,11 @@ export class SubjectHttpService {
     });
   }
 
-  deleteSubject(id: string): Observable<ArrayBuffer> {
-    return this.http.delete<ArrayBuffer>(this.apiUrl + `/${id}`, {
+  deleteSubject(subjectId: string): Observable<ArrayBuffer> {
+    const params = new HttpParams().set('subjectId', subjectId);
+    return this.http.delete<ArrayBuffer>(this.apiUrl, {
       reportProgress: true,
+      params: params,
       observe: 'body',
     });
   }
@@ -179,20 +131,6 @@ export class SubjectHttpService {
       reportProgress: true,
       observe: 'body',
     });
-  }
-
-  getSubjectByMedicalCheckupID(medicalCheckupID: string): Observable<Subject> {
-    const params = new HttpParams().set('medicalCheckupID', medicalCheckupID);
-    console.log(params.toString());
-    return this.http.post<Subject>(
-      this.apiUrl + '/byMedicalCheckupID',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
   }
 
   deleteSelectedSubjects(
@@ -208,15 +146,11 @@ export class SubjectHttpService {
     );
   }
 
-  updateSubject(subject: Subject, key: string): Observable<Subject> {
-    return this.http.post<Subject>(
-      this.apiUrl + `/updateSubject/${key}`,
-      subject,
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+  updateSubject(subject: Subject): Observable<Subject> {
+    return this.http.put<Subject>(this.apiUrl, subject, {
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
   fetchAll(): Observable<Subject> {

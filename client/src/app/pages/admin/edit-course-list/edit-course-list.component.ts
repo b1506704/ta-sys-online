@@ -11,6 +11,7 @@ import { Course } from 'src/app/shared/models/course';
 import { CourseHttpService } from 'src/app/shared/services/course/course-http.service';
 import { CourseStore } from 'src/app/shared/services/course/course-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
+import { SubjectStore } from 'src/app/shared/services/subject/subject-store.service';
 
 @Component({
   selector: 'app-edit-course-list',
@@ -21,11 +22,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
   @ViewChild(DxDataGridComponent, { static: false })
   dataGrid: DxDataGridComponent;
   courseList!: Array<Course>;
-  discountList: Array<Object> = [
-    { _id: '-1', name: '(NONE)' },
-    { _id: '0', name: 'YES' },
-    { _id: '1', name: 'NO' },
-  ];
+  subjectList: Array<Object> = [];
   selectedRows: string[];
   isSelectInfoVisible: boolean;
   selectInfoText: string;
@@ -33,22 +30,25 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
   pageSize: number = 5;
   allowedPageSizes: Array<number | string> = [5, 10, 15];
   scrollingMode: string = 'standard';
-  // standard | virtual | infinite
   currentIndexFromServer: number;
   isSearchingByName: boolean;
   isFilteringByCategory: boolean;
   isFilteringByPrice: boolean;
   isSortingByName: boolean;
 
-  currentCategoryFilterValue: string;
+  currentFilterByPropertyValue: string;
   timeout: any;
-  currentSearchByNameValue: string;
-  currentSortByPriceValue: string;
+  currentSearchByPropertyValue: string;
+  currentSortByPropertyValue: string;
+  currentSortProperty: string = 'name';
+  currentSearchProperty: string = 'name';
+  currentFilterProperty: string = 'subjectId';
 
   constructor(
     private courseStore: CourseStore,
     private store: StoreService,
     private courseHTTP: CourseHttpService,
+    private subjectStore: SubjectStore,
     private router: Router
   ) {}
 
@@ -122,7 +122,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
           onKeyUp: this.onSearchKeyupHandler.bind(this),
           onValueChanged: this.onSearchValueChanged.bind(this),
           mode: 'search',
-          placeholder: 'Search id',
+          placeholder: 'Search name',
         },
       },
       {
@@ -133,7 +133,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
           type: 'normal',
           icon: 'filter',
           disabled: true,
-          hint: 'Filter with health insurance',
+          hint: 'Filter with subject',
         },
       },
       {
@@ -141,12 +141,12 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
         locateInMenu: 'auto',
         widget: 'dxSelectBox',
         options: {
-          items: this.discountList,
-          valueExpr: 'name',
-          // searchExpr: 'name',
+          items: this.subjectList,
+          valueExpr: 'id',
+          searchExpr: 'name',
           displayExpr: 'name',
-          placeholder: 'Filter with health insurance',
-          // searchEnabled: true,
+          placeholder: 'Filter with subject',
+          searchEnabled: true,
           onValueChanged: this.onFilterChange.bind(this),
         },
       },
@@ -168,14 +168,14 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
         options: {
           items: [
             {
-              _id: '-1',
+              id: '-1',
               name: '(NONE)',
             },
-            { _id: '0', name: 'ASC' },
-            { _id: '1', name: 'DESC' },
+            { id: '0', name: 'asc' },
+            { id: '1', name: 'desc' },
           ],
           valueExpr: 'name',
-          placeholder: 'Sort by total cost',
+          placeholder: 'Sort by name',
           displayExpr: 'name',
           onValueChanged: this.onSortValueChanged.bind(this),
         },
@@ -189,11 +189,12 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
       this.isSearchingByName = true;
       this.isFilteringByCategory = false;
       this.isSortingByName = false;
-      console.log(this.currentSearchByNameValue);
-      if (this.currentSearchByNameValue !== '') {
-        this.courseStore.initSearchByNameData(
-          this.currentSearchByNameValue,
-          this.dataGrid.instance.pageIndex(),
+      console.log(this.currentSearchByPropertyValue);
+      if (this.currentSearchByPropertyValue !== '') {
+        this.courseStore.initSearchByPropertyData(
+          this.currentSearchProperty,
+          this.currentSearchByPropertyValue,
+          this.dataGrid.instance.pageIndex() + 1,
           this.pageSize
         );
       } else {
@@ -205,18 +206,19 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
   }
 
   onSearchValueChanged(e: any) {
-    this.currentSearchByNameValue = e.value;
+    this.currentSearchByPropertyValue = e.value;
   }
 
   onSortValueChanged(e: any) {
     this.isSortingByName = true;
     this.isSearchingByName = false;
     this.isFilteringByCategory = false;
-    this.currentSortByPriceValue = e.value;
+    this.currentSortByPropertyValue = e.value;
     if (e.value !== '(NONE)') {
-      this.courseStore.initSortByPriceData(
+      this.courseStore.initSortByPropertyData(
+        this.currentSortProperty,
         e.value,
-        this.dataGrid.instance.pageIndex(),
+        this.dataGrid.instance.pageIndex() + 1,
         this.pageSize
       );
     } else {
@@ -230,16 +232,16 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = true;
     this.isSearchingByName = false;
     this.isSortingByName = false;
-    this.currentCategoryFilterValue = e.value;
+    this.currentFilterByPropertyValue = e.value;
     console.log(e.value);
     if (e.value !== '(NONE)') {
-      this.courseStore.initFilterByCategoryData(
+      this.courseStore.initFilterByPropertyData(
+        this.currentFilterProperty,
         e.value,
-        this.dataGrid.instance.pageIndex(),
+        this.dataGrid.instance.pageIndex() + 1,
         this.pageSize
       );
     } else {
-      //return to pure editor mode
       this.store.showNotif('FILTER MODE OFF', 'custom');
       this.onRefresh();
     }
@@ -282,9 +284,6 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
           break;
       }
     }
-    // todo: handle virtual scrolling when pagesize = 'all'
-    //
-    // event of page size changed by user's click
     if (e.fullName === 'paging.pageSize') {
       this.pageSize = e.value;
       console.log(`Page size changed to ${e.value}`);
@@ -294,24 +293,27 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'FILTER':
-          this.courseStore.filterCourseByCategory(
-            this.currentCategoryFilterValue,
+          this.courseStore.filterCourseByProperty(
+            this.currentFilterProperty,
+            this.currentFilterByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'SEARCH':
-          this.courseStore.searchCourseByName(
-            this.currentSearchByNameValue,
+          this.courseStore.searchCourseByProperty(
+            this.currentSearchProperty,
+            this.currentSearchByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'SORT':
-          this.courseStore.sortCourseByPrice(
-            this.currentSortByPriceValue,
+          this.courseStore.sortCourseByProperty(
+            this.currentSortProperty,
+            this.currentSortByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
@@ -325,106 +327,33 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
 
   paginatePureData(index: number) {
     this.courseStore.loadDataAsync(index, this.pageSize);
-    // if (index === 0) {
-    //   // this.courseStore.loadDataAsync(index + 1, this.pageSize);
-    // } else {
-    //   // this.courseStore.loadDataAsync(index, this.pageSize);
-    //   // this.courseStore.loadDataAsync(index + 1, this.pageSize);
-    //   // this.courseStore.loadDataAsync(index - 1, this.pageSize);
-    // }
   }
 
   paginateFilterData(index: number) {
-    if (index === 0) {
-      this.courseStore.filterCourseByCategory(
-        this.currentCategoryFilterValue,
-        index,
-        this.pageSize
-      );
-      this.courseStore.filterCourseByCategory(
-        this.currentCategoryFilterValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.courseStore.filterCourseByCategory(
-        this.currentCategoryFilterValue,
-        index,
-        this.pageSize
-      );
-      this.courseStore.filterCourseByCategory(
-        this.currentCategoryFilterValue,
-        index + 1,
-        this.pageSize
-      );
-      this.courseStore.filterCourseByCategory(
-        this.currentCategoryFilterValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.courseStore.filterCourseByProperty(
+      this.currentFilterProperty,
+      this.currentFilterByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSearchData(index: number) {
-    if (index === 0) {
-      this.courseStore.searchCourseByName(
-        this.currentSearchByNameValue,
-        index,
-        this.pageSize
-      );
-      this.courseStore.searchCourseByName(
-        this.currentSearchByNameValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.courseStore.searchCourseByName(
-        this.currentSearchByNameValue,
-        index,
-        this.pageSize
-      );
-      this.courseStore.searchCourseByName(
-        this.currentSearchByNameValue,
-        index + 1,
-        this.pageSize
-      );
-      this.courseStore.searchCourseByName(
-        this.currentSearchByNameValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.courseStore.searchCourseByProperty(
+      this.currentSearchProperty,
+      this.currentSearchByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSortData(index: number) {
-    if (index === 0) {
-      this.courseStore.sortCourseByPrice(
-        this.currentSortByPriceValue,
-        index,
-        this.pageSize
-      );
-      this.courseStore.sortCourseByPrice(
-        this.currentSortByPriceValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.courseStore.sortCourseByPrice(
-        this.currentSortByPriceValue,
-        index,
-        this.pageSize
-      );
-      this.courseStore.sortCourseByPrice(
-        this.currentSortByPriceValue,
-        index + 1,
-        this.pageSize
-      );
-      this.courseStore.sortCourseByPrice(
-        this.currentSortByPriceValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.courseStore.sortCourseByProperty(
+      this.currentSortProperty,
+      this.currentSortByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   onEditingStart() {
@@ -444,7 +373,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
         case 'insert':
           this.courseStore.uploadCourse(
             e.changes[0].data,
-            this.dataGrid.instance.pageIndex(),
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
           break;
@@ -452,15 +381,14 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
           console.log(e.changes[0]);
           this.courseStore.updateCourse(
             e.changes[0].data,
-            e.changes[0].key,
-            this.dataGrid.instance.pageIndex(),
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
           break;
         case 'remove':
           this.courseStore.deleteCourse(
-            e.changes[0].key,
-            this.dataGrid.instance.pageIndex(),
+            [e.changes[0].key],
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
           break;
@@ -503,7 +431,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
       this.courseStore.confirmDialog('').then((result: boolean) => {
         if (result) {
           this.courseHTTP
-            .deleteSelectedCourses(this.selectedRows)
+            .deleteCourse(this.selectedRows)
             .toPromise()
             .then(() => {
               this.store.showNotif(
@@ -514,28 +442,31 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
               switch (editorMode) {
                 case 'NORMAL':
                   this.courseStore.initData(
-                    this.dataGrid.instance.pageIndex(),
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'FILTER':
-                  this.courseStore.initFilterByCategoryData(
-                    this.currentCategoryFilterValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.courseStore.initFilterByPropertyData(
+                    this.currentFilterProperty,
+                    this.currentFilterByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'SORT':
-                  this.courseStore.initSortByPriceData(
-                    this.currentSortByPriceValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.courseStore.initSortByPropertyData(
+                    this.currentSortProperty,
+                    this.currentSortByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'SEARCH':
-                  this.courseStore.initSearchByNameData(
-                    this.currentSearchByNameValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.courseStore.initSearchByPropertyData(
+                    this.currentSearchProperty,
+                    this.currentSearchByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
@@ -580,7 +511,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
             .toPromise()
             .then(() => {
               this.courseStore.initData(
-                this.dataGrid.instance.pageIndex(),
+                this.dataGrid.instance.pageIndex() + 1,
                 this.pageSize
               );
             })
@@ -658,7 +589,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
   }
 
   deleteAll() {
-    this.courseStore.deleteAllCourses();
+    this.courseStore.deleteAll();
   }
 
   navigateToStatistics() {
@@ -680,14 +611,22 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.sourceDataListener();
     this.currentPageListener();
-    setTimeout(() => {
-      this.onRefresh();
-    }, 150);
+    this.subjectStore.fetchAll().then((data: any) => {
+      if (data.length !== 0) {
+        console.log('FILTER DATA: ');
+        console.log(data);
+        this.subjectList = data;
+        this.subjectList.unshift({ id: '(NONE)', name: '(NONE)' });
+        setTimeout(() => {
+          this.onRefresh();
+        }, 150);
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.sourceDataListener().unsubscribe();
     this.currentPageListener().unsubscribe();
-    this.onRefresh();
+    this.courseStore.resetState();
   }
 }
