@@ -2,11 +2,11 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { StoreService } from '../../services/store.service';
 import { User } from '../../models/user';
 import { DxFormComponent } from 'devextreme-angular';
-import { LearnerStore } from '../../services/learner/learner-store.service';
-import { InstructorStore } from '../../services/instructor/instructor-store.service';
-import { Learner } from '../../models/learner';
 import { ImageStore } from '../../services/image/image-store.service';
 import { Image } from '../../models/image';
+import { UserStore } from '../../services/user/user-store.service';
+import { UserInfoStore } from '../../services/user-info/user-info-store.service';
+import { UserInfo } from '../../models/userinfo';
 @Component({
   selector: 'app-user-profile',
   templateUrl: 'user-profile.component.html',
@@ -14,13 +14,13 @@ import { Image } from '../../models/image';
 })
 export class UserProfileComponent implements OnInit, OnDestroy {
   @ViewChild(DxFormComponent, { static: false }) form: DxFormComponent;
-  submitButtonOptions: any = {
+  submitUserAccountButtonOptions: any = {
     text: 'Submit',
     icon: 'save',
     type: 'normal',
     useSubmitBehavior: true,
   };
-  resetButtonOptions: any = {
+  resetUserAccountButtonOptions: any = {
     text: 'Reset',
     icon: 'refresh',
     type: 'normal',
@@ -30,44 +30,42 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       this.form.instance.getEditor('username').focus();
     },
   };
-  submitLearnerButtonOptions: any = {
+  submitUserInfoButtonOptions: any = {
     text: 'Submit',
     icon: 'save',
     type: 'normal',
     useSubmitBehavior: true,
   };
-  resetLearnerButtonOptions: any = {
+  resetUserInfoButtonOptions: any = {
     text: 'Reset',
     icon: 'refresh',
     type: 'normal',
     useSubmitBehavior: false,
     onClick: () => {
-      this.renderSourceData();
+      this.getUserAccountData(this.currentUserId);
+      this.getUserInfoData(this.currentUserId);
       this.imageData.url = '../../../../assets/imgs/profile.png';
     },
   };
-  submitInstructorButtonOptions: any = {
-    text: 'Submit',
-    icon: 'save',
-    type: 'normal',
-    useSubmitBehavior: true,
-  };
-  resetInstructorButtonOptions: any = {
-    text: 'Reset',
-    icon: 'refresh',
-    type: 'normal',
-    useSubmitBehavior: false,
-    onClick: () => {
-      this.renderSourceData();
-      this.imageData.url = '../../../../assets/imgs/profile.png';
+  userAccountData!: User;
+  userInfoData!: UserInfo;
+  currentUserId!: string;
+  genderList: Array<Object> = [
+    {
+      id: '(NONE)',
+      name: '(NONE)',
     },
-  };
-  user!: any;
-  learnerData!: Learner;
-  instructorData!: any;
-  currentUser!: User;
-  currentRoleId!: string;
+    {
+      id: '0',
+      name: 'Male',
+    },
+    {
+      id: '1',
+      name: 'Female',
+    },
+  ];
   imageData: Image = {
+    container: '',
     sourceID: '',
     category: '',
     title: '',
@@ -79,8 +77,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: StoreService,
-    private learnerStore: LearnerStore,
-    private instructorStore: InstructorStore,
+    private userAccountStore: UserStore,
+    private userInfoStore: UserInfoStore,
     private imageStore: ImageStore
   ) {}
 
@@ -90,31 +88,15 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     }, 200);
   }
 
-  onSubmit = (e: any) => {
+  onUserAccountSubmit = (e: any) => {
     e.preventDefault();
+    this.userAccountStore.updateUser(this.userAccountData, 1, 5);
   };
 
-  onLearnerSubmit = (e: any) => {
+  onUserInfoSubmit = (e: any) => {
     e.preventDefault();
-    // this.imageData.sourceID = this.learnerData._id;
-    // this.imageData.category = 'learner';
-    // this.imageData.title = this.learnerData.fullName;
-    // this.imageStore.uploadImage(this.imageData, 0, 5);
-    this.learnerStore.updateLearner(
-      this.learnerData,
-      this.learnerData.username,
-      0,
-      5
-    );
-  };
-
-  onInstructorSubmit = (e: any) => {
-    e.preventDefault();
-    // this.imageData.sourceID = this.instructorData._id;
-    // this.imageData.category = 'instructor';
-    // this.imageData.title = this.instructorData.fullName;
-    // this.imageStore.uploadImage(this.imageData, 0, 5);
-    this.instructorStore.updateInstructor(this.instructorData, this.instructorData._id, 0, 5);
+    // also update image
+    this.userInfoStore.updateUserInfo(this.userInfoData, 1, 5);
   };
 
   handleInputChange(e: any) {
@@ -149,38 +131,21 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     console.log(this.imageData.sourceID);
   }
 
-  userDataListener() {
-    return this.store.$currentUser.subscribe((data: any) => {
+  userAccountDataListener() {
+    return this.userAccountStore.$userInstance.subscribe((data: any) => {
       if (data !== null) {
-        this.currentUser = data;
+        this.userAccountData = data;
       }
     });
   }
 
-  userRoleListener() {
-    return this.store.$currentRoleName.subscribe((data: any) => {
-      this.currentRoleId = data;
-    });
-  }
-
-  learnerDataListener() {
-    return this.learnerStore.$learnerInstance.subscribe((data: any) => {
-      if (data !== undefined) {
-        this.learnerData = data;
-        this.imageStore.getImageBySourceID(data._id).then(() => {
-          this.imageDataListener();
-        });
-      }
-    });
-  }
-
-  instructorDataListener() {
-    return this.instructorStore.$instructorInstance.subscribe((data: any) => {
-      if (data !== undefined) {
-        this.instructorData = data;
-        this.imageStore.getImageBySourceID(data._id).then(() => {
-          this.imageDataListener();
-        });
+  userInfoDataListener() {
+    return this.userInfoStore.$userInfoInstance.subscribe((data: any) => {
+      if (data !== null) {
+        this.userInfoData = data;
+        // this.imageStore.getImageBySourceID(data.id).then(() => {
+        //   this.imageDataListener();
+        // });
       }
     });
   }
@@ -195,47 +160,39 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     });
   }
 
-  renderSourceData() {
-    this.user = this.currentUser;
-    switch (this.currentRoleId) {
-      case 'Learner':
-        this.learnerStore
-          .getLearnerByUserName(this.currentUser.username)
-          .then(() => {
-            this.learnerDataListener();
-          });
-        this.user = {
-          username: this.user.username,
-          password: this.user.password,
-          role: this.user.role,
-        };
-        break;
-      case 'Instructor':
-        this.instructorStore
-          .getInstructorByUserName(this.currentUser.username)
-          .then(() => {
-            this.instructorDataListener();
-          });
-        this.user = {
-          username: this.user.username,
-          password: this.user.password,
-          role: this.user.role,
-        };
-        break;
-      default:
-        break;
-    }
+  userIdListener() {
+    return this.store.$currentUserId.subscribe((data: string) => {
+      if (data) {
+        this.currentUserId = data;
+        this.getUserAccountData(data);
+        this.getUserInfoData(data);
+      }
+    });
+  }
+
+  getUserAccountData(id: string) {
+    this.userAccountStore.getUser(id).then(() => {
+      this.userAccountDataListener();
+    });
+  }
+
+  getUserInfoData(id: string) {
+    this.userInfoStore.getUserInfo(id).then(() => {
+      this.userInfoDataListener();
+    });
+  }
+
+  onGenderChange(e: any) {
+    this.userInfoData.gender = e.value;
   }
 
   ngOnInit(): void {
-    this.userDataListener();
-    this.userRoleListener();
-    // this.renderSourceData();
+    this.userIdListener();
   }
 
   ngOnDestroy(): void {
-    this.userDataListener().unsubscribe();
-    this.userRoleListener().unsubscribe();
+    this.userAccountDataListener().unsubscribe();
+    this.userInfoDataListener().unsubscribe();
     // this.imageDataListener().unsubscribe();
   }
 }

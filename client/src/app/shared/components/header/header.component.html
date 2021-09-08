@@ -1,4 +1,4 @@
-<header class="trans-menu" *ngIf="isRoleSelected === true">
+<header class="trans-menu">
   <dx-toolbar class="header-toolbar">
     <ng-container *ngIf="isLoggedIn">
       <dxi-item
@@ -14,9 +14,11 @@
       >
       </dxi-item>
     </ng-container>
-    <dxi-item location="before" class="neon-header" *ngIf="title">
+    <dxi-item location="before" *ngIf="title">
       <div *dxTemplate>
-        <div class="neon-header">{{ title }}</div>
+        <button class="title-button" (click)="navigateHome()">
+          {{ title }}
+        </button>
       </div>
     </dxi-item>
     <dxi-item location="center">
@@ -31,15 +33,10 @@
     </dxi-item>
     <dxi-item location="after" locateInMenu="auto" [visible]="!isLoggedIn">
       <div *dxTemplate="let data of 'item'">
-        <dx-button
-          icon="export"
-          type="normal"
-          text="Login"
-          (onClick)="onLogin()"
-        >
+        <dx-button icon="key" type="normal" text="Login" (onClick)="onLogin()">
         </dx-button>
         <dx-button
-          icon="key"
+          icon="export"
           type="normal"
           text="Signup"
           (onClick)="onSignup()"
@@ -72,7 +69,6 @@
           height="100%"
           stylingMode="text"
         >
-          <!-- [user]="user" -->
           <div *dxTemplate="let data of 'content'">
             <app-user-panel
               [menuItems]="userMenuItems"
@@ -82,7 +78,6 @@
         </dx-button>
       </div>
     </dxi-item>
-    <!-- [user]="user" -->
     <div *dxTemplate="let data of 'menuItem'">
       <app-user-panel
         [menuItems]="userMenuItems"

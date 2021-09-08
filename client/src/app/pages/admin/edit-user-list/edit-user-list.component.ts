@@ -21,12 +21,7 @@ export class EditUserListComponent implements OnInit, OnDestroy {
   @ViewChild(DxDataGridComponent, { static: false })
   dataGrid: DxDataGridComponent;
   userList!: Array<User>;
-  roleList: Array<Object> = [
-    { name: '(NONE)' },
-    { name: 'Learner' },
-    { name: 'Admin' },
-    { name: 'Instructor' },
-  ];
+  roleList: Array<Object> = [];
   selectedRows: string[];
   isSelectInfoVisible: boolean;
   selectInfoText: string;
@@ -34,17 +29,20 @@ export class EditUserListComponent implements OnInit, OnDestroy {
   pageSize: number = 5;
   allowedPageSizes: Array<number | string> = [5, 10, 15];
   scrollingMode: string = 'standard';
-  // standard | virtual | infinite
   currentIndexFromServer: number;
   isSearchingByName: boolean;
   isFilteringByCategory: boolean;
   isFilteringByPrice: boolean;
   isSortingByName: boolean;
+  isAddingNewRow: boolean = false;
 
-  currentCategoryFilterValue: string;
+  currentFilterByPropertyValue: string;
   timeout: any;
-  currentSearchByNameValue: string;
-  currentSortByPriceValue: string;
+  currentSearchByPropertyValue: string;
+  currentSortByPropertyValue: string;
+  currentSortProperty: string = 'username';
+  currentSearchProperty: string = 'username';
+  currentFilterProperty: string = 'roleId';
 
   constructor(
     private userStore: UserStore,
@@ -88,7 +86,7 @@ export class EditUserListComponent implements OnInit, OnDestroy {
         options: {
           type: 'danger',
           icon: 'parentfolder',
-          hint: 'Generate random 10 items',
+          hint: 'Generate random 100+ items',
           onClick: this.onAddRandom.bind(this),
         },
       },
@@ -134,7 +132,7 @@ export class EditUserListComponent implements OnInit, OnDestroy {
           type: 'normal',
           icon: 'filter',
           disabled: true,
-          hint: 'Filter with role',
+          hint: 'Filter with subject',
         },
       },
       {
@@ -143,11 +141,11 @@ export class EditUserListComponent implements OnInit, OnDestroy {
         widget: 'dxSelectBox',
         options: {
           items: this.roleList,
-          valueExpr: 'name',
-          // searchExpr: 'name',
+          valueExpr: 'id',
+          searchExpr: 'name',
           displayExpr: 'name',
           placeholder: 'Filter with role',
-          // searchEnabled: true,
+          searchEnabled: true,
           onValueChanged: this.onFilterChange.bind(this),
         },
       },
@@ -159,7 +157,7 @@ export class EditUserListComponent implements OnInit, OnDestroy {
           type: 'normal',
           icon: 'card',
           disabled: true,
-          hint: 'Sort by name',
+          hint: 'Sort by total cost',
         },
       },
       {
@@ -169,11 +167,11 @@ export class EditUserListComponent implements OnInit, OnDestroy {
         options: {
           items: [
             {
-              _id: '-1',
+              id: '-1',
               name: '(NONE)',
             },
-            { _id: '0', name: 'ASC' },
-            { _id: '1', name: 'DESC' },
+            { id: '0', name: 'asc' },
+            { id: '1', name: 'desc' },
           ],
           valueExpr: 'name',
           placeholder: 'Sort by name',
@@ -184,17 +182,22 @@ export class EditUserListComponent implements OnInit, OnDestroy {
     );
   }
 
+  customizePass(cellInfo: any) {
+    return '*********';
+  }
+
   onSearchKeyupHandler(e: any) {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
       this.isSearchingByName = true;
       this.isFilteringByCategory = false;
       this.isSortingByName = false;
-      console.log(this.currentSearchByNameValue);
-      if (this.currentSearchByNameValue !== '') {
-        this.userStore.initSearchByNameData(
-          this.currentSearchByNameValue,
-          this.dataGrid.instance.pageIndex(),
+      console.log(this.currentSearchByPropertyValue);
+      if (this.currentSearchByPropertyValue !== '') {
+        this.userStore.initSearchByPropertyData(
+          this.currentSearchProperty,
+          this.currentSearchByPropertyValue,
+          this.dataGrid.instance.pageIndex() + 1,
           this.pageSize
         );
       } else {
@@ -206,18 +209,19 @@ export class EditUserListComponent implements OnInit, OnDestroy {
   }
 
   onSearchValueChanged(e: any) {
-    this.currentSearchByNameValue = e.value;
+    this.currentSearchByPropertyValue = e.value;
   }
 
   onSortValueChanged(e: any) {
     this.isSortingByName = true;
     this.isSearchingByName = false;
     this.isFilteringByCategory = false;
-    this.currentSortByPriceValue = e.value;
+    this.currentSortByPropertyValue = e.value;
     if (e.value !== '(NONE)') {
-      this.userStore.initSortByPriceData(
+      this.userStore.initSortByPropertyData(
+        this.currentSortProperty,
         e.value,
-        this.dataGrid.instance.pageIndex(),
+        this.dataGrid.instance.pageIndex() + 1,
         this.pageSize
       );
     } else {
@@ -231,16 +235,16 @@ export class EditUserListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = true;
     this.isSearchingByName = false;
     this.isSortingByName = false;
-    this.currentCategoryFilterValue = e.value;
+    this.currentFilterByPropertyValue = e.value;
     console.log(e.value);
     if (e.value !== '(NONE)') {
-      this.userStore.initFilterByCategoryData(
+      this.userStore.initFilterByPropertyData(
+        this.currentFilterProperty,
         e.value,
-        this.dataGrid.instance.pageIndex(),
+        this.dataGrid.instance.pageIndex() + 1,
         this.pageSize
       );
     } else {
-      //return to pure editor mode
       this.store.showNotif('FILTER MODE OFF', 'custom');
       this.onRefresh();
     }
@@ -262,7 +266,7 @@ export class EditUserListComponent implements OnInit, OnDestroy {
     const editorMode = this.checkEditorMode();
     // event of page index changed
     if (e.fullName === 'paging.pageIndex') {
-      const currentIndex: number = e.value;
+      const currentIndex: number = e.value + 1;
       console.log(
         `New page index: ${currentIndex}. Total items: ${this.userList.length}`
       );
@@ -283,9 +287,6 @@ export class EditUserListComponent implements OnInit, OnDestroy {
           break;
       }
     }
-    // todo: handle virtual scrolling when pagesize = 'all'
-    //
-    // event of page size changed by user's click
     if (e.fullName === 'paging.pageSize') {
       this.pageSize = e.value;
       console.log(`Page size changed to ${e.value}`);
@@ -295,24 +296,27 @@ export class EditUserListComponent implements OnInit, OnDestroy {
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'FILTER':
-          this.userStore.filterUserByCategory(
-            this.currentCategoryFilterValue,
+          this.userStore.filterUserByProperty(
+            this.currentFilterProperty,
+            this.currentFilterByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'SEARCH':
-          this.userStore.searchUserByName(
-            this.currentSearchByNameValue,
+          this.userStore.searchUserByProperty(
+            this.currentSearchProperty,
+            this.currentSearchByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'SORT':
-          this.userStore.sortUserByPrice(
-            this.currentSortByPriceValue,
+          this.userStore.sortUserByProperty(
+            this.currentSortProperty,
+            this.currentSortByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
@@ -325,114 +329,43 @@ export class EditUserListComponent implements OnInit, OnDestroy {
   }
 
   paginatePureData(index: number) {
-    if (index === 0) {
-      this.userStore.loadDataAsync(index, this.pageSize);
-      this.userStore.loadDataAsync(index + 1, this.pageSize);
-    } else {
-      this.userStore.loadDataAsync(index, this.pageSize);
-      this.userStore.loadDataAsync(index + 1, this.pageSize);
-      this.userStore.loadDataAsync(index - 1, this.pageSize);
-    }
+    this.userStore.loadDataAsync(index, this.pageSize);
   }
 
   paginateFilterData(index: number) {
-    if (index === 0) {
-      this.userStore.filterUserByCategory(
-        this.currentCategoryFilterValue,
-        index,
-        this.pageSize
-      );
-      this.userStore.filterUserByCategory(
-        this.currentCategoryFilterValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.userStore.filterUserByCategory(
-        this.currentCategoryFilterValue,
-        index,
-        this.pageSize
-      );
-      this.userStore.filterUserByCategory(
-        this.currentCategoryFilterValue,
-        index + 1,
-        this.pageSize
-      );
-      this.userStore.filterUserByCategory(
-        this.currentCategoryFilterValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.userStore.filterUserByProperty(
+      this.currentFilterProperty,
+      this.currentFilterByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSearchData(index: number) {
-    if (index === 0) {
-      this.userStore.searchUserByName(
-        this.currentSearchByNameValue,
-        index,
-        this.pageSize
-      );
-      this.userStore.searchUserByName(
-        this.currentSearchByNameValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.userStore.searchUserByName(
-        this.currentSearchByNameValue,
-        index,
-        this.pageSize
-      );
-      this.userStore.searchUserByName(
-        this.currentSearchByNameValue,
-        index + 1,
-        this.pageSize
-      );
-      this.userStore.searchUserByName(
-        this.currentSearchByNameValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.userStore.searchUserByProperty(
+      this.currentSearchProperty,
+      this.currentSearchByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSortData(index: number) {
-    if (index === 0) {
-      this.userStore.sortUserByPrice(
-        this.currentSortByPriceValue,
-        index,
-        this.pageSize
-      );
-      this.userStore.sortUserByPrice(
-        this.currentSortByPriceValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.userStore.sortUserByPrice(
-        this.currentSortByPriceValue,
-        index,
-        this.pageSize
-      );
-      this.userStore.sortUserByPrice(
-        this.currentSortByPriceValue,
-        index + 1,
-        this.pageSize
-      );
-      this.userStore.sortUserByPrice(
-        this.currentSortByPriceValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.userStore.sortUserByProperty(
+      this.currentSortProperty,
+      this.currentSortByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   onEditingStart() {
+    this.isAddingNewRow = false;
     this.store.showNotif('Edit mode on', 'custom');
   }
 
   onInitNewRow() {
+    this.isAddingNewRow = true;
     this.store.showNotif(
       'Blank row added, please fill in information',
       'custom'
@@ -445,25 +378,27 @@ export class EditUserListComponent implements OnInit, OnDestroy {
         case 'insert':
           this.userStore.uploadUser(
             e.changes[0].data,
-            this.dataGrid.instance.pageIndex(),
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
+          this.isAddingNewRow = false;
           break;
         case 'update':
           console.log(e.changes[0]);
           this.userStore.updateUser(
             e.changes[0].data,
-            e.changes[0].key,
-            this.dataGrid.instance.pageIndex(),
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
+          this.isAddingNewRow = false;
           break;
         case 'remove':
           this.userStore.deleteUser(
-            e.changes[0].key,
-            this.dataGrid.instance.pageIndex(),
+            [e.changes[0].key],
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
+          this.isAddingNewRow = false;
           break;
         default:
           break;
@@ -474,6 +409,7 @@ export class EditUserListComponent implements OnInit, OnDestroy {
   }
 
   onEditCanceled() {
+    this.isAddingNewRow = false;
     this.store.showNotif('Editing cancelled', 'custom');
   }
 
@@ -504,7 +440,7 @@ export class EditUserListComponent implements OnInit, OnDestroy {
       this.userStore.confirmDialog('').then((result: boolean) => {
         if (result) {
           this.userHTTP
-            .deleteSelectedUsers(this.selectedRows)
+            .deleteUser(this.selectedRows)
             .toPromise()
             .then(() => {
               this.store.showNotif(
@@ -515,28 +451,31 @@ export class EditUserListComponent implements OnInit, OnDestroy {
               switch (editorMode) {
                 case 'NORMAL':
                   this.userStore.initData(
-                    this.dataGrid.instance.pageIndex(),
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'FILTER':
-                  this.userStore.initFilterByCategoryData(
-                    this.currentCategoryFilterValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.userStore.initFilterByPropertyData(
+                    this.currentFilterProperty,
+                    this.currentFilterByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'SORT':
-                  this.userStore.initSortByPriceData(
-                    this.currentSortByPriceValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.userStore.initSortByPropertyData(
+                    this.currentSortProperty,
+                    this.currentSortByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'SEARCH':
-                  this.userStore.initSearchByNameData(
-                    this.currentSearchByNameValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.userStore.initSearchByPropertyData(
+                    this.currentSearchProperty,
+                    this.currentSearchByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
@@ -561,13 +500,16 @@ export class EditUserListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = false;
     this.isSearchingByName = false;
     this.isSortingByName = false;
-    this.userStore.initData(this.dataGrid.instance.pageIndex(), this.pageSize);
+    this.userStore.initData(
+      this.dataGrid.instance.pageIndex() + 1,
+      this.pageSize
+    );
   }
 
   onAddRandom() {
     this.userStore
       .confirmDialog(
-        'This will generate random 10 items in database. Are you sure'
+        'This will generate random 100+ items in database. Are you sure'
       )
       .then((result: boolean) => {
         if (result) {
@@ -578,13 +520,13 @@ export class EditUserListComponent implements OnInit, OnDestroy {
             .toPromise()
             .then(() => {
               this.userStore.initData(
-                this.dataGrid.instance.pageIndex(),
+                this.dataGrid.instance.pageIndex() + 1,
                 this.pageSize
               );
             })
             .then(() => {
               this.store.setIsLoading(false);
-              this.store.showNotif('Generated 10 random items', 'custom');
+              this.store.showNotif('Generated 100+ random items', 'custom');
             });
         }
       });
@@ -627,26 +569,6 @@ export class EditUserListComponent implements OnInit, OnDestroy {
       });
   }
 
-  // default export with selected row
-  // onExporting(e: any) {
-  //   const workbook = new ExcelJS.Workbook();
-  //   const worksheet = workbook.addWorksheet('User List');
-
-  //   exportDataGrid({
-  //     component: e.component,
-  //     worksheet: worksheet,
-  //     autoFilterEnabled: true,
-  //   }).then(() => {
-  //     workbook.xlsx.writeBuffer().then((buffer) => {
-  //       saveAs(
-  //         new Blob([buffer], { type: 'application/octet-stream' }),
-  //         'User_List.xlsx'
-  //       );
-  //     });
-  //   });
-  //   e.cancel = true;
-  // }
-
   exportGridToPdf(e: any) {
     this.userStore
       .confirmDialog('This will export all data to pdf. Are you sure?')
@@ -667,7 +589,7 @@ export class EditUserListComponent implements OnInit, OnDestroy {
                 }).then(() => {
                   doc.save('User_List.pdf');
                   this.store.setIsLoading(false);
-                  this.store.showNotif('Export succesully', 'custom');
+                  this.store.showNotif('Export successfully', 'custom');
                 });
               }, 200);
             });
@@ -676,11 +598,11 @@ export class EditUserListComponent implements OnInit, OnDestroy {
   }
 
   deleteAll() {
-    this.userStore.deleteAllUsers();
+    this.userStore.deleteAll();
   }
 
-  navigateToEditLearner() {
-    this.router.navigate(['/edit_learner_list']);
+  navigateToEditUserInfo() {
+    this.router.navigate(['/edit_user_info_list']);
   }
 
   sourceDataListener() {
@@ -695,17 +617,26 @@ export class EditUserListComponent implements OnInit, OnDestroy {
     });
   }
 
+  filterDataListener() {
+    return this.userStore.$roleList.subscribe((data: any) => {
+      if (data.length !== 0) {
+        this.roleList = data;
+        setTimeout(() => {
+          this.onRefresh();
+        }, 150);
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.sourceDataListener();
     this.currentPageListener();
-    setTimeout(() => {
-      this.onRefresh();
-    }, 150);
+    this.filterDataListener();
   }
 
   ngOnDestroy(): void {
     this.sourceDataListener().unsubscribe();
     this.currentPageListener().unsubscribe();
-    this.onRefresh();
+    this.filterDataListener().unsubscribe();
   }
 }

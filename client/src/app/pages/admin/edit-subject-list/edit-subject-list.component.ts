@@ -124,7 +124,7 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
           onKeyUp: this.onSearchKeyupHandler.bind(this),
           onValueChanged: this.onSearchValueChanged.bind(this),
           mode: 'search',
-          placeholder: 'Search id',
+          placeholder: 'Search name',
         },
       },
       {
@@ -135,7 +135,7 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
           type: 'normal',
           icon: 'filter',
           disabled: true,
-          hint: 'Filter with health insurance',
+          hint: 'Filter with ...',
         },
       },
       {
@@ -145,10 +145,10 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
         options: {
           items: this.discountList,
           valueExpr: 'name',
-          // searchExpr: 'name',
+          searchExpr: 'name',
           displayExpr: 'name',
-          placeholder: 'Filter with health insurance',
-          // searchEnabled: true,
+          placeholder: 'Filter with ...',
+          searchEnabled: true,
           onValueChanged: this.onFilterChange.bind(this),
         },
       },

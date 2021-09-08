@@ -48,17 +48,6 @@
   (onEditCanceled)="onEditCanceled()"
   (onToolbarPreparing)="onToolbarPreparing($event)"
 >
-  <!-- (onExporting)="onExporting($event)" -->
-  <!-- [allowColumnResizing]="true"
-        [allowColumnReordering]="true" -->
-  <!-- (onCellClick)="onCellClick($event)" -->
-  <!-- [focusedRowEnabled]="true" -->
-  <!-- (onFocusedRowChanged)="onFocusedRowChanged($event)" -->
-  <!-- (onFocusedRowChanging)="onFocusedRowChanging($event)"
-        [(autoNavigateToFocusedRow)]="autoNavigateToFocusedRow"
-        [(focusedRowKey)]="focusedRowKey" -->
-  <!-- (onRowInserted)="$event.component.navigateToRow($event.key)" -->
-  <!-- [refreshMode]="'full'" -->
   <dxo-editing
     [allowUpdating]="true"
     [allowDeleting]="true"
@@ -73,21 +62,6 @@
     mode="multiple"
   ></dxo-selection>
 
-  <!-- <dxo-scrolling [mode]="scrollingMode" [rowRenderingMode]="'virtual'"></dxo-scrolling> -->
-
-  <!-- <dxo-header-filter [visible]="true"> </dxo-header-filter> -->
-  <!-- enable to save state of data grid to local storage -->
-  <!-- <dxo-state-storing
-          [enabled]="true"
-          type="localStorage"
-          storageKey="storage"
-        ></dxo-state-storing> -->
-
-  <!-- <dxo-filter-panel [visible]="true"> </dxo-filter-panel> -->
-
-  <!-- <dxo-filter-row [visible]="true"> </dxo-filter-row> -->
-
-  <!-- <dxo-export [enabled]="true" [allowExportSelectedData]="true" [hidden]="true"></dxo-export> -->
   <dxo-grouping
     [contextMenuEnabled]="true"
     expandMode="rowClick"

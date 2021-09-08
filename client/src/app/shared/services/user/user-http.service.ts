@@ -9,241 +9,152 @@ import { User } from '../../models/user';
 })
 export class UserHttpService {
   constructor(private http: HttpClient) {}
-  apiUserUrl = 'https://ta-sys-online-server.azurewebsites.net';
-
+  apiUrl = 'https://ta-sys-online-server.azurewebsites.net';
   fetchUser(page: number, size: number): Observable<User> {
-    const params = new HttpParams().set('page', page).set('size', size);
+    const params = new HttpParams()
+      .set('PageNumber', page)
+      .set('PageSize', size);
     console.log(params.toString());
-    return this.http.get<User>(this.apiUserUrl, {
+    return this.http.get<User>(this.apiUrl + '/api/UserAccount/paging', {
       params: params,
       reportProgress: true,
       observe: 'body',
     });
   }
 
-  fetchRole(): Observable<any> {
-    return this.http.get<any>(this.apiUserUrl + '/api/Role', {
+  fetchUserByLearnerID(
+    page: number,
+    size: number,
+    id: string
+  ): Observable<User> {
+    const params = new HttpParams()
+      .set('PageNumber', page)
+      .set('PageSize', size)
+      .set('Id', id);
+    console.log(params.toString());
+    return this.http.get<User>(this.apiUrl + '/byLearnerID', {
+      params: params,
       reportProgress: true,
       observe: 'body',
     });
   }
 
-  searchUserByName(
+  searchUserByProperty(
+    property: string,
     value: string,
     page: number,
     size: number
   ): Observable<User> {
     const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
+      .set('Property', property)
+      .set('Value', value)
+      .set('PageNumber', page)
+      .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<User>(
-      this.apiUserUrl + '/searchByName',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<User>(this.apiUrl + '/api/UserAccount/search', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
-  filterUserByPrice(
-    criteria: string,
-    value: number,
-    page: number,
-    size: number
-  ): Observable<User> {
-    const params = new HttpParams()
-      .set('criteria', criteria)
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
-    console.log(params.toString());
-    return this.http.post<User>(
-      this.apiUserUrl,
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  filterUserByCategory(
+  filterUserByProperty(
+    property: string,
     value: string,
     page: number,
     size: number
   ): Observable<User> {
     const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
+      .set('Value', value)
+      .set('Property', property)
+      .set('PageNumber', page)
+      .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<User>(
-      this.apiUserUrl + '/filterByCategory',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<User>(this.apiUrl + '/api/UserAccount/filter', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
-  filterUserByJob(value: string, page: number, size: number): Observable<User> {
-    const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
-    console.log(params.toString());
-    return this.http.post<User>(
-      this.apiUserUrl + '/filterByJob',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  filterUserByGender(
+  sortUserByProperty(
     value: string,
+    order: string,
     page: number,
     size: number
   ): Observable<User> {
     const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
+      .set('SortBy', value)
+      .set('Order', order)
+      .set('PageNumber', page)
+      .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<User>(
-      this.apiUserUrl + '/filterByGender',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  sortUserByName(value: string, page: number, size: number): Observable<User> {
-    const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
-    console.log(params.toString());
-    return this.http.post<User>(
-      this.apiUserUrl + '/sortByName',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  sortUserByPrice(value: string, page: number, size: number): Observable<User> {
-    const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
-    console.log(params.toString());
-    return this.http.post<User>(
-      this.apiUserUrl + '/sortByPrice',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<User>(this.apiUrl + '/api/UserAccount/paging', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
   uploadUser(user: User): Observable<User> {
-    return this.http.post<User>(
-      this.apiUserUrl + '/api/Authenticate/Register',
-      user,
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.post<User>(this.apiUrl + '/api/UserAccount', user, {
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
   generateRandomUser(): Observable<User> {
-    return this.http.post<User>(
-      this.apiUserUrl + '/randomUser',
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.post<User>(this.apiUrl + '/randomUser', {
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
-  deleteAllUsers(): Observable<User> {
-    return this.http.post<User>(
-      this.apiUserUrl + '/deleteAll',
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+  deleteUser(id: Array<string>): Observable<Object> {
+    return this.http.post<Object>(this.apiUrl + '/api/UserAccount/delete', id, {
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
-  deleteUser(id: string): Observable<ArrayBuffer> {
-    return this.http.delete<ArrayBuffer>(this.apiUserUrl + `/${id}`, {
+  deleteAll(): Observable<ArrayBuffer> {
+    return this.http.delete<ArrayBuffer>(this.apiUrl + '/api/UserAccount', {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   getUser(id: string): Observable<User> {
-    return this.http.get<User>(this.apiUserUrl + `/${id}`, {
+    return this.http.get<User>(this.apiUrl + `/api/UserAccount/${id}`, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
-  deleteSelectedUsers(selectedItems: Array<string>): Observable<Array<string>> {
-    return this.http.post<Array<string>>(
-      this.apiUserUrl + '/batch',
-      selectedItems,
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  updateUser(user: User, key: string): Observable<User> {
-    return this.http.post<User>(this.apiUserUrl + `/updateUser/${key}`, user, {
+  updateUser(user: User): Observable<User> {
+    return this.http.put<User>(this.apiUrl + '/api/UserAccount', user, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   fetchAll(): Observable<User> {
-    return this.http.post<User>(
-      this.apiUserUrl + `/fetchAll`,
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<User>(this.apiUrl + '/api/UserAccount', {
+      reportProgress: true,
+      observe: 'body',
+    });
+  }
+
+  fetchRole(): Observable<any> {
+    return this.http.get<any>(this.apiUrl + '/api/Role', {
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
   loginUser(user: User): Observable<User> {
     return this.http
-      .post<User>(this.apiUserUrl + '/api/Authenticate/login', user, {
+      .post<User>(this.apiUrl + '/api/Authenticate/login', user, {
         reportProgress: true,
         observe: 'body',
       })
@@ -251,7 +162,7 @@ export class UserHttpService {
   }
 
   logoutUser(user: User): Observable<User> {
-    return this.http.post<User>(this.apiUserUrl + '/logout', user, {
+    return this.http.post<User>(this.apiUrl + '/logout', user, {
       reportProgress: true,
       observe: 'body',
     });

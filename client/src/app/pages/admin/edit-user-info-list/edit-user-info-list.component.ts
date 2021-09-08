@@ -7,21 +7,34 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as ExcelJS from 'exceljs';
 import saveAs from 'file-saver';
-import { Learner } from 'src/app/shared/models/Learner';
-import { LearnerHttpService } from 'src/app/shared/services/learner/learner-http.service';
-import { LearnerStore } from 'src/app/shared/services/learner/learner-store.service';
+import { UserInfo } from 'src/app/shared/models/userinfo';
+import { UserInfoHttpService } from 'src/app/shared/services/user-info/user-info-http.service';
+import { UserInfoStore } from 'src/app/shared/services/user-info/user-info-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
-// import bloodTypeList from 'src/app/shared/services/learner/mock-blood-type';
 
 @Component({
-  selector: 'app-edit-learner-list',
-  templateUrl: './edit-learner-list.component.html',
-  styleUrls: ['./edit-learner-list.component.scss'],
+  selector: 'app-edit-user-info-list',
+  templateUrl: './edit-user-info-list.component.html',
+  styleUrls: ['./edit-user-info-list.component.scss'],
 })
-export class EditLearnerListComponent implements OnInit, OnDestroy {
+export class EditUserInfoListComponent implements OnInit, OnDestroy {
   @ViewChild(DxDataGridComponent, { static: false })
   dataGrid: DxDataGridComponent;
-  learnerList!: Array<Learner>;
+  userInfoList!: Array<UserInfo>;
+  genderList: Array<Object> = [
+    {
+      id: '(NONE)',
+      name: '(NONE)',
+    },
+    {
+      id: '0',
+      name: 'Male',
+    },
+    {
+      id: '1',
+      name: 'Female',
+    },
+  ];
   selectedRows: string[];
   isSelectInfoVisible: boolean;
   selectInfoText: string;
@@ -34,16 +47,20 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
   isFilteringByCategory: boolean;
   isFilteringByPrice: boolean;
   isSortingByName: boolean;
+  isAddingNewRow: boolean = false;
 
-  currentCategoryFilterValue: string;
+  currentFilterByPropertyValue: string;
   timeout: any;
-  currentSearchByNameValue: string;
-  currentSortByPriceValue: string;
+  currentSearchByPropertyValue: string;
+  currentSortByPropertyValue: string;
+  currentSortProperty: string = 'fullName';
+  currentSearchProperty: string = 'fullName';
+  currentFilterProperty: string = 'gender';
 
   constructor(
-    private learnerStore: LearnerStore,
+    private userInfoStore: UserInfoStore,
     private store: StoreService,
-    private learnerHTTP: LearnerHttpService,
+    private userInfoHTTP: UserInfoHttpService,
     private router: Router
   ) {}
 
@@ -51,7 +68,7 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
     e.toolbarOptions.items.unshift(
       {
         location: 'before',
-        template: 'totalLearnerCount',
+        template: 'totalUserInfoCount',
       },
       {
         location: 'after',
@@ -82,7 +99,7 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
         options: {
           type: 'danger',
           icon: 'parentfolder',
-          hint: 'Generate random 10 items',
+          hint: 'Generate random 100+ items',
           onClick: this.onAddRandom.bind(this),
         },
       },
@@ -128,7 +145,7 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
           type: 'normal',
           icon: 'filter',
           disabled: true,
-          hint: 'Filter with blood type',
+          hint: 'Filter with subject',
         },
       },
       {
@@ -136,12 +153,12 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
         locateInMenu: 'auto',
         widget: 'dxSelectBox',
         options: {
-          // items: this.bloodTypeList,
-          valueExpr: 'name',
-          // searchExpr: 'name',
+          items: this.genderList,
+          valueExpr: 'id',
+          searchExpr: 'name',
           displayExpr: 'name',
-          placeholder: 'Filter with blood type',
-          // searchEnabled: true,
+          placeholder: 'Filter with gender',
+          searchEnabled: true,
           onValueChanged: this.onFilterChange.bind(this),
         },
       },
@@ -153,7 +170,7 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
           type: 'normal',
           icon: 'card',
           disabled: true,
-          hint: 'Sort by age',
+          hint: 'Sort by total cost',
         },
       },
       {
@@ -163,14 +180,14 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
         options: {
           items: [
             {
-              _id: '-1',
+              id: '-1',
               name: '(NONE)',
             },
-            { _id: '0', name: 'ASC' },
-            { _id: '1', name: 'DESC' },
+            { id: '0', name: 'asc' },
+            { id: '1', name: 'desc' },
           ],
           valueExpr: 'name',
-          placeholder: 'Sort by age',
+          placeholder: 'Sort by name',
           displayExpr: 'name',
           onValueChanged: this.onSortValueChanged.bind(this),
         },
@@ -184,11 +201,12 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
       this.isSearchingByName = true;
       this.isFilteringByCategory = false;
       this.isSortingByName = false;
-      console.log(this.currentSearchByNameValue);
-      if (this.currentSearchByNameValue !== '') {
-        this.learnerStore.initSearchByNameData(
-          this.currentSearchByNameValue,
-          this.dataGrid.instance.pageIndex(),
+      console.log(this.currentSearchByPropertyValue);
+      if (this.currentSearchByPropertyValue !== '') {
+        this.userInfoStore.initSearchByPropertyData(
+          this.currentSearchProperty,
+          this.currentSearchByPropertyValue,
+          this.dataGrid.instance.pageIndex() + 1,
           this.pageSize
         );
       } else {
@@ -200,18 +218,19 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
   }
 
   onSearchValueChanged(e: any) {
-    this.currentSearchByNameValue = e.value;
+    this.currentSearchByPropertyValue = e.value;
   }
 
   onSortValueChanged(e: any) {
     this.isSortingByName = true;
     this.isSearchingByName = false;
     this.isFilteringByCategory = false;
-    this.currentSortByPriceValue = e.value;
+    this.currentSortByPropertyValue = e.value;
     if (e.value !== '(NONE)') {
-      this.learnerStore.initSortByPriceData(
+      this.userInfoStore.initSortByPropertyData(
+        this.currentSortProperty,
         e.value,
-        this.dataGrid.instance.pageIndex(),
+        this.dataGrid.instance.pageIndex() + 1,
         this.pageSize
       );
     } else {
@@ -225,16 +244,16 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = true;
     this.isSearchingByName = false;
     this.isSortingByName = false;
-    this.currentCategoryFilterValue = e.value;
+    this.currentFilterByPropertyValue = e.value;
     console.log(e.value);
-    if (e.value !== '-1') {
-      this.learnerStore.initFilterByCategoryData(
+    if (e.value !== '(NONE)') {
+      this.userInfoStore.initFilterByPropertyData(
+        this.currentFilterProperty,
         e.value,
-        this.dataGrid.instance.pageIndex(),
+        this.dataGrid.instance.pageIndex() + 1,
         this.pageSize
       );
     } else {
-      //return to pure editor mode
       this.store.showNotif('FILTER MODE OFF', 'custom');
       this.onRefresh();
     }
@@ -256,9 +275,9 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
     const editorMode = this.checkEditorMode();
     // event of page index changed
     if (e.fullName === 'paging.pageIndex') {
-      const currentIndex: number = e.value;
+      const currentIndex: number = e.value + 1;
       console.log(
-        `New page index: ${currentIndex}. Total items: ${this.learnerList.length}`
+        `New page index: ${currentIndex}. Total items: ${this.userInfoList.length}`
       );
       switch (editorMode) {
         case 'NORMAL':
@@ -277,39 +296,39 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
           break;
       }
     }
-    // todo: handle virtual scrolling when pagesize = 'all'
-    //
-    // event of page size changed by user's click
     if (e.fullName === 'paging.pageSize') {
       this.pageSize = e.value;
       console.log(`Page size changed to ${e.value}`);
       switch (editorMode) {
         case 'NORMAL':
-          this.learnerStore.loadDataAsync(
+          this.userInfoStore.loadDataAsync(
             this.currentIndexFromServer,
             e.value
           );
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'FILTER':
-          this.learnerStore.filterLearnerByCategory(
-            this.currentCategoryFilterValue,
+          this.userInfoStore.filterUserInfoByProperty(
+            this.currentFilterProperty,
+            this.currentFilterByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'SEARCH':
-          this.learnerStore.searchLearnerByName(
-            this.currentSearchByNameValue,
+          this.userInfoStore.searchUserInfoByProperty(
+            this.currentSearchProperty,
+            this.currentSearchByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'SORT':
-          this.learnerStore.sortLearnerByPrice(
-            this.currentSortByPriceValue,
+          this.userInfoStore.sortUserInfoByProperty(
+            this.currentSortProperty,
+            this.currentSortByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
@@ -322,114 +341,43 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
   }
 
   paginatePureData(index: number) {
-    if (index === 0) {
-      this.learnerStore.loadDataAsync(index, this.pageSize);
-      this.learnerStore.loadDataAsync(index + 1, this.pageSize);
-    } else {
-      this.learnerStore.loadDataAsync(index, this.pageSize);
-      this.learnerStore.loadDataAsync(index + 1, this.pageSize);
-      this.learnerStore.loadDataAsync(index - 1, this.pageSize);
-    }
+    this.userInfoStore.loadDataAsync(index, this.pageSize);
   }
 
   paginateFilterData(index: number) {
-    if (index === 0) {
-      this.learnerStore.filterLearnerByCategory(
-        this.currentCategoryFilterValue,
-        index,
-        this.pageSize
-      );
-      this.learnerStore.filterLearnerByCategory(
-        this.currentCategoryFilterValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.learnerStore.filterLearnerByCategory(
-        this.currentCategoryFilterValue,
-        index,
-        this.pageSize
-      );
-      this.learnerStore.filterLearnerByCategory(
-        this.currentCategoryFilterValue,
-        index + 1,
-        this.pageSize
-      );
-      this.learnerStore.filterLearnerByCategory(
-        this.currentCategoryFilterValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.userInfoStore.filterUserInfoByProperty(
+      this.currentFilterProperty,
+      this.currentFilterByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSearchData(index: number) {
-    if (index === 0) {
-      this.learnerStore.searchLearnerByName(
-        this.currentSearchByNameValue,
-        index,
-        this.pageSize
-      );
-      this.learnerStore.searchLearnerByName(
-        this.currentSearchByNameValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.learnerStore.searchLearnerByName(
-        this.currentSearchByNameValue,
-        index,
-        this.pageSize
-      );
-      this.learnerStore.searchLearnerByName(
-        this.currentSearchByNameValue,
-        index + 1,
-        this.pageSize
-      );
-      this.learnerStore.searchLearnerByName(
-        this.currentSearchByNameValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.userInfoStore.searchUserInfoByProperty(
+      this.currentSearchProperty,
+      this.currentSearchByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSortData(index: number) {
-    if (index === 0) {
-      this.learnerStore.sortLearnerByPrice(
-        this.currentSortByPriceValue,
-        index,
-        this.pageSize
-      );
-      this.learnerStore.sortLearnerByPrice(
-        this.currentSortByPriceValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.learnerStore.sortLearnerByPrice(
-        this.currentSortByPriceValue,
-        index,
-        this.pageSize
-      );
-      this.learnerStore.sortLearnerByPrice(
-        this.currentSortByPriceValue,
-        index + 1,
-        this.pageSize
-      );
-      this.learnerStore.sortLearnerByPrice(
-        this.currentSortByPriceValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.userInfoStore.sortUserInfoByProperty(
+      this.currentSortProperty,
+      this.currentSortByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   onEditingStart() {
+    this.isAddingNewRow = false;
     this.store.showNotif('Edit mode on', 'custom');
   }
 
   onInitNewRow() {
+    this.isAddingNewRow = true;
     this.store.showNotif(
       'Blank row added, please fill in information',
       'custom'
@@ -440,27 +388,29 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
     if (e.changes.length) {
       switch (e.changes[0].type) {
         case 'insert':
-          this.learnerStore.uploadLearner(
+          this.userInfoStore.uploadUserInfo(
             e.changes[0].data,
-            this.dataGrid.instance.pageIndex(),
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
+          this.isAddingNewRow = false;
           break;
         case 'update':
           console.log(e.changes[0]);
-          this.learnerStore.updateLearner(
+          this.userInfoStore.updateUserInfo(
             e.changes[0].data,
-            e.changes[0].key,
-            this.dataGrid.instance.pageIndex(),
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
+          this.isAddingNewRow = false;
           break;
         case 'remove':
-          this.learnerStore.deleteLearner(
-            e.changes[0].key,
-            this.dataGrid.instance.pageIndex(),
+          this.userInfoStore.deleteUserInfo(
+            [e.changes[0].key],
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
+          this.isAddingNewRow = false;
           break;
         default:
           break;
@@ -471,6 +421,7 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
   }
 
   onEditCanceled() {
+    this.isAddingNewRow = false;
     this.store.showNotif('Editing cancelled', 'custom');
   }
 
@@ -498,10 +449,10 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
     this.store.setIsLoading(true);
     const editorMode = this.checkEditorMode();
     if (this.selectedRows.length) {
-      this.learnerStore.confirmDialog('').then((result: boolean) => {
+      this.userInfoStore.confirmDialog('').then((result: boolean) => {
         if (result) {
-          this.learnerHTTP
-            .deleteSelectedLearners(this.selectedRows)
+          this.userInfoHTTP
+            .deleteUserInfo(this.selectedRows)
             .toPromise()
             .then(() => {
               this.store.showNotif(
@@ -511,29 +462,32 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
               this.clearSelection();
               switch (editorMode) {
                 case 'NORMAL':
-                  this.learnerStore.initData(
-                    this.dataGrid.instance.pageIndex(),
+                  this.userInfoStore.initData(
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'FILTER':
-                  this.learnerStore.initFilterByCategoryData(
-                    this.currentCategoryFilterValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.userInfoStore.initFilterByPropertyData(
+                    this.currentFilterProperty,
+                    this.currentFilterByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'SORT':
-                  this.learnerStore.initSortByPriceData(
-                    this.currentSortByPriceValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.userInfoStore.initSortByPropertyData(
+                    this.currentSortProperty,
+                    this.currentSortByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'SEARCH':
-                  this.learnerStore.initSearchByNameData(
-                    this.currentSearchByNameValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.userInfoStore.initSearchByPropertyData(
+                    this.currentSearchProperty,
+                    this.currentSearchByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
@@ -558,55 +512,55 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = false;
     this.isSearchingByName = false;
     this.isSortingByName = false;
-    this.learnerStore.initData(
-      this.dataGrid.instance.pageIndex(),
+    this.userInfoStore.initData(
+      this.dataGrid.instance.pageIndex() + 1,
       this.pageSize
     );
   }
 
   onAddRandom() {
-    this.learnerStore
+    this.userInfoStore
       .confirmDialog(
-        'This will generate random 10 items in database. Are you sure'
+        'This will generate random 100+ items in database. Are you sure'
       )
       .then((result: boolean) => {
         if (result) {
           this.isFilteringByCategory = false;
           this.store.setIsLoading(true);
-          this.learnerHTTP
-            .generateRandomLearner()
+          this.userInfoHTTP
+            .generateRandomUserInfo()
             .toPromise()
             .then(() => {
-              this.learnerStore.initData(
-                this.dataGrid.instance.pageIndex(),
+              this.userInfoStore.initData(
+                this.dataGrid.instance.pageIndex() + 1,
                 this.pageSize
               );
             })
             .then(() => {
               this.store.setIsLoading(false);
-              this.store.showNotif('Generated 10 random items', 'custom');
+              this.store.showNotif('Generated 100+ random items', 'custom');
             });
         }
       });
   }
 
   exportDataGridToExcel() {
-    this.learnerStore
+    this.userInfoStore
       .confirmDialog(
         'This will export all fetched data to excel. Are you sure?'
       )
       .then((result: boolean) => {
         if (result) {
           this.store.setIsLoading(true);
-          this.learnerHTTP
+          this.userInfoHTTP
             .fetchAll()
             .toPromise()
             .then((data: any) => {
-              this.learnerStore.setExportData(data);
+              this.userInfoStore.setExportData(data);
               console.log(data);
               setTimeout(() => {
                 const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('Learner List');
+                const worksheet = workbook.addWorksheet('UserInfo List');
                 exportDataGridToExcel({
                   component: this.dataGrid.instance,
                   worksheet: worksheet,
@@ -615,7 +569,7 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
                   workbook.xlsx.writeBuffer().then((buffer) => {
                     saveAs(
                       new Blob([buffer], { type: 'application/octet-stream' }),
-                      'Learner_List.xlsx'
+                      'UserInfo_List.xlsx'
                     );
                     this.store.setIsLoading(false);
                     this.store.showNotif('Export succesully', 'custom');
@@ -628,16 +582,16 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
   }
 
   exportGridToPdf(e: any) {
-    this.learnerStore
+    this.userInfoStore
       .confirmDialog('This will export all data to pdf. Are you sure?')
       .then((result: boolean) => {
         if (result) {
           this.store.setIsLoading(true);
-          this.learnerHTTP
+          this.userInfoHTTP
             .fetchAll()
             .toPromise()
             .then((data: any) => {
-              this.learnerStore.setExportData(data);
+              this.userInfoStore.setExportData(data);
               console.log(data);
               setTimeout(() => {
                 const doc = new jsPDF();
@@ -645,9 +599,9 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
                   jsPDFDocument: doc,
                   component: this.dataGrid.instance,
                 }).then(() => {
-                  doc.save('Learner_List.pdf');
+                  doc.save('UserInfo_List.pdf');
                   this.store.setIsLoading(false);
-                  this.store.showNotif('Export succesully', 'custom');
+                  this.store.showNotif('Export successfully', 'custom');
                 });
               }, 200);
             });
@@ -656,21 +610,21 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
   }
 
   deleteAll() {
-    this.learnerStore.deleteAllLearners();
+    this.userInfoStore.deleteAll();
   }
 
-  navigateToEditInstructor() {
-    this.router.navigate(['/edit_instructor_list']);
+  navigateToEditSubject() {
+    this.router.navigate(['/edit_subject_list']);
   }
 
   sourceDataListener() {
-    return this.learnerStore.$learnerList.subscribe((data: any) => {
-      this.learnerList = data;
+    return this.userInfoStore.$userInfoList.subscribe((data: any) => {
+      this.userInfoList = data;
     });
   }
 
   currentPageListener() {
-    return this.learnerStore.$currentPage.subscribe((data: any) => {
+    return this.userInfoStore.$currentPage.subscribe((data: any) => {
       this.currentIndexFromServer = data;
     });
   }
@@ -686,6 +640,5 @@ export class EditLearnerListComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.sourceDataListener().unsubscribe();
     this.currentPageListener().unsubscribe();
-    this.onRefresh();
   }
 }

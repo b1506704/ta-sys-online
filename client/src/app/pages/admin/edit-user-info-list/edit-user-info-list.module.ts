@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { EditLearnerListRoutingModule } from './edit-learner-list-routing.module';
-import { EditLearnerListComponent } from './edit-learner-list.component';
+import { EditUserInfoListRoutingModule } from './edit-user-info-list-routing.module';
+import { EditUserInfoListComponent } from './edit-user-info-list.component';
 import {
   DxDataGridModule,
   DxToolbarModule,
@@ -11,11 +11,11 @@ import {
 @NgModule({
   imports: [
     CommonModule,
-    EditLearnerListRoutingModule,
+    EditUserInfoListRoutingModule,
     DxDataGridModule,
     DxToolbarModule,
     DxButtonModule,
   ],
-  declarations: [EditLearnerListComponent],
+  declarations: [EditUserInfoListComponent],
 })
-export class EditLearnerModule {}
+export class EditUserInfoModule {}

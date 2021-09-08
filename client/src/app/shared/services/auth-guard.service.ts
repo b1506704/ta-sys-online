@@ -6,18 +6,13 @@ import {
   RouterStateSnapshot,
 } from '@angular/router';
 import { Observable } from 'rxjs';
-import { StoreService } from './store.service';
 import { UserStore } from './user/user-store.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthGuardService implements CanActivate {
-  constructor(
-    public userStoreService: UserStore,
-    public router: Router,
-    private store: StoreService
-  ) {}
+  constructor(public userStoreService: UserStore, public router: Router) {}
 
   canActivate(
     next: ActivatedRouteSnapshot,
@@ -25,7 +20,7 @@ export class AuthGuardService implements CanActivate {
   ): Observable<boolean> | Promise<boolean> | boolean {
     this.userStoreService.$isLoggedIn.subscribe((data: any) => {
       if (data !== true) {
-        this.router.navigate(['/splash_screen']);
+        this.router.navigate(['/login']);
       }
     });
     return true;

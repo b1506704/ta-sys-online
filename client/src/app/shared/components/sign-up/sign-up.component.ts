@@ -95,8 +95,10 @@ export class SignUpComponent implements OnInit, OnDestroy {
       },
     };
     this.user = {
+      id: undefined,
       username: '',
       password: '',
+      displayName: '',
       roleId: this.roleList[0],
     };
   }

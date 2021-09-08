@@ -36,8 +36,8 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
   isFilteringByPrice: boolean;
   isSortingByName: boolean;
 
-  currentFilterByPropertyValue: string;
   timeout: any;
+  currentFilterByPropertyValue: string;
   currentSearchByPropertyValue: string;
   currentSortByPropertyValue: string;
   currentSortProperty: string = 'name';

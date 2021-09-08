@@ -8,18 +8,18 @@ import { confirm } from 'devextreme/ui/dialog';
 
 interface ImageState {
   imageList: Array<Image>;
-  isUploadingImage: boolean;
+  isUploading: boolean;
   exportData: Array<Image>;
   selectedImage: Object;
   imageInstance: Image;
   totalPages: number;
   currentPage: number;
   totalItems: number;
-  responseMsg: string;
+  responseMsg: String;
 }
 const initialState: ImageState = {
   imageList: [],
-  isUploadingImage: false,
+  isUploading: false,
   selectedImage: {},
   imageInstance: undefined,
   exportData: [],
@@ -38,7 +38,6 @@ export class ImageStore extends StateService<ImageState> {
   ) {
     super(initialState);
   }
- 
   /**
    * This is a function which fills the items received from pagination in a specific store's state variable.
    * 
@@ -135,7 +134,7 @@ export class ImageStore extends StateService<ImageState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
+        this.store.showNotif(data.error.errorMessage, 'error');
         console.log(data);
       },
     });
@@ -310,7 +309,7 @@ export class ImageStore extends StateService<ImageState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
+        this.store.showNotif(data.error.errorMessage, 'error');
         console.log(data);
       },
     });
@@ -340,7 +339,7 @@ export class ImageStore extends StateService<ImageState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
+        this.store.showNotif(data.error.errorMessage, 'error');
         console.log(data);
       },
     });
@@ -372,22 +371,20 @@ export class ImageStore extends StateService<ImageState> {
     (state) => state.imageInstance
   );
 
-  $isUploadingImage: Observable<boolean> = this.select(
-    (state) => state.isUploadingImage
-  );
+  $isUploading: Observable<boolean> = this.select((state) => state.isUploading);
 
-  uploadImage(image: Image, page: number, size: number) {
+  uploadImage(image: Image) {
     this.setIsLoading(true);
-    this.setisUploadingImage(true);
+    this.setisUploading(true);
     this.imageService.uploadImage(image).subscribe({
       next: (data: any) => {
         this.setState({ responseMsg: data });
         this.setTotalItems(this.state.totalItems + 1);
         console.log(data);
-        this.loadDataAsync(page, size);
+        // this.loadDataAsync(page, size);
         this.getImageBySourceID(image?.sourceID);
         this.setIsLoading(false);
-        this.setisUploadingImage(false);
+        this.setisUploading(false);
       },
       error: (data: any) => {
         this.setIsLoading(false);
@@ -406,11 +403,11 @@ export class ImageStore extends StateService<ImageState> {
             console.log(data);
             this.loadDataAsync(page, size);
             this.setIsLoading(false);
-            this.store.showNotif(data.responseMessage, 'custom');
+            this.store.showNotif(data.message, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.responseMessage, 'error');
+            this.store.showNotif(data.error.errorMessage, 'error');
             console.log(data);
           },
         });
@@ -443,11 +440,11 @@ export class ImageStore extends StateService<ImageState> {
             this.setState({ totalItems: 0 });
             console.log(data);
             this.setIsLoading(false);
-            this.store.showNotif(data.responseMessage, 'custom');
+            this.store.showNotif(data.message, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.responseMessage, 'error');
+            this.store.showNotif(data.error.errorMessage, 'error');
             console.log(data);
           },
         });
@@ -503,7 +500,7 @@ export class ImageStore extends StateService<ImageState> {
         },
         error: (data: any) => {
           this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
+          this.store.showNotif(data.error.errorMessage, 'error');
           console.log(data);
         },
       });
@@ -532,7 +529,7 @@ export class ImageStore extends StateService<ImageState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
+        this.store.showNotif(data.error.errorMessage, 'error');
         console.log(data);
       },
     });
@@ -556,7 +553,7 @@ export class ImageStore extends StateService<ImageState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
+        this.store.showNotif(data.error.errorMessage, 'error');
         console.log(data);
       },
     });
@@ -589,7 +586,7 @@ export class ImageStore extends StateService<ImageState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
+        this.store.showNotif(data.error.errorMessage, 'error');
         console.log(data);
       },
     });
@@ -617,7 +614,7 @@ export class ImageStore extends StateService<ImageState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
+        this.store.showNotif(data.error.errorMessage, 'error');
         console.log(data);
       },
     });
@@ -647,7 +644,7 @@ export class ImageStore extends StateService<ImageState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
+        this.store.showNotif(data.error.errorMessage, 'error');
         console.log(data);
       },
     });
@@ -677,7 +674,7 @@ export class ImageStore extends StateService<ImageState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
+        this.store.showNotif(data.error.errorMessage, 'error');
         console.log(data);
       },
     });
@@ -701,7 +698,7 @@ export class ImageStore extends StateService<ImageState> {
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
+        this.store.showNotif(data.error.errorMessage, 'error');
         console.log(data);
       },
     });
@@ -721,6 +718,7 @@ export class ImageStore extends StateService<ImageState> {
 
   getImageBySourceID(id: string) {
     this.setIsLoading(true);
+    this.setState({ imageInstance: null });
     return this.imageService
       .getImageBySourceID(id)
       .toPromise()
@@ -731,8 +729,8 @@ export class ImageStore extends StateService<ImageState> {
       });
   }
 
-  setisUploadingImage(isFetching: boolean) {
-    this.setState({ isUploadingImage: isFetching });
+  setisUploading(isFetching: boolean) {
+    this.setState({ isUploading: isFetching });
   }
 
   setExportData(array: Array<Image>) {

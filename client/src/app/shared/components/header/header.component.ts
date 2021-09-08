@@ -5,6 +5,7 @@ import {
   Output,
   EventEmitter,
   OnInit,
+  OnDestroy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -16,13 +17,13 @@ import { Router } from '@angular/router';
 import { DxLoadIndicatorModule } from 'devextreme-angular';
 import { StoreService } from '../../services/store.service';
 import { UserStore } from '../../services/user/user-store.service';
-import { User } from '../../models/user';
+
 @Component({
   selector: 'app-header',
   templateUrl: 'header.component.html',
   styleUrls: ['./header.component.scss'],
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   @Output()
   menuToggle = new EventEmitter<boolean>();
 
@@ -45,8 +46,6 @@ export class HeaderComponent implements OnInit {
   isLoadIndicatorVisible!: boolean;
   isLoggedIn!: boolean;
   isRoleSelected: boolean = false;
-  currentUser!: User;
-  roleList: Array<any> = [];
 
   constructor(
     private router: Router,
@@ -54,24 +53,25 @@ export class HeaderComponent implements OnInit {
     private userStore: UserStore
   ) {}
 
-  ngOnInit() {
-    this.store.$isLoading.subscribe((data: any) => {
-      this.isLoadIndicatorVisible = data;
-    });
-    this.store.$currentUser.subscribe((data: any) => {
-      if (data !== null) {
-        this.currentUser = data;
-      }
-    });
-    this.userStore.$isLoggedIn.subscribe((data: any) => {
-      this.isLoggedIn = data;
-    });
-    this.store.$currentRoleName.subscribe((data: any) => {
+  roleNameListener() {
+    return this.store.$currentRoleName.subscribe((data: any) => {
       if (data === undefined) {
         this.isRoleSelected = false;
       } else {
         this.isRoleSelected = true;
       }
+    });
+  }
+
+  isLoadingListener() {
+    return this.store.$isLoading.subscribe((data: any) => {
+      this.isLoadIndicatorVisible = data;
+    });
+  }
+
+  isLoginListener() {
+    return this.userStore.$isLoggedIn.subscribe((data: any) => {
+      this.isLoggedIn = data;
     });
   }
 
@@ -84,12 +84,28 @@ export class HeaderComponent implements OnInit {
   }
 
   onLogout() {
-    this.userStore.logoutUser(this.currentUser);
+    this.userStore.logoutUser();
+  }
+
+  navigateHome() {
+    this.router.navigate(['/splash_screen']);
   }
 
   toggleMenu = () => {
     this.menuToggle.emit();
   };
+
+  ngOnInit() {
+    this.isLoadingListener();
+    this.isLoginListener();
+    this.roleNameListener();
+  }
+
+  ngOnDestroy() {
+    this.isLoadingListener().unsubscribe();
+    this.isLoginListener().unsubscribe();
+    this.roleNameListener().unsubscribe();
+  }
 }
 
 @NgModule({

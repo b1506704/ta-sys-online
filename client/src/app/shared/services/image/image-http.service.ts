@@ -8,21 +8,24 @@ import { Image } from '../../models/image';
 })
 export class ImageHttpService {
   constructor(private http: HttpClient) {}
-  apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Image';
+  apiImageUrl = 'https://ng-health-care-demo.herokuapp.com/images';
+  // apiImageUrl = 'http://localhost/images';
 
   fetchImage(page: number, size: number): Observable<Image> {
     const params = new HttpParams().set('page', page).set('size', size);
     console.log(params.toString());
-    return this.http.get<Image>(this.apiUrl, {
+    return this.http.get<Image>(this.apiImageUrl, {
       params: params,
       reportProgress: true,
       observe: 'body',
     });
   }
 
-  fetchSelectedImages(selectedItems: Array<string>): Observable<Array<Image>> {
+  fetchSelectedImages(
+    selectedItems: Array<string>
+  ): Observable<Array<Image>> {
     return this.http.post<Array<Image>>(
-      this.apiUrl + '/fetchBatch',
+      this.apiImageUrl + '/fetchBatch',
       selectedItems,
       {
         reportProgress: true,
@@ -42,7 +45,7 @@ export class ImageHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Image>(
-      this.apiUrl + '/searchByName',
+      this.apiImageUrl + '/searchByName',
       {},
       {
         params: params,
@@ -65,7 +68,7 @@ export class ImageHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Image>(
-      this.apiUrl,
+      this.apiImageUrl,
       {},
       {
         params: params,
@@ -86,7 +89,7 @@ export class ImageHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Image>(
-      this.apiUrl + '/filterByCategory',
+      this.apiImageUrl + '/filterByCategory',
       {},
       {
         params: params,
@@ -107,7 +110,7 @@ export class ImageHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Image>(
-      this.apiUrl + '/sortByName',
+      this.apiImageUrl + '/sortByName',
       {},
       {
         params: params,
@@ -128,7 +131,7 @@ export class ImageHttpService {
       .set('size', size);
     console.log(params.toString());
     return this.http.post<Image>(
-      this.apiUrl + '/sortByPrice',
+      this.apiImageUrl + '/sortByPrice',
       {},
       {
         params: params,
@@ -139,35 +142,35 @@ export class ImageHttpService {
   }
 
   uploadImage(image: Image): Observable<Image> {
-    return this.http.post<Image>(this.apiUrl, image, {
+    return this.http.post<Image>(this.apiImageUrl, image, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   generateRandomImage(): Observable<Image> {
-    return this.http.post<Image>(this.apiUrl + '/randomImage', {
+    return this.http.post<Image>(this.apiImageUrl + '/randomImage', {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   deleteAllImages(): Observable<Image> {
-    return this.http.post<Image>(this.apiUrl + '/deleteAll', {
+    return this.http.post<Image>(this.apiImageUrl + '/deleteAll', {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   deleteImage(sourceID: string): Observable<ArrayBuffer> {
-    return this.http.delete<ArrayBuffer>(this.apiUrl + `/${sourceID}`, {
+    return this.http.delete<ArrayBuffer>(this.apiImageUrl + `/${sourceID}`, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   getImage(id: string): Observable<Image> {
-    return this.http.get<Image>(this.apiUrl + `/${id}`, {
+    return this.http.get<Image>(this.apiImageUrl + `/${id}`, {
       reportProgress: true,
       observe: 'body',
     });
@@ -177,7 +180,7 @@ export class ImageHttpService {
     const params = new HttpParams().set('sourceID', sourceID);
     console.log(params.toString());
     return this.http.post<Image>(
-      this.apiUrl + '/bySourceID',
+      this.apiImageUrl + '/bySourceID',
       {},
       {
         params: params,
@@ -188,10 +191,10 @@ export class ImageHttpService {
   }
 
   deleteSelectedImages(
-    selectedItems: Array<string>
-  ): Observable<Array<string>> {
-    return this.http.post<Array<string>>(
-      this.apiUrl + '/batch',
+    selectedItems: Array<String>
+  ): Observable<Array<String>> {
+    return this.http.post<Array<String>>(
+      this.apiImageUrl + '/batch',
       selectedItems,
       {
         reportProgress: true,
@@ -201,15 +204,19 @@ export class ImageHttpService {
   }
 
   updateImage(image: Image, key: string): Observable<Image> {
-    return this.http.post<Image>(this.apiUrl + `/updateImage/${key}`, image, {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<Image>(
+      this.apiImageUrl + `/updateImage/${key}`,
+      image,
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   fetchAll(): Observable<Image> {
     return this.http.post<Image>(
-      this.apiUrl + `/fetchAll`,
+      this.apiImageUrl + `/fetchAll`,
       {},
       {
         reportProgress: true,

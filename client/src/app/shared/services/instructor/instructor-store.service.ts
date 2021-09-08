@@ -5,16 +5,14 @@ import { StateService } from '../state.service';
 import { StoreService } from '../store.service';
 import { InstructorHttpService } from './instructor-http.service';
 import { confirm } from 'devextreme/ui/dialog';
-import { ImageStore } from '../image/image-store.service';
+import { UserHttpService } from '../user/user-http.service';
+import { UserStore } from '../user/user-store.service';
 
 interface InstructorState {
   instructorList: Array<Instructor>;
   exportData: Array<Instructor>;
-  instructorInstance: Instructor;
   selectedInstructor: Object;
-  roleStatistics: Array<Object>;
-  departmentStatistics: Array<Object>;
-  genderStatistics: Array<Object>;
+  instructorInstance: Instructor;
   totalPages: number;
   currentPage: number;
   totalItems: number;
@@ -25,9 +23,6 @@ const initialState: InstructorState = {
   selectedInstructor: {},
   instructorInstance: undefined,
   exportData: [],
-  roleStatistics: [],
-  departmentStatistics: [],
-  genderStatistics: [],
   totalPages: 0,
   currentPage: 0,
   totalItems: 0,
@@ -39,8 +34,9 @@ const initialState: InstructorState = {
 export class InstructorStore extends StateService<InstructorState> {
   constructor(
     private instructorService: InstructorHttpService,
-    private store: StoreService,
-    private imageStore: ImageStore
+    private userService: UserHttpService,
+    private userStore: UserStore,
+    private store: StoreService
   ) {
     super(initialState);
   }
@@ -56,11 +52,11 @@ export class InstructorStore extends StateService<InstructorState> {
    * @return {Array<Object>} Return an array with filled items from ss pagination
    * @example
    * this.setState({
-            pendingCheckupList: this.fillEmpty(
-              page,
+            sourceList: this.fillEmpty(
+              page - 1,
               size,
-              this.state.pendingCheckupList,
-              data.items
+              this.state.sourceList,
+              arrayItemFromServer
             ),
           });
    */
@@ -71,14 +67,16 @@ export class InstructorStore extends StateService<InstructorState> {
     addedArray: Array<Instructor>
   ): Array<Instructor> {
     let result: Array<Instructor> = sourceArray;
+    console.log('FILL INDEX');
     let fillIndex = startIndex * endIndex;
+    console.log(fillIndex);
     for (var j = 0; j < addedArray.length; j++) {
       result[fillIndex] = addedArray[j];
       fillIndex++;
     }
     // endIndex = pageSize
     // pageSize = 5
-    // 0 => 0 ,1,2,3,4,
+    // 0 => 0,1,2,3,4,
     // 1 -> 5,6,7,8,9
     // 2 -> 10,11,12,13,14
     // 17 -> 85,86,87,88,89
@@ -87,213 +85,298 @@ export class InstructorStore extends StateService<InstructorState> {
     return result;
   }
 
+  initInfiniteData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.store.setIsLoading(true);
+    return this.userService
+      .filterUserByProperty(property, value, page, size)
+      .toPromise()
+      .then((data: any) => {
+        this.setState({
+          instructorList: data.data,
+        });
+        console.log('Current flag: infite list');
+        console.log(this.state.instructorList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.store.setIsLoading(false);
+      });
+  }
+
+  loadInfiniteDataAsync(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.userService
+      .filterUserByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            instructorList: this.state.instructorList.concat(data.data),
+          });
+          console.log('Infinite list');
+          console.log(this.state.instructorList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
+    this.setIsLoading(true);
+    this.instructorService
+      .fetchInstructorByLearnerID(page, size, learnerID)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            instructorList: this.fillEmpty(
+              page - 1,
+              size,
+              this.state.instructorList,
+              data.data
+            ),
+          });
+          console.log('Pure list');
+          console.log(this.state.instructorList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
+    return this.instructorService
+      .fetchInstructorByLearnerID(page, size, learnerID)
+      .toPromise()
+      .then((data: any) => {
+        this.setState({
+          instructorList: data.data,
+        });
+        console.log('Current flag: infite list');
+        console.log(this.state.instructorList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+      });
+  }
+
+  loadInfiniteDataAsyncByLearnerID(
+    page: number,
+    size: number,
+    learnerID: string
+  ) {
+    this.setIsLoading(true);
+    this.instructorService
+      .fetchInstructorByLearnerID(page, size, learnerID)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            instructorList: this.state.instructorList.concat(data.data),
+          });
+          console.log('Infinite list');
+          console.log(this.state.instructorList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
   initData(page: number, size: number) {
     this.instructorService
       .fetchInstructor(page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          instructorList: new Array<Instructor>(data.totalItems),
+          instructorList: new Array<Instructor>(data.totalRecords),
         });
         console.log('Current flag: pure list');
         console.log(this.state.instructorList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
         this.loadDataAsync(page, size);
       });
   }
 
-  initInfiniteData(page: number, size: number) {
-    this.store.setIsLoading(true);
-    return this.instructorService
-      .fetchInstructor(page, size)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          instructorList: new Array<Instructor>(data.items.length),
-        });
-        this.imageStore.fetchSelectedImages(data.items);
-        console.log('Current flag: infite list');
-        console.log(this.state.instructorList);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-      })
-      .then(() => {
-        this.loadDataAsync(page, size);
-
-      });
-  }
-
-  loadInfiniteDataAsync(page: number, size: number) {
-    this.setIsLoading(true);
-    this.instructorService.fetchInstructor(page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          instructorList: this.state.instructorList.concat(data.items),
-        });
-        this.imageStore.fetchSelectedImages(data.items);
-        console.log('Infinite list');
-        console.log(this.state.instructorList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        // this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  initFilterByCategoryData(value: string, page: number, size: number) {
+  initFilterByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Filtered Mode On', 'custom');
     this.instructorService
-      .filterInstructorByCategory(value, 0, 5)
+      .filterInstructorByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          instructorList: new Array<Instructor>(data.totalItems),
+          instructorList: new Array<Instructor>(data.totalRecords),
         });
         console.log('Current flag: filtered list');
         console.log(this.state.instructorList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.filterInstructorByCategory(value, page, size);
+        this.filterInstructorByProperty(property, value, page, size);
       });
   }
 
-  initInfiniteFilterByCategoryData(value: string, page: number, size: number) {
+  initInfiniteFilterByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Filtered Mode On', 'custom');
     this.instructorService
-      .filterInstructorByCategory(value, page, size)
+      .filterInstructorByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          instructorList: new Array<Instructor>(data.items.length),
+          instructorList: data.data,
         });
         console.log('Current flag: infinite filtered list');
         console.log(this.state.instructorList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-      })
-      .then(() => {
-        this.filterInstructorByCategory(value, page, size);
+        this.setState({ currentPage: data.pageNumber });
       });
   }
 
-  initSearchByNameData(value: string, page: number, size: number) {
+  initSearchByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Searched Mode On', 'custom');
     this.instructorService
-      .searchInstructorByName(value, 0, 5)
+      .searchInstructorByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          instructorList: new Array<Instructor>(data.totalItems),
+          instructorList: new Array<Instructor>(data.totalRecords),
         });
         console.log('Current flag: searched list');
         console.log(this.state.instructorList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.searchInstructorByName(value, page, size);
+        this.searchInstructorByProperty(property, value, page, size);
       });
   }
 
-  initInfiniteSearchByNameData(value: string, page: number, size: number) {
+  initInfiniteSearchByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Searched Mode On', 'custom');
     this.instructorService
-      .searchInstructorByName(value, page, size)
+      .searchInstructorByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
-        if (data.totalItems !== 0) {
+        if (data.totalRecords !== 0) {
           this.setState({
-            instructorList: new Array<Instructor>(data.items.length),
+            instructorList: data.data,
           });
         } else {
           this.store.showNotif('No result found!', 'custom');
         }
         console.log('Current flag: infitite searched list');
         console.log(this.state.instructorList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-      })
-      .then(() => {
-        this.searchInstructorByName(value, page, size);
+        this.setState({ currentPage: data.pageNumber });
       });
   }
 
-  initSortByPriceData(value: string, page: number, size: number) {
+  initSortByPropertyData(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Sort Mode On', 'custom');
     this.instructorService
-      .sortInstructorByPrice(value, 0, 5)
+      .sortInstructorByProperty(value, order, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          instructorList: new Array<Instructor>(data.totalItems),
+          instructorList: new Array<Instructor>(data.totalRecords),
         });
         console.log('Current flag: sort list');
         console.log(this.state.instructorList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.sortInstructorByPrice(value, page, size);
+        this.sortInstructorByProperty(value, order, page, size);
       });
   }
 
-  initInfiniteSortByPriceData(value: string, page: number, size: number) {
+  initInfiniteSortByPropertyData(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Sort Mode On', 'custom');
     this.instructorService
-      .sortInstructorByPrice(value, page, size)
+      .sortInstructorByProperty(value, order, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          instructorList: new Array<Instructor>(data.items.length),
+          instructorList: data.data,
         });
         console.log('Current flag: sort list');
         console.log(this.state.instructorList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-      })
-      .then(() => {
-        this.sortInstructorByPrice(value, page, size);
-      });
-  }
-
-  initSortByName(value: string, page: number, size: number) {
-    this.store.showNotif('Sort Mode On', 'custom');
-    this.instructorService
-      .sortInstructorByName(value, 0, 5)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          instructorList: new Array<Instructor>(data.totalItems),
-        });
-        console.log('Current flag: sort list');
-        console.log(this.state.instructorList);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-      })
-      .then(() => {
-        this.sortInstructorByName(value, page, size);
+        this.setState({ currentPage: data.pageNumber });
       });
   }
 
@@ -303,19 +386,19 @@ export class InstructorStore extends StateService<InstructorState> {
       next: (data: any) => {
         this.setState({
           instructorList: this.fillEmpty(
-            page,
+            page - 1,
             size,
             this.state.instructorList,
-            data.items
+            data.data
           ),
         });
         console.log('Pure list');
         console.log(this.state.instructorList);
         console.log('Server response');
         console.log(data);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
         this.setIsLoading(false);
       },
       error: (data: any) => {
@@ -332,15 +415,15 @@ export class InstructorStore extends StateService<InstructorState> {
       next: (data: any) => {
         this.setState({
           instructorList: this.fillEmpty(
-            page,
+            page - 1,
             size,
             this.state.instructorList,
-            data.items
+            data.data
           ),
         });
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
         console.log('Pure list');
         console.log(this.state.instructorList);
         console.log('Server response');
@@ -364,24 +447,8 @@ export class InstructorStore extends StateService<InstructorState> {
     (state) => state.instructorList
   );
 
-  $departmentStatistics: Observable<Array<Object>> = this.select(
-    (state) => state.departmentStatistics
-  );
-
-  $roleStatistics: Observable<Array<Object>> = this.select(
-    (state) => state.roleStatistics
-  );
-
-  $genderStatistics: Observable<Array<Object>> = this.select(
-    (state) => state.genderStatistics
-  );
-
   $exportData: Observable<Array<Instructor>> = this.select(
     (state) => state.exportData
-  );
-
-  $instructorInstance: Observable<Instructor> = this.select(
-    (state) => state.instructorInstance
   );
 
   $totalPages: Observable<Number> = this.select((state) => state.totalPages);
@@ -392,6 +459,10 @@ export class InstructorStore extends StateService<InstructorState> {
 
   $selectedInstructor: Observable<Object> = this.select(
     (state) => state.selectedInstructor
+  );
+
+  $instructorInstance: Observable<Instructor> = this.select(
+    (state) => state.instructorInstance
   );
 
   uploadInstructor(instructor: Instructor, page: number, size: number) {
@@ -417,11 +488,11 @@ export class InstructorStore extends StateService<InstructorState> {
     });
   }
 
-  updateInstructor(instructor: Instructor, key: string, page: number, size: number) {
+  updateInstructor(instructor: Instructor, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.instructorService.updateInstructor(instructor, key).subscribe({
+        this.instructorService.updateInstructor(instructor).subscribe({
           next: (data: any) => {
             this.setState({ responseMsg: data });
             console.log(data);
@@ -454,7 +525,7 @@ export class InstructorStore extends StateService<InstructorState> {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.instructorService.deleteSelectedInstructors(selectedInstructors).subscribe({
+        this.instructorService.deleteInstructor(selectedInstructors).subscribe({
           next: (data: any) => {
             this.setState({ responseMsg: data });
             console.log(data);
@@ -473,17 +544,13 @@ export class InstructorStore extends StateService<InstructorState> {
     });
   }
 
-  deleteAllInstructors() {
+  deleteAll() {
     this.confirmDialog('Delete all items?').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.instructorService.deleteAllInstructors().subscribe({
+        this.instructorService.deleteAll().subscribe({
           next: (data: any) => {
-            this.setState({ responseMsg: data });
-            this.setState({ instructorList: [] });
-            this.setState({ totalPages: 0 });
-            this.setState({ currentPage: 0 });
-            this.setState({ totalItems: 0 });
+            this.resetState();
             console.log(data);
             this.setIsLoading(false);
             this.store.showNotif(data.responseMessage, 'custom');
@@ -498,7 +565,7 @@ export class InstructorStore extends StateService<InstructorState> {
     });
   }
 
-  deleteInstructor(id: string, page: number, size: number) {
+  deleteInstructor(id: Array<string>, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
@@ -537,6 +604,218 @@ export class InstructorStore extends StateService<InstructorState> {
     this.setState({ currentPage: _currentPage });
   }
 
+  filterInstructorByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.instructorService
+      .filterInstructorByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            this.setState({
+              instructorList: this.fillEmpty(
+                page - 1,
+                size,
+                this.state.instructorList,
+                data.data
+              ),
+            });
+            console.log('Filtered list');
+            console.log(this.state.instructorList);
+            console.log('Server response');
+            console.log(data);
+            this.setState({ totalItems: data.totalRecords });
+            this.setState({ totalPages: data.totalPages });
+            this.setState({ currentPage: data.pageNumber });
+          }
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  filterInfiniteInstructorByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.instructorService
+      .filterInstructorByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            instructorList: this.state.instructorList.concat(data),
+          });
+          console.log('Filtered list');
+          console.log(this.state.instructorList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  searchInstructorByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.instructorService
+      .searchInstructorByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            this.setState({
+              instructorList: this.fillEmpty(
+                page - 1,
+                size,
+                this.state.instructorList,
+                data.data
+              ),
+            });
+          } else {
+            this.store.showNotif('No result found!', 'custom');
+          }
+          console.log('Searched list');
+          console.log(this.state.instructorList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  searchInfiniteInstructorByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.instructorService
+      .searchInstructorByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            this.setState({
+              instructorList: this.state.instructorList.concat(data),
+            });
+          } else {
+            this.store.showNotif('No result found!', 'custome');
+          }
+          console.log('Infite searched list');
+          console.log(this.state.instructorList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  sortInstructorByProperty(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.instructorService
+      .sortInstructorByProperty(value, order, page, size)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({ responseMsg: data });
+          this.setState({
+            instructorList: this.fillEmpty(
+              page - 1,
+              size,
+              this.state.instructorList,
+              data.data
+            ),
+          });
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          console.log('Sorted list');
+          console.log(this.state.instructorList);
+          console.log('Server response');
+          console.log(data);
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  sortInfiniteInstructorByProperty(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.instructorService
+      .sortInstructorByProperty(value, order, page, size)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            instructorList: this.state.instructorList.concat(data),
+          });
+          console.log('Infite sorted list');
+          console.log(this.state.instructorList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
   getInstructor(id: string) {
     this.setIsLoading(true);
     return this.instructorService
@@ -549,328 +828,11 @@ export class InstructorStore extends StateService<InstructorState> {
       });
   }
 
-  getInstructorByUserName(username: string) {
-    this.setIsLoading(true);
-    return this.instructorService
-      .getInstructorByUserName(username)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({ instructorInstance: data });
-        console.log(data);
-        this.setIsLoading(false);
-      });
-  }
-
-  filterInstructorByPrice(
-    criteria: string,
-    value: number,
-    page: number,
-    size: number
-  ) {
-    this.setIsLoading(true);
-    this.instructorService
-      .filterInstructorByPrice(criteria, value, page, size)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({ responseMsg: data });
-          this.setState({
-            instructorList: this.fillEmpty(
-              page,
-              size,
-              this.state.instructorList,
-              data.items
-            ),
-          });
-          this.setState({ totalItems: data.totalItems });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.currentPage });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
-  }
-
-  filterInstructorByCategory(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.instructorService.filterInstructorByCategory(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          instructorList: this.fillEmpty(
-            page,
-            size,
-            this.state.instructorList,
-            data.items
-          ),
-        });
-        console.log('Filtered list');
-        console.log(this.state.instructorList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  filterInfiniteInstructorByCategory(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.instructorService.filterInstructorByCategory(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          instructorList: this.state.instructorList.concat(data.items),
-        });
-        console.log('Filtered list');
-        console.log(this.state.instructorList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  searchInstructorByName(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.instructorService.searchInstructorByName(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          instructorList: this.fillEmpty(
-            page,
-            size,
-            this.state.instructorList,
-            data.items
-          ),
-        });
-        console.log('Searched list');
-        console.log(this.state.instructorList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  searchInfiniteInstructorByName(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.instructorService.searchInstructorByName(value, page, size).subscribe({
-      next: (data: any) => {
-        if (data.totalItems !== 0) {
-          this.setState({
-            instructorList: this.state.instructorList.concat(data.items),
-          });
-        } else {
-          this.store.showNotif('No result found!', 'custome');
-        }
-        console.log('Infite searched list');
-        console.log(this.state.instructorList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  sortInstructorByName(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.instructorService.sortInstructorByName(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({ responseMsg: data });
-        this.setState({
-          instructorList: this.fillEmpty(
-            page,
-            size,
-            this.state.instructorList,
-            data.items
-          ),
-        });
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        console.log('Sorted list');
-        console.log(this.state.instructorList);
-        console.log('Server response');
-        console.log(data);
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  sortInstructorByPrice(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.instructorService.sortInstructorByPrice(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({ responseMsg: data });
-        this.setState({
-          instructorList: this.fillEmpty(
-            page,
-            size,
-            this.state.instructorList,
-            data.items
-          ),
-        });
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        console.log('Sorted list');
-        console.log(this.state.instructorList);
-        console.log('Server response');
-        console.log(data);
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  sortInfiniteInstructorByPrice(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.instructorService.sortInstructorByPrice(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          instructorList: this.state.instructorList.concat(data.items),
-        });
-        console.log('Infite sorted list');
-        console.log(this.state.instructorList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  getRoleCount(value: string) {
-    this.store.setIsLoading(true);
-    return this.instructorService
-      .filterInstructorByRole(value, 0, 5)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          roleStatistics: this.state.roleStatistics.concat({
-            role: value,
-            totalCount: data.totalItems,
-          }),
-        });
-        this.store.setIsLoading(false);
-      });
-  }
-
-  getRoleStatistics() {
-    const roleList = ['Instructor', 'Nurses', 'Assistants'];
-    this.setState({ roleStatistics: [] });
-    roleList.forEach((element) => {
-      this.getRoleCount(element);
-    });
-  }
-
-  getDepartmentCount(value: string) {
-    this.store.setIsLoading(true);
-    return this.instructorService
-      .filterInstructorByCategory(value, 0, 5)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          departmentStatistics: this.state.departmentStatistics.concat({
-            department: value,
-            totalCount: data.totalItems,
-          }),
-        });
-        this.store.setIsLoading(false);
-      });
-  }
-
-  getDepartmentStatistics() {
-    const departmentList = [
-      'Dermatology',
-      'Oncology',
-      'Endocrinology',
-      'Gastroenterology',
-      'Hepato-Biliary-Pancreatic',
-      'Neurology',
-      'Respiratory',
-      'Infectious',
-      'Ophthalmology',
-    ];
-    this.setState({ departmentStatistics: [] });
-    departmentList.forEach((element) => {
-      this.getDepartmentCount(element);
-    });
-  }
-
-  getGenderCount(value: string) {
-    this.store.setIsLoading(true);
-    return this.instructorService
-      .filterInstructorByGender(value, 0, 5)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          genderStatistics: this.state.genderStatistics.concat({
-            gender: value,
-            totalCount: data.totalItems,
-          }),
-        });
-        this.store.setIsLoading(false);
-      });
-  }
-
-  getGenderStatistics() {
-    const genderList = ['Male', 'Female'];
-    this.setState({ genderStatistics: [] });
-    genderList.forEach((element) => {
-      this.getGenderCount(element);
-    });
-  }
-
   setExportData(array: Array<Instructor>) {
     this.setState({ instructorList: array });
+  }
+
+  resetState() {
+    this.setState(initialState);
   }
 }

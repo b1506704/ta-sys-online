@@ -1,13 +1,11 @@
 import { Injectable } from '@angular/core';
 import notify from 'devextreme/ui/notify';
 import { Observable } from 'rxjs';
-import { User } from '../models/user';
 import { StateService } from './state.service';
 
 interface StoreState {
-  userList: Array<User>;
-  selectedUser: Object;
-  currentUser: Object;
+  currentUser: string;
+  currentUserId: string;
   currentRoleId: string;
   currentRoleName: string;
   isLoading: boolean;
@@ -16,12 +14,11 @@ interface StoreState {
   responseMsg: string;
 }
 const initialState: StoreState = {
-  userList: [],
   isPreloading: true,
-  selectedUser: {},
-  currentUser: {},
-  currentRoleId: '',
-  currentRoleName: '',
+  currentUser: undefined,
+  currentUserId: undefined,
+  currentRoleId: undefined,
+  currentRoleName: undefined,
   isLoading: false,
   responseMsg: '',
   notifType: '',
@@ -45,7 +42,11 @@ export class StoreService extends StateService<StoreState> {
 
   $notifType: Observable<string> = this.select((state) => state.notifType);
 
-  $currentUser: Observable<Object> = this.select((state) => state.currentUser);
+  $currentUser: Observable<string> = this.select((state) => state.currentUser);
+
+  $currentUserId: Observable<string> = this.select(
+    (state) => state.currentUserId
+  );
 
   $currentRoleId: Observable<string> = this.select(
     (state) => state.currentRoleId
@@ -73,8 +74,12 @@ export class StoreService extends StateService<StoreState> {
     this.setState({ notifType: type });
   }
 
-  setCurrentUser(_user: Object) {
-    this.setState({ currentUser: _user });
+  setCurrentUser(name: string) {
+    this.setState({ currentUser: name });
+  }
+
+  setCurrentUserId(id: string) {
+    this.setState({ currentUserId: id });
   }
 
   setCurrentUserRoleId(id: string) {
@@ -86,7 +91,7 @@ export class StoreService extends StateService<StoreState> {
   }
 
   showNotif(message: string, type: string) {
-    notify({ message: message, width: 150 }, type);
+    notify({ message: message, width: 150, displayTime: 1000 }, type);
     this.setResponseMsg(message);
   }
 }

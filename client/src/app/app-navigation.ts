@@ -94,13 +94,9 @@ export const navigationAdmin = [
         path: '/edit_user_list',
       },
       {
-        text: 'Edit Learner',
-        path: '/edit_learner_list',
-      },
-      {
-        text: 'Edit Instructor',
-        path: '/edit_instructor_list',
-      },
+        text: 'Edit User Info',
+        path: '/edit_user_info_list',
+      },      
     ],
   },
   {

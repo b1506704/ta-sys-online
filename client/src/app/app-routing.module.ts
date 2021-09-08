@@ -46,19 +46,11 @@ const routes: Routes = [
     canActivate: [AuthGuardService],
   },
   {
-    path: 'edit_learner_list',
-    loadChildren: () =>
-      import('./pages/admin/edit-learner-list/edit-learner-list.module').then(
-        (m) => m.EditLearnerModule
-      ),
-    canActivate: [AuthGuardService],
-  },
-  {
-    path: 'edit_instructor_list',
+    path: 'edit_user_info_list',
     loadChildren: () =>
       import(
-        './pages/admin/edit-instructor-list/edit-instructor-list.module'
-      ).then((m) => m.EditInstructorListModule),
+        './pages/admin/edit-user-info-list/edit-user-info-list.module'
+      ).then((m) => m.EditUserInfoModule),
     canActivate: [AuthGuardService],
   },
   {
@@ -101,8 +93,37 @@ const routes: Routes = [
       ),
     canActivate: [AuthGuardService],
   },
-
+  // visitor
+  {
+    path: 'landing_page',
+    loadChildren: () =>
+      import('./pages/visitor/landing-page/landing-page.module').then(
+        (m) => m.LandingPageModule
+      ),
+  },
+  {
+    path: 'instructor_list',
+    loadChildren: () =>
+      import('./pages/visitor/instructor-list/instructor-list.module').then(
+        (m) => m.InstructorListModule
+      ),
+  },
+  {
+    path: 'course_list',
+    loadChildren: () =>
+      import('./pages/visitor/course-list/course-list.module').then(
+        (m) => m.CourseListModule
+      ),
+  },
+  {
+    path: 'subject_list',
+    loadChildren: () =>
+      import('./pages/visitor/subject-list/subject-list.module').then(
+        (m) => m.SubjectListModule
+      ),
+  },
   // other
+
   {
     path: 'not_found',
     loadChildren: () =>

@@ -1,6 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { StoreService } from '../../services/store.service';
 import { UserStore } from '../../services/user/user-store.service';
 @Component({
   selector: 'app-splash-screen',
@@ -10,14 +8,13 @@ import { UserStore } from '../../services/user/user-store.service';
 export class SplashScreenComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
   date: Date = new Date();
-  constructor(
-    private router: Router,
-    private store: StoreService,
-    private userStore: UserStore
-  ) {}
+  timeout: any;
+  constructor(private userStore: UserStore) {}
 
   preLoading() {
-    this.userStore.dynamicRouting();
+    this.timeout = setTimeout(() => {
+      this.userStore.dynamicRouting();
+    }, 1500);
   }
 
   ngOnInit(): void {
@@ -25,6 +22,6 @@ export class SplashScreenComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // this.preLoading().unsubscribe();
+    clearTimeout(this.timeout);
   }
 }
