@@ -1,6 +1,6 @@
 <div class="container">
   <form
-    id="form-container"
+    id="user-account-form"
     (submit)="onUserAccountSubmit($event)"
     [classList]="['signupForm']"
   >
@@ -8,7 +8,6 @@
       <h3>Profile Detail</h3>
     </div>
     <dx-form
-      id="form"
       [formData]="userAccountData"
       [showValidationSummary]="true"
       validationGroup="userAccountData"
@@ -24,17 +23,20 @@
           >
           </dxi-item>
           <dxi-item
-            dataField="password"
-            [label]="{ text: 'Password' }"
+            dataField="displayName"
+            [label]="{ text: 'Display Name' }"
             editorType="dxTextBox"
-            [editorOptions]="{ mode: 'password' }"
           >
-            <dxi-validation-rule type="required" message="Password is required">
+            <dxi-validation-rule
+              type="required"
+              message="Display name is required"
+            >
             </dxi-validation-rule>
             <dxi-validation-rule
               type="stringLength"
-              message="Password cannot contain more than 12 letters!"
+              message="Display name cannot contain more than 12 letters!"
               [min]="1"
+              [max]="25"
             >
             </dxi-validation-rule>
           </dxi-item>
@@ -58,12 +60,78 @@
     </dx-form>
   </form>
   <form
-    id="user-info-form-container"
+    id="password-form"
+    (submit)="onUserPasswordSubmit($event)"
+    [classList]="['signupForm']"
+  >
+    <dx-form
+      [formData]="userPasswordData"
+      [showValidationSummary]="true"
+      validationGroup="userPasswordData"
+    >
+      <dxi-item itemType="group">
+        <dxi-item itemType="group" caption="Password Modification">
+          <dxi-item
+            dataField="oldPassword"
+            [label]="{ text: 'Current Password' }"
+            editorType="dxTextBox"
+            [editorOptions]="{ mode: 'password' }"
+          >
+            <dxi-validation-rule
+              type="required"
+              message="Current password is required"
+            >
+            </dxi-validation-rule>
+            <dxi-validation-rule
+              type="stringLength"
+              message="Current password cannot contain more than 12 letters!"
+              [min]="1"
+            >
+            </dxi-validation-rule>
+          </dxi-item>
+          <dxi-item
+            dataField="newPassword"
+            [label]="{ text: 'New Password' }"
+            editorType="dxTextBox"
+            [editorOptions]="{ mode: 'password' }"
+          >
+            <dxi-validation-rule
+              type="required"
+              message="New password is required"
+            >
+            </dxi-validation-rule>
+            <dxi-validation-rule
+              type="stringLength"
+              message="New password cannot contain more than 12 letters!"
+              [min]="1"
+            >
+            </dxi-validation-rule>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="2" [cssClass]="'buttonGroup'">
+            <dxi-item
+              itemType="button"
+              horizontalAlignment="center"
+              [buttonOptions]="submitUserPasswordButtonOptions"
+            >
+            </dxi-item>
+            <dxi-item
+              itemType="button"
+              horizontalAlignment="center"
+              [buttonOptions]="resetUserPasswordButtonOptions"
+            >
+            </dxi-item>
+          </dxi-item>
+        </dxi-item>
+      </dxi-item>
+      <dxi-item itemType="group"></dxi-item>
+    </dx-form>
+  </form>
+  <form
+    id="user-info-form"
     (submit)="onUserInfoSubmit($event)"
     [classList]="['signupForm']"
   >
     <dx-form
-      id="user-info-form"
       [formData]="userInfoData"
       [showValidationSummary]="true"
       validationGroup="userInfoData"
@@ -102,7 +170,7 @@
             </dxi-validation-rule>
           </dxi-item>
           <dxi-item name="gender">
-            <dxo-label text="Description"></dxo-label>
+            <dxo-label text="Gender"></dxo-label>
             <dx-select-box
               (onValueChanged)="onGenderChange($event)"
               [displayExpr]="'name'"

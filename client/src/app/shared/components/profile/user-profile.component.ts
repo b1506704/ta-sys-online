@@ -30,6 +30,24 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       this.form.instance.getEditor('username').focus();
     },
   };
+  submitUserPasswordButtonOptions: any = {
+    text: 'Submit',
+    icon: 'save',
+    type: 'normal',
+    useSubmitBehavior: true,
+  };
+  resetUserPasswordButtonOptions: any = {
+    text: 'Reset',
+    icon: 'refresh',
+    type: 'normal',
+    useSubmitBehavior: false,
+    onClick: () => {
+      this.userPasswordData = {
+        oldPassword: '',
+        newPassword: '',
+      };
+    },
+  };
   submitUserInfoButtonOptions: any = {
     text: 'Submit',
     icon: 'save',
@@ -48,6 +66,10 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     },
   };
   userAccountData!: User;
+  userPasswordData: any = {
+    oldPassword: '',
+    newPassword: '',
+  };
   userInfoData!: UserInfo;
   currentUserId!: string;
   genderList: Array<Object> = [
@@ -87,6 +109,15 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       this.form.instance.getEditor('username').focus();
     }, 200);
   }
+
+  onUserPasswordSubmit = (e: any) => {
+    e.preventDefault();
+    this.userAccountStore.changePassword(
+      this.currentUserId,
+      this.userPasswordData.oldPassword,
+      this.userPasswordData.newPassword
+    );
+  };
 
   onUserAccountSubmit = (e: any) => {
     e.preventDefault();

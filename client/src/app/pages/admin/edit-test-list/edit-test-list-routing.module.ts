@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { EditScheduleComponent } from './edit-schedule.component';
+import { EditTestListComponent } from './edit-test-list.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: EditScheduleComponent,
+    component: EditTestListComponent,
   },
 ];
 
@@ -13,4 +13,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class EditScheduleRoutingModule {}
+export class EditTestListRoutingModule {}

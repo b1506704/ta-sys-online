@@ -7,7 +7,7 @@ import { DxScrollViewComponent } from 'devextreme-angular';
 import { Image } from 'src/app/shared/models/image';
 import { ImageStore } from 'src/app/shared/services/image/image-store.service';
 import { Subject } from 'src/app/shared/models/subject';
-import { SubjectStore } from 'src/app/shared/services/subject/subject-store.service';
+import { SubjectHttpService } from 'src/app/shared/services/subject/subject-http.service';
 
 @Component({
   selector: 'app-course-list',
@@ -18,7 +18,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   scrollView: DxScrollViewComponent;
   courseList!: Array<Course>;
-  subjectList!: Array<Subject>;
+  subjectList: Array<Subject> = [];
   currentCourseID!: string;
   pageSize: number = 10;
   pullDown = false;
@@ -59,9 +59,11 @@ export class CourseListComponent implements OnInit, OnDestroy {
 
   filterSelectBoxOptions: any = {
     items: this.subjectList,
-    valueExpr: 'name',
+    valueExpr: 'id',
+    searchExpr: 'name',
     displayExpr: 'name',
     placeholder: 'Filter with subject',
+    searchEnabled: true,
     onValueChanged: this.onFilterChange.bind(this),
   };
 
@@ -71,8 +73,8 @@ export class CourseListComponent implements OnInit, OnDestroy {
         _id: '-1',
         name: '(NONE)',
       },
-      { _id: '0', name: 'ASC' },
-      { _id: '1', name: 'DESC' },
+      { _id: '0', name: 'asc' },
+      { _id: '1', name: 'desc' },
     ],
     valueExpr: 'name',
     placeholder: 'Sort by price',
@@ -94,8 +96,8 @@ export class CourseListComponent implements OnInit, OnDestroy {
 
   constructor(
     private courseStore: CourseStore,
+    private subjectHTTP: SubjectHttpService,
     private store: StoreService,
-    private subjectStore: SubjectStore,
     private router: Router,
     private imageStore: ImageStore
   ) {}
@@ -253,13 +255,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
     this.isSearchingByName = false;
     this.isSortingByPrice = false;
     this.courseStore.initInfiniteData(1, this.pageSize);
-    this.subjectStore.fetchAll().then(() => {
-      this.subjectStore.$subjectList.subscribe((data: Array<any>) => {
-        if (data.length !== 0) {
-          this.subjectList = data;
-        }
-      });
-    });
+    // this.subjectStore.fetchAll();
   }
 
   navigateToSubject() {
@@ -311,18 +307,19 @@ export class CourseListComponent implements OnInit, OnDestroy {
       this.sourceDataListener();
       this.imageDataListener();
     });
-    this.subjectStore.fetchAll().then(() => {
-      this.subjectStore.$subjectList.subscribe((data: Array<any>) => {
-        if (data.length !== 0) {
-          this.subjectList = data;
-        }
-      });
+  }
+
+  filterDataListener() {
+    return this.subjectHTTP.fetchAll().subscribe((data: any) => {
+      this.subjectList = data;
+      console.log(this.subjectList);
     });
   }
 
   ngOnInit(): void {
-    this.currentPageListener();
+    this.filterDataListener();
     this.initData();
+    this.currentPageListener();
   }
 
   ngOnDestroy(): void {

@@ -11,6 +11,7 @@ import { Bill } from 'src/app/shared/models/bill';
 import { BillHttpService } from 'src/app/shared/services/bill/bill-http.service';
 import { BillStore } from 'src/app/shared/services/bill/bill-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
+import { SubjectStore } from 'src/app/shared/services/subject/subject-store.service';
 
 @Component({
   selector: 'app-edit-bill-list',
@@ -21,11 +22,7 @@ export class EditBillListComponent implements OnInit, OnDestroy {
   @ViewChild(DxDataGridComponent, { static: false })
   dataGrid: DxDataGridComponent;
   billList!: Array<Bill>;
-  healthInsuranceList: Array<Object> = [
-    { _id: '-1', name: '(NONE)' },
-    { _id: '0', name: 'YES' },
-    { _id: '1', name: 'NO' },
-  ];
+  subjectList: Array<Object> = [];
   selectedRows: string[];
   isSelectInfoVisible: boolean;
   selectInfoText: string;
@@ -33,22 +30,25 @@ export class EditBillListComponent implements OnInit, OnDestroy {
   pageSize: number = 5;
   allowedPageSizes: Array<number | string> = [5, 10, 15];
   scrollingMode: string = 'standard';
-  // standard | virtual | infinite
   currentIndexFromServer: number;
   isSearchingByName: boolean;
   isFilteringByCategory: boolean;
   isFilteringByPrice: boolean;
   isSortingByName: boolean;
 
-  currentCategoryFilterValue: string;
   timeout: any;
-  currentSearchByNameValue: string;
-  currentSortByPriceValue: string;
+  currentFilterByPropertyValue: string;
+  currentSearchByPropertyValue: string;
+  currentSortByPropertyValue: string;
+  currentSortProperty: string = 'name';
+  currentSearchProperty: string = 'name';
+  currentFilterProperty: string = 'subjectId';
 
   constructor(
     private billStore: BillStore,
     private store: StoreService,
     private billHTTP: BillHttpService,
+    private subjectStore: SubjectStore,
     private router: Router
   ) {}
 
@@ -122,7 +122,7 @@ export class EditBillListComponent implements OnInit, OnDestroy {
           onKeyUp: this.onSearchKeyupHandler.bind(this),
           onValueChanged: this.onSearchValueChanged.bind(this),
           mode: 'search',
-          placeholder: 'Search id',
+          placeholder: 'Search name',
         },
       },
       {
@@ -133,7 +133,7 @@ export class EditBillListComponent implements OnInit, OnDestroy {
           type: 'normal',
           icon: 'filter',
           disabled: true,
-          hint: 'Filter with health insurance',
+          hint: 'Filter with subject',
         },
       },
       {
@@ -141,12 +141,12 @@ export class EditBillListComponent implements OnInit, OnDestroy {
         locateInMenu: 'auto',
         widget: 'dxSelectBox',
         options: {
-          items: this.healthInsuranceList,
-          valueExpr: 'name',
-          // searchExpr: 'name',
+          items: this.subjectList,
+          valueExpr: 'id',
+          searchExpr: 'name',
           displayExpr: 'name',
-          placeholder: 'Filter with health insurance',
-          // searchEnabled: true,
+          placeholder: 'Filter with subject',
+          searchEnabled: true,
           onValueChanged: this.onFilterChange.bind(this),
         },
       },
@@ -168,14 +168,14 @@ export class EditBillListComponent implements OnInit, OnDestroy {
         options: {
           items: [
             {
-              _id: '-1',
+              id: '-1',
               name: '(NONE)',
             },
-            { _id: '0', name: 'ASC' },
-            { _id: '1', name: 'DESC' },
+            { id: '0', name: 'asc' },
+            { id: '1', name: 'desc' },
           ],
           valueExpr: 'name',
-          placeholder: 'Sort by total cost',
+          placeholder: 'Sort by name',
           displayExpr: 'name',
           onValueChanged: this.onSortValueChanged.bind(this),
         },
@@ -189,11 +189,12 @@ export class EditBillListComponent implements OnInit, OnDestroy {
       this.isSearchingByName = true;
       this.isFilteringByCategory = false;
       this.isSortingByName = false;
-      console.log(this.currentSearchByNameValue);
-      if (this.currentSearchByNameValue !== '') {
-        this.billStore.initSearchByNameData(
-          this.currentSearchByNameValue,
-          this.dataGrid.instance.pageIndex(),
+      console.log(this.currentSearchByPropertyValue);
+      if (this.currentSearchByPropertyValue !== '') {
+        this.billStore.initSearchByPropertyData(
+          this.currentSearchProperty,
+          this.currentSearchByPropertyValue,
+          this.dataGrid.instance.pageIndex() + 1,
           this.pageSize
         );
       } else {
@@ -205,18 +206,19 @@ export class EditBillListComponent implements OnInit, OnDestroy {
   }
 
   onSearchValueChanged(e: any) {
-    this.currentSearchByNameValue = e.value;
+    this.currentSearchByPropertyValue = e.value;
   }
 
   onSortValueChanged(e: any) {
     this.isSortingByName = true;
     this.isSearchingByName = false;
     this.isFilteringByCategory = false;
-    this.currentSortByPriceValue = e.value;
+    this.currentSortByPropertyValue = e.value;
     if (e.value !== '(NONE)') {
-      this.billStore.initSortByPriceData(
+      this.billStore.initSortByPropertyData(
+        this.currentSortProperty,
         e.value,
-        this.dataGrid.instance.pageIndex(),
+        this.dataGrid.instance.pageIndex() + 1,
         this.pageSize
       );
     } else {
@@ -230,16 +232,16 @@ export class EditBillListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = true;
     this.isSearchingByName = false;
     this.isSortingByName = false;
-    this.currentCategoryFilterValue = e.value;
+    this.currentFilterByPropertyValue = e.value;
     console.log(e.value);
     if (e.value !== '(NONE)') {
-      this.billStore.initFilterByCategoryData(
+      this.billStore.initFilterByPropertyData(
+        this.currentFilterProperty,
         e.value,
-        this.dataGrid.instance.pageIndex(),
+        this.dataGrid.instance.pageIndex() + 1,
         this.pageSize
       );
     } else {
-      //return to pure editor mode
       this.store.showNotif('FILTER MODE OFF', 'custom');
       this.onRefresh();
     }
@@ -261,7 +263,7 @@ export class EditBillListComponent implements OnInit, OnDestroy {
     const editorMode = this.checkEditorMode();
     // event of page index changed
     if (e.fullName === 'paging.pageIndex') {
-      const currentIndex: number = e.value;
+      const currentIndex: number = e.value + 1;
       console.log(
         `New page index: ${currentIndex}. Total items: ${this.billList.length}`
       );
@@ -282,9 +284,6 @@ export class EditBillListComponent implements OnInit, OnDestroy {
           break;
       }
     }
-    // todo: handle virtual scrolling when pagesize = 'all'
-    //
-    // event of page size changed by user's click
     if (e.fullName === 'paging.pageSize') {
       this.pageSize = e.value;
       console.log(`Page size changed to ${e.value}`);
@@ -294,24 +293,27 @@ export class EditBillListComponent implements OnInit, OnDestroy {
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'FILTER':
-          this.billStore.filterBillByCategory(
-            this.currentCategoryFilterValue,
+          this.billStore.filterBillByProperty(
+            this.currentFilterProperty,
+            this.currentFilterByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'SEARCH':
-          this.billStore.searchBillByName(
-            this.currentSearchByNameValue,
+          this.billStore.searchBillByProperty(
+            this.currentSearchProperty,
+            this.currentSearchByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'SORT':
-          this.billStore.sortBillByPrice(
-            this.currentSortByPriceValue,
+          this.billStore.sortBillByProperty(
+            this.currentSortProperty,
+            this.currentSortByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
@@ -324,107 +326,34 @@ export class EditBillListComponent implements OnInit, OnDestroy {
   }
 
   paginatePureData(index: number) {
-    if (index === 0) {
-      this.billStore.loadDataAsync(index, this.pageSize);
-      this.billStore.loadDataAsync(index + 1, this.pageSize);
-    } else {
-      this.billStore.loadDataAsync(index, this.pageSize);
-      this.billStore.loadDataAsync(index + 1, this.pageSize);
-      this.billStore.loadDataAsync(index - 1, this.pageSize);
-    }
+    this.billStore.loadDataAsync(index, this.pageSize);
   }
 
   paginateFilterData(index: number) {
-    if (index === 0) {
-      this.billStore.filterBillByCategory(
-        this.currentCategoryFilterValue,
-        index,
-        this.pageSize
-      );
-      this.billStore.filterBillByCategory(
-        this.currentCategoryFilterValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.billStore.filterBillByCategory(
-        this.currentCategoryFilterValue,
-        index,
-        this.pageSize
-      );
-      this.billStore.filterBillByCategory(
-        this.currentCategoryFilterValue,
-        index + 1,
-        this.pageSize
-      );
-      this.billStore.filterBillByCategory(
-        this.currentCategoryFilterValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.billStore.filterBillByProperty(
+      this.currentFilterProperty,
+      this.currentFilterByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSearchData(index: number) {
-    if (index === 0) {
-      this.billStore.searchBillByName(
-        this.currentSearchByNameValue,
-        index,
-        this.pageSize
-      );
-      this.billStore.searchBillByName(
-        this.currentSearchByNameValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.billStore.searchBillByName(
-        this.currentSearchByNameValue,
-        index,
-        this.pageSize
-      );
-      this.billStore.searchBillByName(
-        this.currentSearchByNameValue,
-        index + 1,
-        this.pageSize
-      );
-      this.billStore.searchBillByName(
-        this.currentSearchByNameValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.billStore.searchBillByProperty(
+      this.currentSearchProperty,
+      this.currentSearchByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSortData(index: number) {
-    if (index === 0) {
-      this.billStore.sortBillByPrice(
-        this.currentSortByPriceValue,
-        index,
-        this.pageSize
-      );
-      this.billStore.sortBillByPrice(
-        this.currentSortByPriceValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.billStore.sortBillByPrice(
-        this.currentSortByPriceValue,
-        index,
-        this.pageSize
-      );
-      this.billStore.sortBillByPrice(
-        this.currentSortByPriceValue,
-        index + 1,
-        this.pageSize
-      );
-      this.billStore.sortBillByPrice(
-        this.currentSortByPriceValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.billStore.sortBillByProperty(
+      this.currentSortProperty,
+      this.currentSortByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   onEditingStart() {
@@ -444,7 +373,7 @@ export class EditBillListComponent implements OnInit, OnDestroy {
         case 'insert':
           this.billStore.uploadBill(
             e.changes[0].data,
-            this.dataGrid.instance.pageIndex(),
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
           break;
@@ -452,15 +381,14 @@ export class EditBillListComponent implements OnInit, OnDestroy {
           console.log(e.changes[0]);
           this.billStore.updateBill(
             e.changes[0].data,
-            e.changes[0].key,
-            this.dataGrid.instance.pageIndex(),
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
           break;
         case 'remove':
           this.billStore.deleteBill(
-            e.changes[0].key,
-            this.dataGrid.instance.pageIndex(),
+            [e.changes[0].key],
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
           break;
@@ -503,7 +431,7 @@ export class EditBillListComponent implements OnInit, OnDestroy {
       this.billStore.confirmDialog('').then((result: boolean) => {
         if (result) {
           this.billHTTP
-            .deleteSelectedBills(this.selectedRows)
+            .deleteBill(this.selectedRows)
             .toPromise()
             .then(() => {
               this.store.showNotif(
@@ -514,28 +442,31 @@ export class EditBillListComponent implements OnInit, OnDestroy {
               switch (editorMode) {
                 case 'NORMAL':
                   this.billStore.initData(
-                    this.dataGrid.instance.pageIndex(),
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'FILTER':
-                  this.billStore.initFilterByCategoryData(
-                    this.currentCategoryFilterValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.billStore.initFilterByPropertyData(
+                    this.currentFilterProperty,
+                    this.currentFilterByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'SORT':
-                  this.billStore.initSortByPriceData(
-                    this.currentSortByPriceValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.billStore.initSortByPropertyData(
+                    this.currentSortProperty,
+                    this.currentSortByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'SEARCH':
-                  this.billStore.initSearchByNameData(
-                    this.currentSearchByNameValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.billStore.initSearchByPropertyData(
+                    this.currentSearchProperty,
+                    this.currentSearchByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
@@ -560,7 +491,10 @@ export class EditBillListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = false;
     this.isSearchingByName = false;
     this.isSortingByName = false;
-    this.billStore.initData(this.dataGrid.instance.pageIndex(), this.pageSize);
+    this.billStore.initData(
+      this.dataGrid.instance.pageIndex() + 1,
+      this.pageSize
+    );
   }
 
   onAddRandom() {
@@ -577,7 +511,7 @@ export class EditBillListComponent implements OnInit, OnDestroy {
             .toPromise()
             .then(() => {
               this.billStore.initData(
-                this.dataGrid.instance.pageIndex(),
+                this.dataGrid.instance.pageIndex() + 1,
                 this.pageSize
               );
             })
@@ -626,26 +560,6 @@ export class EditBillListComponent implements OnInit, OnDestroy {
       });
   }
 
-  // default export with selected row
-  // onExporting(e: any) {
-  //   const workbook = new ExcelJS.Workbook();
-  //   const worksheet = workbook.addWorksheet('Bill List');
-
-  //   exportDataGrid({
-  //     component: e.component,
-  //     worksheet: worksheet,
-  //     autoFilterEnabled: true,
-  //   }).then(() => {
-  //     workbook.xlsx.writeBuffer().then((buffer) => {
-  //       saveAs(
-  //         new Blob([buffer], { type: 'application/octet-stream' }),
-  //         'Bill_List.xlsx'
-  //       );
-  //     });
-  //   });
-  //   e.cancel = true;
-  // }
-
   exportGridToPdf(e: any) {
     this.billStore
       .confirmDialog('This will export all data to pdf. Are you sure?')
@@ -675,7 +589,7 @@ export class EditBillListComponent implements OnInit, OnDestroy {
   }
 
   deleteAll() {
-    this.billStore.deleteAllBills();
+    this.billStore.deleteAll();
   }
 
   navigateToStatistics() {
@@ -697,14 +611,22 @@ export class EditBillListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.sourceDataListener();
     this.currentPageListener();
-    setTimeout(() => {
-      this.onRefresh();
-    }, 150);
+    this.subjectStore.fetchAll().then((data: any) => {
+      if (data.length !== 0) {
+        console.log('FILTER DATA: ');
+        console.log(data);
+        this.subjectList = data;
+        this.subjectList.unshift({ id: '(NONE)', name: '(NONE)' });
+        setTimeout(() => {
+          this.onRefresh();
+        }, 150);
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.sourceDataListener().unsubscribe();
     this.currentPageListener().unsubscribe();
-    this.onRefresh();
+    this.billStore.resetState();
   }
 }

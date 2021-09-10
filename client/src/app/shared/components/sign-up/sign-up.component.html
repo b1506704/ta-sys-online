@@ -50,6 +50,21 @@
             >
             </dxi-validation-rule>
           </dxi-item>
+          <dxi-item
+            dataField="displayName"
+            [label]="{ text: 'Display Name' }"
+            editorType="dxTextBox"
+          >
+            <dxi-validation-rule type="required" message="Display name is required">
+            </dxi-validation-rule>
+            <dxi-validation-rule
+              type="stringLength"
+              message="Display name cannot contain more than 12 letters!"
+              [min]="1"
+              [max]="25"
+            >
+            </dxi-validation-rule>
+          </dxi-item>
           <dxi-item name="description">
             <dxo-label text="Description"></dxo-label>
             <dx-select-box

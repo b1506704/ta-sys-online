@@ -30,78 +30,66 @@
     </dx-button>
   </dxi-item>
 </dx-toolbar>
-<dx-data-grid
-  id="gridContainer"
-  [dataSource]="billList"
-  keyExpr="_id"
-  [showBorders]="true"
-  [allowColumnReordering]="true"
-  [rowAlternationEnabled]="true"
-  [columnHidingEnabled]="true"
-  [(selectedRowKeys)]="selectedRows"
-  [sorting]="false"
-  (onOptionChanged)="onOptionChanged($event)"
-  (onSelectionChanged)="selectionChangedHandler()"
-  (onEditingStart)="onEditingStart()"
-  (onInitNewRow)="onInitNewRow()"
-  (onSaved)="onSaved($event)"
-  (onEditCanceled)="onEditCanceled()"
-  (onToolbarPreparing)="onToolbarPreparing($event)"
->
-  <dxo-editing
-    [allowUpdating]="true"
-    [allowDeleting]="true"
-    [allowAdding]="true"
-    [useIcons]="true"
-    [selectTextOnEditStart]="true"
+<ng-container *ngIf="subjectList.length !== 0">
+  <dx-data-grid
+    id="gridContainer"
+    [dataSource]="billList"
+    keyExpr="id"
+    [showBorders]="true"
+    [allowColumnReordering]="true"
+    [rowAlternationEnabled]="true"
+    [columnHidingEnabled]="true"
+    [(selectedRowKeys)]="selectedRows"
+    [sorting]="false"
+    (onOptionChanged)="onOptionChanged($event)"
+    (onSelectionChanged)="selectionChangedHandler()"
+    (onEditingStart)="onEditingStart()"
+    (onInitNewRow)="onInitNewRow()"
+    (onSaved)="onSaved($event)"
+    (onEditCanceled)="onEditCanceled()"
+    (onToolbarPreparing)="onToolbarPreparing($event)"
   >
-  </dxo-editing>
-  <dxo-selection
-    [selectAllMode]="'page'"
-    [showCheckBoxesMode]="'onClick'"
-    mode="multiple"
-  ></dxo-selection>
-
-  <dxo-grouping
-    [contextMenuEnabled]="true"
-    expandMode="rowClick"
-  ></dxo-grouping>
-  <dxo-column-chooser [enabled]="true" mode="select"></dxo-column-chooser>
-  <dxo-paging [pageSize]="pageSize"> </dxo-paging>
-
-  <dxo-pager
-    [visible]="true"
-    [displayMode]="'adaptive'"
-    [allowedPageSizes]="allowedPageSizes"
-    [showPageSizeSelector]="true"
-    [showNavigationButtons]="true"
-  >
-  </dxo-pager>
-  <dxo-load-panel [enabled]="true"></dxo-load-panel>
-
-  <dxi-column dataField="prescriptionID" [width]="150">
-    <dxi-validation-rule type="required"></dxi-validation-rule>
-  </dxi-column>
-
-  <dxi-column dataField="learnerID" [width]="150">
-    <dxi-validation-rule type="required"></dxi-validation-rule>
-  </dxi-column>
-
-  <dxi-column dataField="totalCost" dataType="number" [width]="100">
-    <dxi-validation-rule type="required"></dxi-validation-rule>
-  </dxi-column>
-
-  <dxi-column dataField="healthInsurance" [caption]="'Health Insurance'">
-    <dxi-validation-rule type="required"></dxi-validation-rule>
-    <dxo-lookup
-      [dataSource]="healthInsuranceList"
-      displayExpr="name"
-      valueExpr="name"
+    <dxo-editing
+      [allowUpdating]="true"
+      [allowDeleting]="true"
+      [allowAdding]="true"
+      [useIcons]="true"
+      [selectTextOnEditStart]="true"
     >
-    </dxo-lookup>
-  </dxi-column>
+    </dxo-editing>
+    <dxo-selection
+      [selectAllMode]="'page'"
+      [showCheckBoxesMode]="'onClick'"
+      mode="multiple"
+    ></dxo-selection>
+    <dxo-grouping
+      [contextMenuEnabled]="true"
+      expandMode="rowClick"
+    ></dxo-grouping>
+    <dxo-column-chooser [enabled]="true" mode="select"></dxo-column-chooser>
+    <dxo-paging [pageSize]="pageSize"> </dxo-paging>
 
-  <div *dxTemplate="let data of 'totalBillCount'">
-    <span>Total Bill: {{ billList.length }} </span>
-  </div>
-</dx-data-grid>
+    <dxo-pager
+      [visible]="true"
+      [displayMode]="'adaptive'"
+      [allowedPageSizes]="allowedPageSizes"
+      [showPageSizeSelector]="true"
+      [showNavigationButtons]="true"
+    >
+    </dxo-pager>
+    <dxo-load-panel [enabled]="true"></dxo-load-panel>
+
+    <dxi-column dataField="courseId">
+      <dxi-validation-rule type="required"></dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="userId">
+      <dxi-validation-rule type="required"></dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="totalCost">
+      <dxi-validation-rule type="required"></dxi-validation-rule>
+    </dxi-column>    
+    <div *dxTemplate="let data of 'totalBillCount'">
+      <span>Total Bill: {{ billList.length }} </span>
+    </div>
+  </dx-data-grid>
+</ng-container>

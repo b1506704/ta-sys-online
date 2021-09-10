@@ -249,13 +249,6 @@ export class SubjectListComponent implements OnInit, OnDestroy {
     this.isSearchingByName = false;
     this.isSortingByPrice = false;
     this.subjectStore.initInfiniteData(1, this.pageSize);
-    this.subjectStore.fetchAll().then(() => {
-      this.subjectStore.$subjectList.subscribe((data: Array<any>) => {
-        if (data.length !== 0) {
-          this.subjectList = data;
-        }
-      });
-    });
   }
 
   navigateToInstructor() {
@@ -306,13 +299,6 @@ export class SubjectListComponent implements OnInit, OnDestroy {
     this.subjectStore.initInfiniteData(1, this.pageSize).then(() => {
       this.sourceDataListener();
       this.imageDataListener();
-    });
-    this.subjectStore.fetchAll().then(() => {
-      this.subjectStore.$subjectList.subscribe((data: Array<any>) => {
-        if (data.length !== 0) {
-          this.subjectList = data;
-        }
-      });
     });
   }
 

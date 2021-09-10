@@ -96,33 +96,80 @@ export const navigationAdmin = [
       {
         text: 'Edit User Info',
         path: '/edit_user_info_list',
-      },      
+      },
     ],
   },
   {
-    text: 'Edit Schedule',
-    path: '/edit_schedule',
+    text: 'Finance',
+    icon: 'money',
+    items: [
+      {
+        text: 'Edit Bill',
+        path: '/edit_bill_list',
+      },
+      {
+        text: 'Edit Cart',
+        path: '/edit_cart_list',
+      },
+      {
+        text: 'Edit Discount',
+        path: '/edit_discount_list',
+      },
+    ],
+  },
+  {
+    text: 'TASys Network',
+    icon: 'group',
+    items: [
+      {
+        text: 'Edit Post',
+        path: '/edit_post_list',
+      },
+      {
+        text: 'Edit Comment',
+        path: '/edit_comment_list',
+      },
+      {
+        text: 'Edit Message',
+        path: '/edit_message_list',
+      },
+    ],
+  },
+  {
+    text: 'Schedule',
+    path: '/edit_schedule_list',
     icon: 'event',
   },
   {
-    text: 'Edit Room',
-    path: '/edit_room_list',
-    icon: 'toolbox',
+    text: 'Session',
+    path: '/edit_session_list',
+    icon: 'globe',
   },
   {
-    text: 'Edit Bill',
-    path: '/edit_bill_list',
-    icon: 'cart',
-  },
-  {
-    text: 'Edit Subject',
-    path: '/edit_subject_list',
-    icon: 'paste',
-  },
-  {
-    text: 'Edit Course',
-    path: '/edit_course_list',
-    icon: 'copy',
+    text: 'Subject',
+    icon: 'product',
+    items: [
+      {
+        text: 'Edit Subject',
+        path: '/edit_subject_list',
+      },
+      {
+        text: 'Edit Curriculum',
+        path: '/edit_curriculum_list',
+      },
+      {
+        text: 'Edit Course',
+        path: '/edit_course_list',
+      },
+      {
+        text: 'Edit Test',
+        path: '/edit_test_list',
+      },
+      {
+        text: 'Edit Lesson',
+        path: '/edit_lesson_list',
+      },
+    ],
   },
   {
     text: 'File Storage',

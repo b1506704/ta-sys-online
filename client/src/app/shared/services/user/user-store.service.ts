@@ -889,7 +889,7 @@ export class UserStore extends StateService<UserState> {
   getUserId() {
     return localStorage.getItem('id');
   }
-   
+
   isLoggedIn() {
     let authToken = this.getToken();
     return authToken !== null ? true : false;
@@ -943,13 +943,31 @@ export class UserStore extends StateService<UserState> {
     localStorage.removeItem('username');
     localStorage.removeItem('id');
     localStorage.removeItem('roleId');
-    localStorage.removeItem('expiration');    
+    localStorage.removeItem('expiration');
     this.store.setCurrentUser('');
     this.store.setCurrentUserId('');
     this.store.setCurrentUserRoleId('');
-    this.store.setCurrentUserRoleName('');    
+    this.store.setCurrentUserRoleName('');
     this.setState({ isLoggedIn: false });
     this.store.showNotif('Logout successfully', 'custom');
-    this.router.navigate(['/login']);    
+    this.router.navigate(['/login']);
+  }
+
+  changePassword(userId: string, oldPassword: string, newPassword: string) {
+    this.setIsLoading(true);
+    this.userService
+      .changePassword(userId, oldPassword, newPassword)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({ responseMsg: data.responseMessage });
+          this.setIsLoading(false);
+          this.store.showNotif(data.responseMessage, 'custom');
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 }

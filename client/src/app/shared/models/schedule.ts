@@ -1,5 +1,6 @@
 export interface Schedule {
-    instructorID: string,
-    startDate: string,
-    endDate: string,
+    userId: string,
+    courseId: string,
+    startTime: Date,
+    endTime: Date,
 }

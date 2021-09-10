@@ -11,112 +11,89 @@ export class TestHttpService {
   apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Test';
 
   fetchTest(page: number, size: number): Observable<Test> {
-    const params = new HttpParams().set('page', page).set('size', size);
+    const params = new HttpParams()
+      .set('PageNumber', page)
+      .set('PageSize', size);
     console.log(params.toString());
-    return this.http.get<Test>(this.apiUrl, {
+    return this.http.get<Test>(this.apiUrl + '/paging', {
       params: params,
       reportProgress: true,
       observe: 'body',
     });
   }
 
-  searchTestByName(
+  fetchTestByLearnerID(
+    page: number,
+    size: number,
+    id: string
+  ): Observable<Test> {
+    const params = new HttpParams()
+      .set('PageNumber', page)
+      .set('PageSize', size)
+      .set('Id', id);
+    console.log(params.toString());
+    return this.http.get<Test>(this.apiUrl + '/byLearnerID', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
+  }
+
+  searchTestByProperty(
+    property: string,
     value: string,
     page: number,
     size: number
   ): Observable<Test> {
     const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
+      .set('Property', property)
+      .set('Value', value)
+      .set('PageNumber', page)
+      .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<Test>(
-      this.apiUrl + '/searchByName',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Test>(this.apiUrl + '/search', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
-  filterTestByPrice(
-    criteria: string,
-    value: number,
-    page: number,
-    size: number
-  ): Observable<Test> {
-    const params = new HttpParams()
-      .set('criteria', criteria)
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
-    console.log(params.toString());
-    return this.http.post<Test>(
-      this.apiUrl,
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  filterTestByCategory(
+  filterTestByProperty(
+    property: string,
     value: string,
     page: number,
     size: number
   ): Observable<Test> {
     const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
+      .set('Value', value)
+      .set('Property', property)
+      .set('PageNumber', page)
+      .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<Test>(
-      this.apiUrl + '/filterByCategory',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Test>(this.apiUrl + '/filter', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
-  sortTestByName(value: string, page: number, size: number): Observable<Test> {
+  sortTestByProperty(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ): Observable<Test> {
     const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
+      .set('SortBy', value)
+      .set('Order', order)
+      .set('PageNumber', page)
+      .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<Test>(
-      this.apiUrl + '/sortByName',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  sortTestByPrice(value: string, page: number, size: number): Observable<Test> {
-    const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
-    console.log(params.toString());
-    return this.http.post<Test>(
-      this.apiUrl + '/sortByPrice',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Test>(this.apiUrl + '/paging', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
   uploadTest(test: Test): Observable<Test> {
@@ -133,15 +110,15 @@ export class TestHttpService {
     });
   }
 
-  deleteAllTests(): Observable<Test> {
-    return this.http.post<Test>(this.apiUrl + '/deleteAll', {
+  deleteTest(id: Array<string>): Observable<Object> {
+    return this.http.post<Object>(this.apiUrl + '/delete', id, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
-  deleteTest(id: string): Observable<ArrayBuffer> {
-    return this.http.delete<ArrayBuffer>(this.apiUrl + `/${id}`, {
+  deleteAll(): Observable<ArrayBuffer> {
+    return this.http.delete<ArrayBuffer>(this.apiUrl, {
       reportProgress: true,
       observe: 'body',
     });
@@ -154,32 +131,17 @@ export class TestHttpService {
     });
   }
 
-  deleteSelectedTests(selectedItems: Array<string>): Observable<Array<string>> {
-    return this.http.post<Array<string>>(
-      this.apiUrl + '/batch',
-      selectedItems,
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  updateTest(test: Test, key: string): Observable<Test> {
-    return this.http.post<Test>(this.apiUrl + `/updateTest/${key}`, test, {
+  updateTest(test: Test): Observable<Test> {
+    return this.http.put<Test>(this.apiUrl, test, {
       reportProgress: true,
       observe: 'body',
     });
   }
 
   fetchAll(): Observable<Test> {
-    return this.http.post<Test>(
-      this.apiUrl + `/fetchAll`,
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Test>(this.apiUrl, {
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 }

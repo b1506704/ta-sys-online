@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { Bill } from '../../models/bill';
 import { StateService } from '../state.service';
 import { StoreService } from '../store.service';
@@ -11,6 +10,7 @@ interface BillState {
   billList: Array<Bill>;
   exportData: Array<Bill>;
   selectedBill: Object;
+  billInstance: Bill;
   totalPages: number;
   currentPage: number;
   totalItems: number;
@@ -19,6 +19,7 @@ interface BillState {
 const initialState: BillState = {
   billList: [],
   selectedBill: {},
+  billInstance: undefined,
   exportData: [],
   totalPages: 0,
   currentPage: 0,
@@ -47,11 +48,11 @@ export class BillStore extends StateService<BillState> {
    * @return {Array<Object>} Return an array with filled items from ss pagination
    * @example
    * this.setState({
-            pendingCheckupList: this.fillEmpty(
-              page,
+            sourceList: this.fillEmpty(
+              page - 1,
               size,
-              this.state.pendingCheckupList,
-              data.items
+              this.state.sourceList,
+              arrayItemFromServer
             ),
           });
    */
@@ -62,14 +63,16 @@ export class BillStore extends StateService<BillState> {
     addedArray: Array<Bill>
   ): Array<Bill> {
     let result: Array<Bill> = sourceArray;
+    console.log('FILL INDEX');
     let fillIndex = startIndex * endIndex;
+    console.log(fillIndex);
     for (var j = 0; j < addedArray.length; j++) {
       result[fillIndex] = addedArray[j];
       fillIndex++;
     }
     // endIndex = pageSize
     // pageSize = 5
-    // 0 => 0 ,1,2,3,4,
+    // 0 => 0,1,2,3,4,
     // 1 -> 5,6,7,8,9
     // 2 -> 10,11,12,13,14
     // 17 -> 85,86,87,88,89
@@ -78,105 +81,282 @@ export class BillStore extends StateService<BillState> {
     return result;
   }
 
+  initInfiniteData(page: number, size: number) {
+    return this.billService
+      .fetchBill(page, size)
+      .toPromise()
+      .then((data: any) => {
+        this.setState({
+          billList: data.data,
+        });
+        console.log('Current flag: infite list');
+        console.log(this.state.billList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+      });
+  }
+
+  loadInfiniteDataAsync(page: number, size: number) {
+    this.setIsLoading(true);
+    this.billService.fetchBill(page, size).subscribe({
+      next: (data: any) => {
+        this.setState({
+          billList: this.state.billList.concat(data.data),
+        });
+        console.log('Infinite list');
+        console.log(this.state.billList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
+  }
+
+  loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
+    this.setIsLoading(true);
+    this.billService.fetchBillByLearnerID(page, size, learnerID).subscribe({
+      next: (data: any) => {
+        this.setState({
+          billList: this.fillEmpty(
+            page - 1,
+            size,
+            this.state.billList,
+            data.data
+          ),
+        });
+        console.log('Pure list');
+        console.log(this.state.billList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
+  }
+
+  initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
+    return this.billService
+      .fetchBillByLearnerID(page, size, learnerID)
+      .toPromise()
+      .then((data: any) => {
+        this.setState({
+          billList: data.data,
+        });
+        console.log('Current flag: infite list');
+        console.log(this.state.billList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+      });
+  }
+
+  loadInfiniteDataAsyncByLearnerID(
+    page: number,
+    size: number,
+    learnerID: string
+  ) {
+    this.setIsLoading(true);
+    this.billService.fetchBillByLearnerID(page, size, learnerID).subscribe({
+      next: (data: any) => {
+        this.setState({
+          billList: this.state.billList.concat(data.data),
+        });
+        console.log('Infinite list');
+        console.log(this.state.billList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
+  }
+
   initData(page: number, size: number) {
     this.billService
       .fetchBill(page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          billList: new Array<Bill>(data.totalItems),
+          billList: new Array<Bill>(data.totalRecords),
         });
         console.log('Current flag: pure list');
         console.log(this.state.billList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
         this.loadDataAsync(page, size);
       });
   }
 
-  initFilterByCategoryData(value: string, page: number, size: number) {
+  initFilterByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Filtered Mode On', 'custom');
     this.billService
-      .filterBillByCategory(value, 0, 5)
+      .filterBillByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          billList: new Array<Bill>(data.totalItems),
+          billList: new Array<Bill>(data.totalRecords),
         });
         console.log('Current flag: filtered list');
         console.log(this.state.billList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.filterBillByCategory(value, page, size);
+        this.filterBillByProperty(property, value, page, size);
       });
   }
 
-  initSearchByNameData(value: string, page: number, size: number) {
-    this.store.showNotif('Searched Mode On', 'custom');
+  initInfiniteFilterByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.store.showNotif('Filtered Mode On', 'custom');
     this.billService
-      .searchBillByName(value, 0, 5)
+      .filterBillByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          billList: new Array<Bill>(data.totalItems),
+          billList: data.data,
+        });
+        console.log('Current flag: infinite filtered list');
+        console.log(this.state.billList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+      });
+  }
+
+  initSearchByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.store.showNotif('Searched Mode On', 'custom');
+    this.billService
+      .searchBillByProperty(property, value, page, size)
+      .toPromise()
+      .then((data: any) => {
+        this.setState({
+          billList: new Array<Bill>(data.totalRecords),
         });
         console.log('Current flag: searched list');
         console.log(this.state.billList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.searchBillByName(value, page, size);
+        this.searchBillByProperty(property, value, page, size);
       });
   }
 
-  initSortByPriceData(value: string, page: number, size: number) {
+  initInfiniteSearchByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.store.showNotif('Searched Mode On', 'custom');
+    this.billService
+      .searchBillByProperty(property, value, page, size)
+      .toPromise()
+      .then((data: any) => {
+        if (data.totalRecords !== 0) {
+          this.setState({
+            billList: data.data,
+          });
+        } else {
+          this.store.showNotif('No result found!', 'custom');
+        }
+        console.log('Current flag: infitite searched list');
+        console.log(this.state.billList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+      });
+  }
+
+  initSortByPropertyData(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Sort Mode On', 'custom');
     this.billService
-      .sortBillByPrice(value, 0, 5)
+      .sortBillByProperty(value, order, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          billList: new Array<Bill>(data.totalItems),
+          billList: new Array<Bill>(data.totalRecords),
         });
         console.log('Current flag: sort list');
         console.log(this.state.billList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.sortBillByPrice(value, page, size);
+        this.sortBillByProperty(value, order, page, size);
       });
   }
 
-  initSortByName(value: string, page: number, size: number) {
+  initInfiniteSortByPropertyData(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Sort Mode On', 'custom');
     this.billService
-      .sortBillByName(value, 0, 5)
+      .sortBillByProperty(value, order, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          billList: new Array<Bill>(data.totalItems),
+          billList: data.data,
         });
         console.log('Current flag: sort list');
         console.log(this.state.billList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-      })
-      .then(() => {
-        this.sortBillByName(value, page, size);
+        this.setState({ currentPage: data.pageNumber });
       });
   }
-
 
   loadDataAsync(page: number, size: number) {
     this.setIsLoading(true);
@@ -184,19 +364,19 @@ export class BillStore extends StateService<BillState> {
       next: (data: any) => {
         this.setState({
           billList: this.fillEmpty(
-            page,
+            page - 1,
             size,
             this.state.billList,
-            data.items
+            data.data
           ),
         });
         console.log('Pure list');
         console.log(this.state.billList);
         console.log('Server response');
         console.log(data);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
         this.setIsLoading(false);
       },
       error: (data: any) => {
@@ -213,15 +393,15 @@ export class BillStore extends StateService<BillState> {
       next: (data: any) => {
         this.setState({
           billList: this.fillEmpty(
-            page,
+            page - 1,
             size,
             this.state.billList,
-            data.items
+            data.data
           ),
         });
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
         console.log('Pure list');
         console.log(this.state.billList);
         console.log('Server response');
@@ -259,6 +439,10 @@ export class BillStore extends StateService<BillState> {
     (state) => state.selectedBill
   );
 
+  $billInstance: Observable<Bill> = this.select(
+    (state) => state.billInstance
+  );
+
   uploadBill(bill: Bill, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
@@ -282,11 +466,11 @@ export class BillStore extends StateService<BillState> {
     });
   }
 
-  updateBill(bill: Bill, key: string, page: number, size: number) {
+  updateBill(bill: Bill, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.billService.updateBill(bill, key).subscribe({
+        this.billService.updateBill(bill).subscribe({
           next: (data: any) => {
             this.setState({ responseMsg: data });
             console.log(data);
@@ -319,38 +503,32 @@ export class BillStore extends StateService<BillState> {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.billService
-          .deleteSelectedBills(selectedBills)
-          .subscribe({
-            next: (data: any) => {
-              this.setState({ responseMsg: data });
-              console.log(data);
-              this.loadDataAsync(page, size);
-              console.log(this.state.billList);
-              this.setIsLoading(false);
-              this.store.showNotif(data.responseMessage, 'custom');
-            },
-            error: (data: any) => {
-              this.setIsLoading(false);
-              this.store.showNotif(data.error.responseMessage, 'error');
-              console.log(data);
-            },
-          });
+        this.billService.deleteBill(selectedBills).subscribe({
+          next: (data: any) => {
+            this.setState({ responseMsg: data });
+            console.log(data);
+            this.loadDataAsync(page, size);
+            console.log(this.state.billList);
+            this.setIsLoading(false);
+            this.store.showNotif(data.responseMessage, 'custom');
+          },
+          error: (data: any) => {
+            this.setIsLoading(false);
+            this.store.showNotif(data.error.responseMessage, 'error');
+            console.log(data);
+          },
+        });
       }
     });
   }
 
-  deleteAllBills() {
+  deleteAll() {
     this.confirmDialog('Delete all items?').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.billService.deleteAllBills().subscribe({
+        this.billService.deleteAll().subscribe({
           next: (data: any) => {
-            this.setState({ responseMsg: data });
-            this.setState({ billList: [] });
-            this.setState({ totalPages: 0 });
-            this.setState({ currentPage: 0 });
-            this.setState({ totalItems: 0 });
+            this.resetState();
             console.log(data);
             this.setIsLoading(false);
             this.store.showNotif(data.responseMessage, 'custom');
@@ -365,7 +543,7 @@ export class BillStore extends StateService<BillState> {
     });
   }
 
-  deleteBill(id: string, page: number, size: number) {
+  deleteBill(id: Array<string>, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
@@ -402,31 +580,36 @@ export class BillStore extends StateService<BillState> {
 
   setCurrentPage(_currentPage: number) {
     this.setState({ currentPage: _currentPage });
-  }  
+  }
 
-  filterBillByPrice(
-    criteria: string,
-    value: number,
+  filterBillByProperty(
+    property: string,
+    value: string,
     page: number,
     size: number
   ) {
     this.setIsLoading(true);
     this.billService
-      .filterBillByPrice(criteria, value, page, size)
+      .filterBillByProperty(property, value, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({ responseMsg: data });
-          this.setState({
-            billList: this.fillEmpty(
-              page,
-              size,
-              this.state.billList,
-              data.items
-            ),
-          });
-          this.setState({ totalItems: data.totalItems });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.currentPage });
+          if (data.totalRecords !== 0) {
+            this.setState({
+              billList: this.fillEmpty(
+                page - 1,
+                size,
+                this.state.billList,
+                data.data
+              ),
+            });
+            console.log('Filtered list');
+            console.log(this.state.billList);
+            console.log('Server response');
+            console.log(data);
+            this.setState({ totalItems: data.totalRecords });
+            this.setState({ totalPages: data.totalPages });
+            this.setState({ currentPage: data.pageNumber });
+          }
           this.setIsLoading(false);
         },
         error: (data: any) => {
@@ -437,125 +620,197 @@ export class BillStore extends StateService<BillState> {
       });
   }
 
-  filterBillByCategory(value: string, page: number, size: number) {
+  filterInfiniteBillByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.setIsLoading(true);
-    this.billService.filterBillByCategory(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          billList: this.fillEmpty(
-            page,
-            size,
-            this.state.billList,
-            data.items
-          ),
-        });
-        console.log('Filtered list');
-        console.log(this.state.billList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.billService
+      .filterBillByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            billList: this.state.billList.concat(data),
+          });
+          console.log('Filtered list');
+          console.log(this.state.billList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
-  searchBillByName(value: string, page: number, size: number) {
+  searchBillByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.setIsLoading(true);
-    this.billService.searchBillByName(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          billList: this.fillEmpty(
-            page,
-            size,
-            this.state.billList,
-            data.items
-          ),
-        });
-        console.log('Searched list');
-        console.log(this.state.billList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.billService
+      .searchBillByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            this.setState({
+              billList: this.fillEmpty(
+                page - 1,
+                size,
+                this.state.billList,
+                data.data
+              ),
+            });
+          } else {
+            this.store.showNotif('No result found!', 'custom');
+          }
+          console.log('Searched list');
+          console.log(this.state.billList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
-  sortBillByName(value: string, page: number, size: number) {
+  searchInfiniteBillByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.setIsLoading(true);
-    this.billService.sortBillByName(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({ responseMsg: data });
-        this.setState({
-          billList: this.fillEmpty(
-            page,
-            size,
-            this.state.billList,
-            data.items
-          ),
-        });
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        console.log('Sorted list');
-        console.log(this.state.billList);
-        console.log('Server response');
-        console.log(data);
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.billService
+      .searchBillByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            this.setState({
+              billList: this.state.billList.concat(data),
+            });
+          } else {
+            this.store.showNotif('No result found!', 'custome');
+          }
+          console.log('Infite searched list');
+          console.log(this.state.billList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
-  sortBillByPrice(value: string, page: number, size: number) {
+  sortBillByProperty(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
     this.setIsLoading(true);
-    this.billService.sortBillByPrice(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({ responseMsg: data });
-        this.setState({
-          billList: this.fillEmpty(
-            page,
-            size,
-            this.state.billList,
-            data.items
-          ),
-        });
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        console.log('Sorted list');
-        console.log(this.state.billList);
-        console.log('Server response');
+    this.billService
+      .sortBillByProperty(value, order, page, size)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({ responseMsg: data });
+          this.setState({
+            billList: this.fillEmpty(
+              page - 1,
+              size,
+              this.state.billList,
+              data.data
+            ),
+          });
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          console.log('Sorted list');
+          console.log(this.state.billList);
+          console.log('Server response');
+          console.log(data);
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  sortInfiniteBillByProperty(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.billService
+      .sortBillByProperty(value, order, page, size)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            billList: this.state.billList.concat(data),
+          });
+          console.log('Infite sorted list');
+          console.log(this.state.billList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  getBill(id: string) {
+    this.setIsLoading(true);
+    return this.billService
+      .getBill(id)
+      .toPromise()
+      .then((data: any) => {
+        this.setState({ billInstance: data });
         console.log(data);
         this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+      });
   }
 
   setExportData(array: Array<Bill>) {
     this.setState({ billList: array });
+  }
+
+  resetState() {
+    this.setState(initialState);
   }
 }

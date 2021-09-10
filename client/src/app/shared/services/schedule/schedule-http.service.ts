@@ -11,120 +11,89 @@ export class ScheduleHttpService {
   apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Schedule';
 
   fetchSchedule(page: number, size: number): Observable<Schedule> {
-    const params = new HttpParams().set('page', page).set('size', size);
+    const params = new HttpParams()
+      .set('PageNumber', page)
+      .set('PageSize', size);
     console.log(params.toString());
-    return this.http.get<Schedule>(this.apiUrl, {
+    return this.http.get<Schedule>(this.apiUrl + '/paging', {
       params: params,
       reportProgress: true,
       observe: 'body',
     });
   }
 
-  searchScheduleByName(
+  fetchScheduleByLearnerID(
+    page: number,
+    size: number,
+    id: string
+  ): Observable<Schedule> {
+    const params = new HttpParams()
+      .set('PageNumber', page)
+      .set('PageSize', size)
+      .set('Id', id);
+    console.log(params.toString());
+    return this.http.get<Schedule>(this.apiUrl + '/byLearnerID', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
+  }
+
+  searchScheduleByProperty(
+    property: string,
     value: string,
     page: number,
     size: number
   ): Observable<Schedule> {
     const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
+      .set('Property', property)
+      .set('Value', value)
+      .set('PageNumber', page)
+      .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<Schedule>(
-      this.apiUrl + '/searchByName',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Schedule>(this.apiUrl + '/search', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
-  filterScheduleByPrice(
-    criteria: string,
-    value: number,
-    page: number,
-    size: number
-  ): Observable<Schedule> {
-    const params = new HttpParams()
-      .set('criteria', criteria)
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
-    console.log(params.toString());
-    return this.http.post<Schedule>(
-      this.apiUrl,
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  filterScheduleByCategory(
+  filterScheduleByProperty(
+    property: string,
     value: string,
     page: number,
     size: number
   ): Observable<Schedule> {
     const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
+      .set('Value', value)
+      .set('Property', property)
+      .set('PageNumber', page)
+      .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<Schedule>(
-      this.apiUrl + '/filterByCategory',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Schedule>(this.apiUrl + '/filter', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
-  sortScheduleByName(
+  sortScheduleByProperty(
     value: string,
+    order: string,
     page: number,
     size: number
   ): Observable<Schedule> {
     const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
+      .set('SortBy', value)
+      .set('Order', order)
+      .set('PageNumber', page)
+      .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<Schedule>(
-      this.apiUrl + '/sortByName',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  sortScheduleByPrice(
-    value: string,
-    page: number,
-    size: number
-  ): Observable<Schedule> {
-    const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
-    console.log(params.toString());
-    return this.http.post<Schedule>(
-      this.apiUrl + '/sortByPrice',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Schedule>(this.apiUrl + '/paging', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
   uploadSchedule(schedule: Schedule): Observable<Schedule> {
@@ -135,29 +104,21 @@ export class ScheduleHttpService {
   }
 
   generateRandomSchedule(): Observable<Schedule> {
-    return this.http.post<Schedule>(
-      this.apiUrl + '/randomSchedule',
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.post<Schedule>(this.apiUrl + '/randomSchedule', {
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
-  deleteAllSchedules(): Observable<Schedule> {
-    return this.http.post<Schedule>(
-      this.apiUrl + '/deleteAll',
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+  deleteSchedule(id: Array<string>): Observable<Object> {
+    return this.http.post<Object>(this.apiUrl + '/delete', id, {
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
-  deleteSchedule(id: string): Observable<ArrayBuffer> {
-    return this.http.delete<ArrayBuffer>(this.apiUrl + `/${id}`, {
+  deleteAll(): Observable<ArrayBuffer> {
+    return this.http.delete<ArrayBuffer>(this.apiUrl, {
       reportProgress: true,
       observe: 'body',
     });
@@ -170,38 +131,17 @@ export class ScheduleHttpService {
     });
   }
 
-  deleteSelectedSchedules(
-    selectedItems: Array<string>
-  ): Observable<Array<string>> {
-    return this.http.post<Array<string>>(
-      this.apiUrl + '/batch',
-      selectedItems,
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  updateSchedule(schedule: Schedule, key: string): Observable<Schedule> {
-    return this.http.post<Schedule>(
-      this.apiUrl + `/updateSchedule/${key}`,
-      schedule,
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+  updateSchedule(schedule: Schedule): Observable<Schedule> {
+    return this.http.put<Schedule>(this.apiUrl, schedule, {
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
   fetchAll(): Observable<Schedule> {
-    return this.http.post<Schedule>(
-      this.apiUrl + `/fetchAll`,
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Schedule>(this.apiUrl, {
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 }

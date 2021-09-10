@@ -54,10 +54,10 @@ const routes: Routes = [
     canActivate: [AuthGuardService],
   },
   {
-    path: 'edit_room_list',
+    path: 'edit_session_list',
     loadChildren: () =>
-      import('./pages/admin/edit-room-list/edit-room-list.module').then(
-        (m) => m.EditRoomListModule
+      import('./pages/admin/edit-session-list/edit-session-list.module').then(
+        (m) => m.EditSessionListModule
       ),
     canActivate: [AuthGuardService],
   },
@@ -86,10 +86,58 @@ const routes: Routes = [
     canActivate: [AuthGuardService],
   },
   {
-    path: 'edit_schedule',
+    path: 'edit_lesson_list',
     loadChildren: () =>
-      import('./pages/admin/edit-schedule/edit-schedule.module').then(
-        (m) => m.EditScheduleModule
+      import('./pages/admin/edit-lesson-list/edit-lesson-list.module').then(
+        (m) => m.EditLessonListModule
+      ),
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'edit_test_list',
+    loadChildren: () =>
+      import('./pages/admin/edit-test-list/edit-test-list.module').then(
+        (m) => m.EditTestListModule
+      ),
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'edit_curriculum_list',
+    loadChildren: () =>
+      import('./pages/admin/edit-curriculum-list/edit-curriculum-list.module').then(
+        (m) => m.EditCurriculumListModule
+      ),
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'edit_cart_list',
+    loadChildren: () =>
+      import('./pages/admin/edit-cart-list/edit-cart-list.module').then(
+        (m) => m.EditCartListModule
+      ),
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'edit_discount_list',
+    loadChildren: () =>
+      import('./pages/admin/edit-discount-list/edit-discount-list.module').then(
+        (m) => m.EditDiscountListModule
+      ),
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'edit_post_list',
+    loadChildren: () =>
+      import('./pages/admin/edit-post-list/edit-post-list.module').then(
+        (m) => m.EditPostListModule
+      ),
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'edit_schedule_list',
+    loadChildren: () =>
+      import('./pages/admin/edit-schedule-list/edit-schedule-list.module').then(
+        (m) => m.EditScheduleListModule
       ),
     canActivate: [AuthGuardService],
   },

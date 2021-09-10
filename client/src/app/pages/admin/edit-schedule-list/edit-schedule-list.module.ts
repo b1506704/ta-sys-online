@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { EditScheduleRoutingModule } from './edit-schedule-routing.module';
-import { EditScheduleComponent } from './edit-schedule.component';
+import { EditScheduleListRoutingModule } from './edit-schedule-list-routing.module';
+import { EditScheduleListComponent } from './edit-schedule-list.component';
 import {
   DxDataGridModule,
   DxToolbarModule,
@@ -11,11 +11,11 @@ import {
 @NgModule({
   imports: [
     CommonModule,
-    EditScheduleRoutingModule,
+    EditScheduleListRoutingModule,
     DxDataGridModule,
     DxToolbarModule,
     DxButtonModule,
   ],
-  declarations: [EditScheduleComponent],
+  declarations: [EditScheduleListComponent],
 })
-export class EditScheduleModule {}
+export class EditScheduleListModule {}

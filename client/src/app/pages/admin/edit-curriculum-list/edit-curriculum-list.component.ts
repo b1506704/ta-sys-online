@@ -7,25 +7,22 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as ExcelJS from 'exceljs';
 import saveAs from 'file-saver';
-import { Room } from 'src/app/shared/models/room';
-import { RoomHttpService } from 'src/app/shared/services/room/room-http.service';
-import { RoomStore } from 'src/app/shared/services/room/room-store.service';
+import { Curriculum } from 'src/app/shared/models/curriculum';
+import { CurriculumHttpService } from 'src/app/shared/services/curriculum/curriculum-http.service';
+import { CurriculumStore } from 'src/app/shared/services/curriculum/curriculum-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
+import { SubjectStore } from 'src/app/shared/services/subject/subject-store.service';
 
 @Component({
-  selector: 'app-edit-room-list',
-  templateUrl: './edit-room-list.component.html',
-  styleUrls: ['./edit-room-list.component.scss'],
+  selector: 'app-edit-curriculum-list',
+  templateUrl: './edit-curriculum-list.component.html',
+  styleUrls: ['./edit-curriculum-list.component.scss'],
 })
-export class EditRoomListComponent implements OnInit, OnDestroy {
+export class EditCurriculumListComponent implements OnInit, OnDestroy {
   @ViewChild(DxDataGridComponent, { static: false })
   dataGrid: DxDataGridComponent;
-  roomList!: Array<Room>;
-  vacancyStatusList: Array<Object> = [
-    { name: '(NONE)' },
-    { name: 'FULL' },
-    { name: 'AVAILABLE' },
-  ];
+  curriculumList!: Array<Curriculum>;
+  subjectList: Array<Object> = [];
   selectedRows: string[];
   isSelectInfoVisible: boolean;
   selectInfoText: string;
@@ -33,22 +30,25 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
   pageSize: number = 5;
   allowedPageSizes: Array<number | string> = [5, 10, 15];
   scrollingMode: string = 'standard';
-  // standard | virtual | infinite
   currentIndexFromServer: number;
   isSearchingByName: boolean;
   isFilteringByCategory: boolean;
   isFilteringByPrice: boolean;
   isSortingByName: boolean;
 
-  currentCategoryFilterValue: string;
   timeout: any;
-  currentSearchByNameValue: string;
-  currentSortByPriceValue: string;
+  currentFilterByPropertyValue: string;
+  currentSearchByPropertyValue: string;
+  currentSortByPropertyValue: string;
+  currentSortProperty: string = 'name';
+  currentSearchProperty: string = 'name';
+  currentFilterProperty: string = 'subjectId';
 
   constructor(
-    private roomStore: RoomStore,
+    private curriculumStore: CurriculumStore,
     private store: StoreService,
-    private roomHTTP: RoomHttpService,
+    private curriculumHTTP: CurriculumHttpService,
+    private subjectStore: SubjectStore,
     private router: Router
   ) {}
 
@@ -56,7 +56,7 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
     e.toolbarOptions.items.unshift(
       {
         location: 'before',
-        template: 'totalRoomCount',
+        template: 'totalCurriculumCount',
       },
       {
         location: 'after',
@@ -122,7 +122,7 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
           onKeyUp: this.onSearchKeyupHandler.bind(this),
           onValueChanged: this.onSearchValueChanged.bind(this),
           mode: 'search',
-          placeholder: 'Search number',
+          placeholder: 'Search name',
         },
       },
       {
@@ -133,7 +133,7 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
           type: 'normal',
           icon: 'filter',
           disabled: true,
-          hint: 'Filter with vacancy status',
+          hint: 'Filter with subject',
         },
       },
       {
@@ -141,12 +141,12 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
         locateInMenu: 'auto',
         widget: 'dxSelectBox',
         options: {
-          items: this.vacancyStatusList,
-          valueExpr: 'name',
-          // searchExpr: 'name',
+          items: this.subjectList,
+          valueExpr: 'id',
+          searchExpr: 'name',
           displayExpr: 'name',
-          placeholder: 'Filter with vacancy status',
-          // searchEnabled: true,
+          placeholder: 'Filter with subject',
+          searchEnabled: true,
           onValueChanged: this.onFilterChange.bind(this),
         },
       },
@@ -156,9 +156,9 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
         widget: 'dxButton',
         options: {
           type: 'normal',
-          icon: 'event',
+          icon: 'card',
           disabled: true,
-          hint: 'Sort by total slot',
+          hint: 'Sort by total cost',
         },
       },
       {
@@ -168,23 +168,19 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
         options: {
           items: [
             {
-              _id: '-1',
+              id: '-1',
               name: '(NONE)',
             },
-            { _id: '0', name: 'ASC' },
-            { _id: '1', name: 'DESC' },
+            { id: '0', name: 'asc' },
+            { id: '1', name: 'desc' },
           ],
           valueExpr: 'name',
-          placeholder: 'Sort by total slot',
+          placeholder: 'Sort by name',
           displayExpr: 'name',
           onValueChanged: this.onSortValueChanged.bind(this),
         },
       }
     );
-  }
-
-  getTotalLearner(rowData: any) {
-    if (rowData.learnerID) return rowData.learnerID.length;
   }
 
   onSearchKeyupHandler(e: any) {
@@ -193,11 +189,12 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
       this.isSearchingByName = true;
       this.isFilteringByCategory = false;
       this.isSortingByName = false;
-      console.log(this.currentSearchByNameValue);
-      if (this.currentSearchByNameValue !== '') {
-        this.roomStore.initSearchByNameData(
-          this.currentSearchByNameValue,
-          this.dataGrid.instance.pageIndex(),
+      console.log(this.currentSearchByPropertyValue);
+      if (this.currentSearchByPropertyValue !== '') {
+        this.curriculumStore.initSearchByPropertyData(
+          this.currentSearchProperty,
+          this.currentSearchByPropertyValue,
+          this.dataGrid.instance.pageIndex() + 1,
           this.pageSize
         );
       } else {
@@ -209,18 +206,19 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
   }
 
   onSearchValueChanged(e: any) {
-    this.currentSearchByNameValue = e.value;
+    this.currentSearchByPropertyValue = e.value;
   }
 
   onSortValueChanged(e: any) {
     this.isSortingByName = true;
     this.isSearchingByName = false;
     this.isFilteringByCategory = false;
-    this.currentSortByPriceValue = e.value;
+    this.currentSortByPropertyValue = e.value;
     if (e.value !== '(NONE)') {
-      this.roomStore.initSortByPriceData(
+      this.curriculumStore.initSortByPropertyData(
+        this.currentSortProperty,
         e.value,
-        this.dataGrid.instance.pageIndex(),
+        this.dataGrid.instance.pageIndex() + 1,
         this.pageSize
       );
     } else {
@@ -234,16 +232,16 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = true;
     this.isSearchingByName = false;
     this.isSortingByName = false;
-    this.currentCategoryFilterValue = e.value;
+    this.currentFilterByPropertyValue = e.value;
     console.log(e.value);
     if (e.value !== '(NONE)') {
-      this.roomStore.initFilterByCategoryData(
+      this.curriculumStore.initFilterByPropertyData(
+        this.currentFilterProperty,
         e.value,
-        this.dataGrid.instance.pageIndex(),
+        this.dataGrid.instance.pageIndex() + 1,
         this.pageSize
       );
     } else {
-      //return to pure editor mode
       this.store.showNotif('FILTER MODE OFF', 'custom');
       this.onRefresh();
     }
@@ -265,9 +263,9 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
     const editorMode = this.checkEditorMode();
     // event of page index changed
     if (e.fullName === 'paging.pageIndex') {
-      const currentIndex: number = e.value;
+      const currentIndex: number = e.value + 1;
       console.log(
-        `New page index: ${currentIndex}. Total items: ${this.roomList.length}`
+        `New page index: ${currentIndex}. Total items: ${this.curriculumList.length}`
       );
       switch (editorMode) {
         case 'NORMAL':
@@ -286,36 +284,36 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
           break;
       }
     }
-    // todo: handle virtual scrolling when pagesize = 'all'
-    //
-    // event of page size changed by user's click
     if (e.fullName === 'paging.pageSize') {
       this.pageSize = e.value;
       console.log(`Page size changed to ${e.value}`);
       switch (editorMode) {
         case 'NORMAL':
-          this.roomStore.loadDataAsync(this.currentIndexFromServer, e.value);
+          this.curriculumStore.loadDataAsync(this.currentIndexFromServer, e.value);
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'FILTER':
-          this.roomStore.filterRoomByCategory(
-            this.currentCategoryFilterValue,
+          this.curriculumStore.filterCurriculumByProperty(
+            this.currentFilterProperty,
+            this.currentFilterByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'SEARCH':
-          this.roomStore.searchRoomByName(
-            this.currentSearchByNameValue,
+          this.curriculumStore.searchCurriculumByProperty(
+            this.currentSearchProperty,
+            this.currentSearchByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'SORT':
-          this.roomStore.sortRoomByPrice(
-            this.currentSortByPriceValue,
+          this.curriculumStore.sortCurriculumByProperty(
+            this.currentSortProperty,
+            this.currentSortByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
@@ -328,107 +326,34 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
   }
 
   paginatePureData(index: number) {
-    if (index === 0) {
-      this.roomStore.loadDataAsync(index, this.pageSize);
-      this.roomStore.loadDataAsync(index + 1, this.pageSize);
-    } else {
-      this.roomStore.loadDataAsync(index, this.pageSize);
-      this.roomStore.loadDataAsync(index + 1, this.pageSize);
-      this.roomStore.loadDataAsync(index - 1, this.pageSize);
-    }
+    this.curriculumStore.loadDataAsync(index, this.pageSize);
   }
 
   paginateFilterData(index: number) {
-    if (index === 0) {
-      this.roomStore.filterRoomByCategory(
-        this.currentCategoryFilterValue,
-        index,
-        this.pageSize
-      );
-      this.roomStore.filterRoomByCategory(
-        this.currentCategoryFilterValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.roomStore.filterRoomByCategory(
-        this.currentCategoryFilterValue,
-        index,
-        this.pageSize
-      );
-      this.roomStore.filterRoomByCategory(
-        this.currentCategoryFilterValue,
-        index + 1,
-        this.pageSize
-      );
-      this.roomStore.filterRoomByCategory(
-        this.currentCategoryFilterValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.curriculumStore.filterCurriculumByProperty(
+      this.currentFilterProperty,
+      this.currentFilterByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSearchData(index: number) {
-    if (index === 0) {
-      this.roomStore.searchRoomByName(
-        this.currentSearchByNameValue,
-        index,
-        this.pageSize
-      );
-      this.roomStore.searchRoomByName(
-        this.currentSearchByNameValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.roomStore.searchRoomByName(
-        this.currentSearchByNameValue,
-        index,
-        this.pageSize
-      );
-      this.roomStore.searchRoomByName(
-        this.currentSearchByNameValue,
-        index + 1,
-        this.pageSize
-      );
-      this.roomStore.searchRoomByName(
-        this.currentSearchByNameValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.curriculumStore.searchCurriculumByProperty(
+      this.currentSearchProperty,
+      this.currentSearchByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSortData(index: number) {
-    if (index === 0) {
-      this.roomStore.sortRoomByPrice(
-        this.currentSortByPriceValue,
-        index,
-        this.pageSize
-      );
-      this.roomStore.sortRoomByPrice(
-        this.currentSortByPriceValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.roomStore.sortRoomByPrice(
-        this.currentSortByPriceValue,
-        index,
-        this.pageSize
-      );
-      this.roomStore.sortRoomByPrice(
-        this.currentSortByPriceValue,
-        index + 1,
-        this.pageSize
-      );
-      this.roomStore.sortRoomByPrice(
-        this.currentSortByPriceValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.curriculumStore.sortCurriculumByProperty(
+      this.currentSortProperty,
+      this.currentSortByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   onEditingStart() {
@@ -446,25 +371,24 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
     if (e.changes.length) {
       switch (e.changes[0].type) {
         case 'insert':
-          this.roomStore.uploadRoom(
+          this.curriculumStore.uploadCurriculum(
             e.changes[0].data,
-            this.dataGrid.instance.pageIndex(),
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
           break;
         case 'update':
           console.log(e.changes[0]);
-          this.roomStore.updateRoom(
+          this.curriculumStore.updateCurriculum(
             e.changes[0].data,
-            e.changes[0].key,
-            this.dataGrid.instance.pageIndex(),
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
           break;
         case 'remove':
-          this.roomStore.deleteRoom(
-            e.changes[0].key,
-            this.dataGrid.instance.pageIndex(),
+          this.curriculumStore.deleteCurriculum(
+            [e.changes[0].key],
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
           break;
@@ -504,10 +428,10 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
     this.store.setIsLoading(true);
     const editorMode = this.checkEditorMode();
     if (this.selectedRows.length) {
-      this.roomStore.confirmDialog('').then((result: boolean) => {
+      this.curriculumStore.confirmDialog('').then((result: boolean) => {
         if (result) {
-          this.roomHTTP
-            .deleteSelectedRooms(this.selectedRows)
+          this.curriculumHTTP
+            .deleteCurriculum(this.selectedRows)
             .toPromise()
             .then(() => {
               this.store.showNotif(
@@ -517,29 +441,32 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
               this.clearSelection();
               switch (editorMode) {
                 case 'NORMAL':
-                  this.roomStore.initData(
-                    this.dataGrid.instance.pageIndex(),
+                  this.curriculumStore.initData(
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'FILTER':
-                  this.roomStore.initFilterByCategoryData(
-                    this.currentCategoryFilterValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.curriculumStore.initFilterByPropertyData(
+                    this.currentFilterProperty,
+                    this.currentFilterByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'SORT':
-                  this.roomStore.initSortByPriceData(
-                    this.currentSortByPriceValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.curriculumStore.initSortByPropertyData(
+                    this.currentSortProperty,
+                    this.currentSortByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'SEARCH':
-                  this.roomStore.initSearchByNameData(
-                    this.currentSearchByNameValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.curriculumStore.initSearchByPropertyData(
+                    this.currentSearchProperty,
+                    this.currentSearchByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
@@ -564,11 +491,14 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = false;
     this.isSearchingByName = false;
     this.isSortingByName = false;
-    this.roomStore.initData(this.dataGrid.instance.pageIndex(), this.pageSize);
+    this.curriculumStore.initData(
+      this.dataGrid.instance.pageIndex() + 1,
+      this.pageSize
+    );
   }
 
   onAddRandom() {
-    this.roomStore
+    this.curriculumStore
       .confirmDialog(
         'This will generate random 100+ items in database. Are you sure'
       )
@@ -576,12 +506,12 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
         if (result) {
           this.isFilteringByCategory = false;
           this.store.setIsLoading(true);
-          this.roomHTTP
-            .generateRandomRoom()
+          this.curriculumHTTP
+            .generateRandomCurriculum()
             .toPromise()
             .then(() => {
-              this.roomStore.initData(
-                this.dataGrid.instance.pageIndex(),
+              this.curriculumStore.initData(
+                this.dataGrid.instance.pageIndex() + 1,
                 this.pageSize
               );
             })
@@ -594,22 +524,22 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
   }
 
   exportDataGridToExcel() {
-    this.roomStore
+    this.curriculumStore
       .confirmDialog(
         'This will export all fetched data to excel. Are you sure?'
       )
       .then((result: boolean) => {
         if (result) {
           this.store.setIsLoading(true);
-          this.roomHTTP
+          this.curriculumHTTP
             .fetchAll()
             .toPromise()
             .then((data: any) => {
-              this.roomStore.setExportData(data);
+              this.curriculumStore.setExportData(data);
               console.log(data);
               setTimeout(() => {
                 const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('Room List');
+                const worksheet = workbook.addWorksheet('Curriculum List');
                 exportDataGridToExcel({
                   component: this.dataGrid.instance,
                   worksheet: worksheet,
@@ -618,7 +548,7 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
                   workbook.xlsx.writeBuffer().then((buffer) => {
                     saveAs(
                       new Blob([buffer], { type: 'application/octet-stream' }),
-                      'Room_List.xlsx'
+                      'Curriculum_List.xlsx'
                     );
                     this.store.setIsLoading(false);
                     this.store.showNotif('Export succesully', 'custom');
@@ -630,37 +560,17 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
       });
   }
 
-  // default export with selected row
-  // onExporting(e: any) {
-  //   const workbook = new ExcelJS.Workbook();
-  //   const worksheet = workbook.addWorksheet('Room List');
-
-  //   exportDataGrid({
-  //     component: e.component,
-  //     worksheet: worksheet,
-  //     autoFilterEnabled: true,
-  //   }).then(() => {
-  //     workbook.xlsx.writeBuffer().then((buffer) => {
-  //       saveAs(
-  //         new Blob([buffer], { type: 'application/octet-stream' }),
-  //         'Room_List.xlsx'
-  //       );
-  //     });
-  //   });
-  //   e.cancel = true;
-  // }
-
   exportGridToPdf(e: any) {
-    this.roomStore
+    this.curriculumStore
       .confirmDialog('This will export all data to pdf. Are you sure?')
       .then((result: boolean) => {
         if (result) {
           this.store.setIsLoading(true);
-          this.roomHTTP
+          this.curriculumHTTP
             .fetchAll()
             .toPromise()
             .then((data: any) => {
-              this.roomStore.setExportData(data);
+              this.curriculumStore.setExportData(data);
               console.log(data);
               setTimeout(() => {
                 const doc = new jsPDF();
@@ -668,7 +578,7 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
                   jsPDFDocument: doc,
                   component: this.dataGrid.instance,
                 }).then(() => {
-                  doc.save('Room_List.pdf');
+                  doc.save('Curriculum_List.pdf');
                   this.store.setIsLoading(false);
                   this.store.showNotif('Export succesully', 'custom');
                 });
@@ -679,21 +589,21 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
   }
 
   deleteAll() {
-    this.roomStore.deleteAllRooms();
+    this.curriculumStore.deleteAll();
   }
 
-  navigateToEditBill() {
-    this.router.navigate(['/edit_bill_list']);
+  navigateToStatistics() {
+    this.router.navigate(['/statistics']);
   }
 
   sourceDataListener() {
-    return this.roomStore.$roomList.subscribe((data: any) => {
-      this.roomList = data;
+    return this.curriculumStore.$curriculumList.subscribe((data: any) => {
+      this.curriculumList = data;
     });
   }
 
   currentPageListener() {
-    return this.roomStore.$currentPage.subscribe((data: any) => {
+    return this.curriculumStore.$currentPage.subscribe((data: any) => {
       this.currentIndexFromServer = data;
     });
   }
@@ -701,14 +611,22 @@ export class EditRoomListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.sourceDataListener();
     this.currentPageListener();
-    setTimeout(() => {
-      this.onRefresh();
-    }, 150);
+    this.subjectStore.fetchAll().then((data: any) => {
+      if (data.length !== 0) {
+        console.log('FILTER DATA: ');
+        console.log(data);
+        this.subjectList = data;
+        this.subjectList.unshift({ id: '(NONE)', name: '(NONE)' });
+        setTimeout(() => {
+          this.onRefresh();
+        }, 150);
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.sourceDataListener().unsubscribe();
     this.currentPageListener().unsubscribe();
-    this.onRefresh();
+    this.curriculumStore.resetState();
   }
 }

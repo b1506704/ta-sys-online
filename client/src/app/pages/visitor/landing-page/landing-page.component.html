@@ -1,80 +1,146 @@
-<div class="main">
-  <header class="header">
-    <ul class="menu" #menu>
-      <li class="menu__item">
-        <a class="menu__link">Home</a>
-      </li>
-      <li class="menu__item">
-        <a class="menu__link">About Us</a>
-      </li>
-      <li class="menu__item">
-        <a class="menu__link">How it Works</a>
-      </li>
-      <li class="menu__item">
-        <a class="menu__link">Benefits</a>
-      </li>
-      <li class="menu__item">
-        <a class="menu__link">Testimonials</a>
-      </li>
-    </ul>
-    <ul class="menu menu-right" #menuSecond>
-      <li class="menu__item">
-        <a class="menu__link">Blog</a>
-      </li>
-      <li class="menu__item">
-        <a class="menu__link">FAQ</a>
-      </li>
-    </ul>
-  </header>
-  <section class="first-section">
-    <div class="info">
-      <h1 class="heading-1">Real estate advice for real locals.</h1>
-      <p class="paragraph">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia adipisci
-        deserunt eaque.
-      </p>
-      <a class="btn btn--start">Get Started</a>
-    </div>
-    <div class="visuals">
-      <div class="image-container">
-        <img
-          #imageFirst
-          src="../../../../assets/imgs/tesla_director.jpg"
-          alt=""
-        />
+<h2 class="title" #title>Welcome To T.A.S Online</h2>
+<h2 class="subtitle" #subtitle>
+  Highly interactive online learning and teaching assistant platform
+</h2>
+<!-- #intro -->
+<dx-gallery
+  [dataSource]="dataSource"
+  [height]="'100vh'"
+  [slideshowDelay]="slideshowDelay"
+  [loop]="true"
+  width="100%"
+  [showNavButtons]="true"
+  [showIndicator]="true"
+  (onSelectionChanged)="onSelectionChanged($event)"
+>
+  <div *dxTemplate="let galleryItem of 'item'">
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+      "
+    >
+      <div class="img-container">
+        <img class="gallery-image" src="{{ galleryItem.imgUrl }}" />
       </div>
-      <div class="image-container">
-        <img
-          #imageSecond
-          src="../../../../assets/imgs/tesla_director.jpg"
-          alt=""
-        />
+      <div class="content-body">
+        <p class="gallery-title">{{ galleryItem.title }}</p>
+        <p class="gallery-subtitle">{{ galleryItem.subTitle }}</p>
+        <dx-button
+          icon="arrowright"
+          type="normal"
+          (onClick)="navigateInside()"
+          text="Click for more"
+        >
+        </dx-button>
       </div>
     </div>
-  </section>
-  <section class="second-section" #secondSection>
-    <div class="box"></div>
-    <h4 class="heading-4" id="about">About Us</h4>
-    <h1 class="heading-1" id="buy">
-      Buying a home doesn't have to be a mystery.
-    </h1>
-    <div class="info-1">
-      <div class="info-1__text">
-        <span class="quote"> " </span>
-        <h2 class="heading-3">
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-        </h2>
-        <p class="paragraph">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum labore
-          tempora eveniet adipisci sunt harum, eos nobis asperiores cumque
-          veniam fuga fugit eius ab reiciendis, culpa id recusandae illum
-          quisquam!
-        </p>
-        <a class="btn--learn">Learn More</a>
-      </div>
-      <div class="info-1__visual">
-        <img src="../../../../assets/imgs/tesla_director.jpg" alt="" />
-      </div>
+  </div>
+</dx-gallery>
+<h2 class="feature-heading">Features</h2>
+<div class="feature-container box-shadow" #feature1>
+  <div class="feature-content">
+    <div class="feature-title">DATAGRID EDITOR</div>
+    <div class="feature-body">
+      Fully functioned database management with cutting-edge tools and
+      techniques
     </div>
-  </section>
+    <div class="feature-icons">
+      <dx-button icon="splitcells" text="Row Edit"> </dx-button>
+      <dx-button icon="tableproperties" text="Column Edit"> </dx-button>
+      <dx-button icon="trash" text="Delete All"> </dx-button>
+      <dx-button icon="unselectall" text="Selective Remove"> </dx-button>
+      <dx-button icon="xlsxfile" text="Export XLSX"> </dx-button>
+      <dx-button icon="exportpdf" text="Export PDF"> </dx-button>
+      <dx-button icon="add" text="Live Insert"> </dx-button>
+      <dx-button icon="filter" text="Filter & Sort"> </dx-button>
+      <dx-button icon="search" text="Smart Search"> </dx-button>
+      <dx-button icon="range" text="Random Generate"> </dx-button>
+      <dx-button icon="globe" text="SS Pagination"> </dx-button>
+      <dx-button icon="verticalaligncenter" text="Responsive UI"></dx-button>
+    </div>
+  </div>
+  <div class="feature-img">
+    <img
+      src="../../../../assets/imgs/landing_page_9.png"
+      alt="..."
+      style="
+        height: 100%;
+        width: 100%;
+        border-radius: 15px;
+        box-shadow: rgba(79, 205, 255, 0.25) 0px 25px 50px -12px;
+      "
+    />
+  </div>
+</div>
+<div class="feature-container box-shadow" #feature2>
+  <div class="feature-content">
+    <div class="feature-title">DYNAMIC STATISTICS</div>
+    <div class="feature-body">
+      Providing a variety of charts with auto-calculating function and range
+      selectors.
+    </div>
+    <div class="feature-icons">
+      <dx-button icon="splitcells" text="Range Selector"> </dx-button>
+      <dx-button icon="refresh" text="Fetch Data"> </dx-button>
+      <dx-button icon="formula" text="Auto Calculate"> </dx-button>
+      <dx-button icon="like" text="Friendly UI"> </dx-button>
+    </div>
+  </div>
+  <div class="feature-img">
+    <img
+      src="../../../../assets/imgs/landing_page_10.png"
+      alt="..."
+      style="
+        height: 100%;
+        width: 100%;
+        border-radius: 15px;
+        box-shadow: rgba(79, 205, 255, 0.25) 0px 25px 50px -12px;
+      "
+    />
+  </div>
+</div>
+
+<h2 class="feature-heading">Organization</h2>
+<div class="organization-container" #organization1>
+  <div class="organization-img">
+    <img
+      src="../../../../assets/imgs/tesla_director.jpg"
+      alt="..."
+      style="
+        height: 300px;
+        width: 300px;
+        border-radius: 300px;
+        box-shadow: rgba(79, 205, 255, 0.25) 0px 25px 50px -12px;
+      "
+    />
+  </div>
+  <div class="organization-content">
+    <div class="feature-title">Le Bao Anh</div>
+    <div class="feature-body">Frontend Developer</div>
+  </div>
+</div>
+<div class="organization-container" #organization2>
+  <div class="organization-img">
+    <img
+      src="../../../../assets/imgs/tesla_director.jpg"
+      alt="..."
+      style="
+        height: 300px;
+        width: 300px;
+        border-radius: 300px;
+        box-shadow: rgba(79, 205, 255, 0.25) 0px 25px 50px -12px;
+      "
+    />
+  </div>
+  <div class="organization-content">
+    <div class="feature-title">Ha Tan Loc</div>
+    <div class="feature-body">Backend Developer.</div>
+  </div>
+</div>
+
+<div class="footer">
+  <h2>@{{ date }}. T. A. S Online</h2>
 </div>

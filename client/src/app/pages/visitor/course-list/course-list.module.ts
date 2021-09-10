@@ -9,6 +9,7 @@ import {
   DxSpeedDialActionModule,
   DxPopupModule,
   DxFormModule,
+  DxSelectBoxModule,
 } from 'devextreme-angular';
 import { CourseDetailComponent } from './course-detail/course-detail.component';
 import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module';
@@ -23,6 +24,7 @@ import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module
     DxSpeedDialActionModule,
     DxPopupModule,
     DxFormModule,
+    DxSelectBoxModule,
     FormatCurrencyModule,
   ],
   declarations: [CourseListComponent, CourseDetailComponent],

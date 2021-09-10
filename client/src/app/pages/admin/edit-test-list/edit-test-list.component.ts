@@ -7,28 +7,22 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as ExcelJS from 'exceljs';
 import saveAs from 'file-saver';
-import { Schedule } from 'src/app/shared/models/schedule';
-import { ScheduleHttpService } from 'src/app/shared/services/schedule/schedule-http.service';
-import { ScheduleStore } from 'src/app/shared/services/schedule/schedule-store.service';
+import { Test } from 'src/app/shared/models/test';
+import { TestHttpService } from 'src/app/shared/services/test/test-http.service';
+import { TestStore } from 'src/app/shared/services/test/test-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
+import { SubjectStore } from 'src/app/shared/services/subject/subject-store.service';
 
 @Component({
-  selector: 'app-edit-schedule',
-  templateUrl: './edit-schedule.component.html',
-  styleUrls: ['./edit-schedule.component.scss'],
+  selector: 'app-edit-test-list',
+  templateUrl: './edit-test-list.component.html',
+  styleUrls: ['./edit-test-list.component.scss'],
 })
-export class EditScheduleComponent implements OnInit, OnDestroy {
+export class EditTestListComponent implements OnInit, OnDestroy {
   @ViewChild(DxDataGridComponent, { static: false })
   dataGrid: DxDataGridComponent;
-  scheduleList!: Array<Schedule>;
-  instructorList: Array<Object> = [
-    { name: '(NONE)' },
-    { name: 'Dr. Strange Clone' },
-    { name: 'Dr. Alpha Clone' },
-    { name: 'Dr. Beta Clone' },
-    { name: 'Dr. Alien Clone' },
-    { name: 'Dr. Predator Clone' },
-  ];
+  testList!: Array<Test>;
+  subjectList: Array<Object> = [];
   selectedRows: string[];
   isSelectInfoVisible: boolean;
   selectInfoText: string;
@@ -36,22 +30,25 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
   pageSize: number = 5;
   allowedPageSizes: Array<number | string> = [5, 10, 15];
   scrollingMode: string = 'standard';
-  // standard | virtual | infinite
   currentIndexFromServer: number;
   isSearchingByName: boolean;
   isFilteringByCategory: boolean;
   isFilteringByPrice: boolean;
   isSortingByName: boolean;
 
-  currentCategoryFilterValue: string;
   timeout: any;
-  currentSearchByNameValue: string;
-  currentSortByPriceValue: string;
+  currentFilterByPropertyValue: string;
+  currentSearchByPropertyValue: string;
+  currentSortByPropertyValue: string;
+  currentSortProperty: string = 'maxScore';
+  currentSearchProperty: string = 'name';
+  currentFilterProperty: string = 'subjectId';
 
   constructor(
-    private scheduleStore: ScheduleStore,
+    private testStore: TestStore,
     private store: StoreService,
-    private scheduleHTTP: ScheduleHttpService,
+    private testHTTP: TestHttpService,
+    private subjectStore: SubjectStore,
     private router: Router
   ) {}
 
@@ -59,7 +56,7 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
     e.toolbarOptions.items.unshift(
       {
         location: 'before',
-        template: 'totalScheduleCount',
+        template: 'totalTestCount',
       },
       {
         location: 'after',
@@ -134,9 +131,9 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
         widget: 'dxButton',
         options: {
           type: 'normal',
-          icon: 'event',
+          icon: 'filter',
           disabled: true,
-          hint: 'Filter with date',
+          hint: 'Filter with subject',
         },
       },
       {
@@ -144,12 +141,12 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
         locateInMenu: 'auto',
         widget: 'dxSelectBox',
         options: {
-          items: this.instructorList,
-          valueExpr: 'name',
-          // searchExpr: 'name',
+          items: this.subjectList,
+          valueExpr: 'id',
+          searchExpr: 'name',
           displayExpr: 'name',
-          placeholder: 'Filter with instructor name',
-          // searchEnabled: true,
+          placeholder: 'Filter with subject',
+          searchEnabled: true,
           onValueChanged: this.onFilterChange.bind(this),
         },
       },
@@ -161,7 +158,7 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
           type: 'normal',
           icon: 'card',
           disabled: true,
-          hint: 'Sort by room',
+          hint: 'Sort by total cost',
         },
       },
       {
@@ -171,14 +168,14 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
         options: {
           items: [
             {
-              _id: '-1',
+              id: '-1',
               name: '(NONE)',
             },
-            { _id: '0', name: 'ASC' },
-            { _id: '1', name: 'DESC' },
+            { id: '0', name: 'asc' },
+            { id: '1', name: 'desc' },
           ],
           valueExpr: 'name',
-          placeholder: 'Sort by room',
+          placeholder: 'Sort by name',
           displayExpr: 'name',
           onValueChanged: this.onSortValueChanged.bind(this),
         },
@@ -192,11 +189,12 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
       this.isSearchingByName = true;
       this.isFilteringByCategory = false;
       this.isSortingByName = false;
-      console.log(this.currentSearchByNameValue);
-      if (this.currentSearchByNameValue !== '') {
-        this.scheduleStore.initSearchByNameData(
-          this.currentSearchByNameValue,
-          this.dataGrid.instance.pageIndex(),
+      console.log(this.currentSearchByPropertyValue);
+      if (this.currentSearchByPropertyValue !== '') {
+        this.testStore.initSearchByPropertyData(
+          this.currentSearchProperty,
+          this.currentSearchByPropertyValue,
+          this.dataGrid.instance.pageIndex() + 1,
           this.pageSize
         );
       } else {
@@ -208,18 +206,19 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
   }
 
   onSearchValueChanged(e: any) {
-    this.currentSearchByNameValue = e.value;
+    this.currentSearchByPropertyValue = e.value;
   }
 
   onSortValueChanged(e: any) {
     this.isSortingByName = true;
     this.isSearchingByName = false;
     this.isFilteringByCategory = false;
-    this.currentSortByPriceValue = e.value;
+    this.currentSortByPropertyValue = e.value;
     if (e.value !== '(NONE)') {
-      this.scheduleStore.initSortByPriceData(
+      this.testStore.initSortByPropertyData(
+        this.currentSortProperty,
         e.value,
-        this.dataGrid.instance.pageIndex(),
+        this.dataGrid.instance.pageIndex() + 1,
         this.pageSize
       );
     } else {
@@ -233,16 +232,16 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = true;
     this.isSearchingByName = false;
     this.isSortingByName = false;
-    this.currentCategoryFilterValue = e.value;
+    this.currentFilterByPropertyValue = e.value;
     console.log(e.value);
     if (e.value !== '(NONE)') {
-      this.scheduleStore.initFilterByCategoryData(
+      this.testStore.initFilterByPropertyData(
+        this.currentFilterProperty,
         e.value,
-        this.dataGrid.instance.pageIndex(),
+        this.dataGrid.instance.pageIndex() + 1,
         this.pageSize
       );
     } else {
-      //return to pure editor mode
       this.store.showNotif('FILTER MODE OFF', 'custom');
       this.onRefresh();
     }
@@ -264,9 +263,9 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
     const editorMode = this.checkEditorMode();
     // event of page index changed
     if (e.fullName === 'paging.pageIndex') {
-      const currentIndex: number = e.value;
+      const currentIndex: number = e.value + 1;
       console.log(
-        `New page index: ${currentIndex}. Total items: ${this.scheduleList.length}`
+        `New page index: ${currentIndex}. Total items: ${this.testList.length}`
       );
       switch (editorMode) {
         case 'NORMAL':
@@ -285,39 +284,36 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
           break;
       }
     }
-    // todo: handle virtual scrolling when pagesize = 'all'
-    //
-    // event of page size changed by user's click
     if (e.fullName === 'paging.pageSize') {
       this.pageSize = e.value;
       console.log(`Page size changed to ${e.value}`);
       switch (editorMode) {
         case 'NORMAL':
-          this.scheduleStore.loadDataAsync(
-            this.currentIndexFromServer,
-            e.value
-          );
+          this.testStore.loadDataAsync(this.currentIndexFromServer, e.value);
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'FILTER':
-          this.scheduleStore.filterScheduleByCategory(
-            this.currentCategoryFilterValue,
+          this.testStore.filterTestByProperty(
+            this.currentFilterProperty,
+            this.currentFilterByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'SEARCH':
-          this.scheduleStore.searchScheduleByName(
-            this.currentSearchByNameValue,
+          this.testStore.searchTestByProperty(
+            this.currentSearchProperty,
+            this.currentSearchByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
           this.goToPage(this.currentIndexFromServer);
           break;
         case 'SORT':
-          this.scheduleStore.sortScheduleByPrice(
-            this.currentSortByPriceValue,
+          this.testStore.sortTestByProperty(
+            this.currentSortProperty,
+            this.currentSortByPropertyValue,
             this.currentIndexFromServer,
             e.value
           );
@@ -330,107 +326,34 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
   }
 
   paginatePureData(index: number) {
-    if (index === 0) {
-      this.scheduleStore.loadDataAsync(index, this.pageSize);
-      this.scheduleStore.loadDataAsync(index + 1, this.pageSize);
-    } else {
-      this.scheduleStore.loadDataAsync(index, this.pageSize);
-      this.scheduleStore.loadDataAsync(index + 1, this.pageSize);
-      this.scheduleStore.loadDataAsync(index - 1, this.pageSize);
-    }
+    this.testStore.loadDataAsync(index, this.pageSize);
   }
 
   paginateFilterData(index: number) {
-    if (index === 0) {
-      this.scheduleStore.filterScheduleByCategory(
-        this.currentCategoryFilterValue,
-        index,
-        this.pageSize
-      );
-      this.scheduleStore.filterScheduleByCategory(
-        this.currentCategoryFilterValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.scheduleStore.filterScheduleByCategory(
-        this.currentCategoryFilterValue,
-        index,
-        this.pageSize
-      );
-      this.scheduleStore.filterScheduleByCategory(
-        this.currentCategoryFilterValue,
-        index + 1,
-        this.pageSize
-      );
-      this.scheduleStore.filterScheduleByCategory(
-        this.currentCategoryFilterValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.testStore.filterTestByProperty(
+      this.currentFilterProperty,
+      this.currentFilterByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSearchData(index: number) {
-    if (index === 0) {
-      this.scheduleStore.searchScheduleByName(
-        this.currentSearchByNameValue,
-        index,
-        this.pageSize
-      );
-      this.scheduleStore.searchScheduleByName(
-        this.currentSearchByNameValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.scheduleStore.searchScheduleByName(
-        this.currentSearchByNameValue,
-        index,
-        this.pageSize
-      );
-      this.scheduleStore.searchScheduleByName(
-        this.currentSearchByNameValue,
-        index + 1,
-        this.pageSize
-      );
-      this.scheduleStore.searchScheduleByName(
-        this.currentSearchByNameValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.testStore.searchTestByProperty(
+      this.currentSearchProperty,
+      this.currentSearchByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSortData(index: number) {
-    if (index === 0) {
-      this.scheduleStore.sortScheduleByPrice(
-        this.currentSortByPriceValue,
-        index,
-        this.pageSize
-      );
-      this.scheduleStore.sortScheduleByPrice(
-        this.currentSortByPriceValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.scheduleStore.sortScheduleByPrice(
-        this.currentSortByPriceValue,
-        index,
-        this.pageSize
-      );
-      this.scheduleStore.sortScheduleByPrice(
-        this.currentSortByPriceValue,
-        index + 1,
-        this.pageSize
-      );
-      this.scheduleStore.sortScheduleByPrice(
-        this.currentSortByPriceValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.testStore.sortTestByProperty(
+      this.currentSortProperty,
+      this.currentSortByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   onEditingStart() {
@@ -448,25 +371,24 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
     if (e.changes.length) {
       switch (e.changes[0].type) {
         case 'insert':
-          this.scheduleStore.uploadSchedule(
+          this.testStore.uploadTest(
             e.changes[0].data,
-            this.dataGrid.instance.pageIndex(),
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
           break;
         case 'update':
           console.log(e.changes[0]);
-          this.scheduleStore.updateSchedule(
+          this.testStore.updateTest(
             e.changes[0].data,
-            e.changes[0].key,
-            this.dataGrid.instance.pageIndex(),
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
           break;
         case 'remove':
-          this.scheduleStore.deleteSchedule(
-            e.changes[0].key,
-            this.dataGrid.instance.pageIndex(),
+          this.testStore.deleteTest(
+            [e.changes[0].key],
+            this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
           break;
@@ -506,10 +428,10 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
     this.store.setIsLoading(true);
     const editorMode = this.checkEditorMode();
     if (this.selectedRows.length) {
-      this.scheduleStore.confirmDialog('').then((result: boolean) => {
+      this.testStore.confirmDialog('').then((result: boolean) => {
         if (result) {
-          this.scheduleHTTP
-            .deleteSelectedSchedules(this.selectedRows)
+          this.testHTTP
+            .deleteTest(this.selectedRows)
             .toPromise()
             .then(() => {
               this.store.showNotif(
@@ -519,29 +441,32 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
               this.clearSelection();
               switch (editorMode) {
                 case 'NORMAL':
-                  this.scheduleStore.initData(
-                    this.dataGrid.instance.pageIndex(),
+                  this.testStore.initData(
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'FILTER':
-                  this.scheduleStore.initFilterByCategoryData(
-                    this.currentCategoryFilterValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.testStore.initFilterByPropertyData(
+                    this.currentFilterProperty,
+                    this.currentFilterByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'SORT':
-                  this.scheduleStore.initSortByPriceData(
-                    this.currentSortByPriceValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.testStore.initSortByPropertyData(
+                    this.currentSortProperty,
+                    this.currentSortByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
                 case 'SEARCH':
-                  this.scheduleStore.initSearchByNameData(
-                    this.currentSearchByNameValue,
-                    this.dataGrid.instance.pageIndex(),
+                  this.testStore.initSearchByPropertyData(
+                    this.currentSearchProperty,
+                    this.currentSearchByPropertyValue,
+                    this.dataGrid.instance.pageIndex() + 1,
                     this.pageSize
                   );
                   break;
@@ -566,14 +491,14 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = false;
     this.isSearchingByName = false;
     this.isSortingByName = false;
-    this.scheduleStore.initData(
-      this.dataGrid.instance.pageIndex(),
+    this.testStore.initData(
+      this.dataGrid.instance.pageIndex() + 1,
       this.pageSize
     );
   }
 
   onAddRandom() {
-    this.scheduleStore
+    this.testStore
       .confirmDialog(
         'This will generate random 100+ items in database. Are you sure'
       )
@@ -581,12 +506,12 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
         if (result) {
           this.isFilteringByCategory = false;
           this.store.setIsLoading(true);
-          this.scheduleHTTP
-            .generateRandomSchedule()
+          this.testHTTP
+            .generateRandomTest()
             .toPromise()
             .then(() => {
-              this.scheduleStore.initData(
-                this.dataGrid.instance.pageIndex(),
+              this.testStore.initData(
+                this.dataGrid.instance.pageIndex() + 1,
                 this.pageSize
               );
             })
@@ -599,22 +524,22 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
   }
 
   exportDataGridToExcel() {
-    this.scheduleStore
+    this.testStore
       .confirmDialog(
         'This will export all fetched data to excel. Are you sure?'
       )
       .then((result: boolean) => {
         if (result) {
           this.store.setIsLoading(true);
-          this.scheduleHTTP
+          this.testHTTP
             .fetchAll()
             .toPromise()
             .then((data: any) => {
-              this.scheduleStore.setExportData(data);
+              this.testStore.setExportData(data);
               console.log(data);
               setTimeout(() => {
                 const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('Schedule List');
+                const worksheet = workbook.addWorksheet('Test List');
                 exportDataGridToExcel({
                   component: this.dataGrid.instance,
                   worksheet: worksheet,
@@ -623,7 +548,7 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
                   workbook.xlsx.writeBuffer().then((buffer) => {
                     saveAs(
                       new Blob([buffer], { type: 'application/octet-stream' }),
-                      'Schedule_List.xlsx'
+                      'Test_List.xlsx'
                     );
                     this.store.setIsLoading(false);
                     this.store.showNotif('Export succesully', 'custom');
@@ -635,37 +560,17 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
       });
   }
 
-  // default export with selected row
-  // onExporting(e: any) {
-  //   const workbook = new ExcelJS.Workbook();
-  //   const worksheet = workbook.addWorksheet('Schedule List');
-
-  //   exportDataGrid({
-  //     component: e.component,
-  //     worksheet: worksheet,
-  //     autoFilterEnabled: true,
-  //   }).then(() => {
-  //     workbook.xlsx.writeBuffer().then((buffer) => {
-  //       saveAs(
-  //         new Blob([buffer], { type: 'application/octet-stream' }),
-  //         'Schedule_List.xlsx'
-  //       );
-  //     });
-  //   });
-  //   e.cancel = true;
-  // }
-
   exportGridToPdf(e: any) {
-    this.scheduleStore
+    this.testStore
       .confirmDialog('This will export all data to pdf. Are you sure?')
       .then((result: boolean) => {
         if (result) {
           this.store.setIsLoading(true);
-          this.scheduleHTTP
+          this.testHTTP
             .fetchAll()
             .toPromise()
             .then((data: any) => {
-              this.scheduleStore.setExportData(data);
+              this.testStore.setExportData(data);
               console.log(data);
               setTimeout(() => {
                 const doc = new jsPDF();
@@ -673,7 +578,7 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
                   jsPDFDocument: doc,
                   component: this.dataGrid.instance,
                 }).then(() => {
-                  doc.save('Schedule_List.pdf');
+                  doc.save('Test_List.pdf');
                   this.store.setIsLoading(false);
                   this.store.showNotif('Export succesully', 'custom');
                 });
@@ -684,21 +589,21 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
   }
 
   deleteAll() {
-    this.scheduleStore.deleteAllSchedules();
+    this.testStore.deleteAll();
   }
 
-  navigateToEditRoom() {
-    this.router.navigate(['/edit_room_list']);
+  navigateToStatistics() {
+    this.router.navigate(['/statistics']);
   }
 
   sourceDataListener() {
-    return this.scheduleStore.$scheduleList.subscribe((data: any) => {
-      this.scheduleList = data;
+    return this.testStore.$testList.subscribe((data: any) => {
+      this.testList = data;
     });
   }
 
   currentPageListener() {
-    return this.scheduleStore.$currentPage.subscribe((data: any) => {
+    return this.testStore.$currentPage.subscribe((data: any) => {
       this.currentIndexFromServer = data;
     });
   }
@@ -706,14 +611,22 @@ export class EditScheduleComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.sourceDataListener();
     this.currentPageListener();
-    setTimeout(() => {
-      this.onRefresh();
-    }, 150);
+    this.subjectStore.fetchAll().then((data: any) => {
+      if (data.length !== 0) {
+        console.log('FILTER DATA: ');
+        console.log(data);
+        this.subjectList = data;
+        this.subjectList.unshift({ id: '(NONE)', name: '(NONE)' });
+        setTimeout(() => {
+          this.onRefresh();
+        }, 150);
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.sourceDataListener().unsubscribe();
     this.currentPageListener().unsubscribe();
-    this.onRefresh();
+    this.testStore.resetState();
   }
 }

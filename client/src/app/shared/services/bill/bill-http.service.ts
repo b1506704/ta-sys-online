@@ -11,120 +11,89 @@ export class BillHttpService {
   apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Bill';
 
   fetchBill(page: number, size: number): Observable<Bill> {
-    const params = new HttpParams().set('page', page).set('size', size);
+    const params = new HttpParams()
+      .set('PageNumber', page)
+      .set('PageSize', size);
     console.log(params.toString());
-    return this.http.get<Bill>(this.apiUrl, {
+    return this.http.get<Bill>(this.apiUrl + '/paging', {
       params: params,
       reportProgress: true,
       observe: 'body',
     });
   }
 
-  searchBillByName(
+  fetchBillByLearnerID(
+    page: number,
+    size: number,
+    id: string
+  ): Observable<Bill> {
+    const params = new HttpParams()
+      .set('PageNumber', page)
+      .set('PageSize', size)
+      .set('Id', id);
+    console.log(params.toString());
+    return this.http.get<Bill>(this.apiUrl + '/byLearnerID', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
+  }
+
+  searchBillByProperty(
+    property: string,
     value: string,
     page: number,
     size: number
   ): Observable<Bill> {
     const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
+      .set('Property', property)
+      .set('Value', value)
+      .set('PageNumber', page)
+      .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<Bill>(
-      this.apiUrl + '/searchByName',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Bill>(this.apiUrl + '/search', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
-  filterBillByPrice(
-    criteria: string,
-    value: number,
-    page: number,
-    size: number
-  ): Observable<Bill> {
-    const params = new HttpParams()
-      .set('criteria', criteria)
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
-    console.log(params.toString());
-    return this.http.post<Bill>(
-      this.apiUrl,
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  filterBillByCategory(
+  filterBillByProperty(
+    property: string,
     value: string,
     page: number,
     size: number
   ): Observable<Bill> {
     const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
+      .set('Value', value)
+      .set('Property', property)
+      .set('PageNumber', page)
+      .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<Bill>(
-      this.apiUrl + '/filterByCategory',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Bill>(this.apiUrl + '/filter', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
-  sortBillByName(
+  sortBillByProperty(
     value: string,
+    order: string,
     page: number,
     size: number
   ): Observable<Bill> {
     const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
+      .set('SortBy', value)
+      .set('Order', order)
+      .set('PageNumber', page)
+      .set('PageSize', size);
     console.log(params.toString());
-    return this.http.post<Bill>(
-      this.apiUrl + '/sortByName',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  sortBillByPrice(
-    value: string,
-    page: number,
-    size: number
-  ): Observable<Bill> {
-    const params = new HttpParams()
-      .set('value', value)
-      .set('page', page)
-      .set('size', size);
-    console.log(params.toString());
-    return this.http.post<Bill>(
-      this.apiUrl + '/sortByPrice',
-      {},
-      {
-        params: params,
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Bill>(this.apiUrl + '/paging', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
   uploadBill(bill: Bill): Observable<Bill> {
@@ -135,25 +104,21 @@ export class BillHttpService {
   }
 
   generateRandomBill(): Observable<Bill> {
-    return this.http.post<Bill>(
-      this.apiUrl + '/randomBill',
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  deleteAllBills(): Observable<Bill> {
-    return this.http.post<Bill>(this.apiUrl + '/deleteAll',{}, {
+    return this.http.post<Bill>(this.apiUrl + '/randomBill', {
       reportProgress: true,
       observe: 'body',
     });
   }
 
-  deleteBill(id: string): Observable<ArrayBuffer> {
-    return this.http.delete<ArrayBuffer>(this.apiUrl + `/${id}`, {
+  deleteBill(id: Array<string>): Observable<Object> {
+    return this.http.post<Object>(this.apiUrl + '/delete', id, {
+      reportProgress: true,
+      observe: 'body',
+    });
+  }
+
+  deleteAll(): Observable<ArrayBuffer> {
+    return this.http.delete<ArrayBuffer>(this.apiUrl, {
       reportProgress: true,
       observe: 'body',
     });
@@ -166,38 +131,17 @@ export class BillHttpService {
     });
   }
 
-  deleteSelectedBills(
-    selectedItems: Array<string>
-  ): Observable<Array<string>> {
-    return this.http.post<Array<string>>(
-      this.apiUrl + '/batch',
-      selectedItems,
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
-  updateBill(bill: Bill, key: string): Observable<Bill> {
-    return this.http.post<Bill>(
-      this.apiUrl + `/updateBill/${key}`,
-      bill,
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+  updateBill(bill: Bill): Observable<Bill> {
+    return this.http.put<Bill>(this.apiUrl, bill, {
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 
   fetchAll(): Observable<Bill> {
-    return this.http.post<Bill>(
-      this.apiUrl + `/fetchAll`,
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
+    return this.http.get<Bill>(this.apiUrl, {
+      reportProgress: true,
+      observe: 'body',
+    });
   }
 }

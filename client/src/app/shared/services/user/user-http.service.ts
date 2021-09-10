@@ -167,4 +167,19 @@ export class UserHttpService {
       observe: 'body',
     });
   }
+
+  changePassword(
+    userId: string,
+    oldPassword: string,
+    newPassword: string
+  ): Observable<any> {
+    return this.http.post<any>(
+      this.apiUrl + `/api/UserAccount/${userId}/password`,
+      { oldPassword: oldPassword, newPassword: newPassword },
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
+  }
 }

@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { Schedule } from '../../models/schedule';
 import { StateService } from '../state.service';
 import { StoreService } from '../store.service';
@@ -11,6 +10,7 @@ interface ScheduleState {
   scheduleList: Array<Schedule>;
   exportData: Array<Schedule>;
   selectedSchedule: Object;
+  scheduleInstance: Schedule;
   totalPages: number;
   currentPage: number;
   totalItems: number;
@@ -19,6 +19,7 @@ interface ScheduleState {
 const initialState: ScheduleState = {
   scheduleList: [],
   selectedSchedule: {},
+  scheduleInstance: undefined,
   exportData: [],
   totalPages: 0,
   currentPage: 0,
@@ -47,11 +48,11 @@ export class ScheduleStore extends StateService<ScheduleState> {
    * @return {Array<Object>} Return an array with filled items from ss pagination
    * @example
    * this.setState({
-            pendingCheckupList: this.fillEmpty(
-              page,
+            sourceList: this.fillEmpty(
+              page - 1,
               size,
-              this.state.pendingCheckupList,
-              data.items
+              this.state.sourceList,
+              arrayItemFromServer
             ),
           });
    */
@@ -62,14 +63,16 @@ export class ScheduleStore extends StateService<ScheduleState> {
     addedArray: Array<Schedule>
   ): Array<Schedule> {
     let result: Array<Schedule> = sourceArray;
+    console.log('FILL INDEX');
     let fillIndex = startIndex * endIndex;
+    console.log(fillIndex);
     for (var j = 0; j < addedArray.length; j++) {
       result[fillIndex] = addedArray[j];
       fillIndex++;
     }
     // endIndex = pageSize
     // pageSize = 5
-    // 0 => 0 ,1,2,3,4,
+    // 0 => 0,1,2,3,4,
     // 1 -> 5,6,7,8,9
     // 2 -> 10,11,12,13,14
     // 17 -> 85,86,87,88,89
@@ -78,105 +81,282 @@ export class ScheduleStore extends StateService<ScheduleState> {
     return result;
   }
 
+  initInfiniteData(page: number, size: number) {
+    return this.scheduleService
+      .fetchSchedule(page, size)
+      .toPromise()
+      .then((data: any) => {
+        this.setState({
+          scheduleList: data.data,
+        });
+        console.log('Current flag: infite list');
+        console.log(this.state.scheduleList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+      });
+  }
+
+  loadInfiniteDataAsync(page: number, size: number) {
+    this.setIsLoading(true);
+    this.scheduleService.fetchSchedule(page, size).subscribe({
+      next: (data: any) => {
+        this.setState({
+          scheduleList: this.state.scheduleList.concat(data.data),
+        });
+        console.log('Infinite list');
+        console.log(this.state.scheduleList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
+  }
+
+  loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
+    this.setIsLoading(true);
+    this.scheduleService.fetchScheduleByLearnerID(page, size, learnerID).subscribe({
+      next: (data: any) => {
+        this.setState({
+          scheduleList: this.fillEmpty(
+            page - 1,
+            size,
+            this.state.scheduleList,
+            data.data
+          ),
+        });
+        console.log('Pure list');
+        console.log(this.state.scheduleList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
+  }
+
+  initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
+    return this.scheduleService
+      .fetchScheduleByLearnerID(page, size, learnerID)
+      .toPromise()
+      .then((data: any) => {
+        this.setState({
+          scheduleList: data.data,
+        });
+        console.log('Current flag: infite list');
+        console.log(this.state.scheduleList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+      });
+  }
+
+  loadInfiniteDataAsyncByLearnerID(
+    page: number,
+    size: number,
+    learnerID: string
+  ) {
+    this.setIsLoading(true);
+    this.scheduleService.fetchScheduleByLearnerID(page, size, learnerID).subscribe({
+      next: (data: any) => {
+        this.setState({
+          scheduleList: this.state.scheduleList.concat(data.data),
+        });
+        console.log('Infinite list');
+        console.log(this.state.scheduleList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
+  }
+
   initData(page: number, size: number) {
     this.scheduleService
       .fetchSchedule(page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          scheduleList: new Array<Schedule>(data.totalItems),
+          scheduleList: new Array<Schedule>(data.totalRecords),
         });
         console.log('Current flag: pure list');
         console.log(this.state.scheduleList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
         this.loadDataAsync(page, size);
       });
   }
 
-  initFilterByCategoryData(value: string, page: number, size: number) {
+  initFilterByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Filtered Mode On', 'custom');
     this.scheduleService
-      .filterScheduleByCategory(value, 0, 5)
+      .filterScheduleByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          scheduleList: new Array<Schedule>(data.totalItems),
+          scheduleList: new Array<Schedule>(data.totalRecords),
         });
         console.log('Current flag: filtered list');
         console.log(this.state.scheduleList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.filterScheduleByCategory(value, page, size);
+        this.filterScheduleByProperty(property, value, page, size);
       });
   }
 
-  initSearchByNameData(value: string, page: number, size: number) {
-    this.store.showNotif('Searched Mode On', 'custom');
+  initInfiniteFilterByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.store.showNotif('Filtered Mode On', 'custom');
     this.scheduleService
-      .searchScheduleByName(value, 0, 5)
+      .filterScheduleByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          scheduleList: new Array<Schedule>(data.totalItems),
+          scheduleList: data.data,
+        });
+        console.log('Current flag: infinite filtered list');
+        console.log(this.state.scheduleList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+      });
+  }
+
+  initSearchByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.store.showNotif('Searched Mode On', 'custom');
+    this.scheduleService
+      .searchScheduleByProperty(property, value, page, size)
+      .toPromise()
+      .then((data: any) => {
+        this.setState({
+          scheduleList: new Array<Schedule>(data.totalRecords),
         });
         console.log('Current flag: searched list');
         console.log(this.state.scheduleList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.searchScheduleByName(value, page, size);
+        this.searchScheduleByProperty(property, value, page, size);
       });
   }
 
-  initSortByPriceData(value: string, page: number, size: number) {
+  initInfiniteSearchByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.store.showNotif('Searched Mode On', 'custom');
+    this.scheduleService
+      .searchScheduleByProperty(property, value, page, size)
+      .toPromise()
+      .then((data: any) => {
+        if (data.totalRecords !== 0) {
+          this.setState({
+            scheduleList: data.data,
+          });
+        } else {
+          this.store.showNotif('No result found!', 'custom');
+        }
+        console.log('Current flag: infitite searched list');
+        console.log(this.state.scheduleList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+      });
+  }
+
+  initSortByPropertyData(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Sort Mode On', 'custom');
     this.scheduleService
-      .sortScheduleByPrice(value, 0, 5)
+      .sortScheduleByProperty(value, order, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          scheduleList: new Array<Schedule>(data.totalItems),
+          scheduleList: new Array<Schedule>(data.totalRecords),
         });
         console.log('Current flag: sort list');
         console.log(this.state.scheduleList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.sortScheduleByPrice(value, page, size);
+        this.sortScheduleByProperty(value, order, page, size);
       });
   }
 
-  initSortByName(value: string, page: number, size: number) {
+  initInfiniteSortByPropertyData(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Sort Mode On', 'custom');
     this.scheduleService
-      .sortScheduleByName(value, 0, 5)
+      .sortScheduleByProperty(value, order, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          scheduleList: new Array<Schedule>(data.totalItems),
+          scheduleList: data.data,
         });
         console.log('Current flag: sort list');
         console.log(this.state.scheduleList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-      })
-      .then(() => {
-        this.sortScheduleByName(value, page, size);
+        this.setState({ currentPage: data.pageNumber });
       });
   }
-
 
   loadDataAsync(page: number, size: number) {
     this.setIsLoading(true);
@@ -184,19 +364,19 @@ export class ScheduleStore extends StateService<ScheduleState> {
       next: (data: any) => {
         this.setState({
           scheduleList: this.fillEmpty(
-            page,
+            page - 1,
             size,
             this.state.scheduleList,
-            data.items
+            data.data
           ),
         });
         console.log('Pure list');
         console.log(this.state.scheduleList);
         console.log('Server response');
         console.log(data);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
         this.setIsLoading(false);
       },
       error: (data: any) => {
@@ -213,15 +393,15 @@ export class ScheduleStore extends StateService<ScheduleState> {
       next: (data: any) => {
         this.setState({
           scheduleList: this.fillEmpty(
-            page,
+            page - 1,
             size,
             this.state.scheduleList,
-            data.items
+            data.data
           ),
         });
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
         console.log('Pure list');
         console.log(this.state.scheduleList);
         console.log('Server response');
@@ -259,6 +439,10 @@ export class ScheduleStore extends StateService<ScheduleState> {
     (state) => state.selectedSchedule
   );
 
+  $scheduleInstance: Observable<Schedule> = this.select(
+    (state) => state.scheduleInstance
+  );
+
   uploadSchedule(schedule: Schedule, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
@@ -282,11 +466,11 @@ export class ScheduleStore extends StateService<ScheduleState> {
     });
   }
 
-  updateSchedule(schedule: Schedule, key: string, page: number, size: number) {
+  updateSchedule(schedule: Schedule, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.scheduleService.updateSchedule(schedule, key).subscribe({
+        this.scheduleService.updateSchedule(schedule).subscribe({
           next: (data: any) => {
             this.setState({ responseMsg: data });
             console.log(data);
@@ -319,38 +503,32 @@ export class ScheduleStore extends StateService<ScheduleState> {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.scheduleService
-          .deleteSelectedSchedules(selectedSchedules)
-          .subscribe({
-            next: (data: any) => {
-              this.setState({ responseMsg: data });
-              console.log(data);
-              this.loadDataAsync(page, size);
-              console.log(this.state.scheduleList);
-              this.setIsLoading(false);
-              this.store.showNotif(data.responseMessage, 'custom');
-            },
-            error: (data: any) => {
-              this.setIsLoading(false);
-              this.store.showNotif(data.error.responseMessage, 'error');
-              console.log(data);
-            },
-          });
+        this.scheduleService.deleteSchedule(selectedSchedules).subscribe({
+          next: (data: any) => {
+            this.setState({ responseMsg: data });
+            console.log(data);
+            this.loadDataAsync(page, size);
+            console.log(this.state.scheduleList);
+            this.setIsLoading(false);
+            this.store.showNotif(data.responseMessage, 'custom');
+          },
+          error: (data: any) => {
+            this.setIsLoading(false);
+            this.store.showNotif(data.error.responseMessage, 'error');
+            console.log(data);
+          },
+        });
       }
     });
   }
 
-  deleteAllSchedules() {
+  deleteAll() {
     this.confirmDialog('Delete all items?').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.scheduleService.deleteAllSchedules().subscribe({
+        this.scheduleService.deleteAll().subscribe({
           next: (data: any) => {
-            this.setState({ responseMsg: data });
-            this.setState({ scheduleList: [] });
-            this.setState({ totalPages: 0 });
-            this.setState({ currentPage: 0 });
-            this.setState({ totalItems: 0 });
+            this.resetState();
             console.log(data);
             this.setIsLoading(false);
             this.store.showNotif(data.responseMessage, 'custom');
@@ -365,7 +543,7 @@ export class ScheduleStore extends StateService<ScheduleState> {
     });
   }
 
-  deleteSchedule(id: string, page: number, size: number) {
+  deleteSchedule(id: Array<string>, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
@@ -402,31 +580,36 @@ export class ScheduleStore extends StateService<ScheduleState> {
 
   setCurrentPage(_currentPage: number) {
     this.setState({ currentPage: _currentPage });
-  }  
+  }
 
-  filterScheduleByPrice(
-    criteria: string,
-    value: number,
+  filterScheduleByProperty(
+    property: string,
+    value: string,
     page: number,
     size: number
   ) {
     this.setIsLoading(true);
     this.scheduleService
-      .filterScheduleByPrice(criteria, value, page, size)
+      .filterScheduleByProperty(property, value, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({ responseMsg: data });
-          this.setState({
-            scheduleList: this.fillEmpty(
-              page,
-              size,
-              this.state.scheduleList,
-              data.items
-            ),
-          });
-          this.setState({ totalItems: data.totalItems });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.currentPage });
+          if (data.totalRecords !== 0) {
+            this.setState({
+              scheduleList: this.fillEmpty(
+                page - 1,
+                size,
+                this.state.scheduleList,
+                data.data
+              ),
+            });
+            console.log('Filtered list');
+            console.log(this.state.scheduleList);
+            console.log('Server response');
+            console.log(data);
+            this.setState({ totalItems: data.totalRecords });
+            this.setState({ totalPages: data.totalPages });
+            this.setState({ currentPage: data.pageNumber });
+          }
           this.setIsLoading(false);
         },
         error: (data: any) => {
@@ -437,125 +620,197 @@ export class ScheduleStore extends StateService<ScheduleState> {
       });
   }
 
-  filterScheduleByCategory(value: string, page: number, size: number) {
+  filterInfiniteScheduleByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.setIsLoading(true);
-    this.scheduleService.filterScheduleByCategory(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          scheduleList: this.fillEmpty(
-            page,
-            size,
-            this.state.scheduleList,
-            data.items
-          ),
-        });
-        console.log('Filtered list');
-        console.log(this.state.scheduleList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.scheduleService
+      .filterScheduleByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            scheduleList: this.state.scheduleList.concat(data),
+          });
+          console.log('Filtered list');
+          console.log(this.state.scheduleList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
-  searchScheduleByName(value: string, page: number, size: number) {
+  searchScheduleByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.setIsLoading(true);
-    this.scheduleService.searchScheduleByName(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          scheduleList: this.fillEmpty(
-            page,
-            size,
-            this.state.scheduleList,
-            data.items
-          ),
-        });
-        console.log('Searched list');
-        console.log(this.state.scheduleList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.scheduleService
+      .searchScheduleByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            this.setState({
+              scheduleList: this.fillEmpty(
+                page - 1,
+                size,
+                this.state.scheduleList,
+                data.data
+              ),
+            });
+          } else {
+            this.store.showNotif('No result found!', 'custom');
+          }
+          console.log('Searched list');
+          console.log(this.state.scheduleList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
-  sortScheduleByName(value: string, page: number, size: number) {
+  searchInfiniteScheduleByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.setIsLoading(true);
-    this.scheduleService.sortScheduleByName(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({ responseMsg: data });
-        this.setState({
-          scheduleList: this.fillEmpty(
-            page,
-            size,
-            this.state.scheduleList,
-            data.items
-          ),
-        });
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        console.log('Sorted list');
-        console.log(this.state.scheduleList);
-        console.log('Server response');
-        console.log(data);
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.scheduleService
+      .searchScheduleByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            this.setState({
+              scheduleList: this.state.scheduleList.concat(data),
+            });
+          } else {
+            this.store.showNotif('No result found!', 'custome');
+          }
+          console.log('Infite searched list');
+          console.log(this.state.scheduleList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
-  sortScheduleByPrice(value: string, page: number, size: number) {
+  sortScheduleByProperty(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
     this.setIsLoading(true);
-    this.scheduleService.sortScheduleByPrice(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({ responseMsg: data });
-        this.setState({
-          scheduleList: this.fillEmpty(
-            page,
-            size,
-            this.state.scheduleList,
-            data.items
-          ),
-        });
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        console.log('Sorted list');
-        console.log(this.state.scheduleList);
-        console.log('Server response');
+    this.scheduleService
+      .sortScheduleByProperty(value, order, page, size)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({ responseMsg: data });
+          this.setState({
+            scheduleList: this.fillEmpty(
+              page - 1,
+              size,
+              this.state.scheduleList,
+              data.data
+            ),
+          });
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          console.log('Sorted list');
+          console.log(this.state.scheduleList);
+          console.log('Server response');
+          console.log(data);
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  sortInfiniteScheduleByProperty(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.scheduleService
+      .sortScheduleByProperty(value, order, page, size)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            scheduleList: this.state.scheduleList.concat(data),
+          });
+          console.log('Infite sorted list');
+          console.log(this.state.scheduleList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  getSchedule(id: string) {
+    this.setIsLoading(true);
+    return this.scheduleService
+      .getSchedule(id)
+      .toPromise()
+      .then((data: any) => {
+        this.setState({ scheduleInstance: data });
         console.log(data);
         this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+      });
   }
 
   setExportData(array: Array<Schedule>) {
     this.setState({ scheduleList: array });
+  }
+
+  resetState() {
+    this.setState(initialState);
   }
 }
