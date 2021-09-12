@@ -14,9 +14,10 @@ import { DxButtonModule } from 'devextreme-angular/ui/button';
 import { DxToolbarModule } from 'devextreme-angular/ui/toolbar';
 
 import { Router } from '@angular/router';
-import { DxLoadIndicatorModule } from 'devextreme-angular';
+import { DxLoadIndicatorModule, DxProgressBarModule } from 'devextreme-angular';
 import { StoreService } from '../../services/store.service';
 import { UserStore } from '../../services/user/user-store.service';
+import { ScreenService } from '../../services/screen.service';
 
 @Component({
   selector: 'app-header',
@@ -43,14 +44,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
     },
   ];
 
-  isLoadIndicatorVisible!: boolean;
+  isLoadIndicatorVisible: boolean = false;
   isLoggedIn!: boolean;
   isRoleSelected: boolean = false;
+  eventType: string = '';
+  progress!: number;
+  maxValue: number = 100;
+  responsiveWidth: any;
 
   constructor(
     private router: Router,
     private store: StoreService,
-    private userStore: UserStore
+    private userStore: UserStore,
+    private screenService: ScreenService
   ) {}
 
   roleNameListener() {
@@ -67,6 +73,42 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return this.store.$isLoading.subscribe((data: any) => {
       this.isLoadIndicatorVisible = data;
     });
+  }
+
+  responsiveAdapt() {
+    const isXSmall = this.screenService.sizes['screen-x-small'];
+    const isSmall = this.screenService.sizes['screen-small'];
+    if (isXSmall === true) {
+      this.responsiveWidth = 100;
+    } else if (isSmall === true) {
+      this.responsiveWidth = 120;
+    } else {
+      this.responsiveWidth = 300;
+    }
+  }
+
+  responseProgressListener() {
+    return this.store.$responseProgress.subscribe((data: any) => {
+      if (data !== undefined && data !==NaN) {
+        this.progress = data;
+        console.log('RECEIVED PROGRESS');
+        console.log(this.progress);
+      }
+    });
+  }
+
+  responseEventTypeListener() {
+    return this.store.$responseEventType.subscribe((data: any) => {
+      if (data !== undefined) {
+        this.eventType = data;
+        console.log('EVENT TYPE');
+        console.log(this.eventType);
+      }
+    });
+  }
+
+  format(value: number) {
+    return `Loading: ${(value * 100).toFixed(2)}%`;
   }
 
   isLoginListener() {
@@ -96,6 +138,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit() {
+    this.responsiveAdapt();
+    this.responseProgressListener();
+    this.responseEventTypeListener();
     this.isLoadingListener();
     this.isLoginListener();
     this.roleNameListener();
@@ -105,6 +150,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.isLoadingListener().unsubscribe();
     this.isLoginListener().unsubscribe();
     this.roleNameListener().unsubscribe();
+    this.responseProgressListener().unsubscribe();
+    this.responseEventTypeListener().unsubscribe();
   }
 }
 
@@ -113,6 +160,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     CommonModule,
     DxButtonModule,
     UserPanelModule,
+    DxProgressBarModule,
     DxToolbarModule,
     DxLoadIndicatorModule,
   ],

@@ -9,9 +9,9 @@ import {
 import { Image } from 'src/app/shared/models/image';
 import { DxFormComponent } from 'devextreme-angular';
 import { StoreService } from 'src/app/shared/services/store.service';
-import { CustomerHttpService } from 'src/app/shared/services/customer/customer-http.service';
-import { DoctorHttpService } from 'src/app/shared/services/doctor/doctor-http.service';
-import { MedicineHttpService } from 'src/app/shared/services/medicine/medicine-http.service';
+import { LearnerHttpService } from 'src/app/shared/services/learner/learner-http.service';
+import { InstructorHttpService } from 'src/app/shared/services/instructor/instructor-http.service';
+import { PostHttpService } from 'src/app/shared/services/post/post-http.service';
 import { ImageHttpService } from 'src/app/shared/services/image/image-http.service';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
 @Component({
@@ -70,25 +70,25 @@ export class UploadToolComponent implements OnInit, OnDestroy, OnChanges {
     private imageService: ImageHttpService,
     private fileStore: FileStore,
     private store: StoreService,
-    private customerService: CustomerHttpService,
-    private doctorService: DoctorHttpService,
-    private medicineService: MedicineHttpService
+    private learnerService: LearnerHttpService,
+    private instructorService: InstructorHttpService,
+    private postService: PostHttpService
   ) {}
 
   onCategoryValueChanged(e: any) {
     this.imageData.category = e.value;
     this.searchValue = '';
     switch (e.value) {
-      case 'customer':
-      case 'doctor':
+      case 'learner':
+      case 'instructor':
         this.valueExpr = 'fullName';
         this.searchCategory = 'Full Name';
         this.searchPlaceholder = 'Search full name';
         break;
-      case 'medicine':
+      case 'post':
         this.valueExpr = 'name';
-        this.searchCategory = 'Medicine Name';
-        this.searchPlaceholder = 'Search medicine name';
+        this.searchCategory = 'Post Name';
+        this.searchPlaceholder = 'Search post name';
         break;
       default:
         break;
@@ -177,13 +177,13 @@ export class UploadToolComponent implements OnInit, OnDestroy, OnChanges {
         }
       });
     switch (this.imageData?.category) {
-      case 'doctor':
-      case 'customer':
+      case 'instructor':
+      case 'learner':
         this.imageData.title = e.itemData.fullName;
         this.imageData.fileName = e.itemData.fullName;
         this.fileData.fileName = e.itemData.fullName;
         break;
-      case 'medicine':
+      case 'post':
         this.imageData.title = e.itemData.name;
         this.imageData.fileName = e.itemData.name;
         this.fileData.fileName = e.itemData.name;
@@ -198,9 +198,14 @@ export class UploadToolComponent implements OnInit, OnDestroy, OnChanges {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
       switch (this.imageData?.category) {
-        case 'doctor':
-          this.doctorService
-            .searchDoctorByName(this.searchValue, 0, this.pageSize)
+        case 'instructor':
+          this.instructorService
+            .searchInstructorByProperty(
+              this.searchCategory,
+              this.searchValue,
+              0,
+              this.pageSize
+            )
             .subscribe((data: any) => {
               if (data.length !== 0) {
                 this.searchData = data.items;
@@ -219,9 +224,9 @@ export class UploadToolComponent implements OnInit, OnDestroy, OnChanges {
               }
             });
           break;
-        case 'customer':
-          this.customerService
-            .searchCustomerByName(this.searchValue, 0, this.pageSize)
+        case 'learner':
+          this.learnerService
+            .searchLearnerByName(this.searchValue, 0, this.pageSize)
             .subscribe((data: any) => {
               if (data.length !== 0) {
                 this.searchData = data.items;
@@ -239,9 +244,14 @@ export class UploadToolComponent implements OnInit, OnDestroy, OnChanges {
               }
             });
           break;
-        case 'medicine':
-          this.medicineService
-            .searchMedicineByName(this.searchValue, 0, this.pageSize)
+        case 'post':
+          this.postService
+            .searchPostByProperty(
+              this.searchCategory,
+              this.searchValue,
+              0,
+              this.pageSize
+            )
             .subscribe((data: any) => {
               if (data.length !== 0) {
                 this.searchData = data.items;

@@ -6,6 +6,9 @@ import { StateService } from './state.service';
 interface StoreState {
   currentUser: string;
   currentUserId: string;
+  responseList: Array<Object>;
+  responseEventType: string;
+  responseProgress: number;
   currentRoleId: string;
   currentRoleName: string;
   isLoading: boolean;
@@ -15,6 +18,9 @@ interface StoreState {
 }
 const initialState: StoreState = {
   isPreloading: true,
+  responseList: [],
+  responseProgress: undefined,
+  responseEventType: undefined,
   currentUser: undefined,
   currentUserId: undefined,
   currentRoleId: undefined,
@@ -56,6 +62,18 @@ export class StoreService extends StateService<StoreState> {
     (state) => state.currentRoleName
   );
 
+  $responseList: Observable<Object> = this.select(
+    (state) => state.responseList
+  );
+
+  $responseProgress: Observable<number> = this.select(
+    (state) => state.responseProgress
+  );
+
+  $responseEventType: Observable<string> = this.select(
+    (state) => state.responseEventType
+  );
+
   loadDataAsync() {}
 
   setIsLoading(_isLoading: boolean) {
@@ -72,6 +90,25 @@ export class StoreService extends StateService<StoreState> {
 
   setNotifType(type: string) {
     this.setState({ notifType: type });
+  }
+
+  setResponseProgress(progress: number) {
+    this.setState({ responseProgress: progress });
+  }
+
+  setResponseEventType(eventType: string) {
+    this.setState({ responseEventType: eventType });
+  }
+  //todo: manage response progress array
+
+  addResponse(response: Object) {
+    this.setState({ responseList: this.state.responseList.concat(response) });
+  }
+
+  removeResponse(id: any) {
+    this.setState({
+      responseList: this.state.responseList.filter((e: any) => e?.id === id),
+    });
   }
 
   setCurrentUser(name: string) {

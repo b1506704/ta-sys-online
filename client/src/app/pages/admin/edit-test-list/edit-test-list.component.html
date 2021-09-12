@@ -78,31 +78,33 @@
     >
     </dxo-pager>
     <dxo-load-panel [enabled]="true"></dxo-load-panel>
-
+    <dxi-column dataField="courseId" [width]="'10%'">
+      <dxi-validation-rule type="required"></dxi-validation-rule>
+    </dxi-column>
     <dxi-column dataField="name">
       <dxi-validation-rule type="required"></dxi-validation-rule>
-    </dxi-column>  
+    </dxi-column>
     <dxi-column dataField="description">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column>
-    <dxi-column dataField="allocatedTime">
+    <dxi-column dataField="allocatedTime" dataType="number">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column>
-    <dxi-column dataField="deadline">
+    <dxi-column dataField="deadline" dataType="date">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column>
-    <dxi-column dataField="totalQuestion">
+    <dxi-column dataField="totalQuestions" dataType="number">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column>
-    <dxi-column dataField="maxScore">
+    <dxi-column dataField="maxScore" dataType="number">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column>
-    <dxi-column dataField="totalAttempt">
+    <dxi-column dataField="totalAttempt" dataType="number">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column>
-    <dxi-column dataField="maxAttempt">
+    <dxi-column dataField="maxAttempt" dataType="number">
       <dxi-validation-rule type="required"></dxi-validation-rule>
-    </dxi-column>   
+    </dxi-column>
     <div *dxTemplate="let data of 'totalTestCount'">
       <span>Total Test: {{ testList.length }} </span>
     </div>

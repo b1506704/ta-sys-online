@@ -75,7 +75,7 @@ export class UserInfoHttpService {
       reportProgress: true,
       observe: 'body',
     });
-  }
+  }  
 
   sortUserInfoByProperty(
     value: string,

@@ -3,12 +3,16 @@ import {
   HttpHandler,
   HttpEvent,
   HttpRequest,
+  HttpEventType,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { StoreService } from './store.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthInterceptor implements HttpInterceptor {
+  constructor(private store: StoreService) {}
   intercept(
     req: HttpRequest<any>,
     next: HttpHandler
@@ -20,7 +24,45 @@ export class AuthInterceptor implements HttpInterceptor {
       });
       console.log('AUTH REQ:');
       console.log(cloned);
-      return next.handle(cloned);
+      return next.handle(cloned).pipe(
+        tap((event) => {
+          //todo: manage response progress array
+          // const miliseconds = new Date().valueOf();
+          if (event.type == HttpEventType.Sent) {
+            console.log('Request sent');
+            // this.store.addResponse({id: miliseconds, type: 'Requesting', progress: 0});
+            // this.store.setResponseEventType('Requesting');
+            this.store.setResponseProgress(0);
+          }
+          if (event.type === HttpEventType.DownloadProgress) {
+            console.log(event.loaded);
+            console.log(event.total);
+            const progress = (event.loaded / event.total) * 100;
+            console.log('DOWNLOAD PROGRESS');
+            console.log(progress);
+            if (progress !== NaN) {
+              this.store.setResponseProgress(progress);
+            }
+            // this.store.setResponseEventType('Downloading');
+          }
+          if (event.type === HttpEventType.UploadProgress) {
+            console.log(event.loaded);
+            console.log(event.total);
+            const progress = (event.loaded / event.total) * 100;
+            console.log('UPLOAD PROGRESS');
+            console.log(progress);
+            // this.store.setResponseEventType('Sending');
+            if (progress !== NaN) {
+              this.store.setResponseProgress(progress);
+            }
+          }
+          if (event.type === HttpEventType.Response) {
+            // this.store.setResponseEventType('Finishing');
+            console.log('Content downloaded completely');
+            this.store.setResponseProgress(100);
+          }
+        })
+      );
     } else {
       console.log(req);
       return next.handle(req);

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { User } from '../models/user';
 import { UserStore } from './user/user-store.service';
 
 @Injectable({
@@ -10,7 +9,7 @@ export class AuthService {
   sendLoginRequest(user: any) {
     this.userService.loginUser(user);
   }
-  sendRegisterRequest(user: User) {
-    this.userService.uploadUser(user, 0, 5);
+  sendRegisterRequest(user: any) {
+    this.userService.signupUser(user);
   }
 }

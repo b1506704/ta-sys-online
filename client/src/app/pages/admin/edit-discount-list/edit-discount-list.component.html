@@ -79,16 +79,16 @@
     </dxo-pager>
     <dxo-load-panel [enabled]="true"></dxo-load-panel>
 
-    <dxi-column dataField="courseID">
+    <dxi-column dataField="courseId">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column>
     <dxi-column dataField="title">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column>
-    <dxi-column dataField="rate">
+    <dxi-column dataField="rate" dataType="number">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column>
-    <dxi-column dataField="duration">
+    <dxi-column dataField="duration" dataType="number">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column>    
     <div *dxTemplate="let data of 'totalDiscountCount'">

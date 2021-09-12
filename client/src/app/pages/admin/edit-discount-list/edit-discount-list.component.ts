@@ -175,7 +175,7 @@ export class EditDiscountListComponent implements OnInit, OnDestroy {
             { id: '1', name: 'desc' },
           ],
           valueExpr: 'name',
-          placeholder: 'Sort by name',
+          placeholder: 'Sort by rate',
           displayExpr: 'name',
           onValueChanged: this.onSortValueChanged.bind(this),
         },

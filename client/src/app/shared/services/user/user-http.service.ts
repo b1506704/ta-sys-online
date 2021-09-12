@@ -77,6 +77,52 @@ export class UserHttpService {
     });
   }
 
+  filterSearchUserByProperty(
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
+    page: number,
+    size: number
+  ): Observable<User> {
+    const params = new HttpParams()
+      .set('FilterValue', filterValue)
+      .set('FilterProperty', filterProperty)
+      .set('SearchValue', searchValue)
+      .set('SearchProperty', searchProperty)
+      .set('PageNumber', page)
+      .set('PageSize', size);
+    console.log(params.toString());
+    return this.http.get<User>(this.apiUrl + '/api/UserAccount/filter-search', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
+  }
+
+  filterSortUserByProperty(
+    filterProperty: string,
+    filterValue: string,
+    sortProperty: string,
+    sortValue: string,
+    page: number,
+    size: number
+  ): Observable<User> {
+    const params = new HttpParams()
+      .set('Value', filterValue)
+      .set('Property', filterProperty)
+      .set('Order', sortValue)
+      .set('SortBy', sortProperty)
+      .set('PageNumber', page)
+      .set('PageSize', size);
+    console.log(params.toString());
+    return this.http.get<User>(this.apiUrl + '/api/UserAccount/filter', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
+  }
+
   sortUserByProperty(
     value: string,
     order: string,
@@ -96,8 +142,8 @@ export class UserHttpService {
     });
   }
 
-  uploadUser(user: User): Observable<User> {
-    return this.http.post<User>(this.apiUrl + '/api/UserAccount', user, {
+  uploadUser(user: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl + '/api/UserAccount', user, {
       reportProgress: true,
       observe: 'body',
     });
@@ -159,6 +205,17 @@ export class UserHttpService {
         observe: 'body',
       })
       .pipe(shareReplay());
+  }
+
+  signupUser(user: any): Observable<any> {
+    return this.http.post<any>(
+      this.apiUrl + '/api/Authenticate/Register',
+      user,
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   logoutUser(user: User): Observable<User> {

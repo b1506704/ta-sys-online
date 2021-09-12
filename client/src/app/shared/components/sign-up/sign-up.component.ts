@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { DxFormComponent } from 'devextreme-angular';
-import { User } from '../../models/user';
 import { AuthService } from '../../services/auth.service';
 import { StoreService } from '../../services/store.service';
 import { UserStore } from '../../services/user/user-store.service';
@@ -18,7 +17,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     mode: 'password',
     value: this.password,
   };
-  user: User;
+  user: any;
   roleList: Array<any> = [];
   roleSelectBoxOptions: any = {
     items: this.roleList,
@@ -95,7 +94,6 @@ export class SignUpComponent implements OnInit, OnDestroy {
       },
     };
     this.user = {
-      id: undefined,
       username: '',
       password: '',
       displayName: '',

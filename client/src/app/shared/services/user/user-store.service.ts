@@ -506,7 +506,7 @@ export class UserStore extends StateService<UserState> {
 
   $userInstance: Observable<User> = this.select((state) => state.userInstance);
 
-  uploadUser(user: User, page: number, size: number) {
+  uploadUser(user: any, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
@@ -969,5 +969,26 @@ export class UserStore extends StateService<UserState> {
           console.log(data);
         },
       });
+  }
+
+  signupUser(user: any) {
+    this.confirmDialog('').then((confirm: boolean) => {
+      if (confirm) {
+        this.setIsLoading(true);
+        this.userService.signupUser(user).subscribe({
+          next: (data: any) => {
+            this.setState({ responseMsg: data });
+            console.log(data);
+            this.setIsLoading(false);
+            this.store.showNotif(data.responseMessage, 'custom');
+          },
+          error: (data: any) => {
+            this.setIsLoading(false);
+            this.store.showNotif(data.error.responseMessage, 'error');
+            console.log(data);
+          },
+        });
+      }
+    });
   }
 }

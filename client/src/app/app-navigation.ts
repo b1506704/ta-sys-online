@@ -166,6 +166,14 @@ export const navigationAdmin = [
         path: '/edit_test_list',
       },
       {
+        text: 'Edit Question',
+        path: '/edit_question_list',
+      },
+      {
+        text: 'Edit Answer',
+        path: '/edit_answer_list',
+      },
+      {
         text: 'Edit Lesson',
         path: '/edit_lesson_list',
       },

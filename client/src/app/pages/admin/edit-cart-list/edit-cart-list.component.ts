@@ -40,7 +40,7 @@ export class EditCartListComponent implements OnInit, OnDestroy {
   currentFilterByPropertyValue: string;
   currentSearchByPropertyValue: string;
   currentSortByPropertyValue: string;
-  currentSortProperty: string = 'name';
+  currentSortProperty: string = 'totalCourse';
   currentSearchProperty: string = 'name';
   currentFilterProperty: string = 'subjectId';
 
@@ -158,7 +158,7 @@ export class EditCartListComponent implements OnInit, OnDestroy {
           type: 'normal',
           icon: 'card',
           disabled: true,
-          hint: 'Sort by total cost',
+          hint: 'Sort by total course',
         },
       },
       {

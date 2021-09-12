@@ -226,6 +226,7 @@ export class FileHttpService {
       { name: fileName, container: container },
       {
         reportProgress: true,
+        observe: 'body',
       }
     );
   }
@@ -240,6 +241,7 @@ export class FileHttpService {
       {
         responseType: 'blob',
         reportProgress: true,
+        observe: 'body',
       }
     );
   }

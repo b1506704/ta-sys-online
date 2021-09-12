@@ -29,9 +29,9 @@
               <div *dxTemplate>
                 <dx-select-box
                   [dataSource]="[
-                    { name: 'customer' },
-                    { name: 'doctor' },
-                    { name: 'medicine' }
+                    { name: 'learner' },
+                    { name: 'instructor' },
+                    { name: 'post' }
                   ]"
                   [value]="imageData?.category"
                   valueExpr="name"
@@ -82,7 +82,12 @@
                 </div>
               </div>
             </dxi-item>
-
+            <dxi-item name="directory">
+              <dxo-label text="Folder"> </dxo-label>
+              <div *dxTemplate>
+                <div>{{ directory }}/</div>
+              </div>
+            </dxi-item>
             <dxi-item
               dataField="title"
               [label]="{ text: 'Title' }"

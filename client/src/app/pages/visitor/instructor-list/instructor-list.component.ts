@@ -56,25 +56,17 @@ export class InstructorListComponent implements OnInit, OnDestroy {
     onClick: this.onRefresh.bind(this),
   };
 
-  filterSelectBoxOptions: any = {
-    items: this.departmentList,
-    valueExpr: 'name',
-    displayExpr: 'name',
-    placeholder: 'Filter with department',
-    onValueChanged: this.onFilterChange.bind(this),
-  };
-
   sortSelectBoxOptions: any = {
     items: [
       {
         _id: '-1',
         name: '(NONE)',
       },
-      { _id: '0', name: 'ASC' },
-      { _id: '1', name: 'DESC' },
+      { _id: '0', name: 'asc' },
+      { _id: '1', name: 'desc' },
     ],
     valueExpr: 'name',
-    placeholder: 'Sort by age',
+    placeholder: 'Sort by name',
     displayExpr: 'name',
     onValueChanged: this.onSortValueChanged.bind(this),
   };
@@ -116,9 +108,6 @@ export class InstructorListComponent implements OnInit, OnDestroy {
           case 'NORMAL':
             this.paginatePureData(currentIndex + 1);
             break;
-          case 'FILTER':
-            this.paginateFilterData(currentIndex + 1);
-            break;
           case 'SEARCH':
             this.paginateSearchData(currentIndex + 1);
             break;
@@ -148,6 +137,8 @@ export class InstructorListComponent implements OnInit, OnDestroy {
       console.log(this.currentSearchByPropertyValue);
       if (this.currentSearchByPropertyValue !== '') {
         this.instructorStore.initInfiniteSearchByPropertyData(
+          this.currentFilterProperty,
+          this.currentFilterByPropertyValue,
           this.currentSearchProperty,
           this.currentSearchByPropertyValue,
           1,
@@ -172,6 +163,8 @@ export class InstructorListComponent implements OnInit, OnDestroy {
     this.currentSortByPropertyValue = e.value;
     if (e.value !== '(NONE)') {
       this.instructorStore.initInfiniteSortByPropertyData(
+        this.currentFilterProperty,
+        this.currentFilterByPropertyValue,
         this.currentSortProperty,
         e.value,
         1,
@@ -180,26 +173,6 @@ export class InstructorListComponent implements OnInit, OnDestroy {
     } else {
       //return to pure editor mode
       this.store.showNotif('SORT MODE OFF', 'custom');
-      this.onRefresh();
-    }
-  }
-
-  onFilterChange(e: any) {
-    this.isFilteringByCategory = true;
-    this.isSearchingByName = false;
-    this.isSortingByPrice = false;
-    this.currentCategoryFilterValue = e.value;
-    console.log(e.value);
-    if (e.value !== '(NONE)') {
-      this.instructorStore.initInfiniteFilterByPropertyData(
-        this.currentFilterProperty,
-        e.value,
-        1,
-        this.pageSize
-      );
-    } else {
-      //return to pure editor mode
-      this.store.showNotif('FILTER MODE OFF', 'custom');
       this.onRefresh();
     }
   }
@@ -225,17 +198,10 @@ export class InstructorListComponent implements OnInit, OnDestroy {
     );
   }
 
-  paginateFilterData(index: number) {
-    this.instructorStore.filterInfiniteInstructorByProperty(
-      this.currentFilterProperty,
-      this.currentCategoryFilterValue,
-      index,
-      this.pageSize
-    );
-  }
-
   paginateSearchData(index: number) {
     this.instructorStore.searchInfiniteInstructorByProperty(
+      this.currentFilterProperty,
+      this.currentFilterByPropertyValue,
       this.currentSearchProperty,
       this.currentSearchByPropertyValue,
       index,
@@ -245,6 +211,8 @@ export class InstructorListComponent implements OnInit, OnDestroy {
 
   paginateSortData(index: number) {
     this.instructorStore.sortInfiniteInstructorByProperty(
+      this.currentFilterProperty,
+      this.currentFilterByPropertyValue,
       this.currentSortProperty,
       this.currentSortByPropertyValue,
       index,

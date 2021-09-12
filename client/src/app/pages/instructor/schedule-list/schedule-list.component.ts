@@ -14,7 +14,7 @@ export class ScheduleListComponent implements OnInit, OnDestroy {
   //TODO: rewrite fetching logic: by date, find yourself
   scheduleList!: Array<Schedule>;
   pageSize: number = 100;
-  doctorName: Array<Object> = [
+  instructorName: Array<Object> = [
     { name: 'Dr. Elon Musk' },
     { name: 'Dr. Tim Cahill' },
     { name: 'Dr. David De Gea' },
@@ -58,11 +58,11 @@ export class ScheduleListComponent implements OnInit, OnDestroy {
   };
 
   filterSelectBoxOptions: any = {
-    items: this.doctorName,
+    items: this.instructorName,
     valueExpr: '_id',
     // searchExpr: 'name',
     displayExpr: 'name',
-    placeholder: 'Filter with doctor name',
+    placeholder: 'Filter with instructor name',
     // searchEnabled: true,
     onValueChanged: this.onFilterChange.bind(this),
   };

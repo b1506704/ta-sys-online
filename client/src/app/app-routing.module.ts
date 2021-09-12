@@ -102,11 +102,27 @@ const routes: Routes = [
     canActivate: [AuthGuardService],
   },
   {
+    path: 'edit_question_list',
+    loadChildren: () =>
+      import('./pages/admin/edit-question-list/edit-question-list.module').then(
+        (m) => m.EditQuestionListModule
+      ),
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'edit_answer_list',
+    loadChildren: () =>
+      import('./pages/admin/edit-answer-list/edit-answer-list.module').then(
+        (m) => m.EditAnswerListModule
+      ),
+    canActivate: [AuthGuardService],
+  },
+  {
     path: 'edit_curriculum_list',
     loadChildren: () =>
-      import('./pages/admin/edit-curriculum-list/edit-curriculum-list.module').then(
-        (m) => m.EditCurriculumListModule
-      ),
+      import(
+        './pages/admin/edit-curriculum-list/edit-curriculum-list.module'
+      ).then((m) => m.EditCurriculumListModule),
     canActivate: [AuthGuardService],
   },
   {
@@ -130,6 +146,22 @@ const routes: Routes = [
     loadChildren: () =>
       import('./pages/admin/edit-post-list/edit-post-list.module').then(
         (m) => m.EditPostListModule
+      ),
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'edit_comment_list',
+    loadChildren: () =>
+      import('./pages/admin/edit-comment-list/edit-comment-list.module').then(
+        (m) => m.EditCommentListModule
+      ),
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'edit_message_list',
+    loadChildren: () =>
+      import('./pages/admin/edit-message-list/edit-message-list.module').then(
+        (m) => m.EditMessageListModule
       ),
     canActivate: [AuthGuardService],
   },

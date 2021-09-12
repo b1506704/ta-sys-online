@@ -6,7 +6,6 @@ import { StoreService } from '../store.service';
 import { InstructorHttpService } from './instructor-http.service';
 import { confirm } from 'devextreme/ui/dialog';
 import { UserHttpService } from '../user/user-http.service';
-import { UserStore } from '../user/user-store.service';
 
 interface InstructorState {
   instructorList: Array<Instructor>;
@@ -35,7 +34,6 @@ export class InstructorStore extends StateService<InstructorState> {
   constructor(
     private instructorService: InstructorHttpService,
     private userService: UserHttpService,
-    private userStore: UserStore,
     private store: StoreService
   ) {
     super(initialState);
@@ -308,14 +306,23 @@ export class InstructorStore extends StateService<InstructorState> {
   }
 
   initInfiniteSearchByPropertyData(
-    property: string,
-    value: string,
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
     page: number,
     size: number
   ) {
     this.store.showNotif('Searched Mode On', 'custom');
-    this.instructorService
-      .searchInstructorByProperty(property, value, page, size)
+    this.userService
+      .filterSearchUserByProperty(
+        filterProperty,
+        filterValue,
+        searchProperty,
+        searchValue,
+        page,
+        size
+      )
       .toPromise()
       .then((data: any) => {
         if (data.totalRecords !== 0) {
@@ -359,14 +366,23 @@ export class InstructorStore extends StateService<InstructorState> {
   }
 
   initInfiniteSortByPropertyData(
-    value: string,
-    order: string,
+    filterProperty: string,
+    filterValue: string,
+    sortProperty: string,
+    sortValue: string,
     page: number,
     size: number
   ) {
     this.store.showNotif('Sort Mode On', 'custom');
-    this.instructorService
-      .sortInstructorByProperty(value, order, page, size)
+    this.userService
+      .filterSortUserByProperty(
+        filterProperty,
+        filterValue,
+        sortProperty,
+        sortValue,
+        page,
+        size
+      )
       .toPromise()
       .then((data: any) => {
         this.setState({
@@ -714,14 +730,23 @@ export class InstructorStore extends StateService<InstructorState> {
   }
 
   searchInfiniteInstructorByProperty(
-    property: string,
-    value: string,
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
     page: number,
     size: number
   ) {
     this.setIsLoading(true);
-    this.instructorService
-      .searchInstructorByProperty(property, value, page, size)
+    this.userService
+      .filterSearchUserByProperty(
+        filterProperty,
+        filterValue,
+        searchProperty,
+        searchValue,
+        page,
+        size
+      )
       .subscribe({
         next: (data: any) => {
           if (data.totalRecords !== 0) {
@@ -786,14 +811,23 @@ export class InstructorStore extends StateService<InstructorState> {
   }
 
   sortInfiniteInstructorByProperty(
-    value: string,
-    order: string,
+    filterValue: string,
+    filterProperty: string,
+    sortProperty: string,
+    sortValue: string,
     page: number,
     size: number
   ) {
     this.setIsLoading(true);
-    this.instructorService
-      .sortInstructorByProperty(value, order, page, size)
+    this.userService
+      .filterSortUserByProperty(
+        filterValue,
+        filterProperty,
+        sortProperty,
+        sortValue,
+        page,
+        size
+      )
       .subscribe({
         next: (data: any) => {
           this.setState({

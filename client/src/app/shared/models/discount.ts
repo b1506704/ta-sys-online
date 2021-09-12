@@ -1,6 +1,6 @@
 export interface Discount {
-  courseID: string;
+  courseId: string;
   title: string;
   rate: number;
-  duration: Date;
+  duration: number;
 }
