@@ -5,12 +5,10 @@ import { StateService } from '../state.service';
 import { StoreService } from '../store.service';
 import { LearnerHttpService } from './learner-http.service';
 import { confirm } from 'devextreme/ui/dialog';
+import { UserHttpService } from '../user/user-http.service';
 
 interface LearnerState {
   learnerList: Array<Learner>;
-  bloodTypeStatistics: Array<Object>;
-  jobStatistics: Array<Object>;
-  genderStatistics: Array<Object>;
   exportData: Array<Learner>;
   selectedLearner: Object;
   learnerInstance: Learner;
@@ -27,9 +25,6 @@ const initialState: LearnerState = {
   totalPages: 0,
   currentPage: 0,
   totalItems: 0,
-  bloodTypeStatistics: [],
-  jobStatistics: [],
-  genderStatistics: [],
   responseMsg: '',
 };
 @Injectable({
@@ -38,11 +33,11 @@ const initialState: LearnerState = {
 export class LearnerStore extends StateService<LearnerState> {
   constructor(
     private learnerService: LearnerHttpService,
+    private userService: UserHttpService,
     private store: StoreService
   ) {
     super(initialState);
   }
-
   /**
    * This is a function which fills the items received from pagination in a specific store's state variable.
    * 
@@ -55,11 +50,11 @@ export class LearnerStore extends StateService<LearnerState> {
    * @return {Array<Object>} Return an array with filled items from ss pagination
    * @example
    * this.setState({
-            pendingCheckupList: this.fillEmpty(
-              page,
+            sourceList: this.fillEmpty(
+              page - 1,
               size,
-              this.state.pendingCheckupList,
-              data.items
+              this.state.sourceList,
+              arrayItemFromServer
             ),
           });
    */
@@ -70,14 +65,16 @@ export class LearnerStore extends StateService<LearnerState> {
     addedArray: Array<Learner>
   ): Array<Learner> {
     let result: Array<Learner> = sourceArray;
+    console.log('FILL INDEX');
     let fillIndex = startIndex * endIndex;
+    console.log(fillIndex);
     for (var j = 0; j < addedArray.length; j++) {
       result[fillIndex] = addedArray[j];
       fillIndex++;
     }
     // endIndex = pageSize
     // pageSize = 5
-    // 0 => 0 ,1,2,3,4,
+    // 0 => 0,1,2,3,4,
     // 1 -> 5,6,7,8,9
     // 2 -> 10,11,12,13,14
     // 17 -> 85,86,87,88,89
@@ -86,92 +83,135 @@ export class LearnerStore extends StateService<LearnerState> {
     return result;
   }
 
-  getBloodTypeCount(value: string) {
+  initInfiniteData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.store.setIsLoading(true);
-    return this.learnerService
-      .filterLearnerByCategory(value, 0, 5)
+    return this.userService
+      .filterUserByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          bloodTypeStatistics: this.state.bloodTypeStatistics.concat({
-            bloodType: value,
-            totalCount: data.totalItems,
-          }),
+          learnerList: data.data,
         });
+        console.log('Current flag: infite list');
+        console.log(this.state.learnerList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
         this.store.setIsLoading(false);
       });
   }
 
-  getBloodTypeStatistics() {
-    // value = 'O' | 'A' | 'B' |
-    this.setState({ bloodTypeStatistics: [] });
-    this.getBloodTypeCount('O').then(() => {
-      this.getBloodTypeCount('A').then(() => {
-        this.getBloodTypeCount('B');
+  loadInfiniteDataAsync(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.userService
+      .filterUserByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            learnerList: this.state.learnerList.concat(data.data),
+          });
+          console.log('Infinite list');
+          console.log(this.state.learnerList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
       });
-    });
   }
 
-  getJobCount(value: string) {
-    this.store.setIsLoading(true);
+  loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
+    this.setIsLoading(true);
+    this.learnerService
+      .fetchLearnerByLearnerID(page, size, learnerID)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            learnerList: this.fillEmpty(
+              page - 1,
+              size,
+              this.state.learnerList,
+              data.data
+            ),
+          });
+          console.log('Pure list');
+          console.log(this.state.learnerList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
     return this.learnerService
-      .filterLearnerByJob(value, 0, 5)
+      .fetchLearnerByLearnerID(page, size, learnerID)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          jobStatistics: this.state.jobStatistics.concat({
-            job: value,
-            totalCount: data.totalItems,
-          }),
+          learnerList: data.data,
         });
-        this.store.setIsLoading(false);
+        console.log('Current flag: infite list');
+        console.log(this.state.learnerList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
       });
   }
 
-  getJobStatistics() {
-    const jobList = [
-      'Student',
-      'Teacher',
-      'Thief',
-      'Space Pirate',
-      'Spaceship Commander',
-      'Sea Pirate',
-      'Shogun',
-      'Music Conductor',
-      'Fullstack Developer',
-      'Mecha Pilot',
-      'Tester',
-      'Galatic Defender',
-      'Engineer',
-    ];
-    this.setState({ jobStatistics: [] });
-    jobList.forEach((element) => {
-      this.getJobCount(element);
-    });
-  }
-
-  getGenderCount(value: string) {
-    this.store.setIsLoading(true);
-    return this.learnerService
-      .filterLearnerByGender(value, 0, 5)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          genderStatistics: this.state.genderStatistics.concat({
-            gender: value,
-            totalCount: data.totalItems,
-          }),
-        });
-        this.store.setIsLoading(false);
+  loadInfiniteDataAsyncByLearnerID(
+    page: number,
+    size: number,
+    learnerID: string
+  ) {
+    this.setIsLoading(true);
+    this.learnerService
+      .fetchLearnerByLearnerID(page, size, learnerID)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            learnerList: this.state.learnerList.concat(data.data),
+          });
+          console.log('Infinite list');
+          console.log(this.state.learnerList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
       });
-  }
-
-  getGenderStatistics() {
-    const genderList = ['Male', 'Female'];
-    this.setState({ genderStatistics: [] });
-    genderList.forEach((element) => {
-      this.getGenderCount(element);
-    });
   }
 
   initData(page: number, size: number) {
@@ -180,96 +220,179 @@ export class LearnerStore extends StateService<LearnerState> {
       .toPromise()
       .then((data: any) => {
         this.setState({
-          learnerList: new Array<Learner>(data.totalItems),
+          learnerList: new Array<Learner>(data.totalRecords),
         });
         console.log('Current flag: pure list');
         console.log(this.state.learnerList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
         this.loadDataAsync(page, size);
       });
   }
 
-  initFilterByCategoryData(value: string, page: number, size: number) {
+  initFilterByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Filtered Mode On', 'custom');
     this.learnerService
-      .filterLearnerByCategory(value, 0, 5)
+      .filterLearnerByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          learnerList: new Array<Learner>(data.totalItems),
+          learnerList: new Array<Learner>(data.totalRecords),
         });
         console.log('Current flag: filtered list');
         console.log(this.state.learnerList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.filterLearnerByCategory(value, page, size);
+        this.filterLearnerByProperty(property, value, page, size);
       });
   }
 
-  initSearchByNameData(value: string, page: number, size: number) {
-    this.store.showNotif('Searched Mode On', 'custom');
+  initInfiniteFilterByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.store.showNotif('Filtered Mode On', 'custom');
     this.learnerService
-      .searchLearnerByName(value, 0, 5)
+      .filterLearnerByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          learnerList: new Array<Learner>(data.totalItems),
+          learnerList: data.data,
+        });
+        console.log('Current flag: infinite filtered list');
+        console.log(this.state.learnerList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+      });
+  }
+
+  initSearchByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.store.showNotif('Searched Mode On', 'custom');
+    this.learnerService
+      .searchLearnerByProperty(property, value, page, size)
+      .toPromise()
+      .then((data: any) => {
+        this.setState({
+          learnerList: new Array<Learner>(data.totalRecords),
         });
         console.log('Current flag: searched list');
         console.log(this.state.learnerList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.searchLearnerByName(value, page, size);
+        this.searchLearnerByProperty(property, value, page, size);
       });
   }
 
-  initSortByPriceData(value: string, page: number, size: number) {
-    this.store.showNotif('Sort Mode On', 'custom');
-    this.learnerService
-      .sortLearnerByPrice(value, 0, 5)
+  initInfiniteSearchByPropertyData(
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
+    page: number,
+    size: number
+  ) {
+    this.store.showNotif('Searched Mode On', 'custom');
+    this.userService
+      .filterSearchUserByProperty(
+        filterProperty,
+        filterValue,
+        searchProperty,
+        searchValue,
+        page,
+        size
+      )
       .toPromise()
       .then((data: any) => {
-        this.setState({
-          learnerList: new Array<Learner>(data.totalItems),
-        });
-        console.log('Current flag: sort list');
+        if (data.totalRecords !== 0) {
+          this.setState({
+            learnerList: data.data,
+          });
+        } else {
+          this.store.showNotif('No result found!', 'custom');
+        }
+        console.log('Current flag: infitite searched list');
         console.log(this.state.learnerList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-      })
-      .then(() => {
-        this.sortLearnerByPrice(value, page, size);
+        this.setState({ currentPage: data.pageNumber });
       });
   }
 
-  initSortByName(value: string, page: number, size: number) {
+  initSortByPropertyData(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
     this.store.showNotif('Sort Mode On', 'custom');
     this.learnerService
-      .sortLearnerByName(value, 0, 5)
+      .sortLearnerByProperty(value, order, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          learnerList: new Array<Learner>(data.totalItems),
+          learnerList: new Array<Learner>(data.totalRecords),
         });
         console.log('Current flag: sort list');
         console.log(this.state.learnerList);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
       })
       .then(() => {
-        this.sortLearnerByName(value, page, size);
+        this.sortLearnerByProperty(value, order, page, size);
+      });
+  }
+
+  initInfiniteSortByPropertyData(
+    filterProperty: string,
+    filterValue: string,
+    sortProperty: string,
+    sortValue: string,
+    page: number,
+    size: number
+  ) {
+    this.store.showNotif('Sort Mode On', 'custom');
+    this.userService
+      .filterSortUserByProperty(
+        filterProperty,
+        filterValue,
+        sortProperty,
+        sortValue,
+        page,
+        size
+      )
+      .toPromise()
+      .then((data: any) => {
+        this.setState({
+          learnerList: data.data,
+        });
+        console.log('Current flag: sort list');
+        console.log(this.state.learnerList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
       });
   }
 
@@ -279,19 +402,19 @@ export class LearnerStore extends StateService<LearnerState> {
       next: (data: any) => {
         this.setState({
           learnerList: this.fillEmpty(
-            page,
+            page - 1,
             size,
             this.state.learnerList,
-            data.items
+            data.data
           ),
         });
         console.log('Pure list');
         console.log(this.state.learnerList);
         console.log('Server response');
         console.log(data);
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
         this.setIsLoading(false);
       },
       error: (data: any) => {
@@ -308,15 +431,15 @@ export class LearnerStore extends StateService<LearnerState> {
       next: (data: any) => {
         this.setState({
           learnerList: this.fillEmpty(
-            page,
+            page - 1,
             size,
             this.state.learnerList,
-            data.items
+            data.data
           ),
         });
-        this.setState({ totalItems: data.totalItems });
+        this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
+        this.setState({ currentPage: data.pageNumber });
         console.log('Pure list');
         console.log(this.state.learnerList);
         console.log('Server response');
@@ -338,18 +461,6 @@ export class LearnerStore extends StateService<LearnerState> {
 
   $learnerList: Observable<Array<Learner>> = this.select(
     (state) => state.learnerList
-  );
-
-  $bloodTypeStatistics: Observable<Array<Object>> = this.select(
-    (state) => state.bloodTypeStatistics
-  );
-
-  $jobStatistics: Observable<Array<Object>> = this.select(
-    (state) => state.jobStatistics
-  );
-
-  $genderStatistics: Observable<Array<Object>> = this.select(
-    (state) => state.genderStatistics
   );
 
   $exportData: Observable<Array<Learner>> = this.select(
@@ -393,11 +504,11 @@ export class LearnerStore extends StateService<LearnerState> {
     });
   }
 
-  updateLearner(learner: Learner, key: string, page: number, size: number) {
+  updateLearner(learner: Learner, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.learnerService.updateLearner(learner, key).subscribe({
+        this.learnerService.updateLearner(learner).subscribe({
           next: (data: any) => {
             this.setState({ responseMsg: data });
             console.log(data);
@@ -430,38 +541,32 @@ export class LearnerStore extends StateService<LearnerState> {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.learnerService
-          .deleteSelectedLearners(selectedLearners)
-          .subscribe({
-            next: (data: any) => {
-              this.setState({ responseMsg: data });
-              console.log(data);
-              this.loadDataAsync(page, size);
-              console.log(this.state.learnerList);
-              this.setIsLoading(false);
-              this.store.showNotif(data.responseMessage, 'custom');
-            },
-            error: (data: any) => {
-              this.setIsLoading(false);
-              this.store.showNotif(data.error.responseMessage, 'error');
-              console.log(data);
-            },
-          });
+        this.learnerService.deleteLearner(selectedLearners).subscribe({
+          next: (data: any) => {
+            this.setState({ responseMsg: data });
+            console.log(data);
+            this.loadDataAsync(page, size);
+            console.log(this.state.learnerList);
+            this.setIsLoading(false);
+            this.store.showNotif(data.responseMessage, 'custom');
+          },
+          error: (data: any) => {
+            this.setIsLoading(false);
+            this.store.showNotif(data.error.responseMessage, 'error');
+            console.log(data);
+          },
+        });
       }
     });
   }
 
-  deleteAllLearners() {
+  deleteAll() {
     this.confirmDialog('Delete all items?').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.learnerService.deleteAllLearners().subscribe({
+        this.learnerService.deleteAll().subscribe({
           next: (data: any) => {
-            this.setState({ responseMsg: data });
-            this.setState({ learnerList: [] });
-            this.setState({ totalPages: 0 });
-            this.setState({ currentPage: 0 });
-            this.setState({ totalItems: 0 });
+            this.resetState();
             console.log(data);
             this.setIsLoading(false);
             this.store.showNotif(data.responseMessage, 'custom');
@@ -476,7 +581,7 @@ export class LearnerStore extends StateService<LearnerState> {
     });
   }
 
-  deleteLearner(id: string, page: number, size: number) {
+  deleteLearner(id: Array<string>, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
@@ -515,6 +620,236 @@ export class LearnerStore extends StateService<LearnerState> {
     this.setState({ currentPage: _currentPage });
   }
 
+  filterLearnerByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.learnerService
+      .filterLearnerByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            this.setState({
+              learnerList: this.fillEmpty(
+                page - 1,
+                size,
+                this.state.learnerList,
+                data.data
+              ),
+            });
+            console.log('Filtered list');
+            console.log(this.state.learnerList);
+            console.log('Server response');
+            console.log(data);
+            this.setState({ totalItems: data.totalRecords });
+            this.setState({ totalPages: data.totalPages });
+            this.setState({ currentPage: data.pageNumber });
+          }
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  filterInfiniteLearnerByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.learnerService
+      .filterLearnerByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            learnerList: this.state.learnerList.concat(data),
+          });
+          console.log('Filtered list');
+          console.log(this.state.learnerList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  searchLearnerByProperty(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.learnerService
+      .searchLearnerByProperty(property, value, page, size)
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            this.setState({
+              learnerList: this.fillEmpty(
+                page - 1,
+                size,
+                this.state.learnerList,
+                data.data
+              ),
+            });
+          } else {
+            this.store.showNotif('No result found!', 'custom');
+          }
+          console.log('Searched list');
+          console.log(this.state.learnerList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  searchInfiniteLearnerByProperty(
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.userService
+      .filterSearchUserByProperty(
+        filterProperty,
+        filterValue,
+        searchProperty,
+        searchValue,
+        page,
+        size
+      )
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            this.setState({
+              learnerList: this.state.learnerList.concat(data),
+            });
+          } else {
+            this.store.showNotif('No result found!', 'custome');
+          }
+          console.log('Infite searched list');
+          console.log(this.state.learnerList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  sortLearnerByProperty(
+    value: string,
+    order: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.learnerService
+      .sortLearnerByProperty(value, order, page, size)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({ responseMsg: data });
+          this.setState({
+            learnerList: this.fillEmpty(
+              page - 1,
+              size,
+              this.state.learnerList,
+              data.data
+            ),
+          });
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          console.log('Sorted list');
+          console.log(this.state.learnerList);
+          console.log('Server response');
+          console.log(data);
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  sortInfiniteLearnerByProperty(
+    filterValue: string,
+    filterProperty: string,
+    sortProperty: string,
+    sortValue: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.userService
+      .filterSortUserByProperty(
+        filterValue,
+        filterProperty,
+        sortProperty,
+        sortValue,
+        page,
+        size
+      )
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            learnerList: this.state.learnerList.concat(data),
+          });
+          console.log('Infite sorted list');
+          console.log(this.state.learnerList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
   getLearner(id: string) {
     this.setIsLoading(true);
     return this.learnerService
@@ -527,170 +862,11 @@ export class LearnerStore extends StateService<LearnerState> {
       });
   }
 
-  getLearnerByUserName(username: string) {
-    this.setIsLoading(true);
-    return this.learnerService
-      .getLearnerByUserName(username)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({ learnerInstance: data });
-        console.log(data);
-        this.setIsLoading(false);
-      });
-  }
-
-  filterLearnerByPrice(
-    criteria: string,
-    value: number,
-    page: number,
-    size: number
-  ) {
-    this.setIsLoading(true);
-    this.learnerService
-      .filterLearnerByPrice(criteria, value, page, size)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({ responseMsg: data });
-          this.setState({
-            learnerList: this.fillEmpty(
-              page,
-              size,
-              this.state.learnerList,
-              data.items
-            ),
-          });
-          this.setState({ totalItems: data.totalItems });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.currentPage });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
-  }
-
-  filterLearnerByCategory(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.learnerService.filterLearnerByCategory(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          learnerList: this.fillEmpty(
-            page,
-            size,
-            this.state.learnerList,
-            data.items
-          ),
-        });
-        console.log('Filtered list');
-        console.log(this.state.learnerList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  searchLearnerByName(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.learnerService.searchLearnerByName(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          learnerList: this.fillEmpty(
-            page,
-            size,
-            this.state.learnerList,
-            data.items
-          ),
-        });
-        console.log('Searched list');
-        console.log(this.state.learnerList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  sortLearnerByName(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.learnerService.sortLearnerByName(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({ responseMsg: data });
-        this.setState({
-          learnerList: this.fillEmpty(
-            page,
-            size,
-            this.state.learnerList,
-            data.items
-          ),
-        });
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        console.log('Sorted list');
-        console.log(this.state.learnerList);
-        console.log('Server response');
-        console.log(data);
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  sortLearnerByPrice(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.learnerService.sortLearnerByPrice(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({ responseMsg: data });
-        this.setState({
-          learnerList: this.fillEmpty(
-            page,
-            size,
-            this.state.learnerList,
-            data.items
-          ),
-        });
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        console.log('Sorted list');
-        console.log(this.state.learnerList);
-        console.log('Server response');
-        console.log(data);
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
   setExportData(array: Array<Learner>) {
     this.setState({ learnerList: array });
+  }
+
+  resetState() {
+    this.setState(initialState);
   }
 }

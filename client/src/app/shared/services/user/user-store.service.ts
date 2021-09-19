@@ -45,7 +45,7 @@ export class UserStore extends StateService<UserState> {
         this.store.setCurrentUser(this.getUsername());
         this.store.setCurrentUserId(this.getUserId());
         this.store.setCurrentUserRoleId(this.getRoleId());
-        this.store.setisPreloading(true);
+        this.store.setIsPreloading(true);
         this.dynamicRouting();
       }
     });
@@ -131,7 +131,7 @@ export class UserStore extends StateService<UserState> {
         default:
           break;
       }
-      this.store.setisPreloading(false);
+      this.store.setIsPreloading(false);
       console.log(roleName);
     });
   }

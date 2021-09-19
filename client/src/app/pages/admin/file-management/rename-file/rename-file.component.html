@@ -1,22 +1,22 @@
 <div
   [ngClass]="{
-    'folder-popup-content': isUploading === false,
-    'folder-popup-loading': isUploading === true
+    'photo-popup-content': isUploading === false,
+    'photo-popup-loading': isUploading === true
   }"
 >
   <div class="container">
     <form id="form-container" (submit)="onSubmit($event)">
       <dx-form
         id="form"
-        [formData]="containerData"
+        [formData]="fileData"
         [showValidationSummary]="true"
-        validationGroup="renameFolder"
+        validationGroup="updateFolder"
       >
         <dxi-item itemType="group">
           <dxi-item itemType="group" caption="Type in new name">
             <dxi-item
-              dataField="name"
-              [label]="{ text: 'Folder Name' }"
+              dataField="fileName"
+              [label]="{ text: 'File Name' }"
               editorType="dxTextBox"
             >
               <dxi-validation-rule

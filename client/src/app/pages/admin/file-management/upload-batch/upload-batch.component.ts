@@ -44,13 +44,8 @@ export class UploadBatchComponent implements OnInit, OnDestroy, OnChanges {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         console.log(file);
-        if (file.size <= 2000000) {
-          var pattern = /image-*/;
+        if (file.size <= 20000000) {
           var reader = new FileReader();
-          if (!file.type.match(pattern)) {
-            this.store.showNotif('Invalid format!', 'custom');
-            return;
-          }
           reader.onload = this.handleReaderLoaded.bind(this);
           reader.readAsDataURL(file);
           const imageData = {
@@ -64,12 +59,13 @@ export class UploadBatchComponent implements OnInit, OnDestroy, OnChanges {
             url: '',
           };
           const fileData = {
+            sourceID: '7d87bb3b-6eec-649e-42c2-eb6dabb6355a',
+            category: this.directory,
+            container: this.directory,
             fileName: file.name,
-            fileContent: '',
+            title: file.name,
             fileType: file.type,
             fileSize: file.size,
-            fileDirectory: this.directory,
-            metadata: imageData,
           };
           this.imageList = this.imageList.concat(imageData);
           this.fileList = this.fileList.concat(fileData);
@@ -84,7 +80,7 @@ export class UploadBatchComponent implements OnInit, OnDestroy, OnChanges {
     for (let i = 0; i < this.tempUrl.length; i++) {
       const base64Url = this.tempUrl[i];
       this.imageList[i].url = base64Url;
-      this.fileList[i].fileContent = base64Url.split(',')[1];
+      this.fileList[i].data = base64Url.split(',')[1];
     }
     console.log(this.imageList);
     console.log(this.fileList);
@@ -99,10 +95,11 @@ export class UploadBatchComponent implements OnInit, OnDestroy, OnChanges {
   resetValues() {
     this.fileList = [];
     this.imageList = [];
+    this.tempUrl = [];
   }
 
-  isUploadingListener() {
-    return this.fileStore.$isUploading.subscribe((data: boolean) => {
+  isUploadingFilesListener() {
+    return this.fileStore.$isUploadingFiles.subscribe((data: boolean) => {
       this.isUploading = data;
     });
   }
@@ -110,15 +107,16 @@ export class UploadBatchComponent implements OnInit, OnDestroy, OnChanges {
   onSubmit = (e: any) => {
     e.preventDefault();
     if (this.fileList.length) {
-      this.fileStore.uploadFiles(this.fileList, this.directory);
+      this.fileStore.uploadFiles(this.fileList);
       this.resetValues();
     } else {
-      this.store.showNotif('Please select an image', 'custom');
+      this.store.showNotif('Please select a file', 'custom');
     }
   };
 
   ngOnInit(): void {
-    this.isUploadingListener();
+    this.isUploadingFilesListener();
+    this.resetValues();
   }
 
   ngOnChanges(): void {
@@ -126,6 +124,6 @@ export class UploadBatchComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnDestroy(): void {
-    this.isUploadingListener().unsubscribe();
+    this.isUploadingFilesListener().unsubscribe();
   }
 }

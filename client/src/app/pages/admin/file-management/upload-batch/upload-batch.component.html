@@ -47,15 +47,14 @@
                 </div>
               </div>
             </dxi-item>
-            <dxi-item name="avatar">
+            <dxi-item name="file">
               <div *dxTemplate>
-                <div class="image-container">
+                <div class="file-container">
                   <input
-                    class="img-input"
+                    class="file-input"
                     type="file"
                     [multiple]="true"
-                    id="img"
-                    accept="image/*"
+                    id="file"
                     (change)="handleInputChange($event)"
                   />
                 </div>

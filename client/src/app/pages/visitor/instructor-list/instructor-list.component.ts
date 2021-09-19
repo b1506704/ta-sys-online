@@ -5,7 +5,6 @@ import { InstructorStore } from 'src/app/shared/services/instructor/instructor-s
 import { StoreService } from 'src/app/shared/services/store.service';
 import { DxScrollViewComponent } from 'devextreme-angular';
 import { Image } from 'src/app/shared/models/image';
-import departmentList from 'src/app/shared/services/instructor/mock-department';
 import { ImageStore } from 'src/app/shared/services/image/image-store.service';
 import { UserStore } from 'src/app/shared/services/user/user-store.service';
 
@@ -18,7 +17,6 @@ export class InstructorListComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   scrollView: DxScrollViewComponent;
   instructorList!: Array<Instructor>;
-  departmentList: Array<Object> = departmentList();
   currentInstructorID!: string;
   pageSize: number = 10;
   pullDown = false;

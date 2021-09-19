@@ -1,12 +1,9 @@
 import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
-import { ImageStore } from 'src/app/shared/services/image/image-store.service';
-import { Image } from 'src/app/shared/models/image';
 import { DxFileManagerComponent } from 'devextreme-angular';
 import { StoreService } from 'src/app/shared/services/store.service';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
 import { Container } from 'src/app/shared/models/container';
-import { File } from 'src/app/shared/models/file';
 @Component({
   selector: 'app-file-management',
   templateUrl: './file-management.component.html',
@@ -30,35 +27,26 @@ export class FileManagementComponent implements OnInit {
   currentDirectory: string = '';
   fileItems: Array<any> = [];
   isPopupVisible!: boolean;
-  isUploadPopupVisible!: boolean;
+  isUpdateFilePopupVisible!: boolean;
+  isRenameFilePopupVisible!: boolean;
   isUploadBatchPopupVisible!: boolean;
   isUploadContainerPopupVisible!: boolean;
   isUpdateContainerPopupVisible!: boolean;
   isKeyShortcutPopupVisible!: boolean;
   isUploading!: boolean;
+  isLoading!: boolean;
   isCopying!: boolean;
   isMoving!: boolean;
   sourceDirectory!: string;
-  tempCopyItems: Array<string> = [];
+  tempCopyItems: Array<any> = [];
   currentFile!: any;
   uploadButtonOption: any = {};
-  imageList: Array<Image> = [];
-  fileList: Array<File> = [];
+  fileList: Array<any> = [];
   selectedKeys: Array<string> = [];
   selectedItemKey: string;
   selectedItem: any;
   currentIndexFromServer!: number;
   pageSize: number = 5;
-  newFileMenuOptions = {
-    items: [
-      {
-        text: 'Upload Image',
-        icon: 'image',
-        hint: 'Upload new image',
-      },
-    ],
-    onItemClick: this.uploadImage.bind(this),
-  };
   newFilesMenuOptions = {
     items: [
       {
@@ -92,12 +80,12 @@ export class FileManagementComponent implements OnInit {
   deleteMenuOptions = {
     items: [
       {
-        text: 'Delete Image',
+        text: 'Delete File',
         icon: 'trash',
-        hint: 'Delete current image',
+        hint: 'Delete current file',
       },
     ],
-    onItemClick: this.deleteImages.bind(this),
+    onItemClick: this.deleteFiles.bind(this),
   };
   downloadZipMenuOptions = {
     items: [
@@ -117,7 +105,7 @@ export class FileManagementComponent implements OnInit {
         hint: 'Copy selected items',
       },
     ],
-    onItemClick: this.copyImages.bind(this),
+    onItemClick: this.copyFiles.bind(this),
   };
   pasteMenuOptions = {
     items: [
@@ -127,7 +115,7 @@ export class FileManagementComponent implements OnInit {
         hint: 'Paste selected items',
       },
     ],
-    onItemClick: this.pasteImages.bind(this),
+    onItemClick: this.pasteFiles.bind(this),
   };
   clearClipboardMenuOptions = {
     items: [
@@ -147,17 +135,17 @@ export class FileManagementComponent implements OnInit {
         hint: 'Cut selected items',
       },
     ],
-    onItemClick: this.moveImages.bind(this),
+    onItemClick: this.moveFiles.bind(this),
   };
   updateMenuOptions = {
     items: [
       {
-        text: 'Update Image',
-        icon: 'edit',
-        hint: 'Edit current image',
+        text: 'Link Source',
+        icon: 'link',
+        hint: 'Edit current file',
       },
     ],
-    onItemClick: this.updateImage.bind(this),
+    onItemClick: this.updateFile.bind(this),
   };
   deleteFolderMenuOptions = {
     items: [
@@ -179,21 +167,10 @@ export class FileManagementComponent implements OnInit {
     ],
     onItemClick: this.updateContainer.bind(this),
   };
-  cloneFolderMenuOptions = {
-    items: [
-      {
-        text: 'Clone Folder',
-        icon: 'unselectall',
-        hint: 'Clone current folder',
-      },
-    ],
-    onItemClick: this.cloneContainer.bind(this),
-  };
   containerList: Array<Container> = [];
 
   constructor(
     private router: Router,
-    private imageStore: ImageStore,
     private store: StoreService,
     private fileStore: FileStore
   ) {}
@@ -212,7 +189,7 @@ export class FileManagementComponent implements OnInit {
         .confirmDialog(`Delete '${this.currentDirectory}' folder?`)
         .then((confirm: boolean) => {
           if (confirm) {
-            this.fileStore.deleteContainer(this.currentDirectory).then(() => {
+            this.fileStore.deleteContainer([this.currentDirectory]).then(() => {
               this.refreshFolder();
               this.store.showNotif(
                 `'${this.currentDirectory}' folder deleted`,
@@ -226,34 +203,9 @@ export class FileManagementComponent implements OnInit {
     }
   }
 
-  cloneContainer() {
-    if (this.currentDirectory) {
-      this.fileStore
-        .confirmDialog(`Clone '${this.currentDirectory}' folder?`)
-        .then((confirm: boolean) => {
-          if (confirm) {
-            this.fileStore.cloneContainer(this.currentDirectory).then(() => {
-              this.refreshFolder();
-              this.store.showNotif(
-                `'${this.currentDirectory}' folder cloned`,
-                'custom'
-              );
-              this.store.setIsLoading(false);
-              this.currentDirectory = '';
-            });
-          }
-        });
-    }
-  }
-
-  uploadImage() {
-    if (this.currentDirectory === '') {
-      this.store.showNotif(
-        'Please select a folder to upload file(s)',
-        'custom'
-      );
-    } else {
-      this.isUploadPopupVisible = true;
+  renameFile() {
+    if (this.currentDirectory !== '') {
+      this.isRenameFilePopupVisible = true;
     }
   }
 
@@ -268,7 +220,7 @@ export class FileManagementComponent implements OnInit {
     }
   }
 
-  deleteImages() {
+  deleteFiles() {
     if (this.currentDirectory !== '') {
       if (this.selectedKeys.length !== 0) {
         this.fileStore
@@ -276,7 +228,8 @@ export class FileManagementComponent implements OnInit {
           .then((confirm: boolean) => {
             if (confirm) {
               this.fileStore
-                .deleteSelectedFiles(this.selectedKeys, this.currentDirectory)
+                // .deleteSelectedFiles(this.selectedKeys, this.currentDirectory)
+                .deleteSelectedFiles(this.selectedKeys)
                 .then(() => {
                   this.refresh();
                   this.store.showNotif(
@@ -305,7 +258,7 @@ export class FileManagementComponent implements OnInit {
     }
   }
 
-  copyImages() {
+  copyFiles() {
     if (this.selectedKeys.length !== 0) {
       this.isMoving = false;
       this.isCopying = true;
@@ -320,7 +273,7 @@ export class FileManagementComponent implements OnInit {
     }
   }
 
-  moveImages() {
+  moveFiles() {
     if (this.selectedKeys.length !== 0) {
       this.isCopying = false;
       this.isMoving = true;
@@ -332,7 +285,7 @@ export class FileManagementComponent implements OnInit {
     }
   }
 
-  pasteImages() {
+  pasteFiles() {
     if (this.tempCopyItems.length !== 0) {
       const editorMode = this.checkEditorMode();
       switch (editorMode) {
@@ -355,19 +308,15 @@ export class FileManagementComponent implements OnInit {
         if (confirm) {
           this.isCopying = false;
           this.fileStore
-            .copySelectedFiles(
-              this.tempCopyItems,
-              this.sourceDirectory,
-              this.currentDirectory
-            )
+            .copySelectedFiles(this.tempCopyItems, this.currentDirectory)
             .then((data: any) => {
               this.refresh();
-              this.store.showNotif(data.message, 'custom');
+              this.store.showNotif(data.responseMessage, 'custom');
               this.store.setIsLoading(false);
               this.tempCopyItems = [];
             })
             .catch((error) => {
-              this.store.showNotif(error.message, 'error');
+              this.store.showNotif(error, 'error');
             });
         }
       });
@@ -380,19 +329,15 @@ export class FileManagementComponent implements OnInit {
         if (confirm) {
           this.isMoving = false;
           this.fileStore
-            .moveSelectedFiles(
-              this.tempCopyItems,
-              this.sourceDirectory,
-              this.currentDirectory
-            )
+            .moveSelectedFiles(this.tempCopyItems, this.currentDirectory)
             .then((data: any) => {
               this.refresh();
-              this.store.showNotif(data.message, 'custom');
+              this.store.showNotif(data.responseMessage, 'custom');
               this.store.setIsLoading(false);
               this.tempCopyItems = [];
             })
             .catch((error) => {
-              this.store.showNotif(error.message, 'error');
+              this.store.showNotif(error.responseMessage, 'error');
             });
         }
       });
@@ -406,7 +351,7 @@ export class FileManagementComponent implements OnInit {
           .then((confirm: boolean) => {
             if (confirm) {
               this.fileStore
-                .deleteFile(this.selectedItemKey, this.currentDirectory)
+                .deleteSelectedFiles([this.selectedItemKey])
                 .then(() => {
                   this.refresh();
                   this.store.showNotif('1 item deleted', 'custom');
@@ -418,9 +363,9 @@ export class FileManagementComponent implements OnInit {
     }
   }
 
-  updateImage() {
+  updateFile() {
     if (this.currentDirectory !== '') {
-      this.isUploadPopupVisible = true;
+      this.isUpdateFilePopupVisible = true;
     }
   }
 
@@ -430,10 +375,7 @@ export class FileManagementComponent implements OnInit {
         .confirmDialog('Download this item?')
         .then((confirm: boolean) => {
           if (confirm) {
-            this.fileStore.downloadFile(
-              this.selectedItemKey,
-              this.currentDirectory
-            );
+            this.fileStore.downloadFile(this.selectedItemKey);
           }
         });
     }
@@ -445,10 +387,7 @@ export class FileManagementComponent implements OnInit {
         .confirmDialog('Download selected items as zip?')
         .then((confirm: boolean) => {
           if (confirm) {
-            this.fileStore.downloadFiles(
-              this.selectedKeys,
-              this.currentDirectory
-            );
+            this.fileStore.downloadFiles(this.selectedKeys);
           }
         });
     }
@@ -469,7 +408,7 @@ export class FileManagementComponent implements OnInit {
   }
 
   refreshFolder() {
-    this.fileStore.initInfiniteContainer(0, this.pageSize).then(() => {
+    this.fileStore.initInfiniteContainer().then(() => {
       this.containerDataListener();
     });
   }
@@ -486,7 +425,7 @@ export class FileManagementComponent implements OnInit {
     this.fileList = [];
     if (this.currentDirectory !== '') {
       this.fileStore
-        .initInfiniteDataByContainer(this.currentDirectory, this.pageSize)
+        .initInfiniteDataByContainer(this.currentDirectory)
         .then(() => {
           this.mapFileToImage();
         });
@@ -522,14 +461,14 @@ export class FileManagementComponent implements OnInit {
       case 'downloadImage':
         this.downloadImage();
         break;
-      case 'newImage':
-        this.uploadImage();
+      case 'renameFile':
+        this.renameFile();
         break;
       case 'deleteImage':
         this.deleteSelectedImage();
         break;
-      case 'updateImage':
-        this.updateImage();
+      case 'updateFile':
+        this.updateFile();
         break;
       case 'newFolder':
         this.uploadContainer();
@@ -539,9 +478,6 @@ export class FileManagementComponent implements OnInit {
         break;
       case 'updateFolder':
         this.updateContainer();
-        break;
-      case 'cloneFolder':
-        this.cloneContainer();
         break;
       default:
         break;
@@ -584,15 +520,35 @@ export class FileManagementComponent implements OnInit {
     });
   }
 
-  currentPageListener() {
-    return this.imageStore.$currentPage.subscribe((data: any) => {
-      this.currentIndexFromServer = data;
+  isUploadingFilesListener() {
+    return this.fileStore.$isUploadingFiles.subscribe((data: boolean) => {
+      this.isUploadBatchPopupVisible = data;
+      if (data === false) {
+        this.refresh();
+      }
     });
   }
 
-  isUploadingListener() {
+  isUpdatingFileListener() {
+    return this.fileStore.$isUpdatingFile.subscribe((data: boolean) => {
+      this.isUpdateFilePopupVisible = data;
+      if (data === false) {
+        this.refresh();
+      }
+    });
+  }
+
+  isRenamingFileListener() {
+    return this.fileStore.$isRenamingFile.subscribe((data: boolean) => {
+      this.isRenameFilePopupVisible = data;
+      if (data === false) {
+        this.refresh();
+      }
+    });
+  }
+
+  isUploadingBatchListener() {
     return this.fileStore.$isUploading.subscribe((data: boolean) => {
-      this.isUploadPopupVisible = data;
       this.isUploadBatchPopupVisible = data;
       if (data === false) {
         this.refresh();
@@ -620,8 +576,8 @@ export class FileManagementComponent implements OnInit {
 
   mapContainerToFolder() {
     this.fileItems = [];
-    if (this.containerList.length !== 0) {
-      for (let i = 0; i < this.containerList.length; i++) {
+    if (this.containerList?.length !== 0) {
+      for (let i = 0; i < this.containerList?.length; i++) {
         const container = this.containerList[i];
         console.log(container);
         if (container.name) {
@@ -648,26 +604,29 @@ export class FileManagementComponent implements OnInit {
       for (let i = 0; i < this.fileList.length; i++) {
         const file = this.fileList[i];
         this.fileItems[folderIndex].items.push({
-          type: file.properties.contentType,
-          __KEY__: file.name,
-          name: file.name,
+          type: file.fileType,
+          __KEY__: file.id,
+          name: file.fileName,
+          title: file.title,
           isDirectory: false,
-          size: file.properties.contentLength,
+          size: file.fileSize,
           thumbnail: file.url,
+          id: file.id,
+          sourceID: file.sourceID,
         });
       }
     }
     console.log(this.fileItems[folderIndex].items);
     console.log('CURRENT DX FILES');
     console.log(this.fileItems);
-    // setTimeout(() => {
-    this.dxFileManager.instance.refresh();
-    // }, 500);
+    setTimeout(() => {
+      this.dxFileManager.instance.refresh();
+    }, 500);
   }
 
   containerDataListener() {
     return this.fileStore.$containerList.subscribe((data: any) => {
-      if (data.length !== 0) {
+      if (data?.length !== 0) {
         this.containerList = data;
         // setTimeout(() => {
         this.mapContainerToFolder();
@@ -722,11 +681,16 @@ export class FileManagementComponent implements OnInit {
       this.isDirectorySelected === false;
     const isPasteFile =
       keyList.find((e) => e === 'Control') && keyList.find((e) => e === 'v');
-    const isUpdateFile =
+    const isRenameFile =
       keyList.find((e) => e === 'F2') &&
       this.isDirectorySelected === false &&
       this.currentDirectory !== '';
-    const isUploadFile = keyList.find((e) => e === 'PageUp');
+    const isUpdateFile = keyList.find(
+      (e) =>
+        e === 'PageUp' &&
+        this.isDirectorySelected === false &&
+        this.currentDirectory !== ''
+    );
     const isUploadBatch = keyList.find((e) => e === 'Insert');
     const isRenameFolder =
       keyList.find((e) => e === 'F2') &&
@@ -737,20 +701,20 @@ export class FileManagementComponent implements OnInit {
       keyList.find((e) => e === 'ArrowUp');
     const isDeleteFolder =
       keyList.find((e) => e === 'Delete') && this.isDirectorySelected === true;
-    const isCloneFolder =
-      keyList.find((e) => e === 'Control') &&
-      keyList.find((e) => e === 'c') &&
-      this.isDirectorySelected === true;
     if (isClearClipboard) {
       this.clearClipboard();
       this.keyCombination = [];
     }
     if (isDeleteFile) {
-      this.deleteImages();
+      this.deleteFiles();
       this.keyCombination = [];
     }
-    if (isUploadFile) {
-      this.uploadImage();
+    if (isUpdateFile) {
+      this.updateFile();
+      this.keyCombination = [];
+    }
+    if (isRenameFile) {
+      this.renameFile();
       this.keyCombination = [];
     }
     if (isUploadBatch) {
@@ -758,15 +722,15 @@ export class FileManagementComponent implements OnInit {
       this.keyCombination = [];
     }
     if (isCopyFile) {
-      this.copyImages();
+      this.copyFiles();
       this.keyCombination = [];
     }
     if (isMoveFile) {
-      this.moveImages();
+      this.moveFiles();
       this.keyCombination = [];
     }
     if (isPasteFile) {
-      this.pasteImages();
+      this.pasteFiles();
       this.keyCombination = [];
     }
     if (isRenameFolder) {
@@ -775,22 +739,20 @@ export class FileManagementComponent implements OnInit {
     if (isNewFolder) {
       this.uploadContainer();
     }
-    if (isCloneFolder) {
-      this.cloneContainer();
-    }
     if (isDeleteFolder) {
       this.deleteSelectedContainer();
     }
     if (isUpdateFile) {
-      this.updateImage();
+      this.updateFile();
     }
   }
 
   ngOnInit(): void {
     this.refreshFolder();
     this.fileDataListener();
-    this.currentPageListener();
-    this.isUploadingListener();
+    this.isUpdatingFileListener();
+    this.isRenamingFileListener();
+    this.isUploadingFilesListener();
     this.isUploadingFolderListener();
     this.isUpdatingFolderListener();
     //overwrite default key handler
@@ -801,9 +763,10 @@ export class FileManagementComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.containerDataListener().unsubscribe();
-    this.currentPageListener().unsubscribe();
     this.fileDataListener().unsubscribe();
-    this.isUploadingListener().unsubscribe();
+    this.isUpdatingFileListener().unsubscribe();
+    this.isRenamingFileListener().unsubscribe();
+    this.isUploadingFilesListener().unsubscribe();
     this.isUploadingFolderListener().unsubscribe();
     this.isUpdatingFolderListener().unsubscribe();
   }

@@ -1,15 +1,17 @@
-export interface Properties {
-  lastModified: string;
-  etag: string;
-  leaseStatus: string;
-  leaseState: string;
-  hasImmutabilityPolicy: boolean;
-  hasLegalHold: boolean;
-  defaultEncryptionScope: string;
-  preventEncryptionScopeOverride: boolean;
-  ImmutableStorageWithVersioningEnabled: string;
-}
 export interface Container {
-  name: string;
-  properties: Properties;
+  name:            string;
+  properties:      Properties;
+  statusCode:      number;
+  responseMessage: null;
+}
+
+export interface Properties {
+  eTag:                  string;
+  hasImmutabilityPolicy: boolean;
+  hasLegalHold:          boolean;
+  lastModified:          string;
+  leaseStatus:           number;
+  leaseState:            number;
+  leaseDuration:         number;
+  publicAccess:          number;
 }

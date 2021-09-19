@@ -80,7 +80,7 @@ export class StoreService extends StateService<StoreState> {
     this.setState({ isLoading: _isLoading });
   }
 
-  setisPreloading(_isPreloading: boolean) {
+  setIsPreloading(_isPreloading: boolean) {
     this.setState({ isPreloading: _isPreloading });
   }
 

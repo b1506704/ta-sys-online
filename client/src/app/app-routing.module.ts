@@ -173,6 +173,14 @@ const routes: Routes = [
       ),
     canActivate: [AuthGuardService],
   },
+  {
+    path: 'file_management',
+    loadChildren: () =>
+      import('./pages/admin/file-management/file-management.module').then(
+        (m) => m.FileManagementModule
+      ),
+    canActivate: [AuthGuardService],
+  },
   // visitor
   {
     path: 'landing_page',

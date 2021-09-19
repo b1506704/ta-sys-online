@@ -12,6 +12,9 @@ interface FileState {
   fileList: Array<File>;
   containerList: Array<Container>;
   isUploading: boolean;
+  isUploadingFiles: boolean;
+  isUpdatingFile: boolean;
+  isRenamingFile: boolean;
   isUploadingFolder: boolean;
   isUpdatingFolder: boolean;
   exportData: Array<File>;
@@ -27,6 +30,9 @@ const initialState: FileState = {
   fileList: [],
   containerList: [],
   isUploading: false,
+  isUpdatingFile: false,
+  isRenamingFile: false,
+  isUploadingFiles: false,
   isUploadingFolder: false,
   isUpdatingFolder: false,
   selectedFile: {},
@@ -49,128 +55,34 @@ export class FileStore extends StateService<FileState> {
     super(initialState);
   }
 
-  fetchSelectedFiles(source: Array<any>) {
-    const sourceIDs = source.map((e) => e._id);
-    console.log('ARRAY OF IDs');
-    console.log(sourceIDs);
-    this.store.setIsLoading(true);
-    this.fileService.fetchSelectedFiles(sourceIDs).subscribe((data: any) => {
-      this.store.setIsLoading(false);
-      if (data !== null) {
-        this.setState({ fileList: this.state.fileList.concat(data) });
-        console.log('FETCHED FILES');
-        console.log(data);
-        // this.store.setIsLoading(false);
-      }
-    });
-  }
-
-  initInfiniteDataByContainer(container: string, size: number) {
+  initInfiniteDataByContainer(container: string) {
     this.setIsLoading(true);
     return this.fileService
-      .fetchFilesByContainer(container, size)
+      .fetchFilesByContainer(container)
       .toPromise()
       .then((data: any) => {
         this.setState({ fileList: [] });
         this.setState({
-          fileList: data.items,
+          fileList: data,
         });
         console.log('Current flag: infite list');
         console.log(this.state.fileList);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
         this.setIsLoading(false);
+      })
+      .catch((error) => {
+        console.log(error.responseMessage);
       });
   }
 
-  loadInfiniteDataAsync(page: number, size: number) {
-    this.setIsLoading(true);
-    this.fileService.fetchFile(page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          fileList: this.state.fileList.concat(data.items),
-        });
-        console.log('Infinite list');
-        console.log(this.state.fileList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  initInfiniteFilterByCategoryData(value: string, page: number, size: number) {
-    // this.store.showNotif('Filtered Mode On', 'custom');
-    this.setState({ fileList: [] });
-    this.store.setIsLoading(true);
+  initInfiniteFilterByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
     return this.fileService
-      .filterFileByCategory(value, page, size)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          fileList: this.state.fileList.concat(data.items),
-        });
-        console.log('Current flag: infinite filtered list');
-        console.log(this.state.fileList);
-        this.store.setIsLoading(false);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-      });
-    // .then(() => {
-    //   this.filterFileByCategory(value, page, size);
-    // });
-  }
-
-  initInfiniteSearchByNameData(value: string, page: number, size: number) {
-    this.store.showNotif('Searched Mode On', 'custom');
-    this.setIsLoading(true);
-    this.fileService
-      .searchFileByName(value, page, size)
-      .toPromise()
-      .then((data: any) => {
-        if (data.totalItems !== 0) {
-          this.setState({
-            fileList: this.state.fileList.concat(data.items),
-          });
-        } else {
-          this.store.showNotif('No result found!', 'custom');
-        }
-        console.log('Current flag: infitite searched list');
-        console.log(this.state.fileList);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      });
-  }
-
-  initInfiniteSortByPriceData(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.store.showNotif('Sort Mode On', 'custom');
-    this.fileService
-      .sortFileByPrice(value, page, size)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          fileList: this.state.fileList.concat(data.items),
-        });
-        console.log('Current flag: sort list');
-        console.log(this.state.fileList);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      });
+      .filterFileByProperty(property, value, page, size)
+      .toPromise();
   }
 
   setIsLoading(_isLoading: boolean) {
@@ -183,27 +95,19 @@ export class FileStore extends StateService<FileState> {
     (state) => state.containerList
   );
 
-  $exportData: Observable<Array<File>> = this.select(
-    (state) => state.exportData
-  );
-
-  $totalPages: Observable<Number> = this.select((state) => state.totalPages);
-
-  $totalItems: Observable<Number> = this.select((state) => state.totalItems);
-
-  $currentPage: Observable<Number> = this.select((state) => state.currentPage);
-
-  $selectedFile: Observable<Object> = this.select(
-    (state) => state.selectedFile
-  );
-
-  $fileInstance: Observable<File> = this.select((state) => state.fileInstance);
-
-  $downloadedFileInstance: Observable<any> = this.select(
-    (state) => state.fileInstance
-  );
-
   $isUploading: Observable<boolean> = this.select((state) => state.isUploading);
+
+  $isUploadingFiles: Observable<boolean> = this.select(
+    (state) => state.isUploadingFiles
+  );
+
+  $isUpdatingFile: Observable<boolean> = this.select(
+    (state) => state.isUpdatingFile
+  );
+
+  $isRenamingFile: Observable<boolean> = this.select(
+    (state) => state.isRenamingFile
+  );
 
   $isUploadingFolder: Observable<boolean> = this.select(
     (state) => state.isUploadingFolder
@@ -213,47 +117,30 @@ export class FileStore extends StateService<FileState> {
     (state) => state.isUpdatingFolder
   );
 
-  uploadFile(file: File) {
+  downloadFile(id: string) {
     this.setIsLoading(true);
-    this.setisUploading(true);
-    this.fileService.uploadFile(file).subscribe({
-      next: (data: any) => {
-        this.setState({ responseMsg: data });
-        console.log(data);
-        this.setIsLoading(false);
-        this.setisUploading(false);
-        this.store.showNotif(data.message, 'custom');
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  downloadFile(fileName: string, container: string) {
-    this.setIsLoading(true);
-    this.fileService.downloadFile(fileName, container).subscribe({
+    this.fileService.downloadFile(id).subscribe({
       next: (data: any) => {
         console.log(data);
-        saveAs(data.url, data.name, { type: data.type });
+        saveAs(data.url, data.fileName, { type: data.fileType });
         this.setIsLoading(false);
-        this.store.showNotif(`'${fileName}' downloaded`, 'custom');
+        this.store.showNotif(data.responseMessage, 'custom');
       },
       error: (data: any) => {
+        this.store.showNotif(data.error.responseMessage, 'custom');
         this.setIsLoading(false);
         console.log(data);
       },
     });
   }
 
-  downloadFiles(selectedItems: Array<string>, container: string) {
+  downloadFiles(selectedItems: Array<string>) {
     this.setIsLoading(true);
     const currentDate = new Date();
-    this.fileService.downloadFiles(selectedItems, container).subscribe({
+    this.fileService.downloadFiles(selectedItems).subscribe({
       next: (data: any) => {
         if (data !== null) {
+          console.log(data);
           let blob: any = new Blob([data], { type: 'application/zip' });
           saveAs(blob, `${currentDate.toLocaleDateString()}.zip`);
           this.store.showNotif('1 zip downloaded', 'custom');
@@ -261,27 +148,30 @@ export class FileStore extends StateService<FileState> {
         }
       },
       error: (data: any) => {
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         this.setIsLoading(false);
         console.log(data);
       },
     });
   }
 
-  updateFile(file: File, key: string, page: number, size: number) {
+  changeFileName(id: string, fileName: string) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
-        this.fileService.updateFile(file, key).subscribe({
+        this.setIsRenamingFile(true);
+        this.fileService.changeFileName(id, fileName).subscribe({
           next: (data: any) => {
             this.setState({ responseMsg: data });
             console.log(data);
             this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
+            this.setIsRenamingFile(false);
+            this.store.showNotif(data.responseMessage, 'custom');
           },
           error: (data: any) => {
             this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
+            this.setIsRenamingFile(false);
+            this.store.showNotif(data.error.responseMessage, 'error');
             console.log(data);
           },
         });
@@ -289,21 +179,45 @@ export class FileStore extends StateService<FileState> {
     });
   }
 
-  uploadFiles(selectedFiles: Array<File>, container: string) {
+  updateFile(id: string, sourceID: string, title: string) {
+    this.confirmDialog('').then((confirm: boolean) => {
+      if (confirm) {
+        this.setIsLoading(true);
+        this.setIsUpdatingFile(true);
+        this.fileService.updateFile(id, sourceID, title).subscribe({
+          next: (data: any) => {
+            this.setState({ responseMsg: data });
+            console.log(data);
+            this.setIsUpdatingFile(false);
+            this.setIsLoading(false);
+            this.store.showNotif(data.responseMessage, 'custom');
+          },
+          error: (data: any) => {
+            this.setIsLoading(false);
+            this.setIsUpdatingFile(false);
+            this.store.showNotif(data.error.responseMessage, 'error');
+            console.log(data);
+          },
+        });
+      }
+    });
+  }
+
+  uploadFiles(selectedFiles: Array<File>) {
     this.setIsLoading(true);
-    this.setisUploading(true);
-    this.fileService.uploadFiles(selectedFiles, container).subscribe({
+    this.setIsUploadingFiles(true);
+    this.fileService.uploadFiles(selectedFiles).subscribe({
       next: (data: any) => {
         this.setState({ responseMsg: data });
         console.log(data);
         this.setIsLoading(false);
-        this.setisUploading(false);
-        this.store.showNotif(data.message, 'custom');
+        this.setIsUploadingFiles(false);
+        this.store.showNotif(data.responseMessage, 'custom');
       },
       error: (data: any) => {
-        this.store.showNotif(data.error.errorMessage, 'error');
+        this.store.showNotif(data.error.responseMessage, 'error');
         this.setIsLoading(false);
-        this.setisUploading(false);
+        this.setIsUploadingFiles(false);
         console.log(data);
       },
     });
@@ -316,63 +230,23 @@ export class FileStore extends StateService<FileState> {
     return confirm(`<b>Are you sure?</b>`, 'Confirm changes');
   }
 
-  copySelectedFiles(
-    selectedFiles: Array<string>,
-    sourceContainer: string,
-    destinationContainer: string
-  ) {
+  copySelectedFiles(selectedFiles: Array<File>, targetContainer: string) {
     this.setIsLoading(true);
     return this.fileService
-      .copyFiles(selectedFiles, sourceContainer, destinationContainer)
+      .copyFiles(selectedFiles, targetContainer)
       .toPromise();
   }
 
-  moveSelectedFiles(
-    selectedFiles: Array<string>,
-    sourceContainer: string,
-    destinationContainer: string
-  ) {
+  moveSelectedFiles(selectedFiles: Array<File>, targetContainer: string) {
     this.setIsLoading(true);
     return this.fileService
-      .moveFiles(selectedFiles, sourceContainer, destinationContainer)
+      .moveFiles(selectedFiles, targetContainer)
       .toPromise();
   }
 
-  deleteSelectedFiles(selectedFiles: Array<string>, container: string) {
+  deleteSelectedFiles(selectedFiles: Array<string>) {
     this.setIsLoading(true);
-    return this.fileService
-      .deleteSelectedFiles(selectedFiles, container)
-      .toPromise();
-  }
-
-  deleteAllFiles() {
-    this.confirmDialog('Delete all items?').then((confirm: boolean) => {
-      if (confirm) {
-        this.setIsLoading(true);
-        this.fileService.deleteAllFiles().subscribe({
-          next: (data: any) => {
-            this.setState({ responseMsg: data });
-            this.setState({ fileList: [] });
-            this.setState({ totalPages: 0 });
-            this.setState({ currentPage: 0 });
-            this.setState({ totalItems: 0 });
-            console.log(data);
-            this.setIsLoading(false);
-            this.store.showNotif(data.message, 'custom');
-          },
-          error: (data: any) => {
-            this.setIsLoading(false);
-            this.store.showNotif(data.error.errorMessage, 'error');
-            console.log(data);
-          },
-        });
-      }
-    });
-  }
-
-  deleteFile(name: string, container: string) {
-    this.setIsLoading(true);
-    return this.fileService.deleteFile(name, container).toPromise();
+    return this.fileService.deleteSelectedFiles(selectedFiles).toPromise();
   }
 
   selectFile(_file: File) {
@@ -389,186 +263,93 @@ export class FileStore extends StateService<FileState> {
 
   setCurrentPage(_currentPage: number) {
     this.setState({ currentPage: _currentPage });
-  }
-
-  filterInfiniteFileByCategory(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.fileService.filterFileByCategory(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          fileList: this.state.fileList.concat(data.items),
-        });
-        console.log('Filtered list');
-        console.log(this.state.fileList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  searchInfiniteFileByName(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.fileService.searchFileByName(value, page, size).subscribe({
-      next: (data: any) => {
-        if (data.totalItems !== 0) {
-          this.setState({
-            fileList: this.state.fileList.concat(data.items),
-          });
-        } else {
-          this.store.showNotif('No result found!', 'custome');
-        }
-        console.log('Infite searched list');
-        console.log(this.state.fileList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  sortInfiniteFileByPrice(value: string, page: number, size: number) {
-    this.setIsLoading(true);
-    this.fileService.sortFileByPrice(value, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          fileList: this.state.fileList.concat(data.items),
-        });
-        console.log('Infite sorted list');
-        console.log(this.state.fileList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.errorMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  getFile(id: string) {
-    this.setIsLoading(true);
-    return this.fileService
-      .getFile(id)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({ fileInstance: data });
-        console.log(data);
-        this.setIsLoading(false);
-      });
-  }
-
-  getFileBySourceID(id: string) {
-    this.setIsLoading(true);
-    return this.fileService
-      .getFileBySourceID(id)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({ fileInstance: data });
-        console.log(data);
-        this.setIsLoading(false);
-      });
-  }
-
-  setisUploading(isFetching: boolean) {
-    this.setState({ isUploading: isFetching });
-  }
-
-  setisUploadingFolder(isFetching: boolean) {
-    this.setState({ isUploadingFolder: isFetching });
-  }
-
-  setisUpdatingFolder(isFetching: boolean) {
-    this.setState({ isUpdatingFolder: isFetching });
-  }
+  } 
 
   // container functions
 
-  initInfiniteContainer(page: number, size: number) {
+  initInfiniteContainer() {
     this.setIsLoading(true);
     return this.fileService
-      .fetchContainer(page, size)
+      .fetchContainer()
       .toPromise()
       .then((data: any) => {
         this.setState({
-          containerList: data.items,
+          containerList: data,
         });
         console.log('Current flag: infite list');
         console.log(this.state.containerList);
-        this.setState({ totalItems: data.totalItems });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.currentPage });
         this.setIsLoading(false);
       });
   }
+
   uploadContainer(container: Container) {
     this.setIsLoading(true);
-    this.setisUploadingFolder(true);
+    this.setIsUploadingFolder(true);
     this.fileService.uploadContainer(container).subscribe({
       next: (data: any) => {
         this.setState({ responseMsg: data });
         console.log(data);
         this.setIsLoading(false);
-        this.setisUploadingFolder(false);
-        this.store.showNotif(data.message, 'custom');
+        this.setIsUploadingFolder(false);
+        this.store.showNotif(data.responseMessage, 'custom');
       },
       error: (data: any) => {
         this.setIsLoading(false);
-        this.setisUploadingFolder(false);
-        this.store.showNotif(data.errorMessage.message, 'custom');
+        this.setIsUploadingFolder(false);
+        this.store.showNotif(data.error.responseMessage, 'custom');
         console.log(data);
       },
     });
   }
 
-  updateContainer(container: string, newContainer: string) {
+  updateContainer(oldContainerName: string, newContainerName: string) {
     this.setIsLoading(true);
-    this.setisUpdatingFolder(true);
-    this.fileService.updateContainer(container, newContainer).subscribe({
-      next: (data: any) => {
-        this.setState({ responseMsg: data });
-        console.log(data);
-        this.setIsLoading(false);
-        this.setisUpdatingFolder(false);
-        this.store.showNotif(data.message, 'custom');
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.setisUpdatingFolder(false);
-        this.store.showNotif(data.errorMessage.message, 'custom');
-        console.log(data);
-      },
-    });
+    this.setIsUpdatingFolder(true);
+    this.fileService
+      .updateContainer(oldContainerName, newContainerName)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({ responseMsg: data });
+          console.log(data);
+          this.setIsLoading(false);
+          this.setIsUpdatingFolder(false);
+          this.store.showNotif(data.responseMessage, 'custom');
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.setIsUpdatingFolder(false);
+          this.store.showNotif(data.errorMessage.message, 'custom');
+          console.log(data);
+        },
+      });
   }
 
-  deleteContainer(container: string) {
+  deleteContainer(container: Array<string>) {
     this.setIsLoading(true);
     return this.fileService.deleteContainer(container).toPromise();
   }
 
-  cloneContainer(container: string) {
-    this.setIsLoading(true);
-    return this.fileService.cloneContainer(container).toPromise();
+  setIsUploading(isFetching: boolean) {
+    this.setState({ isUploading: isFetching });
+  }
+
+  setIsUploadingFiles(isFetching: boolean) {
+    this.setState({ isUploadingFiles: isFetching });
+  }
+
+  setIsUpdatingFile(isFetching: boolean) {
+    this.setState({ isUpdatingFile: isFetching });
+  }
+
+  setIsRenamingFile(isFetching: boolean) {
+    this.setState({ isRenamingFile: isFetching });
+  }
+
+  setIsUploadingFolder(isFetching: boolean) {
+    this.setState({ isUploadingFolder: isFetching });
+  }
+
+  setIsUpdatingFolder(isFetching: boolean) {
+    this.setState({ isUpdatingFolder: isFetching });
   }
 }

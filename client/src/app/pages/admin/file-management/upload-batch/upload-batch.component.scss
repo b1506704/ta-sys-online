@@ -96,14 +96,14 @@
   }
 }
 
-.img-input {
+.file-input {
   color: transparent;
   width: 65px;
 }
-.img-input::-webkit-file-upload-button {
+.file-input::-webkit-file-upload-button {
   visibility: hidden;
 }
-.img-input::before {
+.file-input::before {
   content: "Upload";
   display: inline-block;
   border: 1px solid #999;
@@ -117,10 +117,10 @@
   font-weight: 700;
   font-size: 15px;
 }
-.img-input:hover::before {
+.file-input:hover::before {
   border-color: rgb(252, 255, 255);
 }
-.img-input:active::before {
+.file-input:active::before {
   background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
 }
 @keyframes color-change {

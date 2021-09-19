@@ -375,7 +375,7 @@ export class ImageStore extends StateService<ImageState> {
 
   uploadImage(image: Image) {
     this.setIsLoading(true);
-    this.setisUploading(true);
+    this.setIsUploading(true);
     this.imageService.uploadImage(image).subscribe({
       next: (data: any) => {
         this.setState({ responseMsg: data });
@@ -384,7 +384,7 @@ export class ImageStore extends StateService<ImageState> {
         // this.loadDataAsync(page, size);
         this.getImageBySourceID(image?.sourceID);
         this.setIsLoading(false);
-        this.setisUploading(false);
+        this.setIsUploading(false);
       },
       error: (data: any) => {
         this.setIsLoading(false);
@@ -729,7 +729,7 @@ export class ImageStore extends StateService<ImageState> {
       });
   }
 
-  setisUploading(isFetching: boolean) {
+  setIsUploading(isFetching: boolean) {
     this.setState({ isUploading: isFetching });
   }
 

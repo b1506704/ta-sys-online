@@ -1,3 +1,16 @@
+.background {
+  background-color: #000000;
+  background-image: linear-gradient(315deg, #000000 0%, #7f8c8d 74%);
+  height: 100%;
+  margin: 0 !important;
+  width: 100%;
+}
+.title-container {
+  margin-top: 15px;
+  margin-left: 15px;
+  color: #000000;
+  font-family: Hero;
+}
 @media screen and (max-width: 800px) {
   .feature-container {
     display: flex;
@@ -103,6 +116,7 @@
   justify-content: center;
   align-items: center;
 }
+
 .content-body {
   position: absolute;
   display: flex;
@@ -110,7 +124,7 @@
   justify-content: flex-start;
   align-items: center;
   top: 0;
-  height: 500px;
+  height: 300px;
   margin-top: 100px;
   width: 100%;
   background-color: rgba(3, 2, 0, 0.9);
@@ -118,7 +132,7 @@
 
 @supports (
   (-webkit-backdrop-filter: blur(2em)) or (backdrop-filter: blur(2em))
-) {
+) {  
   .content-body {
     position: absolute;
     display: flex;
@@ -206,6 +220,7 @@
 }
 
 .box-shadow {
+  border-radius: 5px;
   box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset,
     rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset,
     rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px,

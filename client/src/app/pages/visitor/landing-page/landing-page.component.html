@@ -2,145 +2,191 @@
 <h2 class="subtitle" #subtitle>
   Highly interactive online learning and teaching assistant platform
 </h2>
-<!-- #intro -->
-<dx-gallery
-  [dataSource]="dataSource"
-  [height]="'100vh'"
-  [slideshowDelay]="slideshowDelay"
-  [loop]="true"
-  width="100%"
-  [showNavButtons]="true"
-  [showIndicator]="true"
-  (onSelectionChanged)="onSelectionChanged($event)"
->
-  <div *dxTemplate="let galleryItem of 'item'">
-    <div
-      style="
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
-      "
-    >
-      <div class="img-container">
-        <img class="gallery-image" src="{{ galleryItem.imgUrl }}" />
+<div class="background">
+  <h2 class="feature-heading">For Learners</h2>
+  <div class="organization-container" #organization1>
+    <div class="organization-img box-shadow">
+      <dx-gallery
+        [dataSource]="dataSource"
+        [slideshowDelay]="slideshowDelay"
+        [loop]="true"
+        [showNavButtons]="true"
+        [showIndicator]="true"
+        (onSelectionChanged)="onSelectionChanged($event)"
+      >
+        <div *dxTemplate="let galleryItem of 'item'">
+          <div class="img-container">
+            <img class="gallery-image" src="{{ galleryItem.imgUrl }}" />
+          </div>
+        </div>
+      </dx-gallery>
+    </div>
+    <div class="organization-content">
+      <div class="title-container box-shadow">
+        <div class="feature-title">Streaming</div>
+        <div class="feature-body">
+          Face-to-face video, audio streaming with many useful controls
+        </div>
       </div>
-      <div class="content-body">
-        <p class="gallery-title">{{ galleryItem.title }}</p>
-        <p class="gallery-subtitle">{{ galleryItem.subTitle }}</p>
-        <dx-button
-          icon="arrowright"
-          type="normal"
-          (onClick)="navigateInside()"
-          text="Click for more"
-        >
-        </dx-button>
+      <div class="title-container box-shadow">
+        <div class="feature-title">Interaction</div>
+        <div class="feature-body">
+          Real time lesson interaction with chat message and command UI
+        </div>
+      </div>
+      <div class="title-container box-shadow">
+        <div class="feature-title">Online Payment</div>
+        <div class="feature-body">
+          Pay at home. Get courses at ease. Discounts all the way. Quality
+          guaranteed
+        </div>
       </div>
     </div>
   </div>
-</dx-gallery>
-<h2 class="feature-heading">Features</h2>
-<div class="feature-container box-shadow" #feature1>
-  <div class="feature-content">
-    <div class="feature-title">DATAGRID EDITOR</div>
-    <div class="feature-body">
-      Fully functioned database management with cutting-edge tools and
-      techniques
+  <h2 class="feature-heading">For Instructors</h2>
+  <div class="organization-container" #organization1>
+    <div class="organization-img box-shadow">
+      <dx-gallery
+        [dataSource]="dataSource"
+        [slideshowDelay]="slideshowDelay"
+        [loop]="true"
+        [showNavButtons]="true"
+        [showIndicator]="true"
+        (onSelectionChanged)="onSelectionChanged($event)"
+      >
+        <div *dxTemplate="let galleryItem of 'item'">
+          <div class="img-container">
+            <img class="gallery-image" src="{{ galleryItem.imgUrl }}" />
+          </div>
+        </div>
+      </dx-gallery>
     </div>
-    <div class="feature-icons">
-      <dx-button icon="splitcells" text="Row Edit"> </dx-button>
-      <dx-button icon="tableproperties" text="Column Edit"> </dx-button>
-      <dx-button icon="trash" text="Delete All"> </dx-button>
-      <dx-button icon="unselectall" text="Selective Remove"> </dx-button>
-      <dx-button icon="xlsxfile" text="Export XLSX"> </dx-button>
-      <dx-button icon="exportpdf" text="Export PDF"> </dx-button>
-      <dx-button icon="add" text="Live Insert"> </dx-button>
-      <dx-button icon="filter" text="Filter & Sort"> </dx-button>
-      <dx-button icon="search" text="Smart Search"> </dx-button>
-      <dx-button icon="range" text="Random Generate"> </dx-button>
-      <dx-button icon="globe" text="SS Pagination"> </dx-button>
-      <dx-button icon="verticalaligncenter" text="Responsive UI"></dx-button>
-    </div>
-  </div>
-  <div class="feature-img">
-    <img
-      src="../../../../assets/imgs/landing_page_9.png"
-      alt="..."
-      style="
-        height: 100%;
-        width: 100%;
-        border-radius: 15px;
-        box-shadow: rgba(79, 205, 255, 0.25) 0px 25px 50px -12px;
-      "
-    />
-  </div>
-</div>
-<div class="feature-container box-shadow" #feature2>
-  <div class="feature-content">
-    <div class="feature-title">DYNAMIC STATISTICS</div>
-    <div class="feature-body">
-      Providing a variety of charts with auto-calculating function and range
-      selectors.
-    </div>
-    <div class="feature-icons">
-      <dx-button icon="splitcells" text="Range Selector"> </dx-button>
-      <dx-button icon="refresh" text="Fetch Data"> </dx-button>
-      <dx-button icon="formula" text="Auto Calculate"> </dx-button>
-      <dx-button icon="like" text="Friendly UI"> </dx-button>
+    <div class="organization-content">
+      <div class="title-container box-shadow">
+        <div class="feature-title">Creativity</div>
+        <div class="feature-body">
+          Blueprint curriculum crafting, creating lessons, tests with easy drag
+          and drop and autocomplete
+        </div>
+      </div>
+      <div class="title-container box-shadow">
+        <div class="feature-title">Easy Assessment</div>
+        <div class="feature-body">
+          Supervise learners' progress with modern design charts
+        </div>
+      </div>
+      <div class="title-container box-shadow">
+        <div class="feature-title">Full Asset Control</div>
+        <div class="feature-body">
+          Upload and download files with Google Drive-like storage management
+        </div>
+      </div>
     </div>
   </div>
-  <div class="feature-img">
-    <img
-      src="../../../../assets/imgs/landing_page_10.png"
-      alt="..."
-      style="
-        height: 100%;
-        width: 100%;
-        border-radius: 15px;
-        box-shadow: rgba(79, 205, 255, 0.25) 0px 25px 50px -12px;
-      "
-    />
+  <h2 class="feature-heading">Top Courses</h2>
+  <div class="organization-container" #organization1>
+    <div class="organization-img">
+      <dx-gallery
+        [dataSource]="dataSource"
+        [slideshowDelay]="slideshowDelay"
+        [loop]="true"
+        [showNavButtons]="true"
+        [showIndicator]="true"
+        (onSelectionChanged)="onSelectionChanged($event)"
+      >
+        <div *dxTemplate="let galleryItem of 'item'">
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-start;
+              align-items: center;
+            "
+          >
+            <div class="img-container">
+              <img class="gallery-image" src="{{ galleryItem.imgUrl }}" />
+            </div>
+            <div class="content-body">
+              <p class="gallery-title">{{ galleryItem.title }}</p>
+              <p class="gallery-subtitle">{{ galleryItem.subTitle }}</p>
+              <dx-button
+                icon="arrowright"
+                type="normal"
+                (onClick)="navigateInside()"
+                text="Click for more"
+              >
+              </dx-button>
+            </div>
+          </div>
+        </div>
+      </dx-gallery>
+    </div>
+    <div class="organization-content">
+      <div class="title-container">
+        <div class="feature-title">Le Bao Anh</div>
+        <div class="feature-body">Frontend Developer</div>
+      </div>
+    </div>
   </div>
-</div>
+  <h2 class="feature-heading">Top Instructors</h2>
+  <div class="organization-container" #organization1>
+    <div class="organization-img">
+      <img
+        src="../../../../assets/imgs/tesla_director.jpg"
+        alt="..."
+        style="
+          height: 300px;
+          width: 300px;
+          border-radius: 300px;
+          box-shadow: rgba(79, 205, 255, 0.25) 0px 25px 50px -12px;
+        "
+      />
+    </div>
+    <div class="organization-content">
+      <div class="feature-title">Le Bao Anh</div>
+      <div class="feature-body">Frontend Developer</div>
+    </div>
+  </div>
 
-<h2 class="feature-heading">Organization</h2>
-<div class="organization-container" #organization1>
-  <div class="organization-img">
-    <img
-      src="../../../../assets/imgs/tesla_director.jpg"
-      alt="..."
-      style="
-        height: 300px;
-        width: 300px;
-        border-radius: 300px;
-        box-shadow: rgba(79, 205, 255, 0.25) 0px 25px 50px -12px;
-      "
-    />
+  <h2 class="feature-heading">Organization</h2>
+  <div class="organization-container" #organization1>
+    <div class="organization-img">
+      <img
+        src="../../../../assets/imgs/tesla_director.jpg"
+        alt="..."
+        style="
+          height: 300px;
+          width: 300px;
+          border-radius: 300px;
+          box-shadow: rgba(79, 205, 255, 0.25) 0px 25px 50px -12px;
+        "
+      />
+    </div>
+    <div class="organization-content">
+      <div class="feature-title">Le Bao Anh</div>
+      <div class="feature-body">Frontend Developer</div>
+    </div>
   </div>
-  <div class="organization-content">
-    <div class="feature-title">Le Bao Anh</div>
-    <div class="feature-body">Frontend Developer</div>
+  <div class="organization-container" #organization2>
+    <div class="organization-img">
+      <img
+        src="../../../../assets/imgs/tesla_director.jpg"
+        alt="..."
+        style="
+          height: 300px;
+          width: 300px;
+          border-radius: 300px;
+          box-shadow: rgba(79, 205, 255, 0.25) 0px 25px 50px -12px;
+        "
+      />
+    </div>
+    <div class="organization-content">
+      <div class="feature-title">Ha Tan Loc</div>
+      <div class="feature-body">Backend Developer.</div>
+    </div>
   </div>
-</div>
-<div class="organization-container" #organization2>
-  <div class="organization-img">
-    <img
-      src="../../../../assets/imgs/tesla_director.jpg"
-      alt="..."
-      style="
-        height: 300px;
-        width: 300px;
-        border-radius: 300px;
-        box-shadow: rgba(79, 205, 255, 0.25) 0px 25px 50px -12px;
-      "
-    />
-  </div>
-  <div class="organization-content">
-    <div class="feature-title">Ha Tan Loc</div>
-    <div class="feature-body">Backend Developer.</div>
-  </div>
-</div>
 
-<div class="footer">
-  <h2>@{{ date }}. T. A. S Online</h2>
+  <div class="footer">
+    <h2>@{{ date }}. T. A. S Online</h2>
+  </div>
 </div>

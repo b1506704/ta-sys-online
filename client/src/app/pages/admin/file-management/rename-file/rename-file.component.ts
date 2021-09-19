@@ -7,17 +7,15 @@ import {
   ViewChild,
 } from '@angular/core';
 import { DxFormComponent } from 'devextreme-angular';
-import { StoreService } from 'src/app/shared/services/store.service';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
 @Component({
-  selector: 'app-upload-folder',
-  templateUrl: './upload-folder.component.html',
-  styleUrls: ['./upload-folder.component.scss'],
+  selector: 'app-rename-file',
+  templateUrl: './rename-file.component.html',
+  styleUrls: ['./rename-file.component.scss'],
 })
-export class UploadFolderComponent implements OnInit, OnDestroy, OnChanges {
+export class RenameFileComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild(DxFormComponent, { static: false }) dxForm: DxFormComponent;
-  @Input() directory!: string;
-  @Input() selectedItem!: any;
+  @Input() selectedItem: any;
   submitButtonOptions: any = {
     text: 'Submit',
     icon: 'save',
@@ -31,29 +29,35 @@ export class UploadFolderComponent implements OnInit, OnDestroy, OnChanges {
     useSubmitBehavior: false,
     onClick: this.resetValues.bind(this),
   };
+  fileData: any;
   isUploading!: boolean;
-  containerData: any = {
-    name: '',
-    parentDir: this.directory,
-  };
-  constructor(private store: StoreService, private fileStore: FileStore) {}
+  constructor(private fileStore: FileStore) {}
 
   isUploadingListener() {
-    return this.fileStore.$isUploadingFolder.subscribe((data: boolean) => {
+    return this.fileStore.$isRenamingFile.subscribe((data: boolean) => {
       this.isUploading = data;
     });
   }
 
   resetValues() {
-    this.containerData = {
-      name: '',
-      parentDir: this.directory,
+    this.fileData = {
+      id: '',
+      fileName: '',
     };
+  }
+
+  renderSelectedFile() {
+    if (this.selectedItem) {
+      console.log('SELECTED IMAGE');
+      console.log(this.selectedItem);
+      this.fileData.id = this.selectedItem.__KEY__;
+      this.fileData.fileName = this.selectedItem.name;
+    }
   }
 
   onSubmit = (e: any) => {
     e.preventDefault();
-    this.fileStore.uploadContainer(this.containerData);
+    this.fileStore.changeFileName(this.fileData.id, this.fileData.fileName);
     this.resetValues();
   };
 
@@ -63,6 +67,7 @@ export class UploadFolderComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnChanges(): void {
     this.resetValues();
+    this.renderSelectedFile();
   }
 
   ngOnDestroy(): void {

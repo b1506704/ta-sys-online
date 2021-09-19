@@ -12,10 +12,11 @@ import {
   DxSpeedDialActionModule,
   DxTileViewModule,
 } from 'devextreme-angular';
-import { UploadToolComponent } from './upload-tool/upload-tool.component';
+import { UpdateFileComponent } from './update-file/update-file.component';
 import { UploadFolderComponent } from './upload-folder/upload-folder.component';
 import { UploadBatchComponent } from './upload-batch/upload-batch.component';
 import { UpdateFolderComponent } from './update-folder/update-folder.component';
+import { RenameFileComponent } from './rename-file/rename-file.component';
 
 @NgModule({
   imports: [
@@ -32,9 +33,10 @@ import { UpdateFolderComponent } from './update-folder/update-folder.component';
   ],
   declarations: [
     FileManagementComponent,
-    UploadToolComponent,
+    UpdateFileComponent,
     UploadFolderComponent,
     UploadBatchComponent,
+    RenameFileComponent,
     UpdateFolderComponent,
   ],
 })

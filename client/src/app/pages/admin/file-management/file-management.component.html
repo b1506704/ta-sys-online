@@ -83,12 +83,6 @@
           widget="dxMenu"
           location="before"
           locateInMenu="auto"
-          [options]="newFileMenuOptions"
-        ></dxi-item>
-        <dxi-item
-          widget="dxMenu"
-          location="before"
-          locateInMenu="auto"
           [options]="newFilesMenuOptions"
         ></dxi-item>
       </ng-container>
@@ -168,14 +162,9 @@
           ></dxi-item>
           <dxi-item
             name="updateFolder"
-            text="Update Folder"
+            text="Rename Folder"
             icon="edit"
             beginGroup="true"
-          ></dxi-item>
-          <dxi-item
-            name="cloneFolder"
-            text="Clone Folder"
-            icon="unselectall"
           ></dxi-item>
         </ng-container>
       </ng-container>
@@ -198,8 +187,14 @@
           icon="trash"
         ></dxi-item>
         <dxi-item
-          name="updateImage"
-          text="Update image"
+          name="updateFile"
+          text="Link Source"
+          icon="link"
+          beginGroup="true"
+        ></dxi-item>
+        <dxi-item
+          name="renameFile"
+          text="Rename File"
           icon="edit"
           beginGroup="true"
         ></dxi-item>
@@ -230,8 +225,7 @@
           </div>
           <div class="info-container">
             <p>Detail Information</p>
-            <div>Title: {{ currentFile?.dataItem.name }}</div>
-            <div>Category: {{ currentFile?.dataItem.category }}</div>
+            <div>Title: {{ currentFile?.dataItem.title }}</div>
             <div>Type: {{ currentFile?.dataItem.type }}</div>
             <div>Size: {{ currentFile?.dataItem.size }} byte</div>
           </div>
@@ -240,14 +234,14 @@
     </div>
   </dx-popup>
   <dx-popup
-    id="upload-popup"
+    id="update-file-popup"
     [height]="'90%'"
     [width]="'90%'"
     [showTitle]="true"
     [shading]="true"
     [showCloseButton]="true"
-    [title]="'Upload Tool'"
-    [(visible)]="isUploadPopupVisible"
+    [title]="'Link Source'"
+    [(visible)]="isUpdateFilePopupVisible"
   >
     <div *dxTemplate="let data of 'content'">
       <dx-scroll-view
@@ -257,10 +251,29 @@
         [height]="'100%'"
         [width]="'100%'"
       >
-        <app-upload-tool
-          [directory]="currentDirectory"
-          [selectedItem]="selectedItem"
-        ></app-upload-tool>
+        <app-update-file [selectedItem]="selectedItem"></app-update-file>
+      </dx-scroll-view>
+    </div>
+  </dx-popup>
+  <dx-popup
+    id="rename-file-popup"
+    [height]="'60%'"
+    [width]="'80%'"
+    [showTitle]="true"
+    [shading]="true"
+    [showCloseButton]="true"
+    [title]="'Rename File'"
+    [(visible)]="isRenameFilePopupVisible"
+  >
+    <div *dxTemplate="let data of 'content'">
+      <dx-scroll-view
+        [bounceEnabled]="true"
+        [scrollByContent]="true"
+        [scrollByThumb]="true"
+        [height]="'100%'"
+        [width]="'100%'"
+      >
+        <app-rename-file [selectedItem]="selectedItem"></app-rename-file>
       </dx-scroll-view>
     </div>
   </dx-popup>
