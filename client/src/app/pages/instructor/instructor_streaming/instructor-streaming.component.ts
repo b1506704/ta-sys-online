@@ -64,7 +64,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
   start(): void {
     // #1 connect to signaling server
-    this.signaling.connect('/signaling', true).then(() => {
+    this.signaling.connect('/streaming', true).then(() => {
       if (this.signaling.isConnected()) {
         this.signaling.invoke('CreateOrJoinRoom', this.room.name);
       }
