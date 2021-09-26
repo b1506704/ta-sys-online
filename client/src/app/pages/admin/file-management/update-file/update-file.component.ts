@@ -13,6 +13,11 @@ import { FileStore } from 'src/app/shared/services/file/file-store.service';
 import { Container } from 'src/app/shared/models/container';
 import { UserStore } from 'src/app/shared/services/user/user-store.service';
 import { UserHttpService } from 'src/app/shared/services/user/user-http.service';
+import { CourseHttpService } from 'src/app/shared/services/course/course-http.service';
+import { SubjectHttpService } from 'src/app/shared/services/subject/subject-http.service';
+import { LessonHttpService } from 'src/app/shared/services/lesson/lesson-http.service';
+import { TestHttpService } from 'src/app/shared/services/test/test-http.service';
+import { QuestionHttpService } from 'src/app/shared/services/question/question-http.service';
 @Component({
   selector: 'app-update-file',
   templateUrl: './update-file.component.html',
@@ -70,9 +75,6 @@ export class UpdateFileComponent implements OnInit, OnDestroy, OnChanges {
     {
       name: 'subject',
     },
-    {
-      name: 'curriculum',
-    },
   ];
   isUploading!: boolean;
   searchPlaceholder!: string;
@@ -93,7 +95,12 @@ export class UpdateFileComponent implements OnInit, OnDestroy, OnChanges {
     private store: StoreService,
     private userStore: UserStore,
     private userService: UserHttpService,
-    private postService: PostHttpService
+    private postService: PostHttpService,
+    private courseService: CourseHttpService,
+    private subjectService: SubjectHttpService,
+    private lessonService: LessonHttpService,
+    private testService: TestHttpService,
+    private questionService: QuestionHttpService
   ) {}
 
   onCategoryValueChanged(e: any) {
@@ -110,6 +117,19 @@ export class UpdateFileComponent implements OnInit, OnDestroy, OnChanges {
         this.valueExpr = 'title';
         this.searchCategory = 'Post Title';
         this.searchPlaceholder = 'Search post title';
+        break;
+      case 'course':
+      case 'test':
+      case 'subject':
+      case 'lesson':
+        this.valueExpr = 'name';
+        this.searchCategory = 'Name';
+        this.searchPlaceholder = 'Search name';
+        break;
+      case 'question':
+        this.valueExpr = 'content';
+        this.searchCategory = 'Content';
+        this.searchPlaceholder = 'Search content';
         break;
       default:
         break;
@@ -148,19 +168,7 @@ export class UpdateFileComponent implements OnInit, OnDestroy, OnChanges {
     console.log('SELECTED DATA');
     console.log(this.selectedData);
     this.fileData.sourceID = e.itemData?.id;
-    // this.fileStore
-    //   .initInfiniteFilterByPropertyData('sourceID', e.itemData?.id, 1, 1)
-    //   .then((data: any) => {
-    //     this.isUploading = false;
-    //     if (data.length !== 0) {
-    //       console.log('FILE BY AUTOCOMPLETE');
-    //       console.log(data);
-    //       this.fileData.url = data.data[0]?.url;
-    //       // this.tempUrl = data[0]?.url;
-    //     } else {
-    //       // this.tempUrl = '';
-    //     }
-    //   });
+
     switch (this.fileData?.category) {
       case 'instructor':
       case 'learner':
@@ -168,6 +176,15 @@ export class UpdateFileComponent implements OnInit, OnDestroy, OnChanges {
         break;
       case 'post':
         this.fileData.title = e.itemData.title;
+        break;
+      case 'course':
+      case 'test':
+      case 'subject':
+      case 'lesson':
+        this.fileData.title = e.itemData.name;
+        break;
+      case 'question':
+        this.fileData.title = e.itemData.content;
         break;
       default:
         break;
@@ -234,6 +251,106 @@ export class UpdateFileComponent implements OnInit, OnDestroy, OnChanges {
         case 'post':
           this.postService
             .searchPostByProperty('title', this.searchValue, 0, this.pageSize)
+            .subscribe((data: any) => {
+              this.searchData = data.data;
+              if (data.data === null) {
+                this.store.showNotif('There is no matched item!', 'custom');
+              } else {
+                clearTimeout(this.isOpenSuggestionTimeout);
+                this.isOpenSuggestion = false;
+                this.isOpenSuggestionTimeout = setTimeout(() => {
+                  this.isOpenSuggestion = true;
+                }, 500);
+              }
+              console.log('SEARCH DATA');
+              console.log(this.searchData);
+              this.isUploading = false;
+            });
+          break;
+        case 'course':
+          this.courseService
+            .searchCourseByProperty('name', this.searchValue, 0, this.pageSize)
+            .subscribe((data: any) => {
+              this.searchData = data.data;
+              if (data.data === null) {
+                this.store.showNotif('There is no matched item!', 'custom');
+              } else {
+                clearTimeout(this.isOpenSuggestionTimeout);
+                this.isOpenSuggestion = false;
+                this.isOpenSuggestionTimeout = setTimeout(() => {
+                  this.isOpenSuggestion = true;
+                }, 500);
+              }
+              console.log('SEARCH DATA');
+              console.log(this.searchData);
+              this.isUploading = false;
+            });
+          break;
+        case 'subject':
+          this.subjectService
+            .searchSubjectByProperty('name', this.searchValue, 0, this.pageSize)
+            .subscribe((data: any) => {
+              this.searchData = data.data;
+              if (data.data === null) {
+                this.store.showNotif('There is no matched item!', 'custom');
+              } else {
+                clearTimeout(this.isOpenSuggestionTimeout);
+                this.isOpenSuggestion = false;
+                this.isOpenSuggestionTimeout = setTimeout(() => {
+                  this.isOpenSuggestion = true;
+                }, 500);
+              }
+              console.log('SEARCH DATA');
+              console.log(this.searchData);
+              this.isUploading = false;
+            });
+          break;
+        case 'test':
+          this.testService
+            .searchTestByProperty('name', this.searchValue, 0, this.pageSize)
+            .subscribe((data: any) => {
+              this.searchData = data.data;
+              if (data.data === null) {
+                this.store.showNotif('There is no matched item!', 'custom');
+              } else {
+                clearTimeout(this.isOpenSuggestionTimeout);
+                this.isOpenSuggestion = false;
+                this.isOpenSuggestionTimeout = setTimeout(() => {
+                  this.isOpenSuggestion = true;
+                }, 500);
+              }
+              console.log('SEARCH DATA');
+              console.log(this.searchData);
+              this.isUploading = false;
+            });
+          break;
+        case 'lesson':
+          this.lessonService
+            .searchLessonByProperty('name', this.searchValue, 0, this.pageSize)
+            .subscribe((data: any) => {
+              this.searchData = data.data;
+              if (data.data === null) {
+                this.store.showNotif('There is no matched item!', 'custom');
+              } else {
+                clearTimeout(this.isOpenSuggestionTimeout);
+                this.isOpenSuggestion = false;
+                this.isOpenSuggestionTimeout = setTimeout(() => {
+                  this.isOpenSuggestion = true;
+                }, 500);
+              }
+              console.log('SEARCH DATA');
+              console.log(this.searchData);
+              this.isUploading = false;
+            });
+          break;
+        case 'question':
+          this.questionService
+            .searchQuestionByProperty(
+              'content',
+              this.searchValue,
+              0,
+              this.pageSize
+            )
             .subscribe((data: any) => {
               this.searchData = data.data;
               if (data.data === null) {

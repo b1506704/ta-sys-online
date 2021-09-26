@@ -10,8 +10,6 @@ import {
   DxPopupModule,
   DxFormModule,
 } from 'devextreme-angular';
-import { SubjectDetailComponent } from './subject-detail/subject-detail.component';
-import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module';
 
 @NgModule({
   imports: [
@@ -23,8 +21,7 @@ import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module
     DxSpeedDialActionModule,
     DxPopupModule,
     DxFormModule,
-    FormatCurrencyModule,
   ],
-  declarations: [SubjectListComponent, SubjectDetailComponent],
+  declarations: [SubjectListComponent],
 })
 export class SubjectListModule {}

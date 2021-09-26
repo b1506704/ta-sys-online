@@ -1,0 +1,64 @@
+<dx-popup
+  id="lesson-shortcut-popup"
+  [title]="title"
+  [showTitle]="true"
+  [shading]="true"
+  [position]="'right'"
+  [showCloseButton]="true"
+  [dragEnabled]="true"
+  [height]="'80%'"
+  (onHiding)="closePopupLesson()"
+  [width]="'30%'"
+  [visible]="isVisible"
+>
+  <div *dxTemplate="let data of 'content'">
+    <div class="lesson-input-container">
+      <dx-text-box
+        valueChangeEvent="keyup"
+        (onKeyUp)="onSearchKeyupHandler($event)"
+        (onValueChanged)="onSearchValueChanged($event)"
+        (onEnterKey)="onEnterKey()"
+        [placeholder]="'Enter name...'"
+      ></dx-text-box>
+      <dx-button (onClick)="refresh()" [icon]="'refresh'"></dx-button>
+    </div>
+    <dx-scroll-view
+      [direction]="'vertical'"
+      [showScrollbar]="true"
+      [scrollByContent]="true"
+      [scrollByThumb]="true"
+      (onPullDown)="updateTopContent($event)"
+      (onReachBottom)="updateBottomContent($event)"
+      [bounceEnabled]="false"
+      [height]="'92%'"
+      [width]="'100%'"
+    >
+      <div class="card-container">
+        <div class="card" *ngFor="let item of lessonList">
+          <div class="card-title">{{ item?.name }}</div>
+          <div class="card-body">
+            <div class="card-text">Front: {{ item?.frontText }}</div>
+            <div class="card-text">Back: {{ item?.backText }}</div>
+            <div class="card-text">Note: {{ item?.description }}</div>
+          </div>
+          <div class="card-img">
+            <img
+              [src]="mapFileListToUrl(item?.id)"
+              alt="..."
+              style="height: 100%; width: 100%"
+            />
+          </div>
+          <div>
+            <dx-button
+              icon="upload"
+              type="outline"
+              text="Import"
+              hint="Click to import to desk"
+              (onClick)="exportLesson(item)"
+            ></dx-button>
+          </div>
+        </div>
+      </div>
+    </dx-scroll-view>
+  </div>
+</dx-popup>

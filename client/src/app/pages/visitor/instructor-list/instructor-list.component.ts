@@ -4,8 +4,8 @@ import { Instructor } from 'src/app/shared/models/instructor';
 import { InstructorStore } from 'src/app/shared/services/instructor/instructor-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
 import { DxScrollViewComponent } from 'devextreme-angular';
-import { Image } from 'src/app/shared/models/image';
-import { ImageStore } from 'src/app/shared/services/image/image-store.service';
+import { File } from 'src/app/shared/models/file';
+import { FileStore } from 'src/app/shared/services/file/file-store.service';
 import { UserStore } from 'src/app/shared/services/user/user-store.service';
 
 @Component({
@@ -69,7 +69,7 @@ export class InstructorListComponent implements OnInit, OnDestroy {
     onValueChanged: this.onSortValueChanged.bind(this),
   };
 
-  imageData: Image = {
+  fileData: File = {
     sourceID: '',
     container: '',
     category: '',
@@ -79,13 +79,13 @@ export class InstructorListComponent implements OnInit, OnDestroy {
     fileType: '',
     url: '../../../../assets/imgs/profile.png',
   };
-  imageList: Array<Image> = [];
+  fileList: Array<File> = [];
 
   constructor(
     private instructorStore: InstructorStore,
     private store: StoreService,
     private router: Router,
-    private imageStore: ImageStore,
+    private fileStore: FileStore,
     private userStore: UserStore
   ) {}
 
@@ -247,26 +247,26 @@ export class InstructorListComponent implements OnInit, OnDestroy {
     });
   }
 
-  mapImageListToUrl(_id: string) {
-    if (this.imageList.length !== 0) {
-      const fetchedImage = this.imageList.find(
+  mapFileListToUrl(_id: string) {
+    if (this.fileList.length !== 0) {
+      const fetchedFile = this.fileList.find(
         (e: any) => e.sourceID === _id
       )?.url;
-      if (fetchedImage) {
-        return fetchedImage;
+      if (fetchedFile) {
+        return fetchedFile;
       } else {
-        return this.imageData.url;
+        return this.fileData.url;
       }
     }
-    return this.imageData.url;
+    return this.fileData.url;
   }
 
-  imageDataListener() {
-    return this.imageStore.$imageList.subscribe((data: any) => {
+  fileDataListener() {
+    return this.fileStore.$fileList.subscribe((data: any) => {
       if (data.length !== 0) {
-        this.imageList = data;
+        this.fileList = data;
         console.log('IMAGE LIST OF DOCTOR');
-        console.log(this.imageList);
+        console.log(this.fileList);
       }
     });
   }
@@ -296,7 +296,7 @@ export class InstructorListComponent implements OnInit, OnDestroy {
           )
           .then(() => {
             this.sourceDataListener();
-            this.imageDataListener();
+            this.fileDataListener();
           });
       });
     });
@@ -310,6 +310,6 @@ export class InstructorListComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.sourceDataListener().unsubscribe();
     this.currentPageListener().unsubscribe();
-    this.imageDataListener().unsubscribe();
+    this.fileDataListener().unsubscribe();
   }
 }

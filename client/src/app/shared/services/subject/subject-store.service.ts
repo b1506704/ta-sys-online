@@ -5,6 +5,7 @@ import { StateService } from '../state.service';
 import { StoreService } from '../store.service';
 import { SubjectHttpService } from './subject-http.service';
 import { confirm } from 'devextreme/ui/dialog';
+import { FileStore } from '../file/file-store.service';
 
 interface SubjectState {
   subjectList: Array<Subject>;
@@ -32,7 +33,8 @@ const initialState: SubjectState = {
 export class SubjectStore extends StateService<SubjectState> {
   constructor(
     private subjectService: SubjectHttpService,
-    private store: StoreService
+    private store: StoreService,
+    private fileStore: FileStore
   ) {
     super(initialState);
   }
@@ -81,6 +83,11 @@ export class SubjectStore extends StateService<SubjectState> {
     return result;
   }
 
+  fetchMediaBySourceID(sourceIDs: Array<string>) {
+    const sourceIds = sourceIDs.map((e: any) => e.id);
+    this.fileStore.getFiles(sourceIds);
+  }
+
   initInfiniteData(page: number, size: number) {
     return this.subjectService
       .fetchSubject(page, size)
@@ -89,6 +96,7 @@ export class SubjectStore extends StateService<SubjectState> {
         this.setState({
           subjectList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infite list');
         console.log(this.state.subjectList);
         this.setState({ totalItems: data.totalRecords });
@@ -101,9 +109,12 @@ export class SubjectStore extends StateService<SubjectState> {
     this.setIsLoading(true);
     this.subjectService.fetchSubject(page, size).subscribe({
       next: (data: any) => {
-        this.setState({
-          subjectList: this.state.subjectList.concat(data.data),
-        });
+        if (data.data.length) {
+          this.setState({
+            subjectList: this.state.subjectList.concat(data.data),
+          });
+          this.fetchMediaBySourceID(data.data);
+        }
         console.log('Infinite list');
         console.log(this.state.subjectList);
         console.log('Server response');
@@ -253,9 +264,12 @@ export class SubjectStore extends StateService<SubjectState> {
       .filterSubjectByProperty(property, value, page, size)
       .toPromise()
       .then((data: any) => {
-        this.setState({
-          subjectList: data.data,
-        });
+        if (data.data.length) {
+          this.setState({
+            subjectList: this.state.subjectList.concat(data.data),
+          });
+          this.fetchMediaBySourceID(data.data);
+        }
         console.log('Current flag: infinite filtered list');
         console.log(this.state.subjectList);
         this.setState({ totalItems: data.totalRecords });
@@ -301,9 +315,12 @@ export class SubjectStore extends StateService<SubjectState> {
       .toPromise()
       .then((data: any) => {
         if (data.totalRecords !== 0) {
-          this.setState({
-            subjectList: data.data,
-          });
+          if (data.data.length) {
+            this.setState({
+              subjectList: this.state.subjectList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
         } else {
           this.store.showNotif('No result found!', 'custom');
         }
@@ -351,9 +368,12 @@ export class SubjectStore extends StateService<SubjectState> {
       .sortSubjectByProperty(value, order, page, size)
       .toPromise()
       .then((data: any) => {
-        this.setState({
-          subjectList: data.data,
-        });
+        if (data.data.length) {
+          this.setState({
+            subjectList: this.state.subjectList.concat(data.data),
+          });
+          this.fetchMediaBySourceID(data.data);
+        }
         console.log('Current flag: sort list');
         console.log(this.state.subjectList);
         this.setState({ totalItems: data.totalRecords });
@@ -637,9 +657,12 @@ export class SubjectStore extends StateService<SubjectState> {
       .filterSubjectByProperty(property, value, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            subjectList: this.state.subjectList.concat(data),
-          });
+          if (data.data.length) {
+            this.setState({
+              subjectList: this.state.subjectList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           console.log('Filtered list');
           console.log(this.state.subjectList);
           console.log('Server response');
@@ -709,9 +732,12 @@ export class SubjectStore extends StateService<SubjectState> {
       .subscribe({
         next: (data: any) => {
           if (data.totalRecords !== 0) {
-            this.setState({
-              subjectList: this.state.subjectList.concat(data),
-            });
+            if (data.data.length) {
+              this.setState({
+                subjectList: this.state.subjectList.concat(data.data),
+              });
+              this.fetchMediaBySourceID(data.data);
+            }
           } else {
             this.store.showNotif('No result found!', 'custome');
           }
@@ -780,9 +806,12 @@ export class SubjectStore extends StateService<SubjectState> {
       .sortSubjectByProperty(value, order, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            subjectList: this.state.subjectList.concat(data),
-          });
+          if (data.data.length) {
+            this.setState({
+              subjectList: this.state.subjectList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           console.log('Infite sorted list');
           console.log(this.state.subjectList);
           console.log('Server response');

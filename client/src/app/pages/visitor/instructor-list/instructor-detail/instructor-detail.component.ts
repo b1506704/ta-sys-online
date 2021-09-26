@@ -1,9 +1,10 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { InstructorStore } from '../../../../shared/services/instructor/instructor-store.service';
-import { Image } from 'src/app/shared/models/image';
-import { ImageHttpService } from 'src/app/shared/services/image/image-http.service';
+import { File } from 'src/app/shared/models/file';
+import { FileHttpService } from 'src/app/shared/services/file/file-http.service';
 import { UserInfoStore } from 'src/app/shared/services/user-info/user-info-store.service';
 import { UserInfo } from 'src/app/shared/models/userinfo';
+import { FileStore } from 'src/app/shared/services/file/file-store.service';
 @Component({
   selector: 'app-instructor-detail',
   templateUrl: 'instructor-detail.component.html',
@@ -13,7 +14,7 @@ export class InstructorDetailComponent implements OnInit, OnDestroy, OnChanges {
   @Input() instructorID!: string;
   instructorData!: UserInfo;
   fieldList: Array<Object> = [];
-  imageData: Image = {
+  fileData: File = {
     sourceID: '',
     container: '',
     category: '',
@@ -25,23 +26,26 @@ export class InstructorDetailComponent implements OnInit, OnDestroy, OnChanges {
   };
   constructor(
     private userInfoStore: UserInfoStore,
-    private imageService: ImageHttpService
+    private fileStore: FileStore
   ) {}
 
   instructorDataListener() {
     return this.userInfoStore.$userInfoInstance.subscribe((data: any) => {
-      this.instructorData = data;      
-      // this.imageService.getImageBySourceID(data._id).subscribe((data: any) => {
-      //   if (data !== null) {
-      //     this.imageData = data;
-      //   }
-      // });
+      this.instructorData = data;
+    });
+  }
+
+  getUserMediaData(id: string) {
+    this.fileStore.getFile(id).then((data: any) => {
+      if (data !== null) {
+        this.fileData = data.data[0];
+      }
     });
   }
 
   renderSourceData() {
     this.instructorData = null;
-    this.imageData = {
+    this.fileData = {
       sourceID: '',
       container: '',
       category: '',
@@ -52,6 +56,7 @@ export class InstructorDetailComponent implements OnInit, OnDestroy, OnChanges {
       url: '../../../../assets/imgs/profile.png',
     };
     setTimeout(() => {
+      this.getUserMediaData(this.instructorID);
       this.userInfoStore.getUserInfo(this.instructorID).then(() => {
         this.instructorDataListener();
       });

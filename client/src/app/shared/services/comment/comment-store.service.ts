@@ -5,6 +5,7 @@ import { StateService } from '../state.service';
 import { StoreService } from '../store.service';
 import { CommentHttpService } from './comment-http.service';
 import { confirm } from 'devextreme/ui/dialog';
+import { FileStore } from '../file/file-store.service';
 
 interface CommentState {
   commentList: Array<Comment>;
@@ -32,7 +33,8 @@ const initialState: CommentState = {
 export class CommentStore extends StateService<CommentState> {
   constructor(
     private commentService: CommentHttpService,
-    private store: StoreService
+    private store: StoreService,
+    private fileStore: FileStore
   ) {
     super(initialState);
   }
@@ -81,6 +83,11 @@ export class CommentStore extends StateService<CommentState> {
     return result;
   }
 
+  fetchMediaBySourceID(sourceIDs: Array<string>) {
+    const sourceIds = sourceIDs.map((e: any) => e.id);
+    this.fileStore.getFiles(sourceIds);
+  }
+
   initInfiniteData(page: number, size: number) {
     return this.commentService
       .fetchComment(page, size)
@@ -89,6 +96,7 @@ export class CommentStore extends StateService<CommentState> {
         this.setState({
           commentList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infite list');
         console.log(this.state.commentList);
         this.setState({ totalItems: data.totalRecords });
@@ -104,6 +112,7 @@ export class CommentStore extends StateService<CommentState> {
         this.setState({
           commentList: this.state.commentList.concat(data.data),
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Infinite list');
         console.log(this.state.commentList);
         console.log('Server response');
@@ -123,31 +132,33 @@ export class CommentStore extends StateService<CommentState> {
 
   loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
     this.setIsLoading(true);
-    this.commentService.fetchCommentByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          commentList: this.fillEmpty(
-            page - 1,
-            size,
-            this.state.commentList,
-            data.data
-          ),
-        });
-        console.log('Pure list');
-        console.log(this.state.commentList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.commentService
+      .fetchCommentByLearnerID(page, size, learnerID)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            commentList: this.fillEmpty(
+              page - 1,
+              size,
+              this.state.commentList,
+              data.data
+            ),
+          });
+          console.log('Pure list');
+          console.log(this.state.commentList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
   initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
@@ -158,6 +169,7 @@ export class CommentStore extends StateService<CommentState> {
         this.setState({
           commentList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infite list');
         console.log(this.state.commentList);
         this.setState({ totalItems: data.totalRecords });
@@ -172,26 +184,28 @@ export class CommentStore extends StateService<CommentState> {
     learnerID: string
   ) {
     this.setIsLoading(true);
-    this.commentService.fetchCommentByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          commentList: this.state.commentList.concat(data.data),
-        });
-        console.log('Infinite list');
-        console.log(this.state.commentList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.commentService
+      .fetchCommentByLearnerID(page, size, learnerID)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            commentList: this.state.commentList.concat(data.data),
+          });
+          console.log('Infinite list');
+          console.log(this.state.commentList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
   initData(page: number, size: number) {
@@ -252,6 +266,7 @@ export class CommentStore extends StateService<CommentState> {
         this.setState({
           commentList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infinite filtered list');
         console.log(this.state.commentList);
         this.setState({ totalItems: data.totalRecords });
@@ -300,6 +315,7 @@ export class CommentStore extends StateService<CommentState> {
           this.setState({
             commentList: data.data,
           });
+          this.fetchMediaBySourceID(data.data);
         } else {
           this.store.showNotif('No result found!', 'custom');
         }
@@ -350,6 +366,7 @@ export class CommentStore extends StateService<CommentState> {
         this.setState({
           commentList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: sort list');
         console.log(this.state.commentList);
         this.setState({ totalItems: data.totalRecords });
@@ -631,9 +648,12 @@ export class CommentStore extends StateService<CommentState> {
       .filterCommentByProperty(property, value, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            commentList: this.state.commentList.concat(data),
-          });
+          if (data.data.length) {
+            this.setState({
+              commentList: this.state.commentList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           console.log('Filtered list');
           console.log(this.state.commentList);
           console.log('Server response');
@@ -703,9 +723,12 @@ export class CommentStore extends StateService<CommentState> {
       .subscribe({
         next: (data: any) => {
           if (data.totalRecords !== 0) {
-            this.setState({
-              commentList: this.state.commentList.concat(data),
-            });
+            if (data.data.length) {
+              this.setState({
+                commentList: this.state.commentList.concat(data.data),
+              });
+              this.fetchMediaBySourceID(data.data);
+            }
           } else {
             this.store.showNotif('No result found!', 'custome');
           }
@@ -774,9 +797,12 @@ export class CommentStore extends StateService<CommentState> {
       .sortCommentByProperty(value, order, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            commentList: this.state.commentList.concat(data),
-          });
+          if (data.data.length) {
+            this.setState({
+              commentList: this.state.commentList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           console.log('Infite sorted list');
           console.log(this.state.commentList);
           console.log('Server response');

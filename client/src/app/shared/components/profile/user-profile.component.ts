@@ -2,11 +2,11 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { StoreService } from '../../services/store.service';
 import { User } from '../../models/user';
 import { DxFormComponent } from 'devextreme-angular';
-import { ImageStore } from '../../services/image/image-store.service';
-import { Image } from '../../models/image';
 import { UserStore } from '../../services/user/user-store.service';
 import { UserInfoStore } from '../../services/user-info/user-info-store.service';
 import { UserInfo } from '../../models/userinfo';
+import { FileStore } from '../../services/file/file-store.service';
+import { File } from '../../models/file';
 @Component({
   selector: 'app-user-profile',
   templateUrl: 'user-profile.component.html',
@@ -62,7 +62,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     onClick: () => {
       this.getUserAccountData(this.currentUserId);
       this.getUserInfoData(this.currentUserId);
-      this.imageData.url = '../../../../assets/imgs/profile.png';
+      this.fileData.url = '../../../../assets/imgs/profile.png';
     },
   };
   userAccountData!: User;
@@ -86,11 +86,12 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       name: 'Female',
     },
   ];
-  imageData: Image = {
+  fileData: File = {
     container: '',
     sourceID: '',
     category: '',
     title: '',
+    data: '',
     fileName: '',
     fileSize: 0,
     fileType: '',
@@ -101,7 +102,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     private store: StoreService,
     private userAccountStore: UserStore,
     private userInfoStore: UserInfoStore,
-    private imageStore: ImageStore
+    private fileStore: FileStore
   ) {}
 
   onFormShown(e: any) {
@@ -122,12 +123,14 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   onUserAccountSubmit = (e: any) => {
     e.preventDefault();
     this.userAccountStore.updateUser(this.userAccountData, 1, 5);
+    this.fileStore.uploadFiles([this.fileData]);
   };
 
   onUserInfoSubmit = (e: any) => {
     e.preventDefault();
-    // also update image
+    // also update file
     this.userInfoStore.updateUserInfo(this.userInfoData, 1, 5);
+    this.fileStore.uploadFiles([this.fileData]);
   };
 
   handleInputChange(e: any) {
@@ -135,9 +138,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     console.log(file);
     if (file !== undefined) {
       if (file.size <= 2000000) {
-        this.imageData.fileSize = file.size;
-        this.imageData.fileType = file.type;
-        this.imageData.fileName = file.name;
+        this.fileData.fileSize = file.size;
+        this.fileData.fileType = file.type;
+        this.fileData.fileName = file.name;
         var pattern = /image-*/;
         var reader = new FileReader();
 
@@ -148,7 +151,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         reader.onload = this.handleReaderLoaded.bind(this);
         reader.readAsDataURL(file);
       } else {
-        this.store.showNotif('Image cannot exceed 2MB', 'custom');
+        this.store.showNotif('File cannot exceed 2MB', 'custom');
       }
     }
   }
@@ -157,9 +160,14 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     var reader = e.target;
     console.log('READER');
     console.log(reader);
-    this.imageData.url = reader.result;
+    this.fileData.sourceID = this.currentUserId;
+    this.fileData.container = 'images';
+    this.fileData.category = 'images';
+    this.fileData.title = this.userAccountData.displayName;
+    this.fileData.data = reader.result.split(',')[1];
+    this.fileData.url = reader.result;
     console.log('SOURCE ID');
-    console.log(this.imageData.sourceID);
+    console.log(this.fileData.sourceID);
   }
 
   userAccountDataListener() {
@@ -174,19 +182,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     return this.userInfoStore.$userInfoInstance.subscribe((data: any) => {
       if (data !== null) {
         this.userInfoData = data;
-        // this.imageStore.getImageBySourceID(data.id).then(() => {
-        //   this.imageDataListener();
-        // });
-      }
-    });
-  }
-
-  imageDataListener() {
-    return this.imageStore.$imageInstance.subscribe((data: any) => {
-      if (data !== null) {
-        console.log('IMAGE DATA');
-        console.log(data);
-        this.imageData = data;
       }
     });
   }
@@ -197,6 +192,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         this.currentUserId = data;
         this.getUserAccountData(data);
         this.getUserInfoData(data);
+        this.getUserMediaData(data);
       }
     });
   }
@@ -213,6 +209,14 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     });
   }
 
+  getUserMediaData(id: string) {
+    this.fileStore.getFile(id).then((data: any) => {
+      if (data !== null) {
+        this.fileData = data.data[0];
+      }
+    });
+  }
+
   onGenderChange(e: any) {
     this.userInfoData.gender = e.value;
   }
@@ -224,6 +228,5 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.userAccountDataListener().unsubscribe();
     this.userInfoDataListener().unsubscribe();
-    // this.imageDataListener().unsubscribe();
   }
 }

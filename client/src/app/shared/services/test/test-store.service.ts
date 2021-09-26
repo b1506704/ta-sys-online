@@ -5,6 +5,7 @@ import { StateService } from '../state.service';
 import { StoreService } from '../store.service';
 import { TestHttpService } from './test-http.service';
 import { confirm } from 'devextreme/ui/dialog';
+import { FileStore } from '../file/file-store.service';
 
 interface TestState {
   testList: Array<Test>;
@@ -32,7 +33,8 @@ const initialState: TestState = {
 export class TestStore extends StateService<TestState> {
   constructor(
     private testService: TestHttpService,
-    private store: StoreService
+    private store: StoreService,
+    private fileStore: FileStore
   ) {
     super(initialState);
   }
@@ -81,6 +83,11 @@ export class TestStore extends StateService<TestState> {
     return result;
   }
 
+  fetchMediaBySourceID(sourceIDs: Array<string>) {
+    const sourceIds = sourceIDs.map((e: any) => e.id);
+    this.fileStore.getFiles(sourceIds);
+  }
+
   initInfiniteData(page: number, size: number) {
     return this.testService
       .fetchTest(page, size)
@@ -89,6 +96,7 @@ export class TestStore extends StateService<TestState> {
         this.setState({
           testList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infite list');
         console.log(this.state.testList);
         this.setState({ totalItems: data.totalRecords });
@@ -104,6 +112,7 @@ export class TestStore extends StateService<TestState> {
         this.setState({
           testList: this.state.testList.concat(data.data),
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Infinite list');
         console.log(this.state.testList);
         console.log('Server response');
@@ -252,6 +261,7 @@ export class TestStore extends StateService<TestState> {
         this.setState({
           testList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infinite filtered list');
         console.log(this.state.testList);
         this.setState({ totalItems: data.totalRecords });
@@ -300,6 +310,7 @@ export class TestStore extends StateService<TestState> {
           this.setState({
             testList: data.data,
           });
+          this.fetchMediaBySourceID(data.data);
         } else {
           this.store.showNotif('No result found!', 'custom');
         }
@@ -350,6 +361,7 @@ export class TestStore extends StateService<TestState> {
         this.setState({
           testList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: sort list');
         console.log(this.state.testList);
         this.setState({ totalItems: data.totalRecords });
@@ -631,9 +643,12 @@ export class TestStore extends StateService<TestState> {
       .filterTestByProperty(property, value, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            testList: this.state.testList.concat(data),
-          });
+          if (data.data.length) {
+            this.setState({
+              testList: this.state.testList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           console.log('Filtered list');
           console.log(this.state.testList);
           console.log('Server response');
@@ -703,9 +718,12 @@ export class TestStore extends StateService<TestState> {
       .subscribe({
         next: (data: any) => {
           if (data.totalRecords !== 0) {
-            this.setState({
-              testList: this.state.testList.concat(data),
-            });
+            if (data.data.length) {
+              this.setState({
+                testList: this.state.testList.concat(data.data),
+              });
+              this.fetchMediaBySourceID(data.data);
+            }
           } else {
             this.store.showNotif('No result found!', 'custome');
           }
@@ -774,9 +792,12 @@ export class TestStore extends StateService<TestState> {
       .sortTestByProperty(value, order, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            testList: this.state.testList.concat(data),
-          });
+          if (data.data.length) {
+            this.setState({
+              testList: this.state.testList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           console.log('Infite sorted list');
           console.log(this.state.testList);
           console.log('Server response');

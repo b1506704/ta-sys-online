@@ -77,6 +77,29 @@ export class LessonHttpService {
     });
   }
 
+  filterSearchLessonByProperty(
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
+    page: number,
+    size: number
+  ): Observable<Lesson> {
+    const params = new HttpParams()
+      .set('FilterValue', filterValue)
+      .set('FilterProperty', filterProperty)
+      .set('SearchValue', searchValue)
+      .set('SearchProperty', searchProperty)
+      .set('PageNumber', page)
+      .set('PageSize', size);
+    console.log(params.toString());
+    return this.http.get<Lesson>(this.apiUrl + '/filter-search', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
+  }
+
   sortLessonByProperty(
     value: string,
     order: string,

@@ -1,38 +1,197 @@
-<form (submit)="onSubmit($event)">
-  <dx-form [formData]="room">
-    <dxi-item
-      dataField="name"
-      [label]="{ text: 'Room Name' }"
-      editorType="dxTextBox"
-    >
-      <dxi-validation-rule type="required" message="Room name is required">
-      </dxi-validation-rule>
-      <dxi-validation-rule
-        type="stringLength"
-        message="Room name cannot lower than 1 letter!"
-        [min]="1"
+<div class="classroom-container">
+  <div class="session-user shadow">
+    <ng-container *ngIf="chatUserList.length">
+      <div class="participant shadow" *ngFor="let item of chatUserList">
+        {{ item?.displayName }}
+      </div>
+    </ng-container>
+  </div>
+  <div class="session-blackboard box-shadow">
+    <ng-container *ngIf="blackBoard.length">
+      <dx-gallery
+        [dataSource]="blackBoard"
+        [height]="'100%'"
+        [loop]="false"
+        [width]="'100%'"
+        [initialItemWidth]="150"
+        [showNavButtons]="true"
+        [showIndicator]="false"
       >
-      </dxi-validation-rule>
-    </dxi-item>
-    <dxi-item itemType="group" [colCount]="2" [cssClass]="'buttonGroup'">
-      <dxi-item
-        itemType="button"
-        horizontalAlignment="center"
-        [buttonOptions]="submitInstructorButtonOptions"
-      >
-      </dxi-item>
-      <dxi-item
-        itemType="button"
-        horizontalAlignment="center"
-        [buttonOptions]="resetInstructorButtonOptions"
-      >
-      </dxi-item>
-    </dxi-item>
-  </dx-form>
-</form>
-<div class="content">
+        <div *dxTemplate="let item of 'item'">
+          <div class="asset-container">
+            <div class="card">
+              <div class="asset-title">{{ item?.name }}</div>
+              <div class="asset-img">
+                <img
+                  [src]="mapFileListToUrl(item?.id)"
+                  alt="..."
+                  style="height: 100%; width: 100%"
+                />
+              </div>
+              <div class="asset-button">
+                <dx-button
+                  icon="refresh"
+                  type="normal"
+                  hint="Click to flip"
+                  (onClick)="flipLesson(item.id, !item.isFront)"
+                ></dx-button>
+                <dx-button
+                  icon="trash"
+                  type="normal"
+                  hint="Click to delete"
+                  (onClick)="removeLesson(item.id)"
+                ></dx-button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </dx-gallery>
+    </ng-container>
+  </div>
+  <div class="session-coacher">
+    <div class="participant neon">
+      {{ userEntry?.displayName }}
+    </div>
+    <div class="desk box-shadow">
+      <div class="desk-title neon">Course Asset</div>
+      <ng-container *ngIf="assetList.length">
+        <dx-gallery
+          [dataSource]="assetList"
+          [height]="'100%'"
+          [loop]="false"
+          [width]="'100%'"
+          [initialItemWidth]="150"
+          [showNavButtons]="true"
+          [showIndicator]="false"
+        >
+          <div *dxTemplate="let item of 'item'">
+            <div class="card-container">
+              <div class="card">
+                <div class="card-title">{{ item?.asset.name }}</div>
+                <div class="card-img">
+                  <img
+                    [src]="item?.thumbnail"
+                    alt="..."
+                    style="height: 100%; width: 100%"
+                  />
+                </div>
+                <div class="card-button">
+                  <dx-button
+                    icon="upload"
+                    type="normal"
+                    hint="Click to import to desk"
+                    (onClick)="writeBoard(item)"
+                  ></dx-button>
+                  <dx-button
+                    icon="trash"
+                    type="normal"
+                    hint="Click to import to desk"
+                    (onClick)="removeAsset(item)"
+                  ></dx-button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </dx-gallery>
+      </ng-container>
+    </div>
+  </div>
+</div>
+<!-- <div class="content">
   <div class="videos">
     <video #localVideo id="localVideo" autoplay controls></video>
     <video #remoteVideo id="remoteVideo" autoplay controls></video>
   </div>
-</div>
+</div> -->
+<dx-popup
+  id="room-shortcut-popup"
+  [title]="'Join Room'"
+  [showTitle]="true"
+  [shading]="true"
+  [position]="'right'"
+  [showCloseButton]="true"
+  [dragEnabled]="true"
+  [height]="'50%'"
+  [width]="'20%'"
+  [visible]="isPopupRoomVisible"
+>
+  <div *dxTemplate="let data of 'content'">
+    <form (submit)="onSubmit($event)">
+      <dx-form [formData]="room">
+        <dxi-item
+          dataField="name"
+          [label]="{ text: 'Room Name' }"
+          editorType="dxTextBox"
+        >
+          <dxi-validation-rule type="required" message="Room name is required">
+          </dxi-validation-rule>
+          <dxi-validation-rule
+            type="stringLength"
+            message="Room name cannot lower than 1 letter!"
+            [min]="1"
+          >
+          </dxi-validation-rule>
+        </dxi-item>
+        <dxi-item itemType="group" [colCount]="1" [cssClass]="'buttonGroup'">
+          <dxi-item
+            itemType="button"
+            horizontalAlignment="center"
+            [buttonOptions]="submitRoomButtonOptions"
+          >
+          </dxi-item>
+        </dxi-item>
+      </dx-form>
+    </form>
+  </div>
+</dx-popup>
+
+<app-chat-message-list
+  [chatMessageList]="messageList"
+  [sendMessage]="sendMessage"
+  [closePopupChat]="closePopupChat"
+  [title]="room.name"
+  [userEntry]="userEntry"
+  [isVisible]="isPopupChatVisible"
+></app-chat-message-list>
+<app-lesson-list
+  [closePopupLesson]="closePopupLesson"
+  [insertAsset]="insertAsset"
+  [courseId]="currentCourseId"
+  [title]="'Lesson List'"
+  [isVisible]="isPopupLessonVisible"
+></app-lesson-list>
+<dx-speed-dial-action
+  icon="like"
+  label="Leave Room"
+  [index]="0"
+  (onClick)="hangup()"
+>
+</dx-speed-dial-action>
+<dx-speed-dial-action
+  icon="like"
+  label="Join Room"
+  [index]="1"
+  (onClick)="openPopupRoom()"
+>
+</dx-speed-dial-action>
+<dx-speed-dial-action
+  icon="like"
+  label="Add Lesson"
+  [index]="2"
+  (onClick)="openPopupLesson()"
+>
+</dx-speed-dial-action>
+<dx-speed-dial-action
+  icon="like"
+  label="Add Question"
+  [index]="3"
+  (onClick)="openPopupQuestion()"
+>
+</dx-speed-dial-action>
+<dx-speed-dial-action
+  icon="like"
+  label="Show Chat"
+  [index]="4"
+  (onClick)="openPopupChat()"
+>
+</dx-speed-dial-action>

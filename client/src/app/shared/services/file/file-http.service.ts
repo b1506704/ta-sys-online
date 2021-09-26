@@ -56,7 +56,7 @@ export class FileHttpService {
       reportProgress: true,
       observe: 'body',
     });
-  }
+  }  
 
   filterFileByProperty(
     property: string,

@@ -5,6 +5,7 @@ import { StateService } from '../state.service';
 import { StoreService } from '../store.service';
 import { PostHttpService } from './post-http.service';
 import { confirm } from 'devextreme/ui/dialog';
+import { FileStore } from '../file/file-store.service';
 
 interface PostState {
   postList: Array<Post>;
@@ -32,7 +33,8 @@ const initialState: PostState = {
 export class PostStore extends StateService<PostState> {
   constructor(
     private postService: PostHttpService,
-    private store: StoreService
+    private store: StoreService,
+    private fileStore: FileStore
   ) {
     super(initialState);
   }
@@ -81,6 +83,11 @@ export class PostStore extends StateService<PostState> {
     return result;
   }
 
+  fetchMediaBySourceID(sourceIDs: Array<string>) {
+    const sourceIds = sourceIDs.map((e: any) => e.id);
+    this.fileStore.getFiles(sourceIds);
+  }
+
   initInfiniteData(page: number, size: number) {
     return this.postService
       .fetchPost(page, size)
@@ -89,6 +96,7 @@ export class PostStore extends StateService<PostState> {
         this.setState({
           postList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infite list');
         console.log(this.state.postList);
         this.setState({ totalItems: data.totalRecords });
@@ -104,6 +112,7 @@ export class PostStore extends StateService<PostState> {
         this.setState({
           postList: this.state.postList.concat(data.data),
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Infinite list');
         console.log(this.state.postList);
         console.log('Server response');
@@ -227,6 +236,7 @@ export class PostStore extends StateService<PostState> {
         this.setState({
           postList: new Array<Post>(data.totalRecords),
         });
+        
         console.log('Current flag: filtered list');
         console.log(this.state.postList);
         this.setState({ totalItems: data.totalRecords });
@@ -252,6 +262,7 @@ export class PostStore extends StateService<PostState> {
         this.setState({
           postList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infinite filtered list');
         console.log(this.state.postList);
         this.setState({ totalItems: data.totalRecords });
@@ -300,6 +311,7 @@ export class PostStore extends StateService<PostState> {
           this.setState({
             postList: data.data,
           });
+          this.fetchMediaBySourceID(data.data);
         } else {
           this.store.showNotif('No result found!', 'custom');
         }
@@ -350,6 +362,7 @@ export class PostStore extends StateService<PostState> {
         this.setState({
           postList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: sort list');
         console.log(this.state.postList);
         this.setState({ totalItems: data.totalRecords });
@@ -631,9 +644,12 @@ export class PostStore extends StateService<PostState> {
       .filterPostByProperty(property, value, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            postList: this.state.postList.concat(data),
-          });
+          if (data.data.length) {
+            this.setState({
+              postList: this.state.postList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           console.log('Filtered list');
           console.log(this.state.postList);
           console.log('Server response');
@@ -703,9 +719,12 @@ export class PostStore extends StateService<PostState> {
       .subscribe({
         next: (data: any) => {
           if (data.totalRecords !== 0) {
-            this.setState({
-              postList: this.state.postList.concat(data),
-            });
+            if (data.data.length) {
+              this.setState({
+                postList: this.state.postList.concat(data.data),
+              });
+              this.fetchMediaBySourceID(data.data);
+            }
           } else {
             this.store.showNotif('No result found!', 'custome');
           }
@@ -774,9 +793,12 @@ export class PostStore extends StateService<PostState> {
       .sortPostByProperty(value, order, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            postList: this.state.postList.concat(data),
-          });
+          if (data.data.length) {
+            this.setState({
+              postList: this.state.postList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           console.log('Infite sorted list');
           console.log(this.state.postList);
           console.log('Server response');

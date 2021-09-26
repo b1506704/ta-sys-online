@@ -5,6 +5,7 @@ import { StateService } from '../state.service';
 import { StoreService } from '../store.service';
 import { MessageHttpService } from './message-http.service';
 import { confirm } from 'devextreme/ui/dialog';
+import { FileStore } from '../file/file-store.service';
 
 interface MessageState {
   messageList: Array<Message>;
@@ -32,7 +33,8 @@ const initialState: MessageState = {
 export class MessageStore extends StateService<MessageState> {
   constructor(
     private messageService: MessageHttpService,
-    private store: StoreService
+    private store: StoreService,
+    private fileStore: FileStore
   ) {
     super(initialState);
   }
@@ -81,6 +83,11 @@ export class MessageStore extends StateService<MessageState> {
     return result;
   }
 
+  fetchMediaBySourceID(sourceIDs: Array<string>) {
+    const sourceIds = sourceIDs.map((e: any) => e.id);
+    this.fileStore.getFiles(sourceIds);
+  }
+
   initInfiniteData(page: number, size: number) {
     return this.messageService
       .fetchMessage(page, size)
@@ -89,6 +96,7 @@ export class MessageStore extends StateService<MessageState> {
         this.setState({
           messageList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infite list');
         console.log(this.state.messageList);
         this.setState({ totalItems: data.totalRecords });
@@ -104,6 +112,7 @@ export class MessageStore extends StateService<MessageState> {
         this.setState({
           messageList: this.state.messageList.concat(data.data),
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Infinite list');
         console.log(this.state.messageList);
         console.log('Server response');
@@ -256,6 +265,7 @@ export class MessageStore extends StateService<MessageState> {
         this.setState({
           messageList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infinite filtered list');
         console.log(this.state.messageList);
         this.setState({ totalItems: data.totalRecords });
@@ -304,6 +314,7 @@ export class MessageStore extends StateService<MessageState> {
           this.setState({
             messageList: data.data,
           });
+          this.fetchMediaBySourceID(data.data);
         } else {
           this.store.showNotif('No result found!', 'custom');
         }
@@ -354,6 +365,7 @@ export class MessageStore extends StateService<MessageState> {
         this.setState({
           messageList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: sort list');
         console.log(this.state.messageList);
         this.setState({ totalItems: data.totalRecords });
@@ -635,9 +647,12 @@ export class MessageStore extends StateService<MessageState> {
       .filterMessageByProperty(property, value, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            messageList: this.state.messageList.concat(data),
-          });
+          if (data.data.length) {
+            this.setState({
+              messageList: this.state.messageList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           console.log('Filtered list');
           console.log(this.state.messageList);
           console.log('Server response');
@@ -707,9 +722,12 @@ export class MessageStore extends StateService<MessageState> {
       .subscribe({
         next: (data: any) => {
           if (data.totalRecords !== 0) {
-            this.setState({
-              messageList: this.state.messageList.concat(data),
-            });
+            if (data.data.length) {
+              this.setState({
+                messageList: this.state.messageList.concat(data.data),
+              });
+              this.fetchMediaBySourceID(data.data);
+            }
           } else {
             this.store.showNotif('No result found!', 'custome');
           }
@@ -778,9 +796,12 @@ export class MessageStore extends StateService<MessageState> {
       .sortMessageByProperty(value, order, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            messageList: this.state.messageList.concat(data),
-          });
+          if (data.data.length) {
+            this.setState({
+              messageList: this.state.messageList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           console.log('Infite sorted list');
           console.log(this.state.messageList);
           console.log('Server response');

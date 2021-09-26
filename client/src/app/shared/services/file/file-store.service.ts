@@ -91,6 +91,8 @@ export class FileStore extends StateService<FileState> {
 
   $fileList: Observable<Array<File>> = this.select((state) => state.fileList);
 
+  $fileInstance: Observable<File> = this.select((state) => state.fileInstance);
+
   $containerList: Observable<Array<Container>> = this.select(
     (state) => state.containerList
   );
@@ -132,6 +134,28 @@ export class FileStore extends StateService<FileState> {
         console.log(data);
       },
     });
+  }
+
+  getFile(id: string) {
+    this.setIsLoading(true);
+    return this.fileService
+      .filterFileByProperty('sourceID', id, 1, 1)
+      .toPromise();
+  }
+
+  getFiles(sourceIDs: Array<string>) {
+    this.setState({ fileList: [] });
+    this.setIsLoading(true);
+    for (let i = 0; i < sourceIDs.length; i++) {
+      this.getFile(sourceIDs[i]).then((data: any) => {
+        if (data) {
+          this.setState({ fileList: this.state.fileList.concat(data.data[0]) });
+        }
+      });
+      if (i === sourceIDs.length - 1) {
+        this.setIsLoading(false);
+      }
+    }
   }
 
   downloadFiles(selectedItems: Array<string>) {
@@ -263,7 +287,7 @@ export class FileStore extends StateService<FileState> {
 
   setCurrentPage(_currentPage: number) {
     this.setState({ currentPage: _currentPage });
-  } 
+  }
 
   // container functions
 

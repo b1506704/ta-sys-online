@@ -8,8 +8,8 @@
 .title-container {
   margin-top: 15px;
   margin-left: 15px;
-  color: #000000;
-  font-family: Hero;
+  color: rgb(255, 255, 255);
+  // font-family: Hero;
 }
 @media screen and (max-width: 800px) {
   .feature-container {
@@ -105,7 +105,7 @@
   color: rgb(128, 198, 255);
   justify-content: center;
   align-items: center;
-  font-family: Hero;
+  // font-family: Hero;
 }
 .subtitle {
   font-size: x-large;
@@ -132,7 +132,7 @@
 
 @supports (
   (-webkit-backdrop-filter: blur(2em)) or (backdrop-filter: blur(2em))
-) {  
+) {
   .content-body {
     position: absolute;
     display: flex;

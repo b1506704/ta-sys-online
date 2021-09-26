@@ -4,8 +4,8 @@ import { CommonModule } from '@angular/common';
 import { DxListModule } from 'devextreme-angular/ui/list';
 import { DxContextMenuModule } from 'devextreme-angular/ui/context-menu';
 import { StoreService } from '../../services/store.service';
-import { Image } from '../../models/image';
-import { ImageStore } from '../../services/image/image-store.service';
+import { File } from '../../models/file';
+import { FileStore } from '../../services/file/file-store.service';
 
 @Component({
   selector: 'app-user-panel',
@@ -20,7 +20,7 @@ export class UserPanelComponent implements OnInit, OnDestroy {
   menuMode!: string;
   currentUser!: string;
   currentRoleName!: string;
-  userImage: Image = {
+  userFile: File = {
     container: '',
     sourceID: '',
     category: '',
@@ -31,10 +31,7 @@ export class UserPanelComponent implements OnInit, OnDestroy {
     url: '../../../../assets/imgs/profile.png',
   };
 
-  constructor(
-    private store: StoreService,
-    private imageStore: ImageStore
-  ) {}
+  constructor(private store: StoreService, private fileStore: FileStore) {}
 
   userDataListener() {
     return this.store.$currentUser.subscribe((data: any) => {
@@ -42,24 +39,31 @@ export class UserPanelComponent implements OnInit, OnDestroy {
         this.currentUser = data;
       }
     });
-  }    
+  }
 
-  imageDataListener() {
-    return this.imageStore.$imageInstance.subscribe((data: any) => {
-      if (data !== null) {
-        console.log('IMAGE DATA');
-        console.log(data);
-        this.userImage = data;
+  userIdListener() {
+    return this.store.$currentUserId.subscribe((data: string) => {
+      if (data) {
+        this.getUserMediaData(data);
       }
     });
   }
-  
+
+  getUserMediaData(id: string) {
+    this.fileStore.getFile(id).then((data: any) => {
+      if (data !== null) {
+        this.userFile = data.data[0];
+      }
+    });
+  }
+
   ngOnInit(): void {
+    this.userIdListener();
     this.userDataListener();
   }
   ngOnDestroy(): void {
     this.userDataListener().unsubscribe();
-    // this.imageDataListener().unsubscribe();
+    this.userIdListener().unsubscribe();
   }
 }
 

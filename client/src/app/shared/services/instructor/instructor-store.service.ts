@@ -6,6 +6,7 @@ import { StoreService } from '../store.service';
 import { InstructorHttpService } from './instructor-http.service';
 import { confirm } from 'devextreme/ui/dialog';
 import { UserHttpService } from '../user/user-http.service';
+import { FileStore } from '../file/file-store.service';
 
 interface InstructorState {
   instructorList: Array<Instructor>;
@@ -34,6 +35,7 @@ export class InstructorStore extends StateService<InstructorState> {
   constructor(
     private instructorService: InstructorHttpService,
     private userService: UserHttpService,
+    private fileStore: FileStore,
     private store: StoreService
   ) {
     super(initialState);
@@ -83,6 +85,11 @@ export class InstructorStore extends StateService<InstructorState> {
     return result;
   }
 
+  fetchMediaBySourceID(sourceIDs: Array<string>) {
+    const sourceIds = sourceIDs.map((e: any) => e.id);
+    this.fileStore.getFiles(sourceIds);
+  }
+
   initInfiniteData(
     property: string,
     value: string,
@@ -97,6 +104,7 @@ export class InstructorStore extends StateService<InstructorState> {
         this.setState({
           instructorList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infite list');
         console.log(this.state.instructorList);
         this.setState({ totalItems: data.totalRecords });
@@ -117,9 +125,12 @@ export class InstructorStore extends StateService<InstructorState> {
       .filterUserByProperty(property, value, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            instructorList: this.state.instructorList.concat(data.data),
-          });
+          if (data.data.length) {
+            this.setState({
+              instructorList: this.state.instructorList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           console.log('Infinite list');
           console.log(this.state.instructorList);
           console.log('Server response');
@@ -272,6 +283,7 @@ export class InstructorStore extends StateService<InstructorState> {
         this.setState({
           instructorList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infinite filtered list');
         console.log(this.state.instructorList);
         this.setState({ totalItems: data.totalRecords });
@@ -329,6 +341,7 @@ export class InstructorStore extends StateService<InstructorState> {
           this.setState({
             instructorList: data.data,
           });
+          this.fetchMediaBySourceID(data.data);
         } else {
           this.store.showNotif('No result found!', 'custom');
         }
@@ -388,6 +401,7 @@ export class InstructorStore extends StateService<InstructorState> {
         this.setState({
           instructorList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: sort list');
         console.log(this.state.instructorList);
         this.setState({ totalItems: data.totalRecords });
@@ -669,9 +683,12 @@ export class InstructorStore extends StateService<InstructorState> {
       .filterInstructorByProperty(property, value, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            instructorList: this.state.instructorList.concat(data),
-          });
+          if (data.data.length) {
+            this.setState({
+              instructorList: this.state.instructorList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           console.log('Filtered list');
           console.log(this.state.instructorList);
           console.log('Server response');
@@ -750,11 +767,14 @@ export class InstructorStore extends StateService<InstructorState> {
       .subscribe({
         next: (data: any) => {
           if (data.totalRecords !== 0) {
-            this.setState({
-              instructorList: this.state.instructorList.concat(data),
-            });
+            if (data.data.length) {
+              this.setState({
+                instructorList: this.state.instructorList.concat(data.data),
+              });
+              this.fetchMediaBySourceID(data.data);
+            }
           } else {
-            this.store.showNotif('No result found!', 'custome');
+            this.store.showNotif('No result found!', 'custom');
           }
           console.log('Infite searched list');
           console.log(this.state.instructorList);
@@ -830,9 +850,12 @@ export class InstructorStore extends StateService<InstructorState> {
       )
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            instructorList: this.state.instructorList.concat(data),
-          });
+          if (data.data.length) {
+            this.setState({
+              instructorList: this.state.instructorList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           console.log('Infite sorted list');
           console.log(this.state.instructorList);
           console.log('Server response');

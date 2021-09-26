@@ -59,14 +59,9 @@
     <div class="card-container">
       <div class="card" *ngFor="let item of subjectList">
         <div class="card-title">{{ item?.name }}</div>
-        <div class="card-body">
-          <div class="card-text">
-            Price: {{ item?.cost | formatCurrency: currency }}
-          </div>
-        </div>
         <div class="card-img">
           <img
-            [src]="mapImageListToUrl(item?._id)"
+            [src]="mapFileListToUrl(item?.id)"
             alt="..."
             style="height: 100%; width: 100%"
           />
@@ -91,20 +86,3 @@
   (onClick)="scrollTop()"
 >
 </dx-speed-dial-action>
-<dx-popup
-  [(visible)]="isDetailPopupVisible"
-  [height]="'80%'"
-  [width]="'80%'"
-  [showTitle]="true"
-  [shading]="true"
-  [title]="'Subject Detail'"
-  [dragEnabled]="true"
-  [closeOnOutsideClick]="false"
-  [showCloseButton]="true"
->
-  <div *dxTemplate="let data of 'content'">
-    <ng-container *ngIf="currentSubjectID">
-      <app-subject-detail [subjectID]="currentSubjectID"> </app-subject-detail>
-    </ng-container>
-  </div>
-</dx-popup>
