@@ -322,6 +322,42 @@ export class TestStore extends StateService<TestState> {
       });
   }
 
+  initInfiniteFilterSearchByPropertyData(
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
+    page: number,
+    size: number
+  ) {
+    this.store.showNotif('Searched Mode On', 'custom');
+    this.testService
+      .filterSearchTestByProperty(
+        filterProperty,
+        filterValue,
+        searchProperty,
+        searchValue,
+        page,
+        size
+      )
+      .toPromise()
+      .then((data: any) => {
+        if (data.totalRecords !== 0) {
+          this.setState({
+            testList: data.data,
+          });
+          this.fetchMediaBySourceID(data.data);
+        } else {
+          this.store.showNotif('No result found!', 'custom');
+        }
+        console.log('Current flag: infitite searched list');
+        console.log(this.state.testList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+      });
+  }
+
   initSortByPropertyData(
     value: string,
     order: string,
@@ -433,9 +469,7 @@ export class TestStore extends StateService<TestState> {
     this.store.setIsLoading(_isLoading);
   }
 
-  $testList: Observable<Array<Test>> = this.select(
-    (state) => state.testList
-  );
+  $testList: Observable<Array<Test>> = this.select((state) => state.testList);
 
   $exportData: Observable<Array<Test>> = this.select(
     (state) => state.exportData
@@ -451,9 +485,7 @@ export class TestStore extends StateService<TestState> {
     (state) => state.selectedTest
   );
 
-  $testInstance: Observable<Test> = this.select(
-    (state) => state.testInstance
-  );
+  $testInstance: Observable<Test> = this.select((state) => state.testInstance);
 
   uploadTest(test: Test, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
@@ -666,6 +698,53 @@ export class TestStore extends StateService<TestState> {
       });
   }
 
+  filterSearchInfiniteTestByProperty(
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.testService
+      .filterSearchTestByProperty(
+        filterProperty,
+        filterValue,
+        searchProperty,
+        searchValue,
+        page,
+        size
+      )
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            if (data.data.length) {
+              this.setState({
+                testList: this.state.testList.concat(data.data),
+              });
+              this.fetchMediaBySourceID(data.data);
+            }
+          } else {
+            this.store.showNotif('No result found!', 'custom');
+          }
+          console.log('Infite searched list');
+          console.log(this.state.testList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
   searchTestByProperty(
     property: string,
     value: string,
@@ -744,41 +823,34 @@ export class TestStore extends StateService<TestState> {
       });
   }
 
-  sortTestByProperty(
-    value: string,
-    order: string,
-    page: number,
-    size: number
-  ) {
+  sortTestByProperty(value: string, order: string, page: number, size: number) {
     this.setIsLoading(true);
-    this.testService
-      .sortTestByProperty(value, order, page, size)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({ responseMsg: data });
-          this.setState({
-            testList: this.fillEmpty(
-              page - 1,
-              size,
-              this.state.testList,
-              data.data
-            ),
-          });
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          console.log('Sorted list');
-          console.log(this.state.testList);
-          console.log('Server response');
-          console.log(data);
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.testService.sortTestByProperty(value, order, page, size).subscribe({
+      next: (data: any) => {
+        this.setState({ responseMsg: data });
+        this.setState({
+          testList: this.fillEmpty(
+            page - 1,
+            size,
+            this.state.testList,
+            data.data
+          ),
+        });
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        console.log('Sorted list');
+        console.log(this.state.testList);
+        console.log('Server response');
+        console.log(data);
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
   sortInfiniteTestByProperty(
@@ -788,31 +860,29 @@ export class TestStore extends StateService<TestState> {
     size: number
   ) {
     this.setIsLoading(true);
-    this.testService
-      .sortTestByProperty(value, order, page, size)
-      .subscribe({
-        next: (data: any) => {
-          if (data.data.length) {
-            this.setState({
-              testList: this.state.testList.concat(data.data),
-            });
-            this.fetchMediaBySourceID(data.data);
-          }
-          console.log('Infite sorted list');
-          console.log(this.state.testList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.testService.sortTestByProperty(value, order, page, size).subscribe({
+      next: (data: any) => {
+        if (data.data.length) {
+          this.setState({
+            testList: this.state.testList.concat(data.data),
+          });
+          this.fetchMediaBySourceID(data.data);
+        }
+        console.log('Infite sorted list');
+        console.log(this.state.testList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
   getTest(id: string) {

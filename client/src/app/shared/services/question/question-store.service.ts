@@ -132,31 +132,33 @@ export class QuestionStore extends StateService<QuestionState> {
 
   loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
     this.setIsLoading(true);
-    this.questionService.fetchQuestionByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          questionList: this.fillEmpty(
-            page - 1,
-            size,
-            this.state.questionList,
-            data.data
-          ),
-        });
-        console.log('Pure list');
-        console.log(this.state.questionList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.questionService
+      .fetchQuestionByLearnerID(page, size, learnerID)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            questionList: this.fillEmpty(
+              page - 1,
+              size,
+              this.state.questionList,
+              data.data
+            ),
+          });
+          console.log('Pure list');
+          console.log(this.state.questionList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
   initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
@@ -181,26 +183,28 @@ export class QuestionStore extends StateService<QuestionState> {
     learnerID: string
   ) {
     this.setIsLoading(true);
-    this.questionService.fetchQuestionByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          questionList: this.state.questionList.concat(data.data),
-        });
-        console.log('Infinite list');
-        console.log(this.state.questionList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.questionService
+      .fetchQuestionByLearnerID(page, size, learnerID)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            questionList: this.state.questionList.concat(data.data),
+          });
+          console.log('Infinite list');
+          console.log(this.state.questionList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
   initData(page: number, size: number) {
@@ -236,7 +240,7 @@ export class QuestionStore extends StateService<QuestionState> {
         this.setState({
           questionList: new Array<Question>(data.totalRecords),
         });
-        
+
         console.log('Current flag: filtered list');
         console.log(this.state.questionList);
         this.setState({ totalItems: data.totalRecords });
@@ -305,6 +309,42 @@ export class QuestionStore extends StateService<QuestionState> {
     this.store.showNotif('Searched Mode On', 'custom');
     this.questionService
       .searchQuestionByProperty(property, value, page, size)
+      .toPromise()
+      .then((data: any) => {
+        if (data.totalRecords !== 0) {
+          this.setState({
+            questionList: data.data,
+          });
+          this.fetchMediaBySourceID(data.data);
+        } else {
+          this.store.showNotif('No result found!', 'custom');
+        }
+        console.log('Current flag: infitite searched list');
+        console.log(this.state.questionList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+      });
+  }
+
+  initInfiniteFilterSearchByPropertyData(
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
+    page: number,
+    size: number
+  ) {
+    this.store.showNotif('Searched Mode On', 'custom');
+    this.questionService
+      .filterSearchQuestionByProperty(
+        filterProperty,
+        filterValue,
+        searchProperty,
+        searchValue,
+        page,
+        size
+      )
       .toPromise()
       .then((data: any) => {
         if (data.totalRecords !== 0) {
@@ -651,6 +691,53 @@ export class QuestionStore extends StateService<QuestionState> {
             this.fetchMediaBySourceID(data.data);
           }
           console.log('Filtered list');
+          console.log(this.state.questionList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  filterSearchInfiniteQuestionByProperty(
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.questionService
+      .filterSearchQuestionByProperty(
+        filterProperty,
+        filterValue,
+        searchProperty,
+        searchValue,
+        page,
+        size
+      )
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            if (data.data.length) {
+              this.setState({
+                questionList: this.state.questionList.concat(data.data),
+              });
+              this.fetchMediaBySourceID(data.data);
+            }
+          } else {
+            this.store.showNotif('No result found!', 'custom');
+          }
+          console.log('Infite searched list');
           console.log(this.state.questionList);
           console.log('Server response');
           console.log(data);

@@ -6,16 +6,17 @@ import {
   ViewChild,
 } from '@angular/core';
 import { SignalrService } from 'src/app/shared/services/streaming/signalr.service';
-import { signalRConfig } from 'src/app/shared/services/streaming/signalr.config';
+// import { signalRConfig } from 'src/app/shared/services/streaming/signalr.config';
 import { StoreService } from 'src/app/shared/services/store.service';
 import { UserHttpService } from 'src/app/shared/services/user/user-http.service';
-import { Lesson } from 'src/app/shared/models/lesson';
-import { DxScrollViewComponent, DxTextBoxComponent } from 'devextreme-angular';
 import { UserEntry } from 'src/app/shared/models/user-entry';
 import { ChatMessage } from 'src/app/shared/models/chat-message';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
 import { File } from 'src/app/shared/models/file';
-
+// import { DOCUMENT } from '@angular/common';
+// import { gsap } from 'gsap';
+// import { ScrollTrigger } from 'gsap/ScrollTrigger';
+// import { Router } from '@angular/router';
 @Component({
   templateUrl: 'instructor-streaming.component.html',
   styleUrls: ['./instructor-streaming.component.scss'],
@@ -29,6 +30,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   // dxTextBox: DxTextBoxComponent;
   // localStream: MediaStream;
   // remoteStream: MediaStream;
+  @ViewChild('feature1', { static: true }) feature1: ElementRef<HTMLDivElement>;
 
   room: any = {
     name: '',
@@ -46,8 +48,8 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   isStarted: boolean;
   isPopupChatVisible: boolean;
   isPopupLessonVisible: boolean;
-  isPopupQuestionVisible: boolean;
-  isPopupRoomVisible: boolean;  
+  isPopupTestVisible: boolean;
+  isPopupRoomVisible: boolean;
 
   userEntry: UserEntry = {
     id: '',
@@ -57,8 +59,10 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
   chatUserList: Array<UserEntry> = [];
   messageList: Array<ChatMessage> = [];
-  lessonList: Array<any> = [];
+  // lessonList: Array<any> = [];
+  // questionList: Array<any> = [];
   assetList: Array<any> = [];
+  quizList: Array<any> = [];
   blackBoard: Array<any> = [];
 
   fileData: File = {
@@ -80,8 +84,8 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     private fileStore: FileStore
   ) {}
 
-  openPopupQuestion() {
-    this.isPopupQuestionVisible = true;
+  openPopupTest() {
+    this.isPopupTestVisible = true;
   }
 
   openPopupLesson() {
@@ -102,6 +106,10 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
   closePopupLesson = () => {
     this.isPopupLessonVisible = false;
+  };
+
+  closePopupTest = () => {
+    this.isPopupTestVisible = false;
   };
 
   getUserID() {
@@ -156,7 +164,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   fetchMediaBySourceID(sourceIDs: Array<any>) {
     const sourceIds = sourceIDs.map((e: any) => e.id);
     this.fileStore.getFiles(sourceIds);
-  }  
+  }
 
   onSubmit(e: any) {
     e.preventDefault();
@@ -168,13 +176,20 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     console.log(this.assetList);
   };
 
+  insertQuiz = (e: any, type: string, thumbnail: string) => {
+    this.quizList = this.quizList.concat({ quiz: e, type, thumbnail });
+    console.log(this.quizList);
+  };
+
   writeBoard(e: any) {
     console.log(e);
     switch (e.type) {
       case 'lesson':
         this.addLesson(e.asset.id);
         break;
-
+      case 'question':
+        this.addQuestion(e.quiz.id);
+        break;
       default:
         break;
     }
@@ -198,6 +213,14 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
   flipLesson(id: string, isFront: boolean) {
     this.signaling.invoke('UpdateLesson', this.room.name, isFront, id);
+  }
+
+  addQuestion(id: string) {
+    this.signaling.invoke('AddQuestion', this.room.name, id);
+  }
+
+  removeQuestion(id: string) {
+    this.signaling.invoke('RemoveQuestion', this.room.name, id);
   }
 
   ngOnInit(): void {
@@ -271,6 +294,14 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       // this.lessonList = list;
       this.blackBoard = list;
       this.fetchMediaBySourceID(list);
+      // console.log(this.lessonList);
+      console.log(this.blackBoard);
+    });
+
+    this.signaling.define('question', (question: any) => {
+      // this.lessonList = list;
+      this.blackBoard = question;
+      this.fetchMediaBySourceID(question);
       // console.log(this.lessonList);
       console.log(this.blackBoard);
     });

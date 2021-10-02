@@ -18,7 +18,12 @@
   align-items: center;
   flex-direction: row;
   min-height: 60%;
+  max-height: 60.1%;
   width: 100%;
+  background-image: url("../../../../assets/imgs/blackboard.jpg");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
 }
 
 .session-coacher {
@@ -43,13 +48,23 @@
   color: rgb(255, 255, 255);
   font-weight: bold;
   font-size: 10px;
-  height: 60px;
-  width: 60px;
+  height: 80px;
+  width: 80px;
   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
 }
 
-.session-coacher .desk {
+.desk {
   width: 80%;
+  min-height: 90%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  flex-direction: row;
+}
+
+.desk-asset-container {
+  width: 45%;
   min-height: 90%;
   display: flex;
   justify-content: flex-start;
@@ -57,7 +72,7 @@
   flex-direction: column;
 }
 
-.session-coacher .desk .desk-title {
+.desk-title {
   width: 100%;
   text-align: center;
   font-size: small;
@@ -76,7 +91,7 @@
   align-items: center;
   flex-wrap: wrap;
   width: 100%;
-  height: 20%;
+  height: 10%;
 }
 .session-user .participant {
   display: flex;
@@ -86,8 +101,8 @@
   color: rgb(255, 255, 255);
   font-weight: bold;
   font-size: 10px;
-  height: 60px;
-  width: 60px;
+  height: 45px;
+  width: 45px;
   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
 }
 
@@ -154,23 +169,72 @@
   justify-content: center;
   border-radius: 10px;
   align-items: flex-start;
+  padding: 20px;
 }
 
-.asset-container .card {
-  height: 15%;
-  width: 100px;
+.asset-container-flip {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 20px;
+  background-color: rgb(57, 59, 65);
+  justify-content: center;
+  border-radius: 10px;
+  align-items: flex-start;
+
+  background-image: repeating-linear-gradient(
+      60deg,
+      white,
+      white 18px,
+      transparent 30px,
+      transparent 40.8px,
+      white 48px
+    ),
+    repeating-linear-gradient(
+      150deg,
+      white,
+      white 18px,
+      transparent 30px,
+      transparent 40.8px,
+      white 48px
+    ),
+    repeating-linear-gradient(
+      240deg,
+      white,
+      white 18px,
+      transparent 30px,
+      transparent 40.8px,
+      white 48px
+    ),
+    repeating-linear-gradient(
+      330deg,
+      white,
+      white 18px,
+      transparent 30px,
+      transparent 40.8px,
+      white 48px
+    );
+  background-size: 5px calc(100% + 96px), calc(100% + 96px) 5px,
+    5px calc(100% + 96px), calc(100% + 96px) 5px;
+  background-position: 0 0, 0 0, 100% 0, 0 100%;
+  background-repeat: no-repeat;
+  animation: borderAnimation 1s infinite linear;
+}
+
+.asset-card {
+  height: 250px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.asset-container .card .asset-title {
+.asset-title {
   font-size: small;
   font-weight: bold;
 }
 
-.asset-container .card .asset-body {
+.asset-body {
   display: flex;
   font-size: small;
   justify-content: center;
@@ -178,7 +242,7 @@
   align-items: center;
 }
 
-.asset-container .card .asset-button {
+.asset-button {
   display: flex;
   font-size: small;
   justify-content: space-evenly;
@@ -187,9 +251,9 @@
   align-items: center;
 }
 
-.asset-container .card .asset-img {
-  height: 50px;
-  width: 100x;
+.asset-img {
+  height: 150px;
+  width: 400x;
   margin-bottom: 10px;
 }
 
@@ -199,4 +263,13 @@
     rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px,
     rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px,
     rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
+}
+
+@keyframes borderAnimation {
+  from {
+    background-position: 0 0, -96px 0, 100% -96px, 0 100%;
+  }
+  to {
+    background-position: 0 -96px, 0 0, 100% 0, -96px 100%;
+  }
 }

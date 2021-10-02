@@ -1,5 +1,5 @@
 <dx-popup
-  id="lesson-shortcut-popup"
+  id="question-shortcut-popup"
   [title]="title"
   [showTitle]="true"
   [shading]="true"
@@ -7,12 +7,12 @@
   [showCloseButton]="true"
   [dragEnabled]="true"
   [height]="'80%'"
-  (onHiding)="closePopupLesson()"
+  (onHiding)="closePopupQuestion()"
   [width]="'30%'"
   [visible]="isVisible"
 >
   <div *dxTemplate="let data of 'content'">
-    <div class="lesson-input-container">
+    <div class="question-input-container">
       <dx-text-box
         valueChangeEvent="keyup"
         (onKeyUp)="onSearchKeyupHandler($event)"
@@ -36,12 +36,12 @@
       [width]="'100%'"
     >
       <div class="card-container">
-        <div class="card" *ngFor="let item of lessonList">
-          <div class="card-title">{{ item?.name }}</div>
+        <div class="card" *ngFor="let item of questionList">
+          <div class="card-title">{{ item?.content }}</div>
           <div class="card-body">
-            <div class="card-text">Front: {{ item?.frontText }}</div>
-            <div class="card-text">Back: {{ item?.backText }}</div>
-            <div class="card-text">Note: {{ item?.description }}</div>
+            <div class="card-text">
+              Total Correct Answer: {{ item?.totalCorrectAnswer }}
+            </div>
           </div>
           <div class="card-img">
             <img
@@ -56,7 +56,7 @@
               type="outline"
               text="Import"
               hint="Click to import to desk"
-              (onClick)="exportLesson(item)"
+              (onClick)="exportQuestion(item)"
             ></dx-button>
           </div>
         </div>

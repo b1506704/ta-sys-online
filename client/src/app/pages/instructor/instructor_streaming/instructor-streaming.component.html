@@ -13,20 +13,37 @@
         [height]="'100%'"
         [loop]="false"
         [width]="'100%'"
-        [initialItemWidth]="150"
+        [initialItemWidth]="450"
         [showNavButtons]="true"
         [showIndicator]="false"
       >
         <div *dxTemplate="let item of 'item'">
-          <div class="asset-container">
-            <div class="card">
-              <div class="asset-title">{{ item?.name }}</div>
-              <div class="asset-img">
-                <img
-                  [src]="mapFileListToUrl(item?.id)"
-                  alt="..."
-                  style="height: 100%; width: 100%"
-                />
+          <div
+            [ngClass]="{
+              'asset-container': item?.isFront === true,
+              'asset-container-flip': item?.isFront === false
+            }"
+          >
+            <div class="asset-card">
+              <div class="asset-front" *ngIf="item?.isFront === true">
+                <div class="asset-title">
+                  {{ item?.name }}
+                </div>
+                <div class="asset-body">
+                  {{ item?.frontText }}
+                </div>
+              </div>
+              <div class="asset-back" *ngIf="item?.isFront === false">
+                <div class="asset-body">
+                  {{ item?.backText }}
+                </div>
+                <div class="asset-img">
+                  <img
+                    [src]="mapFileListToUrl(item?.id)"
+                    alt="..."
+                    style="height: 100%; width: 100%"
+                  />
+                </div>
               </div>
               <div class="asset-button">
                 <dx-button
@@ -52,48 +69,93 @@
     <div class="participant neon">
       {{ userEntry?.displayName }}
     </div>
-    <div class="desk box-shadow">
-      <div class="desk-title neon">Course Asset</div>
-      <ng-container *ngIf="assetList.length">
-        <dx-gallery
-          [dataSource]="assetList"
-          [height]="'100%'"
-          [loop]="false"
-          [width]="'100%'"
-          [initialItemWidth]="150"
-          [showNavButtons]="true"
-          [showIndicator]="false"
-        >
-          <div *dxTemplate="let item of 'item'">
-            <div class="card-container">
-              <div class="card">
-                <div class="card-title">{{ item?.asset.name }}</div>
-                <div class="card-img">
-                  <img
-                    [src]="item?.thumbnail"
-                    alt="..."
-                    style="height: 100%; width: 100%"
-                  />
-                </div>
-                <div class="card-button">
-                  <dx-button
-                    icon="upload"
-                    type="normal"
-                    hint="Click to import to desk"
-                    (onClick)="writeBoard(item)"
-                  ></dx-button>
-                  <dx-button
-                    icon="trash"
-                    type="normal"
-                    hint="Click to import to desk"
-                    (onClick)="removeAsset(item)"
-                  ></dx-button>
+    <div class="desk">
+      <div class="desk-asset-container box-shadow">
+        <div class="desk-title neon">Lesson Asset</div>
+        <ng-container *ngIf="assetList.length">
+          <dx-gallery
+            [dataSource]="assetList"
+            [height]="'100%'"
+            [loop]="false"
+            [width]="'100%'"
+            [initialItemWidth]="150"
+            [showNavButtons]="true"
+            [showIndicator]="false"
+          >
+            <div *dxTemplate="let item of 'item'">
+              <div class="card-container">
+                <div class="card">
+                  <div class="card-title">{{ item?.asset.name }}</div>
+                  <div class="card-img">
+                    <img
+                      [src]="item?.thumbnail"
+                      alt="..."
+                      style="height: 100%; width: 100%"
+                    />
+                  </div>
+                  <div class="card-button">
+                    <dx-button
+                      icon="upload"
+                      type="normal"
+                      hint="Click to import to desk"
+                      (onClick)="writeBoard(item)"
+                    ></dx-button>
+                    <dx-button
+                      icon="trash"
+                      type="normal"
+                      hint="Click to import to desk"
+                      (onClick)="removeAsset(item)"
+                    ></dx-button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </dx-gallery>
-      </ng-container>
+          </dx-gallery>
+        </ng-container>
+      </div>
+      <div class="desk-asset-container box-shadow">
+        <div class="desk-title neon">Quiz Asset</div>
+        <ng-container *ngIf="quizList.length">
+          <dx-gallery
+            [dataSource]="quizList"
+            [height]="'100%'"
+            [loop]="false"
+            [width]="'100%'"
+            [initialItemWidth]="150"
+            [showNavButtons]="true"
+            [showIndicator]="false"
+          >
+            <div *dxTemplate="let item of 'item'">
+              <div class="card-container">
+                <div class="card">
+                  <div class="card-title">{{ item?.quiz.content }}</div>
+                  <div class="card-img">
+                    <img
+                      [src]="item?.thumbnail"
+                      alt="..."
+                      style="height: 100%; width: 100%"
+                    />
+                  </div>
+                  <div class="card-button">
+                    <dx-button
+                      icon="upload"
+                      type="normal"
+                      hint="Click to import to desk"
+                      (onClick)="writeBoard(item)"
+                    ></dx-button>
+                    <dx-button
+                      icon="trash"
+                      type="normal"
+                      hint="Click to import to desk"
+                      (onClick)="removeAsset(item)"
+                    ></dx-button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </dx-gallery>
+        </ng-container>
+      </div>
     </div>
   </div>
 </div>
@@ -160,6 +222,13 @@
   [title]="'Lesson List'"
   [isVisible]="isPopupLessonVisible"
 ></app-lesson-list>
+<app-test-list
+  [closePopupTest]="closePopupTest"
+  [insertQuiz]="insertQuiz"
+  [courseId]="currentCourseId"
+  [title]="'Test List'"
+  [isVisible]="isPopupTestVisible"
+></app-test-list>
 <dx-speed-dial-action
   icon="like"
   label="Leave Room"
@@ -183,9 +252,9 @@
 </dx-speed-dial-action>
 <dx-speed-dial-action
   icon="like"
-  label="Add Question"
+  label="Add Test"
   [index]="3"
-  (onClick)="openPopupQuestion()"
+  (onClick)="openPopupTest()"
 >
 </dx-speed-dial-action>
 <dx-speed-dial-action
