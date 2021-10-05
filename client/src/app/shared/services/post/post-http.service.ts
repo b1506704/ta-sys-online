@@ -8,7 +8,8 @@ import { Post } from '../../models/post';
 })
 export class PostHttpService {
   constructor(private http: HttpClient) {}
-  apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Post';
+  // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Post';
+  apiUrl = 'https://localhost:5001';
 
   fetchPost(page: number, size: number): Observable<Post> {
     const params = new HttpParams()

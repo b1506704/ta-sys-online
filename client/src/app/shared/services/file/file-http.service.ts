@@ -9,9 +9,11 @@ import { Container } from '../../models/container';
 })
 export class FileHttpService {
   constructor(private http: HttpClient) {}
-  apiContainerUrl =
-    'https://ta-sys-online-server.azurewebsites.net/api/Container';
-  apiMediaUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Media';
+  // apiContainerUrl =
+  //   'https://ta-sys-online-server.azurewebsites.net/api/Container';
+  // apiMediaUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Media'; 
+  apiMediaUrl = 'https://localhost:5001';
+  apiContainerUrl = 'https://localhost:5001';
 
   fetchContainer(): Observable<Container> {
     return this.http.get<Container>(this.apiContainerUrl, {
@@ -56,7 +58,7 @@ export class FileHttpService {
       reportProgress: true,
       observe: 'body',
     });
-  }  
+  }
 
   filterFileByProperty(
     property: string,

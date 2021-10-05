@@ -8,7 +8,8 @@ import { Test } from '../../models/test';
 })
 export class TestHttpService {
   constructor(private http: HttpClient) {}
-  apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Test';
+  // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Test';
+  apiUrl = 'https://localhost:5001';
 
   fetchTest(page: number, size: number): Observable<Test> {
     const params = new HttpParams()

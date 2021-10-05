@@ -8,7 +8,8 @@ import { Learner } from '../../models/learner';
 })
 export class LearnerHttpService {
   constructor(private http: HttpClient) {}
-  apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Learner';
+  // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Learner';
+  apiUrl = 'https://localhost:5001';
 
   fetchLearner(page: number, size: number): Observable<Learner> {
     const params = new HttpParams()

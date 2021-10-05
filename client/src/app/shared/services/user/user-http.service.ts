@@ -9,7 +9,9 @@ import { User } from '../../models/user';
 })
 export class UserHttpService {
   constructor(private http: HttpClient) {}
-  apiUrl = 'https://ta-sys-online-server.azurewebsites.net';
+  // apiUrl = 'https://ta-sys-online-server.azurewebsites.net';
+  apiUrl = 'https://localhost:5001';
+
   fetchUser(page: number, size: number): Observable<User> {
     const params = new HttpParams()
       .set('PageNumber', page)

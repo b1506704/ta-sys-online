@@ -8,7 +8,8 @@ import { UserInfo } from '../../models/userinfo';
 })
 export class UserInfoHttpService {
   constructor(private http: HttpClient) {}
-  apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/UserInfo';
+  // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/UserInfo';
+  apiUrl = 'https://localhost:5001';
 
   fetchUserInfo(page: number, size: number): Observable<UserInfo> {
     const params = new HttpParams()

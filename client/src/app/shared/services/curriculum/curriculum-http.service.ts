@@ -8,7 +8,8 @@ import { Curriculum } from '../../models/curriculum';
 })
 export class CurriculumHttpService {
   constructor(private http: HttpClient) {}
-  apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/CurriCulum';
+  // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/CurriCulum';
+  apiUrl = 'https://localhost:5001';
 
   fetchCurriculum(page: number, size: number): Observable<Curriculum> {
     const params = new HttpParams()

@@ -8,7 +8,8 @@ import { Bill } from '../../models/bill';
 })
 export class BillHttpService {
   constructor(private http: HttpClient) {}
-  apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Bill';
+  // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Bill';
+  apiUrl = 'https://localhost:5001';
 
   fetchBill(page: number, size: number): Observable<Bill> {
     const params = new HttpParams()

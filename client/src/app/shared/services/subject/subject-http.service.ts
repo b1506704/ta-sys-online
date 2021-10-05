@@ -8,7 +8,8 @@ import { Subject } from '../../models/subject';
 })
 export class SubjectHttpService {
   constructor(private http: HttpClient) {}
-  apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Subject';
+  // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Subject';
+  apiUrl = 'https://localhost:5001';
 
   fetchSubject(page: number, size: number): Observable<Subject> {
     const params = new HttpParams()

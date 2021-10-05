@@ -8,7 +8,8 @@ import { Answer } from '../../models/answer';
 })
 export class AnswerHttpService {
   constructor(private http: HttpClient) {}
-  apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Answer';
+  // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Answer';
+  apiUrl = 'https://localhost:5001';
 
   fetchAnswer(page: number, size: number): Observable<Answer> {
     const params = new HttpParams()
