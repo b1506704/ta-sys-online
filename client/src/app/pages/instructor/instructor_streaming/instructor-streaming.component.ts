@@ -55,7 +55,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     id: '',
     displayName: '',
   };
-  currentCourseId: string = 'f17c05d2-ee85-4f95-4da1-08d9752b901e';
+  currentCourseId: string = '96e29600-fd30-4162-268a-08d989a11e33';
 
   chatUserList: Array<UserEntry> = [];
   messageList: Array<ChatMessage> = [];
