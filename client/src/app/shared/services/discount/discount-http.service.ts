@@ -9,7 +9,7 @@ import { Discount } from '../../models/discount';
 export class DiscountHttpService {
   constructor(private http: HttpClient) {}
   // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Discount';
-  apiUrl = 'https://localhost:5001';
+  apiUrl = 'https://localhost:5001/api/Discount';
 
   fetchDiscount(page: number, size: number): Observable<Discount> {
     const params = new HttpParams()

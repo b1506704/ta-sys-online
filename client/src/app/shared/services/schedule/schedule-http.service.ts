@@ -9,7 +9,7 @@ import { Schedule } from '../../models/schedule';
 export class ScheduleHttpService {
   constructor(private http: HttpClient) {}
   // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Schedule';
-  apiUrl = 'https://localhost:5001';
+  apiUrl = 'https://localhost:5001/api/Schedule';
 
   fetchSchedule(page: number, size: number): Observable<Schedule> {
     const params = new HttpParams()

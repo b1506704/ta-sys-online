@@ -9,7 +9,7 @@ import { Cart } from '../../models/cart';
 export class CartHttpService {
   constructor(private http: HttpClient) {}
   // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Cart';
-  apiUrl = 'https://localhost:5001';
+  apiUrl = 'https://localhost:5001/api/Cart';
 
   fetchCart(page: number, size: number): Observable<Cart> {
     const params = new HttpParams()

@@ -9,7 +9,7 @@ import { Course } from '../../models/course';
 export class CourseHttpService {
   constructor(private http: HttpClient) {}
   // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Course';
-  apiUrl = 'https://localhost:5001';
+  apiUrl = 'https://localhost:5001/api/Course';
 
   fetchCourse(page: number, size: number): Observable<Course> {
     const params = new HttpParams()

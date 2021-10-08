@@ -9,7 +9,7 @@ import { Comment } from '../../models/comment';
 export class CommentHttpService {
   constructor(private http: HttpClient) {}
   // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Comment';
-  apiUrl = 'https://localhost:5001';
+  apiUrl = 'https://localhost:5001/api/Comment';
 
   fetchComment(page: number, size: number): Observable<Comment> {
     const params = new HttpParams()

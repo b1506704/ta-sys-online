@@ -9,7 +9,7 @@ import { Session } from '../../models/session';
 export class SessionHttpService {
   constructor(private http: HttpClient) {}
   // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/StreamSession';
-  apiUrl = 'https://localhost:5001';
+  apiUrl = 'https://localhost:5001/api/StreamSession';
 
   fetchSession(page: number, size: number): Observable<Session> {
     const params = new HttpParams()

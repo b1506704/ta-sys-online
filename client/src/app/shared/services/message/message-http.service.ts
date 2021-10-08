@@ -9,7 +9,7 @@ import { Message } from '../../models/message';
 export class MessageHttpService {
   constructor(private http: HttpClient) {}
   // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Message';
-  apiUrl = 'https://localhost:5001';
+  apiUrl = 'https://localhost:5001/api/Message';
 
   fetchMessage(page: number, size: number): Observable<Message> {
     const params = new HttpParams()

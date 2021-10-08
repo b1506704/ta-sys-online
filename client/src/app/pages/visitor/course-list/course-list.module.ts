@@ -13,6 +13,7 @@ import {
 } from 'devextreme-angular';
 import { CourseDetailComponent } from './course-detail/course-detail.component';
 import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module';
+import { NgxPayPalModule } from 'ngx-paypal';
 
 @NgModule({
   imports: [
@@ -23,6 +24,7 @@ import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module
     DxButtonModule,
     DxSpeedDialActionModule,
     DxPopupModule,
+    NgxPayPalModule,
     DxFormModule,
     DxSelectBoxModule,
     FormatCurrencyModule,

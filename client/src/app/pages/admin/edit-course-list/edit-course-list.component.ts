@@ -371,11 +371,19 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
     if (e.changes.length) {
       switch (e.changes[0].type) {
         case 'insert':
+          const customCourse = e.changes[0].data;
+          customCourse.scheduleIds = [
+            '083ebbdf-b196-4d4f-82da-5c719c0f7265',
+            '09962710-72f7-4bb6-b47c-764cf9685841',
+            '0c612031-44d0-4eb2-bfbd-86a706127a40',
+            '0ccecaf3-c8ad-4c76-ae2c-26635cae160f',
+          ];
           this.courseStore.uploadCourse(
-            e.changes[0].data,
+            customCourse,
             this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
+          console.log(customCourse);
           break;
         case 'update':
           console.log(e.changes[0]);

@@ -32,6 +32,7 @@
     "html-to-pdfmake": "^2.3.2",
     "jspdf": "^2.3.1",
     "jspdf-autotable": "^3.5.15",
+    "ngx-paypal": "^8.0.0",
     "pdfmake": "^0.2.2",
     "rxjs": "~6.6.0",
     "tslib": "^2.1.0",

@@ -12,8 +12,8 @@ export class FileHttpService {
   // apiContainerUrl =
   //   'https://ta-sys-online-server.azurewebsites.net/api/Container';
   // apiMediaUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Media'; 
-  apiMediaUrl = 'https://localhost:5001';
-  apiContainerUrl = 'https://localhost:5001';
+  apiMediaUrl = 'https://localhost:5001/api/Media';
+  apiContainerUrl = 'https://localhost:5001/api/Container';
 
   fetchContainer(): Observable<Container> {
     return this.http.get<Container>(this.apiContainerUrl, {
