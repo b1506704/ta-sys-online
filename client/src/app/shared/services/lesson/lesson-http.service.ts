@@ -128,10 +128,14 @@ export class LessonHttpService {
   }
 
   generateRandomLesson(): Observable<Lesson> {
-    return this.http.post<Lesson>(this.apiUrl + '/randomLesson', {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<any>(
+      'https://localhost:5001/api/Generate/generate-lesson-data',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deleteLesson(id: Array<string>): Observable<Object> {

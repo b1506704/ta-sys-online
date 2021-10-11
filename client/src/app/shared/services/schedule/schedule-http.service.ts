@@ -105,10 +105,14 @@ export class ScheduleHttpService {
   }
 
   generateRandomSchedule(): Observable<Schedule> {
-    return this.http.post<Schedule>(this.apiUrl + '/randomSchedule', {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<any>(
+      'https://localhost:5001/api/Generate/generate-schedule-data',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deleteSchedule(id: Array<string>): Observable<Object> {

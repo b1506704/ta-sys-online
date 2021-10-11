@@ -105,10 +105,14 @@ export class DiscountHttpService {
   }
 
   generateRandomDiscount(): Observable<Discount> {
-    return this.http.post<Discount>(this.apiUrl + '/randomDiscount', {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<any>(
+      'https://localhost:5001/api/Generate/generate-discount-data',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deleteDiscount(id: Array<string>): Observable<Object> {

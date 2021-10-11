@@ -105,10 +105,14 @@ export class BillHttpService {
   }
 
   generateRandomBill(): Observable<Bill> {
-    return this.http.post<Bill>(this.apiUrl + '/randomBill', {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<any>(
+      'https://localhost:5001/api/Generate/generate-bill-data',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deleteBill(id: Array<string>): Observable<Object> {

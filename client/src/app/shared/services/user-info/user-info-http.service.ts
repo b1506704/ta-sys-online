@@ -105,10 +105,14 @@ export class UserInfoHttpService {
   }
 
   generateRandomUserInfo(): Observable<UserInfo> {
-    return this.http.post<UserInfo>(this.apiUrl + '/randomUserInfo', {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<any>(
+      'https://localhost:5001/api/Generate/generate-user-info-data',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deleteUserInfo(id: Array<string>): Observable<Object> {

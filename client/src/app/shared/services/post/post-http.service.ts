@@ -105,10 +105,14 @@ export class PostHttpService {
   }
 
   generateRandomPost(): Observable<Post> {
-    return this.http.post<Post>(this.apiUrl + '/randomPost', {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<any>(
+      'https://localhost:5001/api/Generate/generate-post-data',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deletePost(id: Array<string>): Observable<Object> {

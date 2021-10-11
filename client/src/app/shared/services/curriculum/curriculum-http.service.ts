@@ -105,10 +105,14 @@ export class CurriculumHttpService {
   }
 
   generateRandomCurriculum(): Observable<Curriculum> {
-    return this.http.post<Curriculum>(this.apiUrl + '/randomCurriculum', {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<any>(
+      'https://localhost:5001/api/Generate/generate-curriculum-data',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deleteCurriculum(id: Array<string>): Observable<Object> {

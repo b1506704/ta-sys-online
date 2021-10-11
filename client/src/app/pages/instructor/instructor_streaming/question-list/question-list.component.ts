@@ -62,8 +62,9 @@ export class QuestionListComponent implements OnInit, OnDestroy, OnChanges {
 
   exportQuestion(e: any) {
     const thumbnail = this.mapFileListToUrl(e.id);
+    const questionWithTestId = { question: e, testId: this.testId };
     // console.log(e);
-    this.insertQuiz(e, 'question', thumbnail);
+    this.insertQuiz(questionWithTestId, 'question', thumbnail);
   }
 
   checkEditorMode() {

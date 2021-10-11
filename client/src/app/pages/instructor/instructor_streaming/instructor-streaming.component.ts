@@ -13,6 +13,7 @@ import { UserEntry } from 'src/app/shared/models/user-entry';
 import { ChatMessage } from 'src/app/shared/models/chat-message';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
 import { File } from 'src/app/shared/models/file';
+import { Question } from 'src/app/shared/models/question';
 // import { DOCUMENT } from '@angular/common';
 // import { gsap } from 'gsap';
 // import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -50,6 +51,13 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   isPopupLessonVisible: boolean;
   isPopupTestVisible: boolean;
   isPopupRoomVisible: boolean;
+  isShowingLesson: boolean = false;
+  isShowingQuestion: boolean = false;
+  isShowingAnswer: boolean = false;
+  isShowingCorrectAnswer: boolean = false;
+  isShowingResult: boolean = false;
+  selectedTestId: string = '';
+  selectedQuestion!: any;
 
   userEntry: UserEntry = {
     id: '',
@@ -59,8 +67,6 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
   chatUserList: Array<UserEntry> = [];
   messageList: Array<ChatMessage> = [];
-  // lessonList: Array<any> = [];
-  // questionList: Array<any> = [];
   assetList: Array<any> = [];
   quizList: Array<any> = [];
   blackBoard: Array<any> = [];
@@ -173,16 +179,53 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
   insertAsset = (e: any, type: string, thumbnail: string) => {
     this.assetList = this.assetList.concat({ asset: e, type, thumbnail });
-    console.log(this.assetList);
   };
 
   insertQuiz = (e: any, type: string, thumbnail: string) => {
-    this.quizList = this.quizList.concat({ quiz: e, type, thumbnail });
-    console.log(this.quizList);
+    this.selectedTestId = e.testId;
+    this.selectedQuestion = e.question;
+    console.log(this.selectedTestId);
+    this.quizList = this.quizList.concat({ quiz: e.question, type, thumbnail });
   };
 
+  submitAnswer(e: any) {
+    const mapAnswerRequest = {
+      id: e.id,
+      content: e.content,
+      isCorrect: e.isCorrect,
+      questionId: this.selectedQuestion.id,
+    };
+    const questionWithAnswerChoice = {
+      id: this.selectedQuestion.id,
+      content: this.selectedQuestion.content,
+      score: this.selectedQuestion.score,
+      totalCorrectAnswer: this.selectedQuestion.totalCorrectAnswer,
+      testId: this.selectedTestId,
+      answerRequests: [mapAnswerRequest],
+    };
+    const doTestRequest = {
+      testId: this.selectedTestId,
+      userId: this.userEntry.id,
+      questionRequest: [questionWithAnswerChoice],
+    };
+    console.log(doTestRequest);
+    this.signaling.invoke('DoTest', this.room.name, doTestRequest);
+    this.store.showNotif(e.id, 'custom');
+  }
+
+  showAnswerChoice(isShow: boolean) {
+    this.signaling.invoke('ShowAnswerChoice', this.room.name, isShow);
+  }
+
+  showCorrectAnswer(isShow: boolean) {
+    this.signaling.invoke('ShowCorrectAnswer', this.room.name, isShow);
+  }
+
+  clearBoard() {
+    this.blackBoard = [];
+  }
+
   writeBoard(e: any) {
-    console.log(e);
     switch (e.type) {
       case 'lesson':
         this.addLesson(e.asset.id);
@@ -284,26 +327,49 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       // this.isChannelReady = true;
     });
 
-    // this.signaling.define('flip', (isFront: boolean, id: string) => {
-    //   console.log('CURRENT FLIP LIST');
-    //   console.log(id);
-    //   this.updateLesson(id, isFront);
-    // });
+    this.signaling.define('isShowAnswerChoice', (isShow: boolean) => {
+      this.isShowingAnswer = isShow;
+    });
+
+    this.signaling.define('isShowCorrectAnswer', (isShow: boolean) => {
+      this.isShowingCorrectAnswer = isShow;
+    });
 
     this.signaling.define('lesson', (list: any) => {
-      // this.lessonList = list;
+      this.isShowingQuestion = false;
+      this.isShowingLesson = true;
+      this.isShowingAnswer = false;
+      this.isShowingCorrectAnswer = false;
+      this.isShowingResult = false;
       this.blackBoard = list;
-      this.fetchMediaBySourceID(list);
-      // console.log(this.lessonList);
       console.log(this.blackBoard);
+      this.fetchMediaBySourceID(list);
+    });
+
+    this.signaling.define('test', (list: any) => {
+      this.isShowingQuestion = false;
+      this.isShowingLesson = false;
+      this.isShowingAnswer = false;
+      this.isShowingCorrectAnswer = false;
+      this.isShowingResult = true;
+      this.blackBoard = list;
+      console.log(this.blackBoard);
+      this.fetchMediaBySourceID(list);
     });
 
     this.signaling.define('question', (question: any) => {
-      // this.lessonList = list;
-      this.blackBoard = question;
+      this.isShowingQuestion = true;
+      this.isShowingLesson = false;
+      this.isShowingAnswer = false;
+      this.isShowingCorrectAnswer = false;
+      this.isShowingResult = false;
+      console.log(question);
+      this.clearBoard();
+
+      this.blackBoard.push(question);
+      console.log(this.blackBoard);
       this.fetchMediaBySourceID(question);
       // console.log(this.lessonList);
-      console.log(this.blackBoard);
     });
 
     this.signaling.define(

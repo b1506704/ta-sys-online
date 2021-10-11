@@ -9,7 +9,7 @@ import { Course } from '../../models/course';
 export class CourseHttpService {
   constructor(private http: HttpClient) {}
   // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Course';
-  apiUrl = 'https://localhost:5001/api/Course';
+  apiUrl = 'https://localhost:5001/api/Course'; 
 
   fetchCourse(page: number, size: number): Observable<Course> {
     const params = new HttpParams()
@@ -105,10 +105,14 @@ export class CourseHttpService {
   }
 
   generateRandomCourse(): Observable<Course> {
-    return this.http.post<Course>(this.apiUrl + '/randomCourse', {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<any>(
+      'https://localhost:5001/api/Generate/generate-course-data',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deleteCourse(id: Array<string>): Observable<Object> {

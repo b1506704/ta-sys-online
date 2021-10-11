@@ -105,10 +105,14 @@ export class CommentHttpService {
   }
 
   generateRandomComment(): Observable<Comment> {
-    return this.http.post<Comment>(this.apiUrl + '/randomComment', {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<any>(
+      'https://localhost:5001/api/Generate/generate-comment-data',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deleteComment(id: Array<string>): Observable<Object> {

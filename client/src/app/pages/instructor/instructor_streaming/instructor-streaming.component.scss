@@ -18,7 +18,7 @@
   align-items: center;
   flex-direction: row;
   min-height: 60%;
-  max-height: 60.1%;
+  max-height: 70.1%;
   width: 100%;
   background-image: url("../../../../assets/imgs/blackboard.jpg");
   background-repeat: no-repeat;
@@ -222,7 +222,7 @@
 }
 
 .asset-card {
-  height: 250px;
+  height: 350px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -256,6 +256,77 @@
   width: 400x;
   margin-bottom: 10px;
 }
+
+.answer-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.answer-body {
+  display: flex;
+  min-height: 50px;
+  margin: 10px;
+  min-width: 100px;
+  font-size: xx-small;
+  color: #000;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.719);
+}
+
+.answer-body-correct {
+  display: flex;
+  min-height: 50px;
+  margin: 10px;
+  min-width: 100px;
+  font-size: xx-small;
+  color: #000;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.719);
+  background-image: repeating-linear-gradient(
+      60deg,
+      white,
+      white 18px,
+      transparent 30px,
+      transparent 40.8px,
+      white 48px
+    ),
+    repeating-linear-gradient(
+      150deg,
+      white,
+      white 18px,
+      transparent 30px,
+      transparent 40.8px,
+      white 48px
+    ),
+    repeating-linear-gradient(
+      240deg,
+      white,
+      white 18px,
+      transparent 30px,
+      transparent 40.8px,
+      white 48px
+    ),
+    repeating-linear-gradient(
+      330deg,
+      white,
+      white 18px,
+      transparent 30px,
+      transparent 40.8px,
+      white 48px
+    );
+  background-size: 5px calc(100% + 96px), calc(100% + 96px) 5px,
+    5px calc(100% + 96px), calc(100% + 96px) 5px;
+  background-position: 0 0, 0 0, 100% 0, 0 100%;
+  background-repeat: no-repeat;
+  animation: borderAnimation 1s infinite linear;
+}
+
 
 .box-shadow {
   box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset,

@@ -105,10 +105,14 @@ export class SubjectHttpService {
   }
 
   generateRandomSubject(): Observable<Subject> {
-    return this.http.post<Subject>(this.apiUrl + '/randomSubject', {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<any>(
+      'https://localhost:5001/api/Generate/generate-subject-data',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deleteAllSubjects(): Observable<Subject> {

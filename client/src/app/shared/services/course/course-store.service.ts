@@ -825,7 +825,7 @@ export class CourseStore extends StateService<CourseState> {
 
   setExportData(array: Array<Course>) {
     this.setState({ courseList: array });
-  }
+  }  
 
   resetState() {
     this.setState(initialState);

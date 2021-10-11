@@ -87,7 +87,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
         options: {
           type: 'danger',
           icon: 'parentfolder',
-          hint: 'Generate random 100+ items',
+          hint: 'Generate random item',
           onClick: this.onAddRandom.bind(this),
         },
       },
@@ -508,7 +508,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
   onAddRandom() {
     this.courseStore
       .confirmDialog(
-        'This will generate random 100+ items in database. Are you sure'
+        'This will generate a random item in database. Are you sure'
       )
       .then((result: boolean) => {
         if (result) {
@@ -525,7 +525,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
             })
             .then(() => {
               this.store.setIsLoading(false);
-              this.store.showNotif('Generated 100+ random items', 'custom');
+              this.store.showNotif('Generated 1 random item', 'custom');
             });
         }
       });

@@ -105,10 +105,14 @@ export class CartHttpService {
   }
 
   generateRandomCart(): Observable<Cart> {
-    return this.http.post<Cart>(this.apiUrl + '/randomCart', {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<any>(
+      'https://localhost:5001/api/Generate/generate-cart-data',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deleteCart(id: Array<string>): Observable<Object> {

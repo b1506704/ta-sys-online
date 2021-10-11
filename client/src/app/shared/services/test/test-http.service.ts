@@ -128,10 +128,14 @@ export class TestHttpService {
   }
 
   generateRandomTest(): Observable<Test> {
-    return this.http.post<Test>(this.apiUrl + '/randomTest', {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<any>(
+      'https://localhost:5001/api/Generate/generate-test-data',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deleteTest(id: Array<string>): Observable<Object> {

@@ -105,10 +105,14 @@ export class MessageHttpService {
   }
 
   generateRandomMessage(): Observable<Message> {
-    return this.http.post<Message>(this.apiUrl + '/randomMessage', {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<any>(
+      'https://localhost:5001/api/Generate/generate-message-data',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deleteMessage(id: Array<string>): Observable<Object> {

@@ -128,10 +128,14 @@ export class QuestionHttpService {
   }
 
   generateRandomQuestion(): Observable<Question> {
-    return this.http.post<Question>(this.apiUrl + '/randomQuestion', {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<any>(
+      'https://localhost:5001/api/Generate/generate-question-data',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deleteQuestion(id: Array<string>): Observable<Object> {

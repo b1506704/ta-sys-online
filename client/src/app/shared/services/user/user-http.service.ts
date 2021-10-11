@@ -152,10 +152,14 @@ export class UserHttpService {
   }
 
   generateRandomUser(): Observable<User> {
-    return this.http.post<User>(this.apiUrl + '/randomUser', {
-      reportProgress: true,
-      observe: 'body',
-    });
+    return this.http.post<any>(
+      'https://localhost:5001/api/Generate/generate-user-data',
+      {},
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   deleteUser(id: Array<string>): Observable<Object> {
