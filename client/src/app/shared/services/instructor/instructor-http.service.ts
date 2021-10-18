@@ -9,7 +9,7 @@ import { Instructor } from '../../models/instructor';
 export class InstructorHttpService {
   constructor(private http: HttpClient) {}
   // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Instructor';
-  apiUrl = 'https://localhost:5001/api/Instructo';
+  apiUrl = 'https://localhost:5001/api/Instructor';
 
   fetchInstructor(page: number, size: number): Observable<Instructor> {
     const params = new HttpParams()

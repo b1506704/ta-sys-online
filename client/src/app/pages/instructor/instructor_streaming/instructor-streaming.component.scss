@@ -327,6 +327,57 @@
   animation: borderAnimation 1s infinite linear;
 }
 
+.result-view {
+  position: fixed;
+  right: 5%;
+  top: 20%;
+  border-radius: 15px;
+  background-color: rgba(113, 137, 165, 0.514);
+}
+
+.result-title {
+  width: 100%;
+  font-size: medium;
+  margin-bottom: 10px;
+  text-align: center;
+  height: 50px;
+  color: #fff;
+}
+
+.result-card {
+  height: 150px;
+  width: 150px;
+  border-radius: 5px;
+  background-color: rgba(95, 158, 160, 0.479);
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.result-front {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+ 
+}
+
+.result-user {
+  width: 100%;
+  font-weight: bold;
+  color: #000;
+  font-size: small;
+  text-align: center;
+}
+
+.result-img {
+  height: 50px;
+  width: 50px;
+  border-radius: 100%;
+  margin-bottom: 10px;
+}
 
 .box-shadow {
   box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset,

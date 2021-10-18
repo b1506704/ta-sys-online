@@ -94,62 +94,7 @@
                             isShowingCorrectAnswer === true &&
                             answer.isCorrect === true
                         }"
-                        (onClick)="submitAnswer(answer)"
-                      >
-                        {{ answer?.content }}
-                      </dx-button>
-                    </div>
-                  </div>
-                </div>
-                <div class="asset-button">
-                  <dx-button
-                    icon="upload"
-                    type="normal"
-                    hint="Click to show answer choice"
-                    (onClick)="showAnswerChoice(!isShowingAnswer)"
-                  ></dx-button>
-                  <dx-button
-                    icon="check"
-                    type="normal"
-                    hint="Click to show correct answer"
-                    (onClick)="showCorrectAnswer(!isShowingCorrectAnswer)"
-                  ></dx-button>
-                </div>
-              </div>
-            </div>
-          </ng-container>
-          <ng-container *ngIf="isShowingResult">
-            <div
-              [ngClass]="{
-                'asset-container': isShowingAnswer === false,
-                'asset-container-flip': isShowingAnswer === true
-              }"
-            >
-              <div class="asset-card">
-                <div class="asset-front">
-                  <div class="asset-title">
-                    {{ item?.content }}
-                  </div>
-                  <div class="asset-img">
-                    <img
-                      [src]="mapFileListToUrl(item?.id)"
-                      alt="..."
-                      style="height: 100%; width: 100%"
-                    />
-                  </div>
-                  <div class="asset-body" *ngIf="isShowingAnswer === true">
-                    <div
-                      class="answer-container shadow"
-                      *ngFor="let answer of item?.answerResponses"
-                    >
-                      <dx-button
-                        [ngClass]="{
-                          'answer-body': isShowingAnswer === true,
-                          'answer-body-correct':
-                            isShowingCorrectAnswer === true &&
-                            answer.isCorrect === true
-                        }"
-                        (onClick)="submitAnswer(answer)"
+                        (onClick)="submitAnswer({ q: item, e: answer })"
                       >
                         {{ answer?.content }}
                       </dx-button>
@@ -177,6 +122,69 @@
       </dx-gallery>
     </ng-container>
   </div>
+  <ng-container *ngIf="isShowingResult">
+    <div class="result-view box-shadow">
+      <div class="result-title neon">Test Result</div>
+      <dx-scroll-view
+        [scrollByContent]="true"
+        [scrollByThumb]="true"
+        bounceEnabled="true"
+        [height]="280"
+        [width]="150"
+      >
+        <div class="result-card shadow" *ngFor="let item of resultBoard">
+          <div class="result-front">
+            <div class="result-user">
+              {{ item?.userAccountResponse.displayName }}
+            </div>
+            <div class="result-img">
+              <img
+                [src]="mapFileListToUrl(item?.userAccountResponse.id)"
+                alt="..."
+                style="height: 100%; width: 100%"
+              />
+            </div>
+            <!-- *ngFor="let answer of item.answerResponses" -->
+            <div class="asset-body">
+              <div class="answer-container shadow">
+                Choice: {{ item?.questionResponses[0].content }}
+              </div>
+              <div class="answer-container shadow">
+                Score: {{ item?.score }}
+              </div>
+            </div>
+          </div>
+          <div class="asset-button">
+            <dx-button
+              icon="upload"
+              type="normal"
+              hint="Click to invite for presenting"
+              (onClick)="
+                invitePresenting(
+                  {
+                    id: item?.userAccountResponse.id,
+                    displayName: item?.userAccountResponse.displayName
+                  },
+                  !isPresenting
+                )
+              "
+            ></dx-button>
+            <dx-button
+              icon="arrowright"
+              type="normal"
+              hint="Click to send private message"
+              (onClick)="
+                privateMessage({
+                  id: item?.userAccountResponse.id,
+                  displayName: item?.userAccountResponse.displayName
+                })
+              "
+            ></dx-button>
+          </div>
+        </div>
+      </dx-scroll-view>
+    </div>
+  </ng-container>
   <div class="session-coacher">
     <div class="participant neon">
       {{ userEntry?.displayName }}
@@ -215,7 +223,7 @@
                     <dx-button
                       icon="trash"
                       type="normal"
-                      hint="Click to import to desk"
+                      hint="Click to remove lesson from desk"
                       (onClick)="removeAsset(item)"
                     ></dx-button>
                   </div>
@@ -258,8 +266,8 @@
                     <dx-button
                       icon="trash"
                       type="normal"
-                      hint="Click to import to desk"
-                      (onClick)="removeAsset(item)"
+                      hint="Click to remove quiz from desk"
+                      (onClick)="removeQuiz(item)"
                     ></dx-button>
                   </div>
                 </div>

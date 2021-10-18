@@ -14,6 +14,8 @@ import { ChatMessage } from 'src/app/shared/models/chat-message';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
 import { File } from 'src/app/shared/models/file';
 import { Question } from 'src/app/shared/models/question';
+import { Answer } from 'src/app/shared/models/answer';
+import { DxScrollViewComponent } from 'devextreme-angular';
 // import { DOCUMENT } from '@angular/common';
 // import { gsap } from 'gsap';
 // import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -25,8 +27,8 @@ import { Question } from 'src/app/shared/models/question';
 export class InstructorStreamingComponent implements OnInit, OnDestroy {
   // @ViewChild('localVideo') localVideo: ElementRef;
   // @ViewChild('remoteVideo') remoteVideo: ElementRef;
-  // @ViewChild(DxScrollViewComponent, { static: false })
-  // dxScrollView: DxScrollViewComponent;
+  @ViewChild(DxScrollViewComponent, { static: false })
+  dxScrollView: DxScrollViewComponent;
   // @ViewChild(DxTextBoxComponent, { static: false })
   // dxTextBox: DxTextBoxComponent;
   // localStream: MediaStream;
@@ -56,20 +58,24 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   isShowingAnswer: boolean = false;
   isShowingCorrectAnswer: boolean = false;
   isShowingResult: boolean = false;
+  isPresenting: boolean = false;
   selectedTestId: string = '';
   selectedQuestion!: any;
+  selectedPresenter!: UserEntry;
+  receiveChatUserEntry!: UserEntry;
 
   userEntry: UserEntry = {
     id: '',
     displayName: '',
   };
-  currentCourseId: string = '96e29600-fd30-4162-268a-08d989a11e33';
+  currentCourseId: string = '33ac8c18-1424-4376-bfe3-08d98fe5901d';
 
   chatUserList: Array<UserEntry> = [];
   messageList: Array<ChatMessage> = [];
   assetList: Array<any> = [];
   quizList: Array<any> = [];
   blackBoard: Array<any> = [];
+  resultBoard: Array<any> = [];
 
   fileData: File = {
     sourceID: '',
@@ -135,12 +141,14 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   }
 
   getUserInfo(id: string) {
+    let temp = {};
     this.userService
       .getUser(id)
       .toPromise()
       .then((data: any) => {
-        return data;
-      });
+        temp = data;
+      })
+      .finally(() => temp);
   }
 
   mapFileListToUrl(_id: string) {
@@ -183,34 +191,32 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
   insertQuiz = (e: any, type: string, thumbnail: string) => {
     this.selectedTestId = e.testId;
-    this.selectedQuestion = e.question;
     console.log(this.selectedTestId);
     this.quizList = this.quizList.concat({ quiz: e.question, type, thumbnail });
   };
 
-  submitAnswer(e: any) {
+  submitAnswer(obj: { q: Question; e: Answer }) {
     const mapAnswerRequest = {
-      id: e.id,
-      content: e.content,
-      isCorrect: e.isCorrect,
-      questionId: this.selectedQuestion.id,
+      id: obj.e.id,
+      content: obj.e.content,
+      isCorrect: obj.e.isCorrect,
+      questionId: obj.e.questionId,
     };
     const questionWithAnswerChoice = {
-      id: this.selectedQuestion.id,
-      content: this.selectedQuestion.content,
-      score: this.selectedQuestion.score,
-      totalCorrectAnswer: this.selectedQuestion.totalCorrectAnswer,
-      testId: this.selectedTestId,
+      id: obj.q.id,
+      content: obj.q.content,
+      score: obj.q.score,
+      totalCorrectAnswer: obj.q.totalCorrectAnswer,
+      testId: obj.q.testId,
       answerRequests: [mapAnswerRequest],
     };
     const doTestRequest = {
-      testId: this.selectedTestId,
+      testId: obj.q.testId,
       userId: this.userEntry.id,
       questionRequest: [questionWithAnswerChoice],
     };
     console.log(doTestRequest);
     this.signaling.invoke('DoTest', this.room.name, doTestRequest);
-    this.store.showNotif(e.id, 'custom');
   }
 
   showAnswerChoice(isShow: boolean) {
@@ -246,6 +252,11 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     this.store.showNotif(`Removed ${e.asset.name}`, 'custom');
   }
 
+  removeQuiz(e: any) {
+    this.quizList = this.quizList.filter((a: any) => a.quiz.id !== e.quiz.id);
+    this.store.showNotif(`Removed ${e.quiz.content}`, 'custom');
+  }
+
   addLesson(id: string) {
     this.signaling.invoke('AddLesson', this.room.name, id);
   }
@@ -264,6 +275,60 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
   removeQuestion(id: string) {
     this.signaling.invoke('RemoveQuestion', this.room.name, id);
+  }
+
+  invitePresenting(userEntry: UserEntry, isPresenting: boolean) {
+    this.signaling.invoke(
+      'InviteForPresenting',
+      this.room.name,
+      userEntry,
+      isPresenting
+    );
+  }
+
+  sendMessage = (message: string) => {
+    const newMessage = {
+      userEntry: this.userEntry,
+      message: message,
+      date: new Date().toLocaleTimeString(),
+    };
+    this.messageList = this.messageList.concat(newMessage);
+    this.signaling.invoke(
+      'SendMessage',
+      message,
+      this.room.name,
+      this.userEntry
+    );
+  };
+
+  sendPrivateMessage = (message: string) => {
+    const newMessage = {
+      userEntry: this.userEntry,
+      message: message,
+      date: new Date().toLocaleTimeString(),
+    };
+    this.messageList = this.messageList.concat(newMessage);
+    this.signaling.invoke(
+      'SendPrivateMessage',
+      this.room.name,
+      this.userEntry,
+      this.receiveChatUserEntry,
+      message
+    );
+  };
+
+  privateMessage(receiveUserEntry: UserEntry) {
+    this.store.showNotif(
+      `Invited ${receiveUserEntry.displayName} for private chat`,
+      'custom'
+    );
+    this.signaling.invoke(
+      'SendPrivateMessage',
+      this.room.name,
+      this.userEntry,
+      receiveUserEntry,
+      'test message'
+    );
   }
 
   ngOnInit(): void {
@@ -346,15 +411,23 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       this.fetchMediaBySourceID(list);
     });
 
-    this.signaling.define('test', (list: any) => {
-      this.isShowingQuestion = false;
+    this.signaling.define('test', (list: Array<any>) => {
+      // this.isShowingQuestion = false;
       this.isShowingLesson = false;
-      this.isShowingAnswer = false;
-      this.isShowingCorrectAnswer = false;
+      // this.isShowingAnswer = true;
+      // this.isShowingCorrectAnswer = true;
       this.isShowingResult = true;
-      this.blackBoard = list;
-      console.log(this.blackBoard);
-      this.fetchMediaBySourceID(list);
+      console.log(list);
+      this.resultBoard = list;
+      const displayName = list[list.length].userAccountResponse.displayName;
+      this.store.showNotif(`${displayName} has submitted an answer`, 'custom');
+      // console.log(this.blackBoard);
+      // const stringIds = list.map(
+      //   (e: any) => e.userAccountResponse.id
+      // );
+      // console.log(stringIds);
+      this.fetchMediaBySourceID(list.map((e: any) => e.userAccountResponse.id));
+      this.dxScrollView.instance.scrollBy(150);
     });
 
     this.signaling.define('question', (question: any) => {
@@ -368,7 +441,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
       this.blackBoard.push(question);
       console.log(this.blackBoard);
-      this.fetchMediaBySourceID(question);
+      this.fetchMediaBySourceID([question]);
       // console.log(this.lessonList);
     });
 
@@ -382,6 +455,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
         };
         console.log(message);
         this.messageList = this.messageList.concat(message);
+        this.isPopupChatVisible = true;
         console.log(this.messageList);
         // if (message === 'got user media') {
         //   this.initiateCall();
@@ -402,6 +476,46 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
         // } else if (message === 'bye' && this.isStarted) {
         //   this.handleRemoteHangup();
         // }
+      }
+    );
+
+    this.signaling.define('presenting', (userEntry: any, isPresenting: any) => {
+      this.isPresenting = isPresenting;
+      console.log(userEntry);
+      this.selectedPresenter = userEntry;
+      if (isPresenting === true) {
+        this.store.showNotif(
+          `${userEntry.displayName} is presenting`,
+          'custom'
+        );
+      } else {
+        this.store.showNotif(
+          `${userEntry.displayName} has stopped presenting`,
+          'custom'
+        );
+      }
+    });
+
+    this.signaling.define(
+      'privateMessage',
+      (
+        sendUserEntry: any,
+        receiveUserEntry: any,
+        chatMessage: any,
+        date: any
+      ) => {
+        if (receiveUserEntry.id === this.userEntry.id) {
+          const message: ChatMessage = {
+            userEntry: sendUserEntry,
+            message: chatMessage,
+            date: date,
+          };
+          this.store.showNotif(chatMessage, 'custom');
+          console.log(message);
+          // this.messageList = this.messageList.concat(message);
+          // this.isPopupChatVisible = true;
+          // console.log(this.messageList);
+        }
       }
     );
   }
@@ -511,21 +625,6 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   //     candidate: event.candidate.candidate,
   //   });
   // }
-
-  sendMessage = (message: string) => {
-    const newMessage = {
-      userEntry: this.userEntry,
-      message: message,
-      date: new Date().toLocaleTimeString(),
-    };
-    this.messageList = this.messageList.concat(newMessage);
-    this.signaling.invoke(
-      'SendMessage',
-      message,
-      this.room.name,
-      this.userEntry
-    );
-  };
 
   // addTransceivers(): void {
   //   console.log('Adding transceivers.');

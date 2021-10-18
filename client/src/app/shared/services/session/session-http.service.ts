@@ -106,7 +106,7 @@ export class SessionHttpService {
 
   generateRandomSession(): Observable<Session> {
     return this.http.post<any>(
-      'https://localhost:5001/api/Generate/generate-session-data',
+      'https://localhost:5001/api/Generate/generate-stream-data',
       {},
       {
         reportProgress: true,
