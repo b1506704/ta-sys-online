@@ -74,6 +74,11 @@ export const navigationInstructor = [
     ],
   },
   {
+    text: 'Course List',
+    icon: 'edit',
+    path: '/course_instructor',
+  },
+  {
     text: 'Schedule List',
     icon: 'event',
     path: '/schedule_list',

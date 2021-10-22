@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Session } from 'src/app/shared/models/session';
-import { SessionStore } from 'src/app/shared/services/session/session-store.service';
+import { Router } from '@angular/router';
+import { Course } from 'src/app/shared/models/course';
+import { CourseStore } from 'src/app/shared/services/course/course-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
 import { DxScrollViewComponent } from 'devextreme-angular';
 import { File } from 'src/app/shared/models/file';
@@ -10,16 +10,16 @@ import { Subject } from 'src/app/shared/models/subject';
 import { SubjectHttpService } from 'src/app/shared/services/subject/subject-http.service';
 
 @Component({
-  selector: 'app-session-list',
-  templateUrl: './session-list.component.html',
-  styleUrls: ['./session-list.component.scss'],
+  selector: 'app-course-list',
+  templateUrl: './course-list.component.html',
+  styleUrls: ['./course-list.component.scss'],
 })
-export class SessionListComponent implements OnInit, OnDestroy {
+export class CourseListComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   scrollView: DxScrollViewComponent;
-  sessionList!: Array<Session>;
+  courseList!: Array<Course>;
   subjectList: Array<Subject> = [];
-  currentSessionID!: string;
+  currentCourseID!: string;
   pageSize: number = 10;
   pullDown = false;
   updateContentTimer: any;
@@ -38,7 +38,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
   currentSortByPropertyValue: string;
   currentSortProperty: string = 'cost';
   currentSearchProperty: string = 'name';
-  currentFilterProperty: string = 'courseId';
+  currentFilterProperty: string = 'instructorId';
 
   searchBoxOptions: any = {
     valueChangeEvent: 'keyup',
@@ -94,26 +94,26 @@ export class SessionListComponent implements OnInit, OnDestroy {
   fileList: Array<File> = [];
 
   constructor(
-    private sessionStore: SessionStore,
+    private courseStore: CourseStore,
     private subjectHTTP: SubjectHttpService,
     private store: StoreService,
     private router: Router,
-    private route: ActivatedRoute,
     private fileStore: FileStore
   ) {}
 
-  getCourseId() {
-    return this.route.paramMap.subscribe((param) => {
-      console.log('COURSEID');
-      console.log(param.get('course_id'));
-      this.currentFilterByPropertyValue = param.get('course_id');
+  getUserID() {
+    return this.store.$currentUserId.subscribe((data: string) => {
+      if (data) {
+        this.currentFilterByPropertyValue = data;
+      }
     });
   }
 
-  selectSession(item: any) {
-    this.router.navigate(['course_streaming', JSON.stringify(item)]);
+  selectCourse(_id: string) {
+    this.currentCourseID = _id;
+    this.router.navigate(['course_session', this.currentCourseID]);
     console.log('SELECTED ID');
-    console.log(item);
+    console.log(_id);
   }
 
   updateContent = (args: any, eventName: any) => {
@@ -121,7 +121,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
     const currentIndex = this.currentIndexFromServer;
     if (this.updateContentTimer) clearTimeout(this.updateContentTimer);
     this.updateContentTimer = setTimeout(() => {
-      if (this.sessionList.length) {
+      if (this.courseList.length) {
         switch (editorMode) {
           case 'NORMAL':
             this.paginatePureData(currentIndex + 1);
@@ -157,7 +157,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
       this.isSortingByPrice = false;
       console.log(this.currentSearchByPropertyValue);
       if (this.currentSearchByPropertyValue !== '') {
-        this.sessionStore.initInfiniteSearchByPropertyData(
+        this.courseStore.initInfiniteSearchByPropertyData(
           this.currentSearchProperty,
           this.currentSearchByPropertyValue,
           1,
@@ -181,7 +181,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = false;
     this.currentSortByPropertyValue = e.value;
     if (e.value !== '(NONE)') {
-      this.sessionStore.initInfiniteSortByPropertyData(
+      this.courseStore.initInfiniteSortByPropertyData(
         this.currentSortProperty,
         e.value,
         1,
@@ -201,7 +201,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
     this.currentCategoryFilterValue = e.value;
     console.log(e.value);
     if (e.value !== '(NONE)') {
-      this.sessionStore.initInfiniteFilterByPropertyData(
+      this.courseStore.initInfiniteFilterByPropertyData(
         this.currentFilterProperty,
         e.value,
         1,
@@ -227,7 +227,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
   }
 
   paginatePureData(index: number) {
-    this.sessionStore.filterInfiniteSessionByProperty(
+    this.courseStore.filterInfiniteCourseByProperty(
       this.currentFilterProperty,
       this.currentFilterByPropertyValue,
       index,
@@ -236,7 +236,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
   }
 
   paginateFilterData(index: number) {
-    this.sessionStore.filterInfiniteSessionByProperty(
+    this.courseStore.filterInfiniteCourseByProperty(
       this.currentFilterProperty,
       this.currentCategoryFilterValue,
       index,
@@ -245,18 +245,18 @@ export class SessionListComponent implements OnInit, OnDestroy {
   }
 
   paginateSearchData(index: number) {
-    // this.sessionStore.filterSearchInfiniteSessionByProperty(
-    //   this.currentFilterProperty,
-    //   this.currentFilterByPropertyValue,
-    //   this.currentSearchProperty,
-    //   this.currentSearchByPropertyValue,
-    //   index,
-    //   this.pageSize
-    // );
+    this.courseStore.filterSearchInfiniteCourseByProperty(
+      this.currentFilterProperty,
+      this.currentFilterByPropertyValue,
+      this.currentSearchProperty,
+      this.currentSearchByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSortData(index: number) {
-    this.sessionStore.sortInfiniteSessionByProperty(
+    this.courseStore.sortInfiniteCourseByProperty(
       this.currentSortProperty,
       this.currentSortByPropertyValue,
       index,
@@ -268,7 +268,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = false;
     this.isSearchingByName = false;
     this.isSortingByPrice = false;
-    this.sessionStore.initInfiniteFilterByPropertyData(
+    this.courseStore.initInfiniteFilterByPropertyData(
       this.currentFilterProperty,
       this.currentFilterByPropertyValue,
       1,
@@ -282,8 +282,8 @@ export class SessionListComponent implements OnInit, OnDestroy {
   }
 
   sourceDataListener() {
-    return this.sessionStore.$sessionList.subscribe((data: any) => {
-      this.sessionList = data;
+    return this.courseStore.$courseList.subscribe((data: any) => {
+      this.courseList = data;
     });
   }
 
@@ -312,7 +312,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
   }
 
   currentPageListener() {
-    return this.sessionStore.$currentPage.subscribe((data: any) => {
+    return this.courseStore.$currentPage.subscribe((data: any) => {
       this.currentIndexFromServer = data;
     });
   }
@@ -322,7 +322,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
   }
 
   initData() {
-    this.sessionStore.initInfiniteFilterByPropertyData(
+    this.courseStore.initInfiniteFilterByPropertyData(
       this.currentFilterProperty,
       this.currentFilterByPropertyValue,
       1,
@@ -340,7 +340,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.getCourseId();
+    this.getUserID();
     this.filterDataListener();
     this.initData();
     this.currentPageListener();

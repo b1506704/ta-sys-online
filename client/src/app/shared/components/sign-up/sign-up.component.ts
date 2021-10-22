@@ -42,6 +42,8 @@ export class SignUpComponent implements OnInit, OnDestroy {
     onClick: this.navigateLogin.bind(this),
   };
   isLoading!: boolean;
+  isSignupPopupVisible: boolean;
+
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -66,7 +68,20 @@ export class SignUpComponent implements OnInit, OnDestroy {
   };
 
   navigateLogin() {
-    this.router.navigate(['/login']);
+    this.closeSignupPopup();
+    setTimeout(() => {
+      this.userStore.setIsShowLoginPopup(true);
+    }, 200);
+  }
+
+  checkIsSignupPopupVisible() {
+    return this.userStore.$isShowSignupPopup.subscribe((data: boolean) => {
+      this.isSignupPopupVisible = data;
+    });
+  }
+
+  closeSignupPopup() {
+    this.userStore.setIsShowSignupPopup(false);
   }
 
   roleDataListener() {
@@ -83,6 +98,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.isLoadingListener();
+    this.checkIsSignupPopupVisible();
     this.userStore.getRole().then(() => {
       this.roleDataListener();
     });
@@ -102,5 +118,6 @@ export class SignUpComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy(): void {
     this.isLoadingListener().unsubscribe();
+    this.checkIsSignupPopupVisible().unsubscribe();
   }
 }

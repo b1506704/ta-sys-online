@@ -1,97 +1,130 @@
-<div class="signup-container">
-  <form
-    id="form-container"
-    (submit)="onSignupSubmit($event)"
-    [ngClass]="{
-      corner_box_animation: isLoading === true,
-      signupForm: isLoading === false
-    }"
-  >
-    <div class="long-title">
-      <h3>Signup</h3>
-    </div>
-    <dx-form
-      id="form"
-      [formData]="user"
-      [showValidationSummary]="true"
-      validationGroup="userData"
-      (onContentReady)="onFormShown($event)"
+<dx-popup
+  [(visible)]="isSignupPopupVisible"
+  [height]="'95%'"
+  [width]="'70%'"
+  [showTitle]="false"
+  [shading]="true"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+  [showCloseButton]="false"
+  (onHiding)="closeSignupPopup()"
+>
+  <div *dxTemplate="let data of 'content'">
+    <dx-scroll-view
+      [bounceEnabled]="true"
+      [scrollByContent]="true"
+      [scrollByThumb]="true"
     >
-      <dxi-item itemType="group">
-        <dxi-item itemType="group" caption="Account Information">
-          <dxi-item
-            dataField="username"
-            [label]="{ text: 'Username' }"
-            editorType="dxTextBox"
+      <div class="signup-container">
+        <form
+          id="form-container"
+          (submit)="onSignupSubmit($event)"
+          [ngClass]="{
+            corner_box_animation: isLoading === true,
+            signupForm: isLoading === false
+          }"
+        >
+          <div class="long-title">
+            <h3>Signup</h3>
+          </div>
+          <dx-form
+            id="form"
+            [formData]="user"
+            [showValidationSummary]="true"
+            validationGroup="userData"
+            (onContentReady)="onFormShown($event)"
           >
-            <dxi-validation-rule type="required" message="Username is required">
-            </dxi-validation-rule>
-            <dxi-validation-rule
-              type="stringLength"
-              message="Username cannot contain more than 8 letters!"
-              [min]="1"
-              [max]="8"
-            >
-            </dxi-validation-rule>
-          </dxi-item>
-          <dxi-item
-            dataField="password"
-            [label]="{ text: 'Password' }"
-            editorType="dxTextBox"
-            [editorOptions]="{ mode: 'password' }"
-          >
-            <dxi-validation-rule type="required" message="Password is required">
-            </dxi-validation-rule>
-            <dxi-validation-rule
-              type="stringLength"
-              message="Password cannot contain more than 12 letters!"
-              [min]="1"
-              [max]="8"
-            >
-            </dxi-validation-rule>
-          </dxi-item>
-          <dxi-item
-            dataField="displayName"
-            [label]="{ text: 'Display Name' }"
-            editorType="dxTextBox"
-          >
-            <dxi-validation-rule type="required" message="Display name is required">
-            </dxi-validation-rule>
-            <dxi-validation-rule
-              type="stringLength"
-              message="Display name cannot contain more than 12 letters!"
-              [min]="1"
-              [max]="25"
-            >
-            </dxi-validation-rule>
-          </dxi-item>
-          <dxi-item name="description">
-            <dxo-label text="Description"></dxo-label>
-            <dx-select-box
-              (onValueChanged)="onRoleChange($event)"
-              [displayExpr]="'name'"
-              [valueExpr]="'id'"
-              [dataSource]="roleList"
-              [value]="roleList[0]"
-            >
-            </dx-select-box>
-          </dxi-item>
-          <dxi-item itemType="group" [colCount]="2" [cssClass]="'buttonGroup'">
-            <dxi-item
-              itemType="button"
-              horizontalAlignment="center"
-              [buttonOptions]="signupButtonOptions"
-            >
+            <dxi-item itemType="group">
+              <dxi-item itemType="group" caption="Account Information">
+                <dxi-item
+                  dataField="username"
+                  [label]="{ text: 'Username' }"
+                  editorType="dxTextBox"
+                >
+                  <dxi-validation-rule
+                    type="required"
+                    message="Username is required"
+                  >
+                  </dxi-validation-rule>
+                  <dxi-validation-rule
+                    type="stringLength"
+                    message="Username cannot contain more than 8 letters!"
+                    [min]="1"
+                    [max]="8"
+                  >
+                  </dxi-validation-rule>
+                </dxi-item>
+                <dxi-item
+                  dataField="password"
+                  [label]="{ text: 'Password' }"
+                  editorType="dxTextBox"
+                  [editorOptions]="{ mode: 'password' }"
+                >
+                  <dxi-validation-rule
+                    type="required"
+                    message="Password is required"
+                  >
+                  </dxi-validation-rule>
+                  <dxi-validation-rule
+                    type="stringLength"
+                    message="Password cannot contain more than 12 letters!"
+                    [min]="1"
+                    [max]="8"
+                  >
+                  </dxi-validation-rule>
+                </dxi-item>
+                <dxi-item
+                  dataField="displayName"
+                  [label]="{ text: 'Display Name' }"
+                  editorType="dxTextBox"
+                >
+                  <dxi-validation-rule
+                    type="required"
+                    message="Display name is required"
+                  >
+                  </dxi-validation-rule>
+                  <dxi-validation-rule
+                    type="stringLength"
+                    message="Display name cannot contain more than 12 letters!"
+                    [min]="1"
+                    [max]="25"
+                  >
+                  </dxi-validation-rule>
+                </dxi-item>
+                <dxi-item name="description">
+                  <dxo-label text="Description"></dxo-label>
+                  <dx-select-box
+                    (onValueChanged)="onRoleChange($event)"
+                    [displayExpr]="'name'"
+                    [valueExpr]="'id'"
+                    [dataSource]="roleList"
+                    [value]="roleList[0]"
+                  >
+                  </dx-select-box>
+                </dxi-item>
+                <dxi-item
+                  itemType="group"
+                  [colCount]="2"
+                  [cssClass]="'buttonGroup'"
+                >
+                  <dxi-item
+                    itemType="button"
+                    horizontalAlignment="center"
+                    [buttonOptions]="signupButtonOptions"
+                  >
+                  </dxi-item>
+                  <dxi-item
+                    itemType="button"
+                    horizontalAlignment="center"
+                    [buttonOptions]="loginButtonOptions"
+                  >
+                  </dxi-item>
+                </dxi-item>
+              </dxi-item>
             </dxi-item>
-            <dxi-item
-              itemType="button"
-              horizontalAlignment="center"
-              [buttonOptions]="loginButtonOptions"
-            >
-            </dxi-item>
-          </dxi-item>
-        </dxi-item>
-      </dxi-item>
-    </dx-form>
-  </form>
-</div>
+          </dx-form>
+        </form>
+      </div>
+    </dx-scroll-view>
+  </div>
+</dx-popup>

@@ -1,11 +1,7 @@
 .videos {
-  margin-top: 5px;
-  text-align: center;
-  height: 50%;
-
   video {
-    width: 49%;
-    height: 50vh;
+    width: 250px;
+    height: 250px;
     margin: 3px;
   }
 }
@@ -361,7 +357,6 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
- 
 }
 
 .result-user {

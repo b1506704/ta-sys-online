@@ -6,6 +6,7 @@ import { FileHttpService } from 'src/app/shared/services/file/file-http.service'
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
 import { ICreateOrderRequest, IPayPalConfig } from 'ngx-paypal';
 import { BillStore } from 'src/app/shared/services/bill/bill-store.service';
+import { UserStore } from 'src/app/shared/services/user/user-store.service';
 @Component({
   selector: 'app-course-detail',
   templateUrl: 'course-detail.component.html',
@@ -28,9 +29,11 @@ export class CourseDetailComponent implements OnInit, OnDestroy, OnChanges {
   };
   payPalConfig?: IPayPalConfig;
   showSuccess: boolean;
+  isLogin: boolean;
   constructor(
     private courseStore: CourseStore,
     private fileStore: FileStore,
+    private userStore: UserStore,
     private billStore: BillStore
   ) {}
 
@@ -142,7 +145,18 @@ export class CourseDetailComponent implements OnInit, OnDestroy, OnChanges {
     };
   }
 
+  checkLogin() {
+    return this.userStore.$isLoggedIn.subscribe((data: boolean) => {
+      this.isLogin = data;
+    });
+  }
+
+  showLoginPopup() {
+    this.userStore.setIsShowLoginPopup(true);
+  }
+
   ngOnInit(): void {
+    this.checkLogin();
     // this.initConfig();
   }
 
@@ -152,5 +166,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnDestroy(): void {
     this.courseDataListener().unsubscribe();
+    this.checkLogin().unsubscribe();
   }
 }

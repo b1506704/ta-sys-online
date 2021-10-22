@@ -64,5 +64,11 @@
       </dxi-item>
     </dx-form>
   </form>
-  <ngx-paypal [config]="payPalConfig"></ngx-paypal>
+  <dx-button
+    style="width: 100%"
+    *ngIf="!isLogin"
+    text="Login to purchase"
+    (onClick)="showLoginPopup()"
+  ></dx-button>
+  <ngx-paypal *ngIf="isLogin" [config]="payPalConfig"></ngx-paypal>
 </dx-scroll-view>

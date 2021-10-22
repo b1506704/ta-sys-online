@@ -89,7 +89,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   responseProgressListener() {
     return this.store.$responseProgress.subscribe((data: any) => {
-      if (data !== undefined && data !==NaN) {
+      if (data !== undefined && data !== NaN) {
         this.progress = data;
         console.log('RECEIVED PROGRESS');
         console.log(this.progress);
@@ -118,11 +118,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   onLogin() {
-    this.router.navigate(['/login']);
+    this.userStore.setIsShowLoginPopup(true);
   }
 
   onSignup() {
-    this.router.navigate(['/signup']);
+    this.userStore.setIsShowSignupPopup(true);
   }
 
   onLogout() {

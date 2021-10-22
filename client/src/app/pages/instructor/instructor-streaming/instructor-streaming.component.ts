@@ -6,9 +6,8 @@ import {
   ViewChild,
 } from '@angular/core';
 import { SignalrService } from 'src/app/shared/services/streaming/signalr.service';
-// import { signalRConfig } from 'src/app/shared/services/streaming/signalr.config';
+import { signalRConfig } from 'src/app/shared/services/streaming/signalr.config';
 import { StoreService } from 'src/app/shared/services/store.service';
-import { UserHttpService } from 'src/app/shared/services/user/user-http.service';
 import { UserEntry } from 'src/app/shared/models/user-entry';
 import { ChatMessage } from 'src/app/shared/models/chat-message';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
@@ -16,6 +15,7 @@ import { File } from 'src/app/shared/models/file';
 import { Question } from 'src/app/shared/models/question';
 import { Answer } from 'src/app/shared/models/answer';
 import { DxScrollViewComponent } from 'devextreme-angular';
+import { Router, ActivatedRoute } from '@angular/router';
 // import { DOCUMENT } from '@angular/common';
 // import { gsap } from 'gsap';
 // import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -25,14 +25,14 @@ import { DxScrollViewComponent } from 'devextreme-angular';
   styleUrls: ['./instructor-streaming.component.scss'],
 })
 export class InstructorStreamingComponent implements OnInit, OnDestroy {
-  // @ViewChild('localVideo') localVideo: ElementRef;
-  // @ViewChild('remoteVideo') remoteVideo: ElementRef;
+  @ViewChild('localVideo') localVideo: ElementRef;
+  @ViewChild('remoteVideo') remoteVideo: ElementRef;
   @ViewChild(DxScrollViewComponent, { static: false })
   dxScrollView: DxScrollViewComponent;
   // @ViewChild(DxTextBoxComponent, { static: false })
   // dxTextBox: DxTextBoxComponent;
-  // localStream: MediaStream;
-  // remoteStream: MediaStream;
+  localStream: MediaStream;
+  remoteStream: MediaStream;
   @ViewChild('feature1', { static: true }) feature1: ElementRef<HTMLDivElement>;
 
   room: any = {
@@ -53,6 +53,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   isPopupLessonVisible: boolean;
   isPopupTestVisible: boolean;
   isPopupRoomVisible: boolean;
+  isPopupVideoVisible: boolean;
   isShowingLesson: boolean = false;
   isShowingQuestion: boolean = false;
   isShowingAnswer: boolean = false;
@@ -91,10 +92,23 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
   constructor(
     private signaling: SignalrService,
-    private userService: UserHttpService,
     private store: StoreService,
-    private fileStore: FileStore
+    private fileStore: FileStore,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
+
+  getCourseId() {
+    return this.route.paramMap.subscribe((param) => {
+      const session = JSON.parse(param.get('id'));
+      console.log(session);
+      this.currentCourseId = session.courseId;
+    });
+  }
+
+  openPopupVideo() {
+    this.isPopupVideoVisible = true;
+  }
 
   openPopupTest() {
     this.isPopupTestVisible = true;
@@ -111,6 +125,14 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   openPopupRoom() {
     this.isPopupRoomVisible = true;
   }
+
+  closePopupRoom = () => {
+    this.isPopupRoomVisible = false;
+  };
+
+  closePopupVideo = () => {
+    this.isPopupVideoVisible = false;
+  };
 
   closePopupChat = () => {
     this.isPopupChatVisible = false;
@@ -138,17 +160,6 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
         this.userEntry.displayName = data;
       }
     });
-  }
-
-  getUserInfo(id: string) {
-    let temp = {};
-    this.userService
-      .getUser(id)
-      .toPromise()
-      .then((data: any) => {
-        temp = data;
-      })
-      .finally(() => temp);
   }
 
   mapFileListToUrl(_id: string) {
@@ -286,7 +297,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     );
   }
 
-  sendMessage = (message: string) => {
+  sendMessage = (message: any) => {
     const newMessage = {
       userEntry: this.userEntry,
       message: message,
@@ -362,8 +373,10 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     // #2 define signaling communication
     this.defineSignaling();
 
+    this.openPopupVideo();
+
     // #3 get media from current client
-    // this.getUserMedia();
+    this.getUserMedia();
   }
 
   defineSignaling(): void {
@@ -375,14 +388,14 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       console.log('CURRENT USER ENTRY LIST');
       console.log(userEntryList);
       this.chatUserList = userEntryList;
-      // this.isInitiator = true;
+      this.isInitiator = true;
     });
 
     this.signaling.define('joined', (userEntryList: any) => {
       console.log('CURRENT USER ENTRY LIST');
       console.log(userEntryList);
       this.chatUserList = userEntryList;
-      // this.isChannelReady = true;
+      this.isChannelReady = true;
     });
 
     this.signaling.define('left', (userEntryList: any) => {
@@ -457,25 +470,25 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
         this.messageList = this.messageList.concat(message);
         this.isPopupChatVisible = true;
         console.log(this.messageList);
-        // if (message === 'got user media') {
-        //   this.initiateCall();
-        // } else if (message.type === 'offer') {
-        //   if (!this.isStarted) {
-        //     this.initiateCall();
-        //   }
-        //   this.peerConnection.setRemoteDescription(
-        //     new RTCSessionDescription(message)
-        //   );
-        //   this.sendAnswer();
-        // } else if (message.type === 'answer' && this.isStarted) {
-        //   this.peerConnection.setRemoteDescription(
-        //     new RTCSessionDescription(message)
-        //   );
-        // } else if (message.type === 'candidate' && this.isStarted) {
-        //   this.addIceCandidate(message);
-        // } else if (message === 'bye' && this.isStarted) {
-        //   this.handleRemoteHangup();
-        // }
+        if (chatMessage == 'got user media') {
+          this.initiateCall();
+        } else if (chatMessage.type == 'offer') {
+          if (!this.isStarted) {
+            this.initiateCall();
+          }
+          this.peerConnection.setRemoteDescription(
+            new RTCSessionDescription(chatMessage)
+          );
+          this.sendAnswer();
+        } else if (chatMessage.type == 'answer' && this.isStarted) {
+          this.peerConnection.setRemoteDescription(
+            new RTCSessionDescription(chatMessage)
+          );
+        } else if (chatMessage.type == 'candidate' && this.isStarted) {
+          this.addIceCandidate(chatMessage);
+        } else if (chatMessage == 'bye' && this.isStarted) {
+          this.handleRemoteHangup();
+        }
       }
     );
 
@@ -488,6 +501,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
           `${userEntry.displayName} is presenting`,
           'custom'
         );
+        this.getDisplayMedia();
       } else {
         this.store.showNotif(
           `${userEntry.displayName} has stopped presenting`,
@@ -520,140 +534,158 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     );
   }
 
-  // getUserMedia(): void {
-  //   navigator.mediaDevices
-  //     .getUserMedia({
-  //       audio: true,
-  //       video: true,
-  //     })
-  //     .then((stream: MediaStream) => {
-  //       this.addLocalStream(stream);
-  //       this.sendMessage('got user media');
-  //       if (this.isInitiator) {
-  //         this.initiateCall();
-  //       }
-  //     })
-  //     .catch((e) => {
-  //       alert('getUserMedia() error: ' + e.name + ': ' + e.message);
-  //     });
-  // }
+  getUserMedia(): void {
+    navigator.mediaDevices
+      .getUserMedia({
+        audio: true,
+        video: true,
+      })
+      .then((stream: MediaStream) => {
+        this.addLocalStream(stream);
+        this.sendMessage('got user media');
+        if (this.isInitiator) {
+          this.initiateCall();
+        }
+      })
+      .catch((e) => {
+        alert('getUserMedia() error: ' + e.name + ': ' + e.message);
+      });
+  }
 
-  // initiateCall(): void {
-  //   console.log('Initiating a call.');
-  //   if (!this.isStarted && this.localStream && this.isChannelReady) {
-  //     this.createPeerConnection();
+  getDisplayMedia(): void {
+    const mediaDevices = navigator.mediaDevices as any;
+    const stream = mediaDevices
+      .getDisplayMedia({ audio: true, video: true })
+      .then((stream: MediaStream) => {
+        this.addLocalStream(stream);
+        this.sendMessage('got user media');
+        if (this.isInitiator) {
+          this.initiateCall();
+        }
+      })
+      .catch((e: any) => {
+        alert('getUserMedia() error: ' + e.name + ': ' + e.message);
+      });
+  }
 
-  //     this.peerConnection.addTrack(
-  //       this.localStream.getVideoTracks()[0],
-  //       this.localStream
-  //     );
-  //     this.peerConnection.addTrack(
-  //       this.localStream.getAudioTracks()[0],
-  //       this.localStream
-  //     );
+  initiateCall(): void {
+    this.store.showNotif('Initiating a call', 'custom');
+    console.log('Initiating a call.');
+    if (!this.isStarted && this.localStream && this.isChannelReady) {
+      this.createPeerConnection();
 
-  //     this.isStarted = true;
-  //     if (this.isInitiator) {
-  //       this.sendOffer();
-  //     }
-  //   }
-  // }
+      this.peerConnection.addTrack(
+        this.localStream.getVideoTracks()[0],
+        this.localStream
+      );
+      this.peerConnection.addTrack(
+        this.localStream.getAudioTracks()[0],
+        this.localStream
+      );
 
-  // createPeerConnection(): void {
-  //   console.log('Creating peer connection.');
-  //   try {
-  //     this.peerConnection = new RTCPeerConnection({
-  //       iceServers: signalRConfig.iceServers,
-  //       sdpSemantics: 'unified-plan',
-  //     } as RTCConfiguration);
+      this.isStarted = true;
+      if (this.isInitiator) {
+        this.sendOffer();
+      }
+    }
+  }
 
-  //     this.peerConnection.onicecandidate = (
-  //       event: RTCPeerConnectionIceEvent
-  //     ) => {
-  //       if (event.candidate) {
-  //         this.sendIceCandidate(event);
-  //       } else {
-  //         console.log('End of candidates.');
-  //       }
-  //     };
+  createPeerConnection(): void {
+    console.log('Creating peer connection.');
+    this.store.showNotif('Creating peer connection.', 'custom');
+    try {
+      this.peerConnection = new RTCPeerConnection({
+        iceServers: signalRConfig.iceServers,
+        sdpSemantics: 'unified-plan',
+      } as RTCConfiguration);
 
-  //     this.peerConnection.ontrack = (event: RTCTrackEvent) => {
-  //       console.log(event.streams);
-  //       if (event.streams[0]) {
-  //         this.addRemoteStream(event.streams[0]);
-  //       }
-  //     };
-  //   } catch (e) {
-  //     console.log('Failed to create PeerConnection.', e.message);
-  //     return;
-  //   }
-  // }
+      this.peerConnection.onicecandidate = (
+        event: RTCPeerConnectionIceEvent
+      ) => {
+        if (event.candidate) {
+          this.sendIceCandidate(event);
+        } else {
+          console.log('End of candidates.');
+        }
+      };
 
-  // sendOffer(): void {
-  //   console.log('Sending offer to peer.');
-  //   this.addTransceivers();
-  //   this.peerConnection.createOffer().then((sdp: RTCSessionDescriptionInit) => {
-  //     this.peerConnection.setLocalDescription(sdp);
-  //     this.sendMessage(sdp);
-  //   });
-  // }
+      this.peerConnection.ontrack = (event: RTCTrackEvent) => {
+        if (event.streams[0]) {
+          this.addRemoteStream(event.streams[0]);
+        }
+      };
+    } catch (e) {
+      console.log('Failed to create PeerConnection.', e.message);
+      return;
+    }
+  }
 
-  // sendAnswer(): void {
-  //   console.log('Sending answer to peer.');
-  //   this.addTransceivers();
-  //   this.peerConnection.createAnswer().then((sdp: RTCSessionDescription) => {
-  //     this.peerConnection.setLocalDescription(sdp);
-  //     this.sendMessage(sdp);
-  //   });
-  // }
+  sendOffer(): void {
+    console.log('Sending offer to peer.');
+    this.addTransceivers();
+    this.peerConnection.createOffer().then((sdp: RTCSessionDescriptionInit) => {
+      this.peerConnection.setLocalDescription(sdp);
+      console.log(sdp.sdp);
+      this.sendMessage(sdp);
+    });
+  }
 
-  // addIceCandidate(message: any): void {
-  //   console.log('Adding ice candidate.');
-  //   const candidate = new RTCIceCandidate({
-  //     sdpMLineIndex: message.label,
-  //     candidate: message.candidate,
-  //   });
-  //   this.peerConnection.addIceCandidate(candidate);
-  // }
+  sendAnswer(): void {
+    console.log('Sending answer to peer.');
+    this.addTransceivers();
+    this.peerConnection.createAnswer().then((sdp: RTCSessionDescription) => {
+      this.peerConnection.setLocalDescription(sdp);
+      this.sendMessage(sdp);
+    });
+  }
 
-  // sendIceCandidate(event: RTCPeerConnectionIceEvent): void {
-  //   console.log('Sending ice candidate to remote peer.');
-  //   this.sendMessage({
-  //     type: 'candidate',
-  //     label: event.candidate.sdpMLineIndex,
-  //     id: event.candidate.sdpMid,
-  //     candidate: event.candidate.candidate,
-  //   });
-  // }
+  addIceCandidate(message: any): void {
+    console.log('Adding ice candidate.');
+    const candidate = new RTCIceCandidate({
+      sdpMLineIndex: message.label,
+      candidate: message.candidate,
+    });
+    this.peerConnection.addIceCandidate(candidate);
+  }
 
-  // addTransceivers(): void {
-  //   console.log('Adding transceivers.');
-  //   const init = {
-  //     direction: 'recvonly',
-  //     streams: [],
-  //     sendEncodings: [],
-  //   } as RTCRtpTransceiverInit;
-  //   this.peerConnection.addTransceiver('audio', init);
-  //   this.peerConnection.addTransceiver('video', init);
-  // }
+  sendIceCandidate(event: RTCPeerConnectionIceEvent): void {
+    console.log('Sending ice candidate to remote peer.');
+    this.sendMessage({
+      type: 'candidate',
+      label: event.candidate.sdpMLineIndex,
+      id: event.candidate.sdpMid,
+      candidate: event.candidate.candidate,
+    });
+  }
 
-  // addLocalStream(stream: MediaStream): void {
-  //   console.log('Local stream added.');
-  //   this.localStream = stream;
-  //   this.localVideo.nativeElement.srcObject = this.localStream;
-  //   this.localVideo.nativeElement.muted = 'muted';
-  // }
+  addTransceivers(): void {
+    console.log('Adding transceivers.');
+    const init = {
+      direction: 'recvonly',
+      streams: [],
+      sendEncodings: [],
+    } as RTCRtpTransceiverInit;
+    this.peerConnection.addTransceiver('audio', init);
+    this.peerConnection.addTransceiver('video', init);
+  }
 
-  // addRemoteStream(stream: MediaStream): void {
-  //   console.log('Remote stream added.');
-  //   this.remoteStream = stream;
-  //   this.remoteVideo.nativeElement.srcObject = this.remoteStream;
-  //   this.remoteVideo.nativeElement.muted = 'muted';
-  // }
+  addLocalStream(stream: MediaStream): void {
+    console.log('Local stream added.');
+    this.localStream = stream;
+    this.localVideo.nativeElement.srcObject = this.localStream;
+    this.localVideo.nativeElement.muted = 'muted';
+  }
+
+  addRemoteStream(stream: MediaStream): void {
+    console.log('Remote stream added.');
+    this.remoteStream = stream;
+    this.remoteVideo.nativeElement.srcObject = this.remoteStream;
+    this.remoteVideo.nativeElement.muted = 'muted';
+  }
 
   hangup(): void {
     console.log('Hanging up.');
-    // this.stopPeerConnection();
+    this.stopPeerConnection();
     // this.sendMessage(`${this.userEntry.DisplayName} has left.`);
     console.log(this.room.name);
     console.log(this.userEntry);
@@ -666,34 +698,34 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       });
   }
 
-  // handleRemoteHangup(): void {
-  //   console.log('Session terminated by remote peer.');
-  //   this.stopPeerConnection();
-  //   this.isInitiator = true;
-  // }
+  handleRemoteHangup(): void {
+    console.log('Session terminated by remote peer.');
+    this.stopPeerConnection();
+    this.isInitiator = true;
+  }
 
-  // stopPeerConnection(): void {
-  //   this.isStarted = false;
-  //   this.isChannelReady = false;
-  //   if (this.peerConnection) {
-  //     this.peerConnection.close();
-  //     this.peerConnection = null;
-  //   }
-  // }
+  stopPeerConnection(): void {
+    this.isStarted = false;
+    this.isChannelReady = false;
+    if (this.peerConnection) {
+      this.peerConnection.close();
+      this.peerConnection = null;
+    }
+  }
 
   ngOnDestroy(): void {
     this.getUserID().unsubscribe();
     this.getDisplayName().unsubscribe();
     this.hangup();
-    // if (this.localStream && this.localStream.active) {
-    //   this.localStream.getTracks().forEach((track) => {
-    //     track.stop();
-    //   });
-    // }
-    // if (this.remoteStream && this.remoteStream.active) {
-    //   this.remoteStream.getTracks().forEach((track) => {
-    //     track.stop();
-    //   });
-    // }
+    if (this.localStream && this.localStream.active) {
+      this.localStream.getTracks().forEach((track) => {
+        track.stop();
+      });
+    }
+    if (this.remoteStream && this.remoteStream.active) {
+      this.remoteStream.getTracks().forEach((track) => {
+        track.stop();
+      });
+    }
   }
 }

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SessionListRoutingModule } from './session-list-routing.module';
-import { SessionListComponent } from './session-list.component';
+import { CourseListRoutingModule } from './course-list-routing.module';
+import { CourseListComponent } from './course-list.component';
 import {
   DxScrollViewModule,
   DxToolbarModule,
@@ -16,7 +16,7 @@ import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module
 @NgModule({
   imports: [
     CommonModule,
-    SessionListRoutingModule,
+    CourseListRoutingModule,
     DxScrollViewModule,
     DxToolbarModule,
     DxButtonModule,
@@ -26,6 +26,6 @@ import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module
     DxSelectBoxModule,
     FormatCurrencyModule,
   ],
-  declarations: [SessionListComponent],
+  declarations: [CourseListComponent],
 })
-export class SessionListModule {}
+export class CourseListModule {}

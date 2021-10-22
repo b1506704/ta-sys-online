@@ -7,7 +7,7 @@ const routes: Routes = [
   {
     path: 'learner_home',
     loadChildren: () =>
-      import('./pages/learner/learner_home/learner-home.module').then(
+      import('./pages/learner/learner-home/learner-home.module').then(
         (m) => m.LearnerHomeModule
       ),
   },
@@ -15,16 +15,38 @@ const routes: Routes = [
   {
     path: 'instructor_home',
     loadChildren: () =>
-      import('./pages/instructor/instructor_home/instructor-home.module').then(
+      import('./pages/instructor/instructor-home/instructor-home.module').then(
         (m) => m.InstructorHomeModule
       ),
     canActivate: [AuthGuardService],
   },
   {
+    path: 'course_instructor',
+    loadChildren: () =>
+      import('./pages/instructor/course-list/course-list.module').then(
+        (m) => m.CourseListModule
+      ),
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'course_session/:course_id',
+    loadChildren: () =>
+      import('./pages/instructor/session-list/session-list.module').then(
+        (m) => m.SessionListModule
+      ),
+  },
+  {
+    path: 'course_streaming/:id',
+    loadChildren: () =>
+      import(
+        './pages/instructor/instructor-streaming/instructor-streaming.module'
+      ).then((m) => m.InstructorStreamingModule),
+  },
+  {
     path: 'instructor_streaming',
     loadChildren: () =>
       import(
-        './pages/instructor/instructor_streaming/instructor-streaming.module'
+        './pages/instructor/instructor-streaming/instructor-streaming.module'
       ).then((m) => m.InstructorStreamingModule),
     canActivate: [AuthGuardService],
   },
@@ -211,26 +233,11 @@ const routes: Routes = [
       ),
   },
   // other
-
   {
     path: 'not_found',
     loadChildren: () =>
       import('./pages/not-found/not-found.module').then(
         (m) => m.NotFoundModule
-      ),
-  },
-  {
-    path: 'login',
-    loadChildren: () =>
-      import('../app/shared/components/login/login.module').then(
-        (m) => m.LoginModule
-      ),
-  },
-  {
-    path: 'signup',
-    loadChildren: () =>
-      import('./shared/components/sign-up/sign-up.module').then(
-        (m) => m.SignUpModule
       ),
   },
   {

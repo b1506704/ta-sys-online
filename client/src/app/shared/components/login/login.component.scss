@@ -19,12 +19,15 @@
   text-align: center;
   margin-bottom: 20px;
 }
+.login-popup {
+  background-color: transparent;
+}
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  position: fixed;
+  // position: fixed;
   height: 100%;
   width: 100%;
 }

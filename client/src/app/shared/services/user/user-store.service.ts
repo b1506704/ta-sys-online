@@ -17,6 +17,8 @@ interface UserState {
   totalItems: number;
   responseMsg: string;
   isLoggedIn: boolean;
+  isShowLoginPopup: boolean;
+  isShowSignupPopup: boolean;
 }
 const initialState: UserState = {
   userList: [],
@@ -29,6 +31,8 @@ const initialState: UserState = {
   totalItems: 0,
   responseMsg: '',
   isLoggedIn: localStorage.getItem('access_token') !== null,
+  isShowLoginPopup: false,
+  isShowSignupPopup: false,
 };
 @Injectable({
   providedIn: 'root',
@@ -486,6 +490,14 @@ export class UserStore extends StateService<UserState> {
 
   $isLoggedIn: Observable<boolean> = this.select((state) => state.isLoggedIn);
 
+  $isShowLoginPopup: Observable<boolean> = this.select(
+    (state) => state.isShowLoginPopup
+  );
+
+  $isShowSignupPopup: Observable<boolean> = this.select(
+    (state) => state.isShowSignupPopup
+  );
+
   $userList: Observable<Array<User>> = this.select((state) => state.userList);
 
   $roleList: Observable<Array<any>> = this.select((state) => state.roleList);
@@ -639,6 +651,14 @@ export class UserStore extends StateService<UserState> {
 
   setTotalItems(_totalItems: number) {
     this.setState({ totalItems: _totalItems });
+  }
+
+  setIsShowLoginPopup(isShow: boolean) {
+    this.setState({ isShowLoginPopup: isShow });
+  }
+
+  setIsShowSignupPopup(isShow: boolean) {
+    this.setState({ isShowSignupPopup: isShow });
   }
 
   setCurrentPage(_currentPage: number) {
@@ -928,6 +948,7 @@ export class UserStore extends StateService<UserState> {
         setTimeout(() => {
           this.setState({ isLoggedIn: true });
           this.store.showNotif(data.responseMessage, 'custom');
+          this.setIsShowLoginPopup(false);
         }, 2000);
       },
       error: (data: any) => {
@@ -949,8 +970,8 @@ export class UserStore extends StateService<UserState> {
     this.store.setCurrentUserRoleId('');
     this.store.setCurrentUserRoleName('');
     this.setState({ isLoggedIn: false });
+    this.setIsShowLoginPopup(true);
     this.store.showNotif('Logout successfully', 'custom');
-    this.router.navigate(['/login']);
   }
 
   changePassword(userId: string, oldPassword: string, newPassword: string) {

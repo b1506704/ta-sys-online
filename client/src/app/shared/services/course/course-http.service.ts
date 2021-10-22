@@ -78,6 +78,30 @@ export class CourseHttpService {
     });
   }
 
+  filterSearchCourseByProperty(
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
+    page: number,
+    size: number
+  ): Observable<Course> {
+    const params = new HttpParams()
+      .set('FilterValue', filterValue)
+      .set('FilterProperty', filterProperty)
+      .set('SearchValue', searchValue)
+      .set('SearchProperty', searchProperty)
+      .set('PageNumber', page)
+      .set('PageSize', size);
+    console.log(params.toString());
+    return this.http.get<Course>(this.apiUrl + '/filter-search', {
+      params: params,
+      reportProgress: true,
+      observe: 'body',
+    });
+  }
+
+
   sortCourseByProperty(
     value: string,
     order: string,

@@ -3,4 +3,5 @@ export interface Session {
   endTime: Date;
   maxParticipants: number;
   creatorId: string;  
+  courseId: string;  
 }
