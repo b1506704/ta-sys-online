@@ -1,7 +1,7 @@
 <dx-popup
-  [(visible)]="isSignupPopupVisible"
+  [visible]="isSignupPopupVisible"
   [height]="'95%'"
-  [width]="'70%'"
+  [width]="'90%'"
   [showTitle]="false"
   [shading]="true"
   [dragEnabled]="true"
@@ -10,11 +10,11 @@
   (onHiding)="closeSignupPopup()"
 >
   <div *dxTemplate="let data of 'content'">
-    <dx-scroll-view
+    <!-- <dx-scroll-view
       [bounceEnabled]="true"
       [scrollByContent]="true"
       [scrollByThumb]="true"
-    >
+    > -->
       <div class="signup-container">
         <form
           id="form-container"
@@ -31,7 +31,7 @@
             id="form"
             [formData]="user"
             [showValidationSummary]="true"
-            validationGroup="userData"
+            validationGroup="userSignupData"
             (onContentReady)="onFormShown($event)"
           >
             <dxi-item itemType="group">
@@ -125,6 +125,6 @@
           </dx-form>
         </form>
       </div>
-    </dx-scroll-view>
+    <!-- </dx-scroll-view> -->
   </div>
 </dx-popup>

@@ -1,9 +1,13 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { Schedule } from 'src/app/shared/models/schedule';
-import { ScheduleHttpService } from 'src/app/shared/services/schedule/schedule-http.service';
-import { ScheduleStore } from 'src/app/shared/services/schedule/schedule-store.service';
+import { Session } from 'src/app/shared/models/session';
+import { SessionStore } from 'src/app/shared/services/session/session-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
+import { DxScrollViewComponent } from 'devextreme-angular';
+import { File } from 'src/app/shared/models/file';
+import { FileStore } from 'src/app/shared/services/file/file-store.service';
+import { Subject } from 'src/app/shared/models/subject';
+import { SubjectHttpService } from 'src/app/shared/services/subject/subject-http.service';
 
 @Component({
   selector: 'app-schedule-list',
@@ -11,35 +15,30 @@ import { StoreService } from 'src/app/shared/services/store.service';
   styleUrls: ['./schedule-list.component.scss'],
 })
 export class ScheduleListComponent implements OnInit, OnDestroy {
-  //TODO: rewrite fetching logic: by date, find yourself
-  scheduleList!: Array<Schedule>;
+  @ViewChild(DxScrollViewComponent, { static: false })
+  scrollView: DxScrollViewComponent;
+  sessionList!: Array<Session>; 
+  subjectList: Array<Subject> = [];
+  currentSessionID!: string;
   pageSize: number = 100;
-  instructorName: Array<Object> = [
-    { name: 'Dr. Elon Musk' },
-    { name: 'Dr. Tim Cahill' },
-    { name: 'Dr. David De Gea' },
-    { name: 'Dr. Manuel Neuer' },
-    { name: 'Dr. Phi Minh Long' },
-    { name: 'Dr. Au Trung' },
-    { name: 'Dr. Thach Sung' },
-    { name: 'Dr. Alien' },
-    { name: 'Dr. Predator' },
-  ];
-  allowedPageSizes: Array<number | string> = [5, 10, 15];
-  // standard | virtual | infinite
+  pullDown = false;
+  updateContentTimer: any;
   currentIndexFromServer: number;
   isSearchingByName: boolean;
   isFilteringByCategory: boolean;
   isFilteringByPrice: boolean;
   isSortingByName: boolean;
   isSortingByPrice: boolean;
-  currentDate: Date = new Date(2021, 2, 28);
+  isDetailPopupVisible: boolean = false;
+
   currentCategoryFilterValue: string;
   timeout: any;
-  currentSearchByNameValue: string;
-  currentSortByPriceValue: string;
-
-  isEdit: boolean = false;
+  currentFilterByPropertyValue: string;
+  currentSearchByPropertyValue: string;
+  currentSortByPropertyValue: string;
+  currentSortProperty: string = 'cost';
+  currentSearchProperty: string = 'name';
+  currentFilterProperty: string = 'courseId';
 
   searchBoxOptions: any = {
     valueChangeEvent: 'keyup',
@@ -58,12 +57,12 @@ export class ScheduleListComponent implements OnInit, OnDestroy {
   };
 
   filterSelectBoxOptions: any = {
-    items: this.instructorName,
-    valueExpr: '_id',
-    // searchExpr: 'name',
+    items: this.subjectList,
+    valueExpr: 'id',
+    searchExpr: 'name',
     displayExpr: 'name',
-    placeholder: 'Filter with instructor name',
-    // searchEnabled: true,
+    placeholder: 'Filter with subject',
+    searchEnabled: true,
     onValueChanged: this.onFilterChange.bind(this),
   };
 
@@ -73,95 +72,33 @@ export class ScheduleListComponent implements OnInit, OnDestroy {
         _id: '-1',
         name: '(NONE)',
       },
-      { _id: '0', name: 'ASC' },
-      { _id: '1', name: 'DESC' },
+      { _id: '0', name: 'asc' },
+      { _id: '1', name: 'desc' },
     ],
     valueExpr: 'name',
-    placeholder: 'Sort room',
+    placeholder: 'Sort by price',
     displayExpr: 'name',
     onValueChanged: this.onSortValueChanged.bind(this),
   };
 
+  fileData: File = {
+    sourceID: '',
+    container: '',
+    category: '',
+    title: '',
+    fileName: '',
+    fileSize: 0,
+    fileType: '',
+    url: '../../../../assets/imgs/profile.png',
+  };
+  fileList: Array<File> = [];
+  currentDate: Date = new Date();
+
   constructor(
-    private scheduleStore: ScheduleStore,
+    private sessionStore: SessionStore,
     private store: StoreService,
-    private scheduleHTTP: ScheduleHttpService,
     private router: Router
   ) {}
-
-  onSearchKeyupHandler(e: any) {
-    clearTimeout(this.timeout);
-    this.timeout = setTimeout(() => {
-      this.isSearchingByName = true;
-      this.isFilteringByCategory = false;
-      this.isSortingByPrice = false;
-      console.log(this.currentSearchByNameValue);
-      if (this.currentSearchByNameValue !== '') {
-        this.scheduleStore.initSearchByNameData(
-          this.currentSearchByNameValue,
-          this.currentIndexFromServer,
-          this.pageSize
-        );
-      } else {
-        //return to pure editor mode
-        this.store.showNotif('SEARCH MODE OFF', 'custom');
-        this.onRefresh();
-      }
-    }, 1250);
-  }
-
-  onSearchValueChanged(e: any) {
-    this.currentSearchByNameValue = e.value;
-  }
-
-  onSortValueChanged(e: any) {
-    this.isSortingByPrice = true;
-    this.isSearchingByName = false;
-    this.isFilteringByCategory = false;
-    this.currentSortByPriceValue = e.value;
-    if (e.value !== '(NONE)') {
-      this.scheduleStore.initSortByPriceData(
-        e.value,
-        this.currentIndexFromServer,
-        this.pageSize
-      );
-    } else {
-      //return to pure editor mode
-      this.store.showNotif('SORT MODE OFF', 'custom');
-      this.onRefresh();
-    }
-  }
-
-  onFilterChange(e: any) {
-    this.isFilteringByCategory = true;
-    this.isSearchingByName = false;
-    this.isSortingByPrice = false;
-    this.currentCategoryFilterValue = e.value;
-    console.log(e.value);
-    if (e.value !== '-1') {
-      this.scheduleStore.initFilterByCategoryData(
-        e.value,
-        this.currentIndexFromServer,
-        this.pageSize
-      );
-    } else {
-      //return to pure editor mode
-      this.store.showNotif('FILTER MODE OFF', 'custom');
-      this.onRefresh();
-    }
-  }
-
-  checkEditorMode() {
-    if (this.isFilteringByCategory === true) {
-      return 'FILTER';
-    } else if (this.isSearchingByName === true) {
-      return 'SEARCH';
-    } else if (this.isSortingByPrice === true) {
-      return 'SORT';
-    } else {
-      return 'NORMAL';
-    }
-  }
 
   onOptionChanged(e: any) {
     const editorMode = this.checkEditorMode();
@@ -187,146 +124,194 @@ export class ScheduleListComponent implements OnInit, OnDestroy {
   }
 
   onAppointmentClick(e: any) {
-    this.store.showNotif(`Room: ${e.targetedAppointmentData.room}`, 'custom');
+    this.store.showNotif(
+      `Room: ${e.targetedAppointmentData.maxParticipants}`,
+      'custom'
+    );
   }
 
   onAppointmentDblClick(e: any) {
     e.cancel = true;
   }
 
-  paginatePureData(index: number) {
-    if (index === 0) {
-      this.scheduleStore.loadDataAsync(index, this.pageSize);
-      this.scheduleStore.loadDataAsync(index + 1, this.pageSize);
+  selectSession(item: any) {
+    this.router.navigate(['course_streaming', JSON.stringify(item)]);
+    console.log('SELECTED ID');
+    console.log(item);
+  }
+
+  updateContent = (args: any, eventName: any) => {
+    const editorMode = this.checkEditorMode();
+    const currentIndex = this.currentIndexFromServer;
+    if (this.updateContentTimer) clearTimeout(this.updateContentTimer);
+    this.updateContentTimer = setTimeout(() => {
+      if (this.sessionList.length) {
+        switch (editorMode) {
+          case 'NORMAL':
+            this.paginatePureData(currentIndex + 1);
+            break;
+          case 'FILTER':
+            this.paginateFilterData(currentIndex + 1);
+            break;
+          case 'SEARCH':
+            this.paginateSearchData(currentIndex + 1);
+            break;
+          case 'SORT':
+            this.paginateSortData(currentIndex + 1);
+            break;
+          default:
+            break;
+        }
+      }
+      args.component.release();
+    }, 500);
+  };
+  updateTopContent = (e: any) => {
+    this.updateContent(e, 'PullDown');
+  };
+  updateBottomContent = (e: any) => {
+    this.updateContent(e, 'ReachBottom');
+  };
+
+  onSearchKeyupHandler(e: any) {
+    clearTimeout(this.timeout);
+    this.timeout = setTimeout(() => {
+      this.isSearchingByName = true;
+      this.isFilteringByCategory = false;
+      this.isSortingByPrice = false;
+      console.log(this.currentSearchByPropertyValue);
+      if (this.currentSearchByPropertyValue !== '') {
+        this.sessionStore.initInfiniteSearchByPropertyData(
+          this.currentSearchProperty,
+          this.currentSearchByPropertyValue,
+          1,
+          this.pageSize
+        );
+      } else {
+        //return to pure editor mode
+        this.store.showNotif('SEARCH MODE OFF', 'custom');
+        this.onRefresh();
+      }
+    }, 1250);
+  }
+
+  onSearchValueChanged(e: any) {
+    this.currentSearchByPropertyValue = e.value;
+  }
+
+  onSortValueChanged(e: any) {
+    this.isSortingByPrice = true;
+    this.isSearchingByName = false;
+    this.isFilteringByCategory = false;
+    this.currentSortByPropertyValue = e.value;
+    if (e.value !== '(NONE)') {
+      this.sessionStore.initInfiniteSortByPropertyData(
+        this.currentSortProperty,
+        e.value,
+        1,
+        this.pageSize
+      );
     } else {
-      this.scheduleStore.loadDataAsync(index, this.pageSize);
-      this.scheduleStore.loadDataAsync(index + 1, this.pageSize);
-      this.scheduleStore.loadDataAsync(index - 1, this.pageSize);
+      //return to pure editor mode
+      this.store.showNotif('SORT MODE OFF', 'custom');
+      this.onRefresh();
     }
+  }
+
+  onFilterChange(e: any) {
+    this.isFilteringByCategory = true;
+    this.isSearchingByName = false;
+    this.isSortingByPrice = false;
+    this.currentCategoryFilterValue = e.value;
+    console.log(e.value);
+    if (e.value !== '(NONE)') {
+      this.sessionStore.initInfiniteFilterByPropertyData(
+        this.currentFilterProperty,
+        e.value,
+        1,
+        this.pageSize
+      );
+    } else {
+      //return to pure editor mode
+      this.store.showNotif('FILTER MODE OFF', 'custom');
+      this.onRefresh();
+    }
+  }
+
+  checkEditorMode() {
+    if (this.isFilteringByCategory === true) {
+      return 'FILTER';
+    } else if (this.isSearchingByName === true) {
+      return 'SEARCH';
+    } else if (this.isSortingByPrice === true) {
+      return 'SORT';
+    } else {
+      return 'NORMAL';
+    }
+  }
+
+  paginatePureData(index: number) {
+    this.sessionStore.loadInfiniteDataAsync(index, this.pageSize);
   }
 
   paginateFilterData(index: number) {
-    if (index === 0) {
-      this.scheduleStore.filterScheduleByCategory(
-        this.currentCategoryFilterValue,
-        index,
-        this.pageSize
-      );
-      this.scheduleStore.filterScheduleByCategory(
-        this.currentCategoryFilterValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.scheduleStore.filterScheduleByCategory(
-        this.currentCategoryFilterValue,
-        index,
-        this.pageSize
-      );
-      this.scheduleStore.filterScheduleByCategory(
-        this.currentCategoryFilterValue,
-        index + 1,
-        this.pageSize
-      );
-      this.scheduleStore.filterScheduleByCategory(
-        this.currentCategoryFilterValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.sessionStore.filterInfiniteSessionByProperty(
+      this.currentFilterProperty,
+      this.currentCategoryFilterValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSearchData(index: number) {
-    if (index === 0) {
-      this.scheduleStore.searchScheduleByName(
-        this.currentSearchByNameValue,
-        index,
-        this.pageSize
-      );
-      this.scheduleStore.searchScheduleByName(
-        this.currentSearchByNameValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.scheduleStore.searchScheduleByName(
-        this.currentSearchByNameValue,
-        index,
-        this.pageSize
-      );
-      this.scheduleStore.searchScheduleByName(
-        this.currentSearchByNameValue,
-        index + 1,
-        this.pageSize
-      );
-      this.scheduleStore.searchScheduleByName(
-        this.currentSearchByNameValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.sessionStore.searchInfiniteSessionByProperty(
+      this.currentSearchProperty,
+      this.currentSearchByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSortData(index: number) {
-    if (index === 0) {
-      this.scheduleStore.sortScheduleByPrice(
-        this.currentSortByPriceValue,
-        index,
-        this.pageSize
-      );
-      this.scheduleStore.sortScheduleByPrice(
-        this.currentSortByPriceValue,
-        index + 1,
-        this.pageSize
-      );
-    } else {
-      this.scheduleStore.sortScheduleByPrice(
-        this.currentSortByPriceValue,
-        index,
-        this.pageSize
-      );
-      this.scheduleStore.sortScheduleByPrice(
-        this.currentSortByPriceValue,
-        index + 1,
-        this.pageSize
-      );
-      this.scheduleStore.sortScheduleByPrice(
-        this.currentSortByPriceValue,
-        index - 1,
-        this.pageSize
-      );
-    }
+    this.sessionStore.sortInfiniteSessionByProperty(
+      this.currentSortProperty,
+      this.currentSortByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   onRefresh() {
     this.isFilteringByCategory = false;
     this.isSearchingByName = false;
     this.isSortingByPrice = false;
-    this.scheduleStore.initData(this.currentIndexFromServer, this.pageSize);
-  }
-
-  navigateToHealthCondition() {
-    this.router.navigate(['/health_condition']);
+    this.sessionStore.initInfiniteData(1, this.pageSize);
   }
 
   sourceDataListener() {
-    return this.scheduleStore.$scheduleList.subscribe((data: any) => {
-      this.scheduleList = data;
+    return this.sessionStore.$sessionList.subscribe((data: any) => {
+      this.sessionList = data;
     });
   }
 
   currentPageListener() {
-    return this.scheduleStore.$currentPage.subscribe((data: any) => {
+    return this.sessionStore.$currentPage.subscribe((data: any) => {
       this.currentIndexFromServer = data;
     });
   }
 
-  ngOnInit(): void {
+  scrollTop() {
+    this.scrollView.instance.scrollTo({ top: 0, left: 0 });
+  }
+
+  initData() {
+    this.sessionStore.initInfiniteData(1, this.pageSize);
     this.sourceDataListener();
+  }
+
+  ngOnInit(): void {
+    this.initData();
     this.currentPageListener();
-    setTimeout(() => {
-      this.onRefresh();
-    }, 150);
   }
 
   ngOnDestroy(): void {

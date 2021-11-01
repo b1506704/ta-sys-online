@@ -11,5 +11,4 @@ export interface Course {
   cost: number;
   subjectId: string;
   instructorId: string;
-  scheduleIds: Array<string>;
 }

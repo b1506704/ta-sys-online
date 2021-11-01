@@ -111,7 +111,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
 
   selectCourse(_id: string) {
     this.currentCourseID = _id;
-    this.router.navigate(['course_session', this.currentCourseID]);
+    this.router.navigate(['course_classroom', this.currentCourseID]);
     console.log('SELECTED ID');
     console.log(_id);
   }

@@ -5,6 +5,7 @@ import { StateService } from '../state.service';
 import { StoreService } from '../store.service';
 import { CartHttpService } from './cart-http.service';
 import { confirm } from 'devextreme/ui/dialog';
+import { Course } from '../../models/course';
 
 interface CartState {
   cartList: Array<Cart>;
@@ -96,7 +97,7 @@ export class CartStore extends StateService<CartState> {
         this.setState({ currentPage: data.pageNumber });
       });
   }
-
+ 
   loadInfiniteDataAsync(page: number, size: number) {
     this.setIsLoading(true);
     this.cartService.fetchCart(page, size).subscribe({
@@ -119,80 +120,7 @@ export class CartStore extends StateService<CartState> {
         console.log(data);
       },
     });
-  }
-
-  loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
-    this.setIsLoading(true);
-    this.cartService.fetchCartByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          cartList: this.fillEmpty(
-            page - 1,
-            size,
-            this.state.cartList,
-            data.data
-          ),
-        });
-        console.log('Pure list');
-        console.log(this.state.cartList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
-    return this.cartService
-      .fetchCartByLearnerID(page, size, learnerID)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          cartList: data.data,
-        });
-        console.log('Current flag: infite list');
-        console.log(this.state.cartList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-      });
-  }
-
-  loadInfiniteDataAsyncByLearnerID(
-    page: number,
-    size: number,
-    learnerID: string
-  ) {
-    this.setIsLoading(true);
-    this.cartService.fetchCartByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          cartList: this.state.cartList.concat(data.data),
-        });
-        console.log('Infinite list');
-        console.log(this.state.cartList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
+  }    
 
   initData(page: number, size: number) {
     this.cartService
@@ -421,9 +349,7 @@ export class CartStore extends StateService<CartState> {
     this.store.setIsLoading(_isLoading);
   }
 
-  $cartList: Observable<Array<Cart>> = this.select(
-    (state) => state.cartList
-  );
+  $cartList: Observable<Array<Cart>> = this.select((state) => state.cartList);
 
   $exportData: Observable<Array<Cart>> = this.select(
     (state) => state.exportData
@@ -439,9 +365,7 @@ export class CartStore extends StateService<CartState> {
     (state) => state.selectedCart
   );
 
-  $cartInstance: Observable<Cart> = this.select(
-    (state) => state.cartInstance
-  );
+  $cartInstance: Observable<Cart> = this.select((state) => state.cartInstance);
 
   uploadCart(cart: Cart, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
@@ -475,6 +399,69 @@ export class CartStore extends StateService<CartState> {
             this.setState({ responseMsg: data });
             console.log(data);
             this.loadDataAsync(page, size);
+            this.setIsLoading(false);
+            this.store.showNotif(data.responseMessage, 'custom');
+          },
+          error: (data: any) => {
+            this.setIsLoading(false);
+            this.store.showNotif(data.error.responseMessage, 'error');
+            console.log(data);
+          },
+        });
+      }
+    });
+  }
+
+  addToCart(course: Course, userId: string) {
+    this.confirmDialog('').then((confirm: boolean) => {
+      if (confirm) {
+        this.setIsLoading(true);
+        this.cartService.addToCart(course, userId).subscribe({
+          next: (data: any) => {
+            this.setState({ responseMsg: data });
+            console.log(data);
+            this.setIsLoading(false);
+            this.store.showNotif(data.responseMessage, 'custom');
+          },
+          error: (data: any) => {
+            this.setIsLoading(false);
+            this.store.showNotif(data.error.responseMessage, 'error');
+            console.log(data);
+          },
+        });
+      }
+    });
+  }
+
+  removeFromCart(course: Course, userId: string) {
+    this.confirmDialog('').then((confirm: boolean) => {
+      if (confirm) {
+        this.setIsLoading(true);
+        this.cartService.removeFromCart(course, userId).subscribe({
+          next: (data: any) => {
+            this.setState({ responseMsg: data });
+            console.log(data);
+            this.setIsLoading(false);
+            this.store.showNotif(data.responseMessage, 'custom');
+          },
+          error: (data: any) => {
+            this.setIsLoading(false);
+            this.store.showNotif(data.error.responseMessage, 'error');
+            console.log(data);
+          },
+        });
+      }
+    });
+  }
+
+  removeAllFromCart(userId: string) {
+    this.confirmDialog('').then((confirm: boolean) => {
+      if (confirm) {
+        this.setIsLoading(true);
+        this.cartService.removeAllFromCart(userId).subscribe({
+          next: (data: any) => {
+            this.setState({ responseMsg: data });
+            console.log(data);
             this.setIsLoading(false);
             this.store.showNotif(data.responseMessage, 'custom');
           },
@@ -726,41 +713,34 @@ export class CartStore extends StateService<CartState> {
       });
   }
 
-  sortCartByProperty(
-    value: string,
-    order: string,
-    page: number,
-    size: number
-  ) {
+  sortCartByProperty(value: string, order: string, page: number, size: number) {
     this.setIsLoading(true);
-    this.cartService
-      .sortCartByProperty(value, order, page, size)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({ responseMsg: data });
-          this.setState({
-            cartList: this.fillEmpty(
-              page - 1,
-              size,
-              this.state.cartList,
-              data.data
-            ),
-          });
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          console.log('Sorted list');
-          console.log(this.state.cartList);
-          console.log('Server response');
-          console.log(data);
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.cartService.sortCartByProperty(value, order, page, size).subscribe({
+      next: (data: any) => {
+        this.setState({ responseMsg: data });
+        this.setState({
+          cartList: this.fillEmpty(
+            page - 1,
+            size,
+            this.state.cartList,
+            data.data
+          ),
+        });
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        console.log('Sorted list');
+        console.log(this.state.cartList);
+        console.log('Server response');
+        console.log(data);
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
   sortInfiniteCartByProperty(
@@ -770,28 +750,26 @@ export class CartStore extends StateService<CartState> {
     size: number
   ) {
     this.setIsLoading(true);
-    this.cartService
-      .sortCartByProperty(value, order, page, size)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({
-            cartList: this.state.cartList.concat(data),
-          });
-          console.log('Infite sorted list');
-          console.log(this.state.cartList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.cartService.sortCartByProperty(value, order, page, size).subscribe({
+      next: (data: any) => {
+        this.setState({
+          cartList: this.state.cartList.concat(data),
+        });
+        console.log('Infite sorted list');
+        console.log(this.state.cartList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
   getCart(id: string) {

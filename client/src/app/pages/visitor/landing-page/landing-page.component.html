@@ -7,12 +7,11 @@
   <div class="organization-container" #organization1>
     <div class="organization-img box-shadow">
       <dx-gallery
-        [dataSource]="dataSource"
+        [dataSource]="learnerFeature"
         [slideshowDelay]="slideshowDelay"
         [loop]="true"
         [showNavButtons]="true"
         [showIndicator]="true"
-        (onSelectionChanged)="onSelectionChanged($event)"
       >
         <div *dxTemplate="let galleryItem of 'item'">
           <div class="img-container">
@@ -47,12 +46,11 @@
   <div class="organization-container" #organization1>
     <div class="organization-img box-shadow">
       <dx-gallery
-        [dataSource]="dataSource"
+        [dataSource]="instructorFeature"
         [slideshowDelay]="slideshowDelay"
         [loop]="true"
         [showNavButtons]="true"
         [showIndicator]="true"
-        (onSelectionChanged)="onSelectionChanged($event)"
       >
         <div *dxTemplate="let galleryItem of 'item'">
           <div class="img-container">
@@ -87,12 +85,11 @@
   <div class="organization-container" #organization1>
     <div class="organization-img">
       <dx-gallery
-        [dataSource]="dataSource"
-        [slideshowDelay]="slideshowDelay"
+        [dataSource]="courseList"
         [loop]="true"
         [showNavButtons]="true"
         [showIndicator]="true"
-        (onSelectionChanged)="onSelectionChanged($event)"
+        (onSelectionChanged)="onCourseSelectionChanged($event)"
       >
         <div *dxTemplate="let galleryItem of 'item'">
           <div
@@ -104,15 +101,20 @@
             "
           >
             <div class="img-container">
-              <img class="gallery-image" src="{{ galleryItem.imgUrl }}" />
+              <img
+                class="gallery-image"
+                [src]="mapFileListToUrl(galleryItem?.id)"
+              />
             </div>
             <div class="content-body">
-              <p class="gallery-title">{{ galleryItem.title }}</p>
-              <p class="gallery-subtitle">{{ galleryItem.subTitle }}</p>
+              <p class="gallery-title">{{ galleryItem?.name }}</p>
+              <!-- <p class="gallery-subtitle">
+                {{ galleryItem?.summary }}
+              </p> -->
               <dx-button
                 icon="arrowright"
                 type="normal"
-                (onClick)="navigateInside()"
+                (onClick)="navigateCourse(galleryItem?.id)"
                 text="Click for more"
               >
               </dx-button>
@@ -123,28 +125,66 @@
     </div>
     <div class="organization-content">
       <div class="title-container">
-        <div class="feature-title">Le Bao Anh</div>
-        <div class="feature-body">Frontend Developer</div>
+        <div class="feature-title">Price: {{ currentMiniCourse?.cost | formatCurrency: "$" }}</div>
+        <div class="feature-body">
+          Length: {{ currentMiniCourse?.duration }} Weeks
+        </div>
+        <div class="feature-body">
+          Available Slot: {{ currentMiniCourse?.availableSlot }}
+        </div>
+        <div class="feature-body">
+          Rating: {{ currentMiniCourse?.rating }}/10
+        </div>
       </div>
     </div>
   </div>
   <h2 class="feature-heading">Top Instructors</h2>
   <div class="organization-container" #organization1>
     <div class="organization-img">
-      <img
-        src="../../../../assets/imgs/tesla_director.jpg"
-        alt="..."
-        style="
-          height: 300px;
-          width: 300px;
-          border-radius: 300px;
-          box-shadow: rgba(79, 205, 255, 0.25) 0px 25px 50px -12px;
-        "
-      />
+      <dx-gallery
+        [dataSource]="instructorList"
+        [loop]="true"
+        [showNavButtons]="true"
+        [showIndicator]="true"
+        (onSelectionChanged)="onInstructorSelectionChanged($event)"
+      >
+        <div *dxTemplate="let galleryItem of 'item'">
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-start;
+              align-items: center;
+            "
+          >
+            <div class="img-container">
+              <img
+                class="gallery-image"
+                [src]="mapFileListToUrl(galleryItem?.id)"
+              />
+            </div>
+            <div class="content-body">
+              <p class="gallery-title">{{ galleryItem?.displayName }}</p>
+              <!-- <p class="gallery-subtitle">{{ galleryItem?.bio }}</p> -->
+              <dx-button
+                icon="arrowright"
+                type="normal"
+                (onClick)="navigateInstructor(galleryItem?.id)"
+                text="Click for more"
+              >
+              </dx-button>
+            </div>
+          </div>
+        </div>
+      </dx-gallery>
     </div>
     <div class="organization-content">
-      <div class="feature-title">Le Bao Anh</div>
-      <div class="feature-body">Frontend Developer</div>
+      <div class="feature-title">
+        {{ currentMiniInstructor?.fullName }}
+      </div>
+      <div class="feature-body">Phone: {{ currentMiniInstructor?.phone }}</div>
+      <div class="feature-body">Email: {{ currentMiniInstructor?.email }}</div>
+      <div class="feature-body">Biography: {{ currentMiniInstructor?.bio }}</div>
     </div>
   </div>
 
@@ -190,3 +230,38 @@
     <h2>@{{ date }}. T. A. S Online</h2>
   </div>
 </div>
+<dx-popup
+  [(visible)]="isCourseDetailPopupVisible"
+  [height]="'90%'"
+  [width]="'90%'"
+  [showTitle]="true"
+  [shading]="true"
+  [title]="'Course Detail'"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="false"
+  [showCloseButton]="true"
+>
+  <div *dxTemplate="let data of 'content'">
+    <ng-container *ngIf="currentCourse">
+      <app-course-detail [courseID]="currentCourse"> </app-course-detail>
+    </ng-container>
+  </div>
+</dx-popup>
+<dx-popup
+  [(visible)]="isInstructorDetailPopupVisible"
+  [height]="'90%'"
+  [width]="'90%'"
+  [showTitle]="true"
+  [shading]="true"
+  [title]="'Instructor Detail'"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="false"
+  [showCloseButton]="true"
+>
+  <div *dxTemplate="let data of 'content'">
+    <ng-container *ngIf="currentInstructor">
+      <app-instructor-detail [instructorID]="currentInstructor">
+      </app-instructor-detail>
+    </ng-container>
+  </div>
+</dx-popup>

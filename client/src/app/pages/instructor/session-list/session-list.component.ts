@@ -20,7 +20,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
   sessionList!: Array<Session>;
   subjectList: Array<Subject> = [];
   currentSessionID!: string;
-  pageSize: number = 10;
+  pageSize: number = 10;  
   pullDown = false;
   updateContentTimer: any;
   currentIndexFromServer: number;
@@ -98,17 +98,8 @@ export class SessionListComponent implements OnInit, OnDestroy {
     private subjectHTTP: SubjectHttpService,
     private store: StoreService,
     private router: Router,
-    private route: ActivatedRoute,
     private fileStore: FileStore
   ) {}
-
-  getCourseId() {
-    return this.route.paramMap.subscribe((param) => {
-      console.log('COURSEID');
-      console.log(param.get('course_id'));
-      this.currentFilterByPropertyValue = param.get('course_id');
-    });
-  }
 
   selectSession(item: any) {
     this.router.navigate(['course_streaming', JSON.stringify(item)]);
@@ -227,12 +218,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
   }
 
   paginatePureData(index: number) {
-    this.sessionStore.filterInfiniteSessionByProperty(
-      this.currentFilterProperty,
-      this.currentFilterByPropertyValue,
-      index,
-      this.pageSize
-    );
+    this.sessionStore.loadInfiniteDataAsync(index, this.pageSize);
   }
 
   paginateFilterData(index: number) {
@@ -245,14 +231,12 @@ export class SessionListComponent implements OnInit, OnDestroy {
   }
 
   paginateSearchData(index: number) {
-    // this.sessionStore.filterSearchInfiniteSessionByProperty(
-    //   this.currentFilterProperty,
-    //   this.currentFilterByPropertyValue,
-    //   this.currentSearchProperty,
-    //   this.currentSearchByPropertyValue,
-    //   index,
-    //   this.pageSize
-    // );
+    this.sessionStore.searchInfiniteSessionByProperty(
+      this.currentSearchProperty,
+      this.currentSearchByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateSortData(index: number) {
@@ -268,13 +252,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = false;
     this.isSearchingByName = false;
     this.isSortingByPrice = false;
-    this.sessionStore.initInfiniteFilterByPropertyData(
-      this.currentFilterProperty,
-      this.currentFilterByPropertyValue,
-      1,
-      this.pageSize
-    );
-    // this.subjectStore.fetchAll();
+    this.sessionStore.initInfiniteData(1, this.pageSize);
   }
 
   navigateToScheduleList() {
@@ -305,8 +283,6 @@ export class SessionListComponent implements OnInit, OnDestroy {
     return this.fileStore.$fileList.subscribe((data: any) => {
       if (data.length !== 0) {
         this.fileList = data;
-        console.log('IMAGE LIST OF DOCTOR');
-        console.log(this.fileList);
       }
     });
   }
@@ -322,12 +298,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
   }
 
   initData() {
-    this.sessionStore.initInfiniteFilterByPropertyData(
-      this.currentFilterProperty,
-      this.currentFilterByPropertyValue,
-      1,
-      this.pageSize
-    );
+    this.sessionStore.initInfiniteData(1, this.pageSize);
     this.sourceDataListener();
     this.fileDataListener();
   }
@@ -335,12 +306,10 @@ export class SessionListComponent implements OnInit, OnDestroy {
   filterDataListener() {
     return this.subjectHTTP.fetchAll().subscribe((data: any) => {
       this.subjectList = data;
-      console.log(this.subjectList);
     });
   }
 
   ngOnInit(): void {
-    this.getCourseId();
     this.filterDataListener();
     this.initData();
     this.currentPageListener();

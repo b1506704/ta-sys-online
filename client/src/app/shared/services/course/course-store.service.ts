@@ -862,6 +862,51 @@ export class CourseStore extends StateService<CourseState> {
       });
   }
 
+  initInfiniteUserCourseData(userId: string, page: number, size: number) {
+    this.store.setIsLoading(true);
+    this.courseService
+      .fetchUserCourse(page, size, userId)
+      .toPromise()
+      .then((data: any) => {
+        this.setState({
+          courseList: data.data,
+        });
+        console.log('Current flag: infinite filtered list');
+        console.log(this.state.courseList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.store.setIsLoading(false);
+      });
+  }
+
+  loadInfiniteUserCourseDataAsync(userId: string, page: number, size: number) {
+    this.setIsLoading(true);
+    this.courseService.fetchUserCourse(page, size, userId).subscribe({
+      next: (data: any) => {
+        if (data.data.length) {
+          this.setState({
+            courseList: this.state.courseList.concat(data.data),
+          });
+          this.fetchMediaBySourceID(data.data);
+        }
+        console.log('Infinite list');
+        console.log(this.state.courseList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
+  }
+
   sortInfiniteCourseByProperty(
     value: string,
     order: string,

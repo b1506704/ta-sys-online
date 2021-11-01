@@ -2,7 +2,7 @@
   class="login-popup"
   [visible]="isLoginPopupVisible"
   [height]="'95%'"
-  [width]="'70%'"
+  [width]="'90%'"
   [showTitle]="false"
   [shading]="true"
   [dragEnabled]="true"
@@ -35,7 +35,7 @@
           [showColonAfterLabel]="true"
           [showValidationSummary]="true"
           [scrollingEnabled]="true"
-          validationGroup="userData"
+          validationGroup="userLoginData"
         >
           <dxi-item itemType="group" caption="Account Information">
             <dxi-item dataField="username" [label]="{ text: 'Username' }">

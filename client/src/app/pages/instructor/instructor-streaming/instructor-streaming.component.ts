@@ -16,6 +16,8 @@ import { Question } from 'src/app/shared/models/question';
 import { Answer } from 'src/app/shared/models/answer';
 import { DxScrollViewComponent } from 'devextreme-angular';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Course } from 'src/app/shared/models/course';
+import { Subject } from 'src/app/shared/models/subject';
 // import { DOCUMENT } from '@angular/common';
 // import { gsap } from 'gsap';
 // import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -89,6 +91,10 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     url: '../../../../assets/imgs/profile.png',
   };
   fileList: Array<File> = [];
+  courseData!: Course;
+  creatorData!: any;
+  subjectData!: Subject;
+  streamSessionData!: any;
 
   constructor(
     private signaling: SignalrService,
@@ -98,11 +104,17 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute
   ) {}
 
-  getCourseId() {
+  getMetaData() {
     return this.route.paramMap.subscribe((param) => {
       const session = JSON.parse(param.get('id'));
+      this.streamSessionData = session;
       console.log(session);
       this.currentCourseId = session.courseId;
+      this.courseData = session.courseTable;
+      this.creatorData = session.creator;
+      this.room.name = `R${this.courseData.name[0]}${
+        this.creatorData.displayName[0]
+      }${session.id[0] + session.id[1]}`.toUpperCase();
     });
   }
 
@@ -180,8 +192,8 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     return this.fileStore.$fileList.subscribe((data: any) => {
       if (data.length !== 0) {
         this.fileList = data;
-        console.log('IMAGE LIST OF DOCTOR');
-        console.log(this.fileList);
+        // console.log('IMAGE LIST OF DOCTOR');
+        // console.log(this.fileList);
       }
     });
   }
@@ -343,6 +355,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getMetaData();
     this.fileDataListener();
     this.getUserID();
     this.getDisplayName();
@@ -351,7 +364,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
         this.signaling.invoke('Authorize').then((token: string) => {
           if (token) {
             sessionStorage.setItem('token', token);
-            // this.start();
+            this.start();
           }
         });
       }
@@ -466,10 +479,10 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
           message: chatMessage,
           date: date,
         };
-        console.log(message);
+        // console.log(message);
         this.messageList = this.messageList.concat(message);
         this.isPopupChatVisible = true;
-        console.log(this.messageList);
+        // console.log(this.messageList);
         if (chatMessage == 'got user media') {
           this.initiateCall();
         } else if (chatMessage.type == 'offer') {
@@ -525,7 +538,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
             date: date,
           };
           this.store.showNotif(chatMessage, 'custom');
-          console.log(message);
+          // console.log(message);
           // this.messageList = this.messageList.concat(message);
           // this.isPopupChatVisible = true;
           // console.log(this.messageList);
@@ -625,7 +638,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     this.addTransceivers();
     this.peerConnection.createOffer().then((sdp: RTCSessionDescriptionInit) => {
       this.peerConnection.setLocalDescription(sdp);
-      console.log(sdp.sdp);
+      // console.log(sdp.sdp);
       this.sendMessage(sdp);
     });
   }
@@ -716,6 +729,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.getUserID().unsubscribe();
     this.getDisplayName().unsubscribe();
+    this.getMetaData().unsubscribe();
     this.hangup();
     if (this.localStream && this.localStream.active) {
       this.localStream.getTracks().forEach((track) => {

@@ -1,5 +1,9 @@
+import { Course } from "./course";
+
 export interface Bill {
-  courseID: string;
-  userID: string;
-  totalCost: Number;
+  courseRequests: Array<Course>;
+  userAccountId: string;
+  totalCost: number;
+  description: string;
+  totalItem: number;
 }

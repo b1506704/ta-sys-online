@@ -11,6 +11,27 @@ const routes: Routes = [
         (m) => m.LearnerHomeModule
       ),
   },
+  {
+    path: 'cart_list',
+    loadChildren: () =>
+      import('./pages/learner/cart-list/cart-list.module').then(
+        (m) => m.CartListModule
+      ),
+  },
+  {
+    path: 'learner_course_list',
+    loadChildren: () =>
+      import('./pages/learner/course-list/course-list.module').then(
+        (m) => m.CourseListModule
+      ),
+  },
+  {
+    path: 'learner_course',
+    loadChildren: () =>
+      import('./pages/learner/learner-course/course-list.module').then(
+        (m) => m.CourseListModule
+      ),
+  },
   // instructor route
   {
     path: 'instructor_home',
@@ -29,7 +50,7 @@ const routes: Routes = [
     canActivate: [AuthGuardService],
   },
   {
-    path: 'course_session/:course_id',
+    path: 'instructor_session',
     loadChildren: () =>
       import('./pages/instructor/session-list/session-list.module').then(
         (m) => m.SessionListModule
@@ -43,12 +64,26 @@ const routes: Routes = [
       ).then((m) => m.InstructorStreamingModule),
   },
   {
+    path: 'course_classroom/:courseId',
+    loadChildren: () =>
+      import(
+        './pages/instructor/instructor-classroom/instructor-classroom.module'
+      ).then((m) => m.InstructorClassroomModule),
+  },
+  {
     path: 'instructor_streaming',
     loadChildren: () =>
       import(
         './pages/instructor/instructor-streaming/instructor-streaming.module'
       ).then((m) => m.InstructorStreamingModule),
     canActivate: [AuthGuardService],
+  },
+  {
+    path: 'schedule_list',
+    loadChildren: () =>
+      import('./pages/instructor/schedule-list/schedule-list.module').then(
+        (m) => m.ScheduleListModule
+      ),
   },
   // admin route
   {
@@ -80,14 +115,6 @@ const routes: Routes = [
     loadChildren: () =>
       import('./pages/admin/edit-session-list/edit-session-list.module').then(
         (m) => m.EditSessionListModule
-      ),
-    canActivate: [AuthGuardService],
-  },
-  {
-    path: 'edit_bill_list',
-    loadChildren: () =>
-      import('./pages/admin/edit-bill-list/edit-bill-list.module').then(
-        (m) => m.EditBillListModule
       ),
     canActivate: [AuthGuardService],
   },
@@ -156,14 +183,6 @@ const routes: Routes = [
     canActivate: [AuthGuardService],
   },
   {
-    path: 'edit_discount_list',
-    loadChildren: () =>
-      import('./pages/admin/edit-discount-list/edit-discount-list.module').then(
-        (m) => m.EditDiscountListModule
-      ),
-    canActivate: [AuthGuardService],
-  },
-  {
     path: 'edit_post_list',
     loadChildren: () =>
       import('./pages/admin/edit-post-list/edit-post-list.module').then(
@@ -184,14 +203,6 @@ const routes: Routes = [
     loadChildren: () =>
       import('./pages/admin/edit-message-list/edit-message-list.module').then(
         (m) => m.EditMessageListModule
-      ),
-    canActivate: [AuthGuardService],
-  },
-  {
-    path: 'edit_schedule_list',
-    loadChildren: () =>
-      import('./pages/admin/edit-schedule-list/edit-schedule-list.module').then(
-        (m) => m.EditScheduleListModule
       ),
     canActivate: [AuthGuardService],
   },

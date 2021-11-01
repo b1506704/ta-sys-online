@@ -123,7 +123,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   onUserAccountSubmit = (e: any) => {
     e.preventDefault();
     this.userAccountStore.updateUser(this.userAccountData, 1, 5);
-    this.fileStore.uploadFiles([this.fileData]);
+    // this.fileStore.uploadFiles([this.fileData]);
   };
 
   onUserInfoSubmit = (e: any) => {

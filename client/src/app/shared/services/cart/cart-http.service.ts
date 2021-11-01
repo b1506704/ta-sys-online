@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Cart } from '../../models/cart';
+import { Course } from '../../models/course';
 
 @Injectable({
   providedIn: 'root',
@@ -17,23 +18,6 @@ export class CartHttpService {
       .set('PageSize', size);
     console.log(params.toString());
     return this.http.get<Cart>(this.apiUrl + '/paging', {
-      params: params,
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
-  fetchCartByLearnerID(
-    page: number,
-    size: number,
-    id: string
-  ): Observable<Cart> {
-    const params = new HttpParams()
-      .set('PageNumber', page)
-      .set('PageSize', size)
-      .set('Id', id);
-    console.log(params.toString());
-    return this.http.get<Cart>(this.apiUrl + '/byLearnerID', {
       params: params,
       reportProgress: true,
       observe: 'body',
@@ -129,8 +113,8 @@ export class CartHttpService {
     });
   }
 
-  getCart(id: string): Observable<Cart> {
-    return this.http.get<Cart>(this.apiUrl + `/${id}`, {
+  getCart(userId: string): Observable<Cart> {
+    return this.http.get<Cart>(this.apiUrl + `/${userId}`, {
       reportProgress: true,
       observe: 'body',
     });
@@ -141,6 +125,40 @@ export class CartHttpService {
       reportProgress: true,
       observe: 'body',
     });
+  }
+
+  addToCart(course: Course, userId: string): Observable<Cart> {
+    const params = new HttpParams().set('userId', userId);
+    return this.http.put<Cart>(this.apiUrl + `/${userId}/add-to-cart`, course, {
+      reportProgress: true,
+      observe: 'body',
+      params: params,
+    });
+  }
+
+  removeFromCart(course: Course, userId: string): Observable<Cart> {
+    const params = new HttpParams().set('userId', userId);
+    return this.http.put<Cart>(
+      this.apiUrl + `/${userId}/remove-from-cart`,
+      course,
+      {
+        reportProgress: true,
+        observe: 'body',
+        params: params,
+      }
+    );
+  }
+
+  removeAllFromCart(userId: string): Observable<ArrayBuffer> {
+    const params = new HttpParams().set('userId', userId);
+    return this.http.delete<ArrayBuffer>(
+      this.apiUrl + `/${userId}/remove-all-from-cart`,
+      {
+        reportProgress: true,
+        observe: 'body',
+        params: params,
+      }
+    );
   }
 
   fetchAll(): Observable<Cart> {

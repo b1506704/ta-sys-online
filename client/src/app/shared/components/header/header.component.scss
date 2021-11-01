@@ -38,6 +38,18 @@
   .neon-header {
     display: none;
   }
+  .title-button {
+    font-family: Hero;
+    font-size: 15px;
+    color: rgb(247, 253, 255);
+    background: none;
+    border: none;
+    padding: 5px;
+    margin-left: 15px;
+    letter-spacing: 2px;
+    transition: all 2s ease-in-out;
+    cursor: pointer;
+  }
 }
 @media screen and (min-width: 341px) {
   .title-button {
@@ -47,6 +59,7 @@
     background: none;
     border: none;
     padding: 5px;
+    margin-left: 15px;
     letter-spacing: 2px;
     transition: all 2s ease-in-out;
     cursor: pointer;

@@ -144,7 +144,7 @@ export class FileStore extends StateService<FileState> {
   }
 
   getFiles(sourceIDs: Array<string>) {
-    this.setState({ fileList: [] });
+    // this.setState({ fileList: [] });
     this.setIsLoading(true);
     for (let i = 0; i < sourceIDs.length; i++) {
       this.getFile(sourceIDs[i]).then((data: any) => {

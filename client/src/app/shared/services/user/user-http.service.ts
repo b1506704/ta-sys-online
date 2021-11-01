@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
+import { Course } from '../../models/course';
 import { User } from '../../models/user';
 
 @Injectable({
@@ -150,7 +151,7 @@ export class UserHttpService {
       observe: 'body',
     });
   }
-
+   
   generateRandomUser(): Observable<User> {
     return this.http.post<any>(
       'https://localhost:5001/api/Generate/generate-user-data',

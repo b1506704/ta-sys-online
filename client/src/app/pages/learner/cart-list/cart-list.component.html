@@ -1,0 +1,107 @@
+<dx-toolbar
+  [ngStyle]="{
+    paddingLeft: '25px',
+    marginBottom: '5px'
+  }"
+>
+  <dxi-item [location]="'before'" [text]="'Cart List'"> </dxi-item>
+  <dxi-item location="before" locateInMenu="auto">
+    <dx-button
+      icon="trash"
+      type="danger"
+      text="Remove All"
+      hint="Remove all courses from cart"
+      (onClick)="removeAllCourse()"
+    >
+    </dx-button>
+  </dxi-item>
+  <dxi-item location="after" locateInMenu="auto">
+    <dx-button
+      icon="arrowright"
+      type="outline"
+      text="To Subject"
+      hint="Navigate to subject list "
+      (onClick)="navigateToSubject()"
+    >
+    </dx-button>
+  </dxi-item>
+</dx-toolbar>
+<dx-scroll-view
+  [direction]="'vertical'"
+  [showScrollbar]="true"
+  [scrollByContent]="true"
+  [scrollByThumb]="true"
+  [height]="'100%'"
+  [width]="'100%'"
+  [bounceEnabled]="false"
+>
+  <ng-container *ngIf="cartList">
+    <div class="card-container">
+      <div class="card" *ngFor="let item of cartList.courses">
+        <div class="card-title">{{ item?.name }}</div>
+        <div class="card-body">
+          <div class="card-text">
+            Price: {{ item?.cost | formatCurrency: currency }}
+          </div>
+        </div>
+        <div class="card-img">
+          <img
+            src="../../../../assets/imgs/shopping-cart.png"
+            alt="..."
+            style="height: 100%; width: 100%"
+          />
+        </div>
+        <div>
+          <dx-button
+            icon="clear"
+            type="outline"
+            text="Paypal Purchase"
+            hint="Click to pay with Paypal"
+            (onClick)="selectCourse(item?.id, item?.userAccountId)"
+          ></dx-button>
+          <dx-button
+            icon="clear"
+            type="outline"
+            text="Remove"
+            hint="Click to remove this course form cart"
+            (onClick)="removeCourse(item)"
+          ></dx-button>
+          <dx-button
+            style="width: 100%"
+            *ngIf="!isLogin"
+            text="Login to purchase"
+            (onClick)="showLoginPopup()"
+          ></dx-button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</dx-scroll-view>
+<dx-speed-dial-action
+  icon="arrowup"
+  label=""
+  [index]="1"
+  (onClick)="scrollTop()"
+>
+</dx-speed-dial-action>
+<dx-popup
+  [(visible)]="isDetailPopupVisible"
+  [height]="'80%'"
+  [width]="'80%'"
+  [showTitle]="true"
+  [shading]="true"
+  [title]="'Course Detail'"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="false"
+  [showCloseButton]="true"
+>
+  <div *dxTemplate="let data of 'content'">
+    <ng-container *ngIf="currentCourseID">
+      <app-course-detail
+        [courseID]="currentCourseID"
+        [buyerId]="currentUserAccountId"
+      >
+      </app-course-detail>
+    </ng-container>
+  </div>
+</dx-popup>

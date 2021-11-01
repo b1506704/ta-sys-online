@@ -5,5 +5,6 @@ export interface Learner {
   address: string;
   phone: string;
   dateOfBirth: Date;
+  bio: string;
   userAccountId: string;
 }

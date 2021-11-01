@@ -44,7 +44,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     },
   ];
 
-  isLoadIndicatorVisible: boolean = false;
+  isLoadIndicatorVisible!: boolean;
   isLoggedIn!: boolean;
   isRoleSelected: boolean = false;
   eventType: string = '';
@@ -91,8 +91,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return this.store.$responseProgress.subscribe((data: any) => {
       if (data !== undefined && data !== NaN) {
         this.progress = data;
-        console.log('RECEIVED PROGRESS');
-        console.log(this.progress);
+        // console.log('RECEIVED PROGRESS');
+        // console.log(this.progress);
       }
     });
   }
@@ -101,8 +101,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return this.store.$responseEventType.subscribe((data: any) => {
       if (data !== undefined) {
         this.eventType = data;
-        console.log('EVENT TYPE');
-        console.log(this.eventType);
+        // console.log('EVENT TYPE');
+        // console.log(this.eventType);
       }
     });
   }

@@ -8,7 +8,7 @@
 ::ng-deep .loginForm {
   background-color: transparent;
   box-shadow: $box-shadow;
-  width: 60%;
+  width: 100%;
   padding: 20px;
 }
 ::ng-deep .long-title h3 {
@@ -33,7 +33,8 @@
 }
 .corner_box_animation {
   background-color: transparent;
-  width: 60%;
+  // width: 60%;
+  width: 100%;
   padding: 20px;
   background-image: repeating-linear-gradient(
       60deg,

@@ -22,35 +22,35 @@ export class AuthInterceptor implements HttpInterceptor {
       const cloned = req.clone({
         headers: req.headers.set('Authorization', 'Bearer ' + token),
       });
-      console.log('AUTH REQ:');
-      console.log(cloned);
+      // console.log('AUTH REQ:');
+      // console.log(cloned);
       return next.handle(cloned).pipe(
         tap((event) => {
           //todo: manage response progress array
           // const miliseconds = new Date().valueOf();
           if (event.type == HttpEventType.Sent) {
-            console.log('Request sent');
+            // console.log('Request sent');
             // this.store.addResponse({id: miliseconds, type: 'Requesting', progress: 0});
             // this.store.setResponseEventType('Requesting');
             this.store.setResponseProgress(0);
           }
           if (event.type === HttpEventType.DownloadProgress) {
-            console.log(event.loaded);
-            console.log(event.total);
+            // console.log(event.loaded);
+            // console.log(event.total);
             const progress = (event.loaded / event.total) * 100;
-            console.log('DOWNLOAD PROGRESS');
-            console.log(progress);
+            // console.log('DOWNLOAD PROGRESS');
+            // console.log(progress);
             if (progress !== NaN) {
               this.store.setResponseProgress(progress);
             }
             // this.store.setResponseEventType('Downloading');
           }
           if (event.type === HttpEventType.UploadProgress) {
-            console.log(event.loaded);
-            console.log(event.total);
+            // console.log(event.loaded);
+            // console.log(event.total);
             const progress = (event.loaded / event.total) * 100;
-            console.log('UPLOAD PROGRESS');
-            console.log(progress);
+            // console.log('UPLOAD PROGRESS');
+            // console.log(progress);
             // this.store.setResponseEventType('Sending');
             if (progress !== NaN) {
               this.store.setResponseProgress(progress);
@@ -58,13 +58,13 @@ export class AuthInterceptor implements HttpInterceptor {
           }
           if (event.type === HttpEventType.Response) {
             // this.store.setResponseEventType('Finishing');
-            console.log('Content downloaded completely');
+            // console.log('Content downloaded completely');
             this.store.setResponseProgress(100);
           }
         })
       );
     } else {
-      console.log(req);
+      // console.log(req);
       return next.handle(req);
     }
   }

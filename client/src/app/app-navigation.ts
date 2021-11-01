@@ -19,23 +19,24 @@ export const navigationLearner = [
     ],
   },
   {
-    text: 'Instructor Schedule',
-    icon: 'event',
-    path: '/instructor_schedule',
+    text: 'Cart List',
+    icon: 'cart',
+    path: '/cart_list',
   },
   {
-    text: 'TASys Network',
-    icon: 'like',
-    items: [
-      {
-        text: 'Sub menu 1',
-        path: '/bbbbbbb',
-      },
-      {
-        text: 'Sub menu 2',
-        path: '/ddddddd',
-      },
-    ],
+    text: 'Course List',
+    icon: 'product',
+    path: '/learner_course_list',
+  },
+  {
+    text: 'Classroom',
+    icon: 'group',
+    path: '/learner_course',
+  },
+  {
+    text: 'Schedule List',
+    icon: 'event',
+    path: '/schedule_list',
   },
 ];
 
@@ -68,8 +69,8 @@ export const navigationInstructor = [
         path: '/instructor_streaming',
       },
       {
-        text: 'Sub menu 2',
-        path: '/bbb',
+        text: 'Session List',
+        path: '/instructor_session',
       },
     ],
   },
@@ -139,11 +140,6 @@ export const navigationAdmin = [
         path: '/edit_message_list',
       },
     ],
-  },
-  {
-    text: 'Schedule',
-    path: '/edit_schedule_list',
-    icon: 'event',
   },
   {
     text: 'Session',

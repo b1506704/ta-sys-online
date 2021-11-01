@@ -236,6 +236,23 @@
             >
             </dxi-validation-rule>
           </dxi-item>
+          <dxi-item
+            dataField="bio"
+            [label]="{ text: 'Biography' }"
+            editorType="dxTextBox"
+          >
+            <dxi-validation-rule
+              type="required"
+              message="Biography is required"
+            >
+            </dxi-validation-rule>
+            <dxi-validation-rule
+              type="stringLength"
+              message="Biography cannot lower than 1 letter!"
+              [min]="1"
+            >
+            </dxi-validation-rule>
+          </dxi-item>
           <dxi-item itemType="group" [colCount]="2" [cssClass]="'buttonGroup'">
             <dxi-item
               itemType="button"

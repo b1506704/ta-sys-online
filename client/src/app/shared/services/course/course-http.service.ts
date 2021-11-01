@@ -9,7 +9,8 @@ import { Course } from '../../models/course';
 export class CourseHttpService {
   constructor(private http: HttpClient) {}
   // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Course';
-  apiUrl = 'https://localhost:5001/api/Course'; 
+  apiUrl = 'https://localhost:5001/api/Course';
+  apiUserAccountUrl = 'https://localhost:5001';
 
   fetchCourse(page: number, size: number): Observable<Course> {
     const params = new HttpParams()
@@ -21,6 +22,25 @@ export class CourseHttpService {
       reportProgress: true,
       observe: 'body',
     });
+  }
+
+  fetchUserCourse(
+    page: number,
+    size: number,
+    userId: string
+  ): Observable<Course> {
+    const params = new HttpParams()
+      .set('PageNumber', page)
+      .set('PageSize', size);
+    console.log(params.toString());
+    return this.http.get<Course>(
+      this.apiUserAccountUrl + `/api/UserAccount/${userId}/courses`,
+      {
+        params: params,
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   fetchCourseByLearnerID(
@@ -100,7 +120,6 @@ export class CourseHttpService {
       observe: 'body',
     });
   }
-
 
   sortCourseByProperty(
     value: string,

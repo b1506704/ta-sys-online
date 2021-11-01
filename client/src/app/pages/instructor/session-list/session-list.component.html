@@ -66,10 +66,21 @@
   <ng-container *ngIf="sessionList">
     <div class="card-container">
       <div class="card" *ngFor="let item of sessionList">
-        <div class="card-title">{{ item?.startTime }}</div>
+        <div class="card-title">
+          R{{ item?.courseTable.name[0] }}{{ item?.creator.displayName[0]
+          }}{{ item?.id[0] + item?.id[1] | uppercase }}
+        </div>
         <div class="card-body">
-          <div class="card-text">Start Time: {{ item?.startTime }}</div>
-          <div class="card-text">End Time: {{ item?.endTime }}</div>
+          <div class="card-text">Course: {{ item?.courseTable.name }}</div>
+          <div class="card-text">
+            Start Time: {{ item?.startTime | date: "dd/mm, h:mm a" }}
+          </div>
+          <div class="card-text">
+            End Time: {{ item?.endTime | date: "dd/mm, h:mm a" }}
+          </div>
+          <div class="card-text">
+            Max Participants: {{ item?.maxParticipants }}
+          </div>
         </div>
         <div class="card-img">
           <img

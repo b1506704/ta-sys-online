@@ -8,6 +8,7 @@ import { File } from 'src/app/shared/models/file';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
 import { Subject } from 'src/app/shared/models/subject';
 import { SubjectHttpService } from 'src/app/shared/services/subject/subject-http.service';
+import { UserStore } from 'src/app/shared/services/user/user-store.service';
 
 @Component({
   selector: 'app-course-list',
@@ -98,6 +99,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
     private subjectHTTP: SubjectHttpService,
     private store: StoreService,
     private router: Router,
+    private userStore: UserStore,
     private fileStore: FileStore
   ) {}
 
