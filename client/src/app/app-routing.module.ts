@@ -103,14 +103,6 @@ const routes: Routes = [
     canActivate: [AuthGuardService],
   },
   {
-    path: 'edit_user_info_list',
-    loadChildren: () =>
-      import(
-        './pages/admin/edit-user-info-list/edit-user-info-list.module'
-      ).then((m) => m.EditUserInfoModule),
-    canActivate: [AuthGuardService],
-  },
-  {
     path: 'edit_session_list',
     loadChildren: () =>
       import('./pages/admin/edit-session-list/edit-session-list.module').then(

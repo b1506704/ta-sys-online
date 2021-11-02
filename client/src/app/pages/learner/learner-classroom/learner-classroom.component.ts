@@ -23,10 +23,10 @@ import { Subject } from 'src/app/shared/models/subject';
 // import { ScrollTrigger } from 'gsap/ScrollTrigger';
 // import { Router } from '@angular/router';
 @Component({
-  templateUrl: 'instructor-classroom.component.html',
-  styleUrls: ['./instructor-classroom.component.scss'],
+  templateUrl: 'learner-classroom.component.html',
+  styleUrls: ['./learner-classroom.component.scss'],
 })
-export class InstructorClassroomComponent implements OnInit, OnDestroy {
+export class LearnerClassroomComponent implements OnInit, OnDestroy {
   @ViewChild('localVideo') localVideo: ElementRef;
   @ViewChild('remoteVideo') remoteVideo: ElementRef;
   @ViewChild(DxScrollViewComponent, { static: false })

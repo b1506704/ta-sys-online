@@ -57,7 +57,7 @@
             type="outline"
             text="Paypal Purchase"
             hint="Click to pay with Paypal"
-            (onClick)="selectCourse(item?.id, item?.userAccountId)"
+            (onClick)="selectCourse(item?.id)"
           ></dx-button>
           <dx-button
             icon="clear"
@@ -96,7 +96,7 @@
   [showCloseButton]="true"
 >
   <div *dxTemplate="let data of 'content'">
-    <ng-container *ngIf="currentCourseID">
+    <ng-container *ngIf="currentCourseID && currentUserAccountId">
       <app-course-detail
         [courseID]="currentCourseID"
         [buyerId]="currentUserAccountId"

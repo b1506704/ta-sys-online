@@ -4,7 +4,6 @@ import { Cart } from 'src/app/shared/models/cart';
 import { CartStore } from 'src/app/shared/services/cart/cart-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
 import { DxScrollViewComponent } from 'devextreme-angular';
-import { ICreateOrderRequest, IPayPalConfig } from 'ngx-paypal';
 import { Course } from 'src/app/shared/models/course';
 
 @Component({
@@ -37,9 +36,8 @@ export class CartListComponent implements OnInit, OnDestroy {
     });
   }
 
-  selectCourse(_id: string, buyerId: string) {
+  selectCourse(_id: string) {
     this.currentCourseID = _id;
-    this.currentUserAccountId = buyerId;
     console.log('SELECTED ID');
     console.log(_id);
     this.isDetailPopupVisible = true;
@@ -60,6 +58,8 @@ export class CartListComponent implements OnInit, OnDestroy {
   sourceDataListener() {
     return this.cartStore.$cartInstance.subscribe((data: any) => {
       this.cartList = data;
+      this.currentUserAccountId = data.userAccountId;
+      console.log(data);
     });
   }
 

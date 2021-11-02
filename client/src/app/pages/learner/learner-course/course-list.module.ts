@@ -12,6 +12,7 @@ import {
   DxSelectBoxModule,
 } from 'devextreme-angular';
 import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module';
+import { CourseDetailComponent } from './course-detail/course-detail.component';
 
 @NgModule({
   imports: [
@@ -26,6 +27,6 @@ import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module
     DxSelectBoxModule,
     FormatCurrencyModule,
   ],
-  declarations: [CourseListComponent],
+  declarations: [CourseListComponent, CourseDetailComponent],
 })
 export class CourseListModule {}

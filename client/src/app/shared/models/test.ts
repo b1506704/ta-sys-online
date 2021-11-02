@@ -6,6 +6,5 @@ export interface Test {
     deadline: Date;
     totalQuestions: number;
     maxScore: number;
-    totalAttempt: number;
     maxAttempt: number;
 }
