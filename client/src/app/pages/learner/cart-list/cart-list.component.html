@@ -1,11 +1,26 @@
 <dx-toolbar
   [ngStyle]="{
     paddingLeft: '25px',
-    marginBottom: '5px'
+    marginBottom: '15px'
   }"
 >
   <dxi-item [location]="'before'" [text]="'Cart List'"> </dxi-item>
-  <dxi-item location="before" locateInMenu="auto">
+  <dxi-item [location]="'before'">
+    <div style="font-size: medium; font-weight: bold; padding: 5px">
+      | Total Cost: {{ cartList.totalCost | formatCurrency: "$" }} |
+    </div>
+  </dxi-item>
+  <dxi-item [location]="'before'">
+    <div style="font-size: medium; font-weight: bold; padding: 5px">
+      | Total Courses: {{ cartList.totalCourse }} |
+    </div>
+  </dxi-item>
+  <dxi-item location="center" locateInMenu="auto">
+    <div>
+      <ngx-paypal [config]="payPalConfig"></ngx-paypal>
+    </div>
+  </dxi-item>
+  <dxi-item location="center" locateInMenu="auto">
     <dx-button
       icon="trash"
       type="danger"
@@ -19,9 +34,9 @@
     <dx-button
       icon="arrowright"
       type="outline"
-      text="To Subject"
-      hint="Navigate to subject list "
-      (onClick)="navigateToSubject()"
+      text="To Classroom"
+      hint="Navigate to purchased courses"
+      (onClick)="navigateToClassroom()"
     >
     </dx-button>
   </dxi-item>
@@ -35,7 +50,7 @@
   [width]="'100%'"
   [bounceEnabled]="false"
 >
-  <ng-container *ngIf="cartList">
+  <ng-container *ngIf="cartList.courses?.length">
     <div class="card-container">
       <div class="card" *ngFor="let item of cartList.courses">
         <div class="card-title">{{ item?.name }}</div>
@@ -53,10 +68,10 @@
         </div>
         <div>
           <dx-button
-            icon="clear"
+            icon="edit"
             type="outline"
-            text="Paypal Purchase"
-            hint="Click to pay with Paypal"
+            text="Detail"
+            hint="Click to see detail"
             (onClick)="selectCourse(item?.id)"
           ></dx-button>
           <dx-button
@@ -66,14 +81,13 @@
             hint="Click to remove this course form cart"
             (onClick)="removeCourse(item)"
           ></dx-button>
-          <dx-button
-            style="width: 100%"
-            *ngIf="!isLogin"
-            text="Login to purchase"
-            (onClick)="showLoginPopup()"
-          ></dx-button>
         </div>
       </div>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="cartList.courses?.length === 0">
+    <div style="width: 100%; text-align: center; margin: 25px">
+      No item in cart
     </div>
   </ng-container>
 </dx-scroll-view>
@@ -96,12 +110,8 @@
   [showCloseButton]="true"
 >
   <div *dxTemplate="let data of 'content'">
-    <ng-container *ngIf="currentCourseID && currentUserAccountId">
-      <app-course-detail
-        [courseID]="currentCourseID"
-        [buyerId]="currentUserAccountId"
-      >
-      </app-course-detail>
+    <ng-container *ngIf="currentCourseID">
+      <app-course-detail [courseID]="currentCourseID"> </app-course-detail>
     </ng-container>
   </div>
 </dx-popup>

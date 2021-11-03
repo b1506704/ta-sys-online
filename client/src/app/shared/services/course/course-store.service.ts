@@ -9,6 +9,7 @@ import { FileStore } from '../file/file-store.service';
 
 interface CourseState {
   courseList: Array<Course>;
+  courseLearnerList: Array<Course>;
   exportData: Array<Course>;
   selectedCourse: Object;
   courseInstance: Course;
@@ -19,6 +20,7 @@ interface CourseState {
 }
 const initialState: CourseState = {
   courseList: [],
+  courseLearnerList: [],
   selectedCourse: {},
   courseInstance: undefined,
   exportData: [],
@@ -475,6 +477,10 @@ export class CourseStore extends StateService<CourseState> {
     (state) => state.courseList
   );
 
+  $courseLearnerList: Observable<Array<Course>> = this.select(
+    (state) => state.courseLearnerList
+  );
+
   $exportData: Observable<Array<Course>> = this.select(
     (state) => state.exportData
   );
@@ -869,10 +875,10 @@ export class CourseStore extends StateService<CourseState> {
       .toPromise()
       .then((data: any) => {
         this.setState({
-          courseList: data.data,
+          courseLearnerList: data.data,
         });
         console.log('Current flag: infinite filtered list');
-        console.log(this.state.courseList);
+        console.log(this.state.courseLearnerList);
         this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
         this.setState({ currentPage: data.pageNumber });
@@ -886,7 +892,7 @@ export class CourseStore extends StateService<CourseState> {
       next: (data: any) => {
         if (data.data.length) {
           this.setState({
-            courseList: this.state.courseList.concat(data.data),
+            courseLearnerList: this.state.courseLearnerList.concat(data.data),
           });
           this.fetchMediaBySourceID(data.data);
         }

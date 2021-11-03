@@ -25,6 +25,7 @@ import { CourseDetailComponent } from './course-detail/course-detail.component';
     DxSpeedDialActionModule,
     DxPopupModule,
     NgxPayPalModule,
+    FormatCurrencyModule,
     DxFormModule,
     DxSelectBoxModule,
     FormatCurrencyModule,

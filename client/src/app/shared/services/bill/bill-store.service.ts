@@ -421,9 +421,7 @@ export class BillStore extends StateService<BillState> {
     this.store.setIsLoading(_isLoading);
   }
 
-  $billList: Observable<Array<Bill>> = this.select(
-    (state) => state.billList
-  );
+  $billList: Observable<Array<Bill>> = this.select((state) => state.billList);
 
   $exportData: Observable<Array<Bill>> = this.select(
     (state) => state.exportData
@@ -439,20 +437,16 @@ export class BillStore extends StateService<BillState> {
     (state) => state.selectedBill
   );
 
-  $billInstance: Observable<Bill> = this.select(
-    (state) => state.billInstance
-  );
+  $billInstance: Observable<Bill> = this.select((state) => state.billInstance);
 
-  uploadBill(bill: Bill, page: number, size: number) {
+  uploadBill(bill: Bill) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
         this.billService.uploadBill(bill).subscribe({
           next: (data: any) => {
             this.setState({ responseMsg: data });
-            this.setTotalItems(this.state.totalItems + 1);
             console.log(data);
-            this.loadDataAsync(page, size);
             this.setIsLoading(false);
             this.store.showNotif(data.responseMessage, 'custom');
           },
@@ -726,41 +720,34 @@ export class BillStore extends StateService<BillState> {
       });
   }
 
-  sortBillByProperty(
-    value: string,
-    order: string,
-    page: number,
-    size: number
-  ) {
+  sortBillByProperty(value: string, order: string, page: number, size: number) {
     this.setIsLoading(true);
-    this.billService
-      .sortBillByProperty(value, order, page, size)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({ responseMsg: data });
-          this.setState({
-            billList: this.fillEmpty(
-              page - 1,
-              size,
-              this.state.billList,
-              data.data
-            ),
-          });
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          console.log('Sorted list');
-          console.log(this.state.billList);
-          console.log('Server response');
-          console.log(data);
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.billService.sortBillByProperty(value, order, page, size).subscribe({
+      next: (data: any) => {
+        this.setState({ responseMsg: data });
+        this.setState({
+          billList: this.fillEmpty(
+            page - 1,
+            size,
+            this.state.billList,
+            data.data
+          ),
+        });
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        console.log('Sorted list');
+        console.log(this.state.billList);
+        console.log('Server response');
+        console.log(data);
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
   sortInfiniteBillByProperty(
@@ -770,28 +757,26 @@ export class BillStore extends StateService<BillState> {
     size: number
   ) {
     this.setIsLoading(true);
-    this.billService
-      .sortBillByProperty(value, order, page, size)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({
-            billList: this.state.billList.concat(data),
-          });
-          console.log('Infite sorted list');
-          console.log(this.state.billList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.billService.sortBillByProperty(value, order, page, size).subscribe({
+      next: (data: any) => {
+        this.setState({
+          billList: this.state.billList.concat(data),
+        });
+        console.log('Infite sorted list');
+        console.log(this.state.billList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
   getBill(id: string) {

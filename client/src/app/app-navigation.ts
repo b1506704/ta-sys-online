@@ -98,33 +98,21 @@ export const navigationAdmin = [
       {
         text: 'Edit User',
         path: '/edit_user_list',
-      },
-      {
-        text: 'Edit User Info',
-        path: '/edit_user_info_list',
-      },
+      }      
     ],
   },
   {
     text: 'Finance',
     icon: 'money',
-    items: [
-      {
-        text: 'Edit Bill',
-        path: '/edit_bill_list',
-      },
+    items: [     
       {
         text: 'Edit Cart',
         path: '/edit_cart_list',
-      },
-      {
-        text: 'Edit Discount',
-        path: '/edit_discount_list',
-      },
+      },     
     ],
   },
   {
-    text: 'TASys Network',
+    text: 'Classroom',
     icon: 'group',
     items: [
       {

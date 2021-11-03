@@ -161,7 +161,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   sourceDataListener() {
-    return this.courseStore.$courseList.subscribe((data: any) => {
+    return this.courseStore.$courseLearnerList.subscribe((data: any) => {
       this.courseList = data;
     });
   }

@@ -85,7 +85,10 @@
     <dxi-column dataField="totalCourse">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column>
-  
+    <dxi-column dataField="totalCost">
+      <dxi-validation-rule type="required"></dxi-validation-rule>
+    </dxi-column>
+
     <div *dxTemplate="let data of 'totalCartCount'">
       <span>Total Cart: {{ cartList.length }} </span>
     </div>

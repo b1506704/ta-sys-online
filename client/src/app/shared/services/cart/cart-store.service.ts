@@ -97,7 +97,7 @@ export class CartStore extends StateService<CartState> {
         this.setState({ currentPage: data.pageNumber });
       });
   }
- 
+
   loadInfiniteDataAsync(page: number, size: number) {
     this.setIsLoading(true);
     this.cartService.fetchCart(page, size).subscribe({
@@ -120,7 +120,7 @@ export class CartStore extends StateService<CartState> {
         console.log(data);
       },
     });
-  }    
+  }
 
   initData(page: number, size: number) {
     this.cartService
@@ -434,45 +434,13 @@ export class CartStore extends StateService<CartState> {
   }
 
   removeFromCart(course: Course, userId: string) {
-    this.confirmDialog('').then((confirm: boolean) => {
-      if (confirm) {
-        this.setIsLoading(true);
-        this.cartService.removeFromCart(course, userId).subscribe({
-          next: (data: any) => {
-            this.setState({ responseMsg: data });
-            console.log(data);
-            this.setIsLoading(false);
-            this.store.showNotif(data.responseMessage, 'custom');
-          },
-          error: (data: any) => {
-            this.setIsLoading(false);
-            this.store.showNotif(data.error.responseMessage, 'error');
-            console.log(data);
-          },
-        });
-      }
-    });
+    this.setIsLoading(true);
+    return this.cartService.removeFromCart(course, userId).toPromise();
   }
 
   removeAllFromCart(userId: string) {
-    this.confirmDialog('').then((confirm: boolean) => {
-      if (confirm) {
-        this.setIsLoading(true);
-        this.cartService.removeAllFromCart(userId).subscribe({
-          next: (data: any) => {
-            this.setState({ responseMsg: data });
-            console.log(data);
-            this.setIsLoading(false);
-            this.store.showNotif(data.responseMessage, 'custom');
-          },
-          error: (data: any) => {
-            this.setIsLoading(false);
-            this.store.showNotif(data.error.responseMessage, 'error');
-            console.log(data);
-          },
-        });
-      }
-    });
+    this.setIsLoading(true);
+    return this.cartService.removeAllFromCart(userId).toPromise();
   }
 
   confirmDialog(msg: string) {
