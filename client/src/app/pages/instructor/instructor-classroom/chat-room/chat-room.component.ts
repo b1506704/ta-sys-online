@@ -10,11 +10,11 @@ import { Subject } from 'src/app/shared/models/subject';
 import { SubjectHttpService } from 'src/app/shared/services/subject/subject-http.service';
 
 @Component({
-  selector: 'app-course-list',
-  templateUrl: './course-list.component.html',
-  styleUrls: ['./course-list.component.scss'],
+  selector: 'app-chat-room',
+  templateUrl: './chat-room.component.html',
+  styleUrls: ['./chat-room.component.scss'],
 })
-export class CourseListComponent implements OnInit, OnDestroy {
+export class ChatRoomComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   scrollView: DxScrollViewComponent;
   courseList!: Array<Course>;
@@ -109,10 +109,11 @@ export class CourseListComponent implements OnInit, OnDestroy {
     });
   }
 
-  selectCourse(course: Course) {
-    this.router.navigate(['instructor_classroom', JSON.stringify(course)]);
-    console.log('SELECTED COURSE');
-    console.log(course);
+  selectCourse(_id: string) {
+    this.currentCourseID = _id;
+    this.router.navigate(['course_classroom', this.currentCourseID]);
+    console.log('SELECTED ID');
+    console.log(_id);
   }
 
   updateContent = (args: any, eventName: any) => {

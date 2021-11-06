@@ -44,7 +44,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     },
   ];
 
-  isLoadIndicatorVisible!: boolean;
+  isLoadIndicatorVisible: boolean = false;
   isLoggedIn!: boolean;
   isRoleSelected: boolean = false;
   eventType: string = '';

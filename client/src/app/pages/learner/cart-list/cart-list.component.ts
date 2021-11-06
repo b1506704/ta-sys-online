@@ -95,7 +95,7 @@ export class CartListComponent implements OnInit, OnDestroy, AfterViewInit {
     const date = new Date();
     const bill: Bill = {
       description: `Payment succeeded on ${date}`,
-      userAccountId: this.cartList.userAccountID,
+      userAccountId: this.cartList.userAccountId,
       courseRequests: this.cartList.courses,
       totalCost: this.cartList.totalCost,
       totalItem: this.cartList.totalCourse,

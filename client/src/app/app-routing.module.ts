@@ -64,7 +64,7 @@ const routes: Routes = [
       ).then((m) => m.InstructorStreamingModule),
   },
   {
-    path: 'course_classroom/:courseId',
+    path: 'instructor_classroom/:classroom_data',
     loadChildren: () =>
       import(
         './pages/instructor/instructor-classroom/instructor-classroom.module'

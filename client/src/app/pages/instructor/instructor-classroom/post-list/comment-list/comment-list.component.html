@@ -1,0 +1,26 @@
+<ng-container *ngIf="commentList.length !== 0">
+  <dx-scroll-view
+    [direction]="'vertical'"
+    [showScrollbar]="true"
+    [scrollByContent]="true"
+    [scrollByThumb]="true"
+    [height]="200"
+  >
+    <div class="comment-body" *ngFor="let item of commentList">
+      <div class="avatar">
+        <img
+          [src]="mapFileListToUrl(item?.id)"
+          alt="..."
+          style="height: 35px; width: 35px; border-radius: 35px"
+        />
+        <div class="user-name">HAHA</div>
+        <div class="post-date">
+          {{ item?.createdDate | date: "dd/mm, h:mm a" }}
+        </div>
+      </div>
+      <div class="comment-content">
+        {{ item?.content }}
+      </div>
+    </div>
+  </dx-scroll-view>
+</ng-container>

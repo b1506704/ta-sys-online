@@ -6,5 +6,5 @@ export interface Question {
   content: string;
   score: number;
   totalCorrectAnswer: number;
-  answerRequests: Array<Answer>;
+  answerRequests?: Array<Answer>;
 }

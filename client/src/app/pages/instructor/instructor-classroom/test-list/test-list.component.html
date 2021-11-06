@@ -63,9 +63,9 @@
   (onReachBottom)="updateBottomContent($event)"
   [bounceEnabled]="false"
 >
-  <ng-container *ngIf="courseList">
+  <ng-container *ngIf="testList">
     <div class="card-container">
-      <div class="card" *ngFor="let item of courseList">
+      <div class="card" *ngFor="let item of testList">
         <div class="card-title">{{ item?.name }}</div>
         <div class="card-body">
           <div class="card-text">
@@ -85,7 +85,7 @@
             type="outline"
             text="Detail"
             hint="Click to see course detail"
-            (onClick)="selectCourse(item)"
+            (onClick)="selectCourse(item?.id)"
           ></dx-button>
         </div>
       </div>

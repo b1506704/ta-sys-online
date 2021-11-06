@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { Course } from 'src/app/shared/models/course';
-import { CourseStore } from 'src/app/shared/services/course/course-store.service';
+import { Test } from 'src/app/shared/models/test';
+import { TestStore } from 'src/app/shared/services/test/test-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
 import { DxScrollViewComponent } from 'devextreme-angular';
 import { File } from 'src/app/shared/models/file';
@@ -10,16 +10,16 @@ import { Subject } from 'src/app/shared/models/subject';
 import { SubjectHttpService } from 'src/app/shared/services/subject/subject-http.service';
 
 @Component({
-  selector: 'app-course-list',
-  templateUrl: './course-list.component.html',
-  styleUrls: ['./course-list.component.scss'],
+  selector: 'app-test-list',
+  templateUrl: './test-list.component.html',
+  styleUrls: ['./test-list.component.scss'],
 })
-export class CourseListComponent implements OnInit, OnDestroy {
+export class TestListComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   scrollView: DxScrollViewComponent;
-  courseList!: Array<Course>;
+  testList!: Array<Test>;
   subjectList: Array<Subject> = [];
-  currentCourseID!: string;
+  currentTestID!: string;
   pageSize: number = 10;
   pullDown = false;
   updateContentTimer: any;
@@ -94,7 +94,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   fileList: Array<File> = [];
 
   constructor(
-    private courseStore: CourseStore,
+    private testStore: TestStore,
     private subjectHTTP: SubjectHttpService,
     private store: StoreService,
     private router: Router,
@@ -109,10 +109,11 @@ export class CourseListComponent implements OnInit, OnDestroy {
     });
   }
 
-  selectCourse(course: Course) {
-    this.router.navigate(['instructor_classroom', JSON.stringify(course)]);
-    console.log('SELECTED COURSE');
-    console.log(course);
+  selectTest(_id: string) {
+    this.currentTestID = _id;
+    this.router.navigate(['test_classroom', this.currentTestID]);
+    console.log('SELECTED ID');
+    console.log(_id);
   }
 
   updateContent = (args: any, eventName: any) => {
@@ -120,7 +121,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
     const currentIndex = this.currentIndexFromServer;
     if (this.updateContentTimer) clearTimeout(this.updateContentTimer);
     this.updateContentTimer = setTimeout(() => {
-      if (this.courseList.length) {
+      if (this.testList.length) {
         switch (editorMode) {
           case 'NORMAL':
             this.paginatePureData(currentIndex + 1);
@@ -156,7 +157,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
       this.isSortingByPrice = false;
       console.log(this.currentSearchByPropertyValue);
       if (this.currentSearchByPropertyValue !== '') {
-        this.courseStore.initInfiniteSearchByPropertyData(
+        this.testStore.initInfiniteSearchByPropertyData(
           this.currentSearchProperty,
           this.currentSearchByPropertyValue,
           1,
@@ -180,7 +181,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = false;
     this.currentSortByPropertyValue = e.value;
     if (e.value !== '(NONE)') {
-      this.courseStore.initInfiniteSortByPropertyData(
+      this.testStore.initInfiniteSortByPropertyData(
         this.currentSortProperty,
         e.value,
         1,
@@ -200,7 +201,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
     this.currentCategoryFilterValue = e.value;
     console.log(e.value);
     if (e.value !== '(NONE)') {
-      this.courseStore.initInfiniteFilterByPropertyData(
+      this.testStore.initInfiniteFilterByPropertyData(
         this.currentFilterProperty,
         e.value,
         1,
@@ -226,7 +227,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   paginatePureData(index: number) {
-    this.courseStore.filterInfiniteCourseByProperty(
+    this.testStore.filterInfiniteTestByProperty(
       this.currentFilterProperty,
       this.currentFilterByPropertyValue,
       index,
@@ -235,7 +236,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   paginateFilterData(index: number) {
-    this.courseStore.filterInfiniteCourseByProperty(
+    this.testStore.filterInfiniteTestByProperty(
       this.currentFilterProperty,
       this.currentCategoryFilterValue,
       index,
@@ -244,7 +245,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   paginateSearchData(index: number) {
-    this.courseStore.filterSearchInfiniteCourseByProperty(
+    this.testStore.filterSearchInfiniteTestByProperty(
       this.currentFilterProperty,
       this.currentFilterByPropertyValue,
       this.currentSearchProperty,
@@ -255,7 +256,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   paginateSortData(index: number) {
-    this.courseStore.sortInfiniteCourseByProperty(
+    this.testStore.sortInfiniteTestByProperty(
       this.currentSortProperty,
       this.currentSortByPropertyValue,
       index,
@@ -267,7 +268,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = false;
     this.isSearchingByName = false;
     this.isSortingByPrice = false;
-    this.courseStore.initInfiniteFilterByPropertyData(
+    this.testStore.initInfiniteFilterByPropertyData(
       this.currentFilterProperty,
       this.currentFilterByPropertyValue,
       1,
@@ -281,8 +282,8 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   sourceDataListener() {
-    return this.courseStore.$courseList.subscribe((data: any) => {
-      this.courseList = data;
+    return this.testStore.$testList.subscribe((data: any) => {
+      this.testList = data;
     });
   }
 
@@ -311,7 +312,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   currentPageListener() {
-    return this.courseStore.$currentPage.subscribe((data: any) => {
+    return this.testStore.$currentPage.subscribe((data: any) => {
       this.currentIndexFromServer = data;
     });
   }
@@ -321,7 +322,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   initData() {
-    this.courseStore.initInfiniteFilterByPropertyData(
+    this.testStore.initInfiniteFilterByPropertyData(
       this.currentFilterProperty,
       this.currentFilterByPropertyValue,
       1,

@@ -6,6 +6,42 @@ const routes: Routes = [
   {
     path: '',
     component: InstructorClassroomComponent,
+    children: [
+      {
+        path: 'test_list',
+        outlet: 'conditionOutlet',
+        loadChildren: () =>
+          import('./test-list/test-list.module').then((m) => m.TestListModule),
+      },
+      {
+        path: 'post_list',
+        outlet: 'conditionOutlet',
+        loadChildren: () =>
+          import('./post-list/post-list.module').then((m) => m.PostListModule),
+      },
+      {
+        path: 'practice_list',
+        outlet: 'conditionOutlet',
+        loadChildren: () =>
+          import('./practice-list/practice-list.module').then(
+            (m) => m.PracticeListModule
+          ),
+      },
+      {
+        path: 'member_list',
+        outlet: 'conditionOutlet',
+        loadChildren: () =>
+          import('./member-list/member-list.module').then(
+            (m) => m.MemberListModule
+          ),
+      },
+      {
+        path: 'chat_room',
+        outlet: 'conditionOutlet',
+        loadChildren: () =>
+          import('./chat-room/chat-room.module').then((m) => m.ChatRoomModule),
+      },
+    ],
   },
 ];
 

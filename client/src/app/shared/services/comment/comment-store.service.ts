@@ -258,21 +258,20 @@ export class CommentStore extends StateService<CommentState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
-    this.commentService
+    return this.commentService
       .filterCommentByProperty(property, value, page, size)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          commentList: data.data,
-        });
-        this.fetchMediaBySourceID(data.data);
-        console.log('Current flag: infinite filtered list');
-        console.log(this.state.commentList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-      });
+      .toPromise();
+    // .then((data: any) => {
+    //   this.setState({
+    //     commentList: data.data,
+    //   });
+    //   this.fetchMediaBySourceID(data.data);
+    //   console.log('Current flag: infinite filtered list');
+    //   console.log(this.state.commentList);
+    //   this.setState({ totalItems: data.totalRecords });
+    //   this.setState({ totalPages: data.totalPages });
+    //   this.setState({ currentPage: data.pageNumber });
+    // });
   }
 
   initSearchByPropertyData(

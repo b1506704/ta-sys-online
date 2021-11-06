@@ -236,7 +236,7 @@ export class PostStore extends StateService<PostState> {
         this.setState({
           postList: new Array<Post>(data.totalRecords),
         });
-        
+
         console.log('Current flag: filtered list');
         console.log(this.state.postList);
         this.setState({ totalItems: data.totalRecords });
@@ -305,6 +305,42 @@ export class PostStore extends StateService<PostState> {
     this.store.showNotif('Searched Mode On', 'custom');
     this.postService
       .searchPostByProperty(property, value, page, size)
+      .toPromise()
+      .then((data: any) => {
+        if (data.totalRecords !== 0) {
+          this.setState({
+            postList: data.data,
+          });
+          this.fetchMediaBySourceID(data.data);
+        } else {
+          this.store.showNotif('No result found!', 'custom');
+        }
+        console.log('Current flag: infitite searched list');
+        console.log(this.state.postList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+      });
+  }
+
+  initInfiniteFilterSearchByPropertyData(
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
+    page: number,
+    size: number
+  ) {
+    this.store.showNotif('Searched Mode On', 'custom');
+    this.postService
+      .filterSearchPostByProperty(
+        filterProperty,
+        filterValue,
+        searchProperty,
+        searchValue,
+        page,
+        size
+      )
       .toPromise()
       .then((data: any) => {
         if (data.totalRecords !== 0) {
@@ -434,9 +470,7 @@ export class PostStore extends StateService<PostState> {
     this.store.setIsLoading(_isLoading);
   }
 
-  $postList: Observable<Array<Post>> = this.select(
-    (state) => state.postList
-  );
+  $postList: Observable<Array<Post>> = this.select((state) => state.postList);
 
   $exportData: Observable<Array<Post>> = this.select(
     (state) => state.exportData
@@ -452,9 +486,7 @@ export class PostStore extends StateService<PostState> {
     (state) => state.selectedPost
   );
 
-  $postInstance: Observable<Post> = this.select(
-    (state) => state.postInstance
-  );
+  $postInstance: Observable<Post> = this.select((state) => state.postInstance);
 
   uploadPost(post: Post, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
@@ -745,33 +777,43 @@ export class PostStore extends StateService<PostState> {
       });
   }
 
-  sortPostByProperty(
-    value: string,
-    order: string,
+  filterSearchInfinitePostByProperty(
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
     page: number,
     size: number
   ) {
     this.setIsLoading(true);
     this.postService
-      .sortPostByProperty(value, order, page, size)
+      .filterSearchPostByProperty(
+        filterProperty,
+        filterValue,
+        searchProperty,
+        searchValue,
+        page,
+        size
+      )
       .subscribe({
         next: (data: any) => {
-          this.setState({ responseMsg: data });
-          this.setState({
-            postList: this.fillEmpty(
-              page - 1,
-              size,
-              this.state.postList,
-              data.data
-            ),
-          });
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          console.log('Sorted list');
+          if (data.totalRecords !== 0) {
+            if (data.data.length) {
+              this.setState({
+                postList: this.state.postList.concat(data.data),
+              });
+              this.fetchMediaBySourceID(data.data);
+            }
+          } else {
+            this.store.showNotif('No result found!', 'custom');
+          }
+          console.log('Infite searched list');
           console.log(this.state.postList);
           console.log('Server response');
           console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
           this.setIsLoading(false);
         },
         error: (data: any) => {
@@ -782,6 +824,36 @@ export class PostStore extends StateService<PostState> {
       });
   }
 
+  sortPostByProperty(value: string, order: string, page: number, size: number) {
+    this.setIsLoading(true);
+    this.postService.sortPostByProperty(value, order, page, size).subscribe({
+      next: (data: any) => {
+        this.setState({ responseMsg: data });
+        this.setState({
+          postList: this.fillEmpty(
+            page - 1,
+            size,
+            this.state.postList,
+            data.data
+          ),
+        });
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        console.log('Sorted list');
+        console.log(this.state.postList);
+        console.log('Server response');
+        console.log(data);
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
+  }
+
   sortInfinitePostByProperty(
     value: string,
     order: string,
@@ -789,31 +861,29 @@ export class PostStore extends StateService<PostState> {
     size: number
   ) {
     this.setIsLoading(true);
-    this.postService
-      .sortPostByProperty(value, order, page, size)
-      .subscribe({
-        next: (data: any) => {
-          if (data.data.length) {
-            this.setState({
-              postList: this.state.postList.concat(data.data),
-            });
-            this.fetchMediaBySourceID(data.data);
-          }
-          console.log('Infite sorted list');
-          console.log(this.state.postList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.postService.sortPostByProperty(value, order, page, size).subscribe({
+      next: (data: any) => {
+        if (data.data.length) {
+          this.setState({
+            postList: this.state.postList.concat(data.data),
+          });
+          this.fetchMediaBySourceID(data.data);
+        }
+        console.log('Infite sorted list');
+        console.log(this.state.postList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
   getPost(id: string) {

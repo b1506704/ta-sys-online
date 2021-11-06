@@ -6,6 +6,7 @@ import { StateService } from './state.service';
 interface StoreState {
   currentUser: string;
   currentUserId: string;
+  currentCourseId: string;
   responseList: Array<Object>;
   responseEventType: string;
   responseProgress: number;
@@ -23,6 +24,7 @@ const initialState: StoreState = {
   responseEventType: undefined,
   currentUser: undefined,
   currentUserId: undefined,
+  currentCourseId: undefined,
   currentRoleId: undefined,
   currentRoleName: undefined,
   isLoading: false,
@@ -52,6 +54,10 @@ export class StoreService extends StateService<StoreState> {
 
   $currentUserId: Observable<string> = this.select(
     (state) => state.currentUserId
+  );
+
+  $currentCourseId: Observable<string> = this.select(
+    (state) => state.currentCourseId
   );
 
   $currentRoleId: Observable<string> = this.select(
@@ -117,6 +123,10 @@ export class StoreService extends StateService<StoreState> {
 
   setCurrentUserId(id: string) {
     this.setState({ currentUserId: id });
+  }
+
+  setCurrentCourseId(id: string) {
+    this.setState({ currentCourseId: id });
   }
 
   setCurrentUserRoleId(id: string) {

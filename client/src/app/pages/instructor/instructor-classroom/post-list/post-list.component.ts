@@ -1,25 +1,22 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { Course } from 'src/app/shared/models/course';
-import { CourseStore } from 'src/app/shared/services/course/course-store.service';
+import { Post } from 'src/app/shared/models/post';
+import { PostStore } from 'src/app/shared/services/post/post-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
 import { DxScrollViewComponent } from 'devextreme-angular';
 import { File } from 'src/app/shared/models/file';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
-import { Subject } from 'src/app/shared/models/subject';
-import { SubjectHttpService } from 'src/app/shared/services/subject/subject-http.service';
+import { CommentStore } from 'src/app/shared/services/comment/comment-store.service';
 
 @Component({
-  selector: 'app-course-list',
-  templateUrl: './course-list.component.html',
-  styleUrls: ['./course-list.component.scss'],
+  selector: 'app-post-list',
+  templateUrl: './post-list.component.html',
+  styleUrls: ['./post-list.component.scss'],
 })
-export class CourseListComponent implements OnInit, OnDestroy {
+export class PostListComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   scrollView: DxScrollViewComponent;
-  courseList!: Array<Course>;
-  subjectList: Array<Subject> = [];
-  currentCourseID!: string;
+  postList!: Array<Post>;
+  currentPostID!: string;
   pageSize: number = 10;
   pullDown = false;
   updateContentTimer: any;
@@ -36,9 +33,12 @@ export class CourseListComponent implements OnInit, OnDestroy {
   currentFilterByPropertyValue: string;
   currentSearchByPropertyValue: string;
   currentSortByPropertyValue: string;
-  currentSortProperty: string = 'cost';
-  currentSearchProperty: string = 'name';
-  currentFilterProperty: string = 'instructorId';
+  currentSortProperty: string = 'createdDate';
+  currentSearchProperty: string = 'title';
+  currentFilterProperty: string = 'courseId';
+
+  commentValue: string;
+  currentUserDisplayname: string;
 
   searchBoxOptions: any = {
     valueChangeEvent: 'keyup',
@@ -54,16 +54,6 @@ export class CourseListComponent implements OnInit, OnDestroy {
     icon: 'refresh',
     hint: 'Fetch data from server',
     onClick: this.onRefresh.bind(this),
-  };
-
-  filterSelectBoxOptions: any = {
-    items: this.subjectList,
-    valueExpr: 'id',
-    searchExpr: 'name',
-    displayExpr: 'name',
-    placeholder: 'Filter with subject',
-    searchEnabled: true,
-    onValueChanged: this.onFilterChange.bind(this),
   };
 
   sortSelectBoxOptions: any = {
@@ -94,12 +84,17 @@ export class CourseListComponent implements OnInit, OnDestroy {
   fileList: Array<File> = [];
 
   constructor(
-    private courseStore: CourseStore,
-    private subjectHTTP: SubjectHttpService,
+    private postStore: PostStore,
+    private commentStore: CommentStore,
     private store: StoreService,
-    private router: Router,
     private fileStore: FileStore
   ) {}
+
+  commentInputChanged(e: any) {
+    this.commentValue = e.value;
+  }
+
+  submitComment() {}
 
   getUserID() {
     return this.store.$currentUserId.subscribe((data: string) => {
@@ -109,10 +104,20 @@ export class CourseListComponent implements OnInit, OnDestroy {
     });
   }
 
-  selectCourse(course: Course) {
-    this.router.navigate(['instructor_classroom', JSON.stringify(course)]);
-    console.log('SELECTED COURSE');
-    console.log(course);
+  getUserDisplayName() {
+    return this.store.$currentUser.subscribe((data: string) => {
+      if (data) {
+        this.currentUserDisplayname = data;
+      }
+    });
+  }
+
+  likePost(post: Post) {
+    console.log(post);
+  }
+
+  commentPost(post: Post) {
+    console.log(post);
   }
 
   updateContent = (args: any, eventName: any) => {
@@ -120,7 +125,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
     const currentIndex = this.currentIndexFromServer;
     if (this.updateContentTimer) clearTimeout(this.updateContentTimer);
     this.updateContentTimer = setTimeout(() => {
-      if (this.courseList.length) {
+      if (this.postList.length) {
         switch (editorMode) {
           case 'NORMAL':
             this.paginatePureData(currentIndex + 1);
@@ -156,7 +161,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
       this.isSortingByPrice = false;
       console.log(this.currentSearchByPropertyValue);
       if (this.currentSearchByPropertyValue !== '') {
-        this.courseStore.initInfiniteSearchByPropertyData(
+        this.postStore.initInfiniteSearchByPropertyData(
           this.currentSearchProperty,
           this.currentSearchByPropertyValue,
           1,
@@ -180,7 +185,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = false;
     this.currentSortByPropertyValue = e.value;
     if (e.value !== '(NONE)') {
-      this.courseStore.initInfiniteSortByPropertyData(
+      this.postStore.initInfiniteSortByPropertyData(
         this.currentSortProperty,
         e.value,
         1,
@@ -189,26 +194,6 @@ export class CourseListComponent implements OnInit, OnDestroy {
     } else {
       //return to pure editor mode
       this.store.showNotif('SORT MODE OFF', 'custom');
-      this.onRefresh();
-    }
-  }
-
-  onFilterChange(e: any) {
-    this.isFilteringByCategory = true;
-    this.isSearchingByName = false;
-    this.isSortingByPrice = false;
-    this.currentCategoryFilterValue = e.value;
-    console.log(e.value);
-    if (e.value !== '(NONE)') {
-      this.courseStore.initInfiniteFilterByPropertyData(
-        this.currentFilterProperty,
-        e.value,
-        1,
-        this.pageSize
-      );
-    } else {
-      //return to pure editor mode
-      this.store.showNotif('FILTER MODE OFF', 'custom');
       this.onRefresh();
     }
   }
@@ -226,7 +211,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   paginatePureData(index: number) {
-    this.courseStore.filterInfiniteCourseByProperty(
+    this.postStore.filterInfinitePostByProperty(
       this.currentFilterProperty,
       this.currentFilterByPropertyValue,
       index,
@@ -235,7 +220,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   paginateFilterData(index: number) {
-    this.courseStore.filterInfiniteCourseByProperty(
+    this.postStore.filterInfinitePostByProperty(
       this.currentFilterProperty,
       this.currentCategoryFilterValue,
       index,
@@ -244,7 +229,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   paginateSearchData(index: number) {
-    this.courseStore.filterSearchInfiniteCourseByProperty(
+    this.postStore.filterSearchInfinitePostByProperty(
       this.currentFilterProperty,
       this.currentFilterByPropertyValue,
       this.currentSearchProperty,
@@ -255,7 +240,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   paginateSortData(index: number) {
-    this.courseStore.sortInfiniteCourseByProperty(
+    this.postStore.sortInfinitePostByProperty(
       this.currentSortProperty,
       this.currentSortByPropertyValue,
       index,
@@ -267,22 +252,17 @@ export class CourseListComponent implements OnInit, OnDestroy {
     this.isFilteringByCategory = false;
     this.isSearchingByName = false;
     this.isSortingByPrice = false;
-    this.courseStore.initInfiniteFilterByPropertyData(
+    this.postStore.initInfiniteFilterByPropertyData(
       this.currentFilterProperty,
       this.currentFilterByPropertyValue,
       1,
       this.pageSize
     );
-    // this.subjectStore.fetchAll();
   }
 
-  navigateToScheduleList() {
-    this.router.navigate(['/schedule_list']);
-  }
-
-  sourceDataListener() {
-    return this.courseStore.$courseList.subscribe((data: any) => {
-      this.courseList = data;
+  postDataListener() {
+    return this.postStore.$postList.subscribe((data: any) => {
+      this.postList = data;
     });
   }
 
@@ -311,7 +291,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   currentPageListener() {
-    return this.courseStore.$currentPage.subscribe((data: any) => {
+    return this.postStore.$currentPage.subscribe((data: any) => {
       this.currentIndexFromServer = data;
     });
   }
@@ -321,32 +301,33 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   initData() {
-    this.courseStore.initInfiniteFilterByPropertyData(
-      this.currentFilterProperty,
-      this.currentFilterByPropertyValue,
-      1,
-      this.pageSize
-    );
-    this.sourceDataListener();
-    this.fileDataListener();
-  }
-
-  filterDataListener() {
-    return this.subjectHTTP.fetchAll().subscribe((data: any) => {
-      this.subjectList = data;
-      console.log(this.subjectList);
+    return this.store.$currentCourseId.subscribe((data: any) => {
+      if (data !== undefined) {
+        this.currentFilterByPropertyValue = data;
+        this.postStore.initInfiniteFilterByPropertyData(
+          this.currentFilterProperty,
+          this.currentFilterByPropertyValue,
+          1,
+          this.pageSize
+        );
+        this.postDataListener();
+        this.fileDataListener();
+      }
     });
   }
 
   ngOnInit(): void {
     this.getUserID();
-    this.filterDataListener();
+    this.getUserDisplayName();
     this.initData();
     this.currentPageListener();
   }
 
   ngOnDestroy(): void {
-    this.sourceDataListener().unsubscribe();
+    this.initData().unsubscribe();
+    this.getUserID().unsubscribe();
+    this.getUserDisplayName().unsubscribe();
+    this.postDataListener().unsubscribe();
     this.currentPageListener().unsubscribe();
     this.fileDataListener().unsubscribe();
   }

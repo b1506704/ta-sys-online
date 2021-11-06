@@ -1,0 +1,156 @@
+<dx-toolbar
+  [ngStyle]="{
+    paddingLeft: '25px',
+    marginBottom: '5px'
+  }"
+>
+  <dxi-item [location]="'before'" [text]="'Activity'"> </dxi-item>
+  <dxi-item widget="dxTextBox" [options]="searchBoxOptions" location="center">
+  </dxi-item>
+  <dxi-item
+    widget="dxButton"
+    [options]="refreshButtonOptions"
+    location="after"
+    [locateInMenu]="'auto'"
+  >
+  </dxi-item>
+  <dxi-item [locateInMenu]="'auto'" [location]="'after'">
+    <dx-button icon="group" type="normal" [disabled]="true"> </dx-button>
+  </dxi-item>
+  <dxi-item
+    widget="dxSelectBox"
+    [options]="sortSelectBoxOptions"
+    location="after"
+    [locateInMenu]="'auto'"
+  >
+  </dxi-item>
+</dx-toolbar>
+<dx-scroll-view
+  [direction]="'vertical'"
+  [showScrollbar]="true"
+  [scrollByContent]="true"
+  [scrollByThumb]="true"
+  [width]="'100%'"
+  [height]="'73vh'"
+  (onPullDown)="updateTopContent($event)"
+  (onReachBottom)="updateBottomContent($event)"
+  [bounceEnabled]="false"
+>
+  <ng-container *ngIf="postList.length">
+    <div class="card-container">
+      <div class="card" *ngFor="let item of postList">
+        <div class="card-header">
+          <div class="avatar">
+            <img
+              [src]="mapFileListToUrl(item?.id)"
+              alt="..."
+              style="height: 50px; width: 50px; border-radius: 50px"
+            />
+            <div class="user-name">
+              {{ item?.userAccountResponse.displayName }}
+            </div>
+            <div class="post-date">
+              {{ item?.createdDate | date: "dd/mm, h:mm a" }}
+            </div>
+          </div>
+          <div class="card-title">{{ item?.title }}</div>
+          <div class="button-group">
+            <dx-button
+              icon="like"
+              type="danger"
+              hint="Click to like post"
+              (onClick)="likePost(item)"
+            ></dx-button>
+            <div class="like-count">10</div>
+            <dx-button
+              icon="arrowright"
+              type="normal"
+              hint="Click to comment post"
+              (onClick)="commentPost(item)"
+            ></dx-button>
+            <div class="comment-count">10</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="post-content">
+            <dx-scroll-view
+              [showScrollbar]="true"
+              [scrollByContent]="true"
+              [scrollByThumb]="true"
+              [height]="300"
+            >
+              <div class="card-text">{{ item?.content }}</div>
+              <div class="card-img">
+                <img
+                  [src]="mapFileListToUrl(item?.id)"
+                  alt="..."
+                  style="height: 250px; width: 250px; border-radius: 250px"
+                />
+              </div>
+            </dx-scroll-view>
+          </div>
+          <div class="post-comment">
+            <div class="comment-input">
+              <div class="avatar">
+                <img
+                  [src]="mapFileListToUrl(item?.id)"
+                  alt="..."
+                  style="height: 35px; width: 35px; border-radius: 35px"
+                />
+                <div class="user-name">
+                  {{ currentUserDisplayname }}
+                </div>
+              </div>
+              <dx-text-box
+                [showClearButton]="true"
+                placeholder="Enter comment"
+                valueChangeEvent="keyup"
+                (onValueChanged)="commentInputChanged($event)"
+              ></dx-text-box>
+              <dx-button
+                icon="like"
+                hint="Click to comment"
+                type="danger"
+                (onClick)="submitComment()"
+              ></dx-button>
+            </div>
+            <app-comment-list [postId]="item.id"></app-comment-list>
+            <!-- <dx-scroll-view
+              [direction]="'vertical'"
+              [showScrollbar]="true"
+              [scrollByContent]="true"
+              [scrollByThumb]="true"
+              [height]="200"
+            >
+              <div class="comment-body">
+                <div class="avatar">
+                  <img
+                    [src]="mapFileListToUrl(item?.id)"
+                    alt="..."
+                    style="height: 35px; width: 35px; border-radius: 35px"
+                  />
+                  <div class="user-name">
+                    {{ item?.userAccountResponse.displayName }}
+                  </div>
+                  <div class="post-date">
+                    {{ item?.createdDate | date: "dd/mm, h:mm a" }}
+                  </div>
+                </div>
+                <div class="comment-content">
+                  What the ...........................What the .
+                </div>
+              </div>
+            </dx-scroll-view> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</dx-scroll-view>
+<dx-speed-dial-action
+  icon="arrowup"
+  label=""
+  [index]="1"
+  (onClick)="scrollTop()"
+>
+</dx-speed-dial-action>
