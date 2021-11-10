@@ -10,6 +10,7 @@ export class PostHttpService {
   constructor(private http: HttpClient) {}
   // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Post';
   apiUrl = 'https://localhost:5001/api/Post';
+  apiPostLikeUrl = 'https://localhost:5001/api/PostLike';
 
   fetchPost(page: number, size: number): Observable<Post> {
     const params = new HttpParams()
@@ -125,6 +126,17 @@ export class PostHttpService {
       reportProgress: true,
       observe: 'body',
     });
+  }
+
+  likePost(postId: string, userAccountId: string): Observable<any> {
+    return this.http.post<any>(
+      this.apiPostLikeUrl,
+      { postId, userAccountId },
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
   }
 
   generateRandomPost(): Observable<Post> {

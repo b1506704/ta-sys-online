@@ -5,7 +5,7 @@ import { StoreService } from 'src/app/shared/services/store.service';
 import { DxScrollViewComponent } from 'devextreme-angular';
 import { File } from 'src/app/shared/models/file';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
-import { CommentStore } from 'src/app/shared/services/comment/comment-store.service';
+import { PostHttpService } from 'src/app/shared/services/post/post-http.service';
 
 @Component({
   selector: 'app-post-list',
@@ -17,7 +17,9 @@ export class PostListComponent implements OnInit, OnDestroy {
   scrollView: DxScrollViewComponent;
   postList!: Array<Post>;
   currentPostID!: string;
-  pageSize: number = 10;
+  currentUpdatedPost!: Post;
+  currentSelectedPost!: Post;
+  pageSize: number = 5;
   pullDown = false;
   updateContentTimer: any;
   currentIndexFromServer: number;
@@ -26,6 +28,8 @@ export class PostListComponent implements OnInit, OnDestroy {
   isFilteringByPrice: boolean;
   isSortingByName: boolean;
   isSortingByPrice: boolean;
+  isUploadPopupVisible: boolean = false;
+  isUpdatePopupVisible: boolean = false;
   isDetailPopupVisible: boolean = false;
 
   currentCategoryFilterValue: string;
@@ -37,7 +41,7 @@ export class PostListComponent implements OnInit, OnDestroy {
   currentSearchProperty: string = 'title';
   currentFilterProperty: string = 'courseId';
 
-  commentValue: string;
+  currentUserId: string;
   currentUserDisplayname: string;
 
   searchBoxOptions: any = {
@@ -46,7 +50,7 @@ export class PostListComponent implements OnInit, OnDestroy {
     onKeyUp: this.onSearchKeyupHandler.bind(this),
     onValueChanged: this.onSearchValueChanged.bind(this),
     mode: 'search',
-    placeholder: 'Search with name',
+    placeholder: 'Post title...',
   };
 
   refreshButtonOptions: any = {
@@ -66,7 +70,7 @@ export class PostListComponent implements OnInit, OnDestroy {
       { _id: '1', name: 'desc' },
     ],
     valueExpr: 'name',
-    placeholder: 'Sort by price',
+    placeholder: 'Sort by date',
     displayExpr: 'name',
     onValueChanged: this.onSortValueChanged.bind(this),
   };
@@ -85,21 +89,15 @@ export class PostListComponent implements OnInit, OnDestroy {
 
   constructor(
     private postStore: PostStore,
-    private commentStore: CommentStore,
+    private postHTTP: PostHttpService,
     private store: StoreService,
     private fileStore: FileStore
   ) {}
 
-  commentInputChanged(e: any) {
-    this.commentValue = e.value;
-  }
-
-  submitComment() {}
-
   getUserID() {
     return this.store.$currentUserId.subscribe((data: string) => {
       if (data) {
-        this.currentFilterByPropertyValue = data;
+        this.currentUserId = data;
       }
     });
   }
@@ -113,12 +111,53 @@ export class PostListComponent implements OnInit, OnDestroy {
   }
 
   likePost(post: Post) {
-    console.log(post);
+    this.store.setIsLoading(true);
+    this.postHTTP
+      .likePost(post.id, this.currentUserId)
+      .subscribe((data: any) => {
+        this.store.showNotif(`${data.responseMessage}`, 'custom');
+        this.store.setIsLoading(false);
+      });
   }
 
-  commentPost(post: Post) {
-    console.log(post);
+  uploadPost() {
+    this.isUploadPopupVisible = true;
   }
+
+  updatePost(post: Post) {
+    this.currentUpdatedPost = post;
+    this.isUpdatePopupVisible = true;
+  }
+
+  deletePost(post: Post) {
+    this.postStore.confirmDialog('').then((confirm: boolean) => {
+      if (confirm) {
+        this.store.setIsLoading(true);
+        this.postHTTP.deletePost([post.id]).subscribe((data: any) => {
+          this.initData();
+          this.store.showNotif(`${data.responseMessage}`, 'custom');
+          this.store.setIsLoading(false);
+        });
+      }
+    });
+  }
+
+  showDetail(post: Post) {
+    this.currentSelectedPost = post;
+    this.isDetailPopupVisible = true;
+  }
+
+  closePopupUpload = () => {
+    this.isUploadPopupVisible = false;
+  };
+
+  closePopupUpdate = () => {
+    this.isUpdatePopupVisible = false;
+  };
+
+  closeDetailPopup = () => {
+    this.isDetailPopupVisible = false;
+  };
 
   updateContent = (args: any, eventName: any) => {
     const editorMode = this.checkEditorMode();
@@ -146,6 +185,7 @@ export class PostListComponent implements OnInit, OnDestroy {
       args.component.release();
     }, 500);
   };
+
   updateTopContent = (e: any) => {
     this.updateContent(e, 'PullDown');
   };
@@ -296,6 +336,14 @@ export class PostListComponent implements OnInit, OnDestroy {
     });
   }
 
+  isUploadingListener() {
+    return this.postStore.$isUploading.subscribe((data: boolean) => {
+      if (data === false) {
+        this.initData();
+      }
+    });
+  }
+
   scrollTop() {
     this.scrollView.instance.scrollTo({ top: 0, left: 0 });
   }
@@ -319,6 +367,7 @@ export class PostListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getUserID();
     this.getUserDisplayName();
+    this.isUploadingListener();
     this.initData();
     this.currentPageListener();
   }
@@ -330,5 +379,6 @@ export class PostListComponent implements OnInit, OnDestroy {
     this.postDataListener().unsubscribe();
     this.currentPageListener().unsubscribe();
     this.fileDataListener().unsubscribe();
+    this.isUploadingListener().unsubscribe();
   }
 }

@@ -4,8 +4,21 @@
     marginBottom: '5px'
   }"
 >
-  <dxi-item [location]="'before'" [text]="'Activity'"> </dxi-item>
-  <dxi-item widget="dxTextBox" [options]="searchBoxOptions" location="center">
+  <dxi-item
+    [location]="'before'"
+    [text]="'Activity'"
+    style="padding-right: 15px"
+  >
+  </dxi-item>
+  <dxi-item widget="dxTextBox" [options]="searchBoxOptions" location="before">
+  </dxi-item>
+  <dxi-item [locateInMenu]="'auto'" [location]="'after'">
+    <dx-button
+      icon="plus"
+      type="danger"
+      hint="Click to add post post detail"
+      (onClick)="uploadPost()"
+    ></dx-button>
   </dxi-item>
   <dxi-item
     widget="dxButton"
@@ -15,7 +28,7 @@
   >
   </dxi-item>
   <dxi-item [locateInMenu]="'auto'" [location]="'after'">
-    <dx-button icon="group" type="normal" [disabled]="true"> </dx-button>
+    <dx-button icon="event" type="normal" [disabled]="true"> </dx-button>
   </dxi-item>
   <dxi-item
     widget="dxSelectBox"
@@ -42,7 +55,7 @@
         <div class="card-header">
           <div class="avatar">
             <img
-              [src]="mapFileListToUrl(item?.id)"
+              [src]="mapFileListToUrl(item?.userAccountResponse.id)"
               alt="..."
               style="height: 50px; width: 50px; border-radius: 50px"
             />
@@ -50,25 +63,44 @@
               {{ item?.userAccountResponse.displayName }}
             </div>
             <div class="post-date">
-              {{ item?.createdDate | date: "dd/mm, h:mm a" }}
+              {{ item?.createdDate | date: "dd/MM, hh:mm aa" }}
             </div>
           </div>
           <div class="card-title">{{ item?.title }}</div>
-          <div class="button-group">
-            <dx-button
-              icon="like"
-              type="danger"
-              hint="Click to like post"
-              (onClick)="likePost(item)"
-            ></dx-button>
-            <div class="like-count">10</div>
-            <dx-button
-              icon="arrowright"
-              type="normal"
-              hint="Click to comment post"
-              (onClick)="commentPost(item)"
-            ></dx-button>
-            <div class="comment-count">10</div>
+          <div class="post-util">
+            <div class="button-group">
+              <dx-button
+                icon="like"
+                type="danger"
+                hint="Click to like post"
+                (onClick)="likePost(item)"
+              ></dx-button>
+              <div class="like-count">- {{ item?.countPostLike }} -</div>
+              <dx-button
+                icon="fullscreen"
+                type="normal"
+                hint="Click to see post detail"
+                (onClick)="showDetail(item)"
+              ></dx-button>
+            </div>
+            <div
+              class="button-group"
+              *ngIf="item.userAccountResponse.id === currentUserId"
+            >
+              <dx-button
+                icon="trash"
+                type="danger"
+                hint="Click to delete post"
+                (onClick)="deletePost(item)"
+              ></dx-button>
+              <div class="like-count">-</div>
+              <dx-button
+                icon="edit"
+                type="danger"
+                hint="Click to edit post"
+                (onClick)="updatePost(item)"
+              ></dx-button>
+            </div>
           </div>
         </div>
         <div class="card-body">
@@ -79,74 +111,46 @@
               [scrollByThumb]="true"
               [height]="300"
             >
-              <div class="card-text">{{ item?.content }}</div>
-              <div class="card-img">
-                <img
-                  [src]="mapFileListToUrl(item?.id)"
-                  alt="..."
-                  style="height: 250px; width: 250px; border-radius: 250px"
-                />
-              </div>
+              <dx-html-editor readOnly="true" [value]="item?.content">
+              </dx-html-editor>
             </dx-scroll-view>
           </div>
           <div class="post-comment">
-            <div class="comment-input">
-              <div class="avatar">
-                <img
-                  [src]="mapFileListToUrl(item?.id)"
-                  alt="..."
-                  style="height: 35px; width: 35px; border-radius: 35px"
-                />
-                <div class="user-name">
-                  {{ currentUserDisplayname }}
-                </div>
-              </div>
-              <dx-text-box
-                [showClearButton]="true"
-                placeholder="Enter comment"
-                valueChangeEvent="keyup"
-                (onValueChanged)="commentInputChanged($event)"
-              ></dx-text-box>
-              <dx-button
-                icon="like"
-                hint="Click to comment"
-                type="danger"
-                (onClick)="submitComment()"
-              ></dx-button>
-            </div>
-            <app-comment-list [postId]="item.id"></app-comment-list>
-            <!-- <dx-scroll-view
-              [direction]="'vertical'"
-              [showScrollbar]="true"
-              [scrollByContent]="true"
-              [scrollByThumb]="true"
-              [height]="200"
-            >
-              <div class="comment-body">
-                <div class="avatar">
-                  <img
-                    [src]="mapFileListToUrl(item?.id)"
-                    alt="..."
-                    style="height: 35px; width: 35px; border-radius: 35px"
-                  />
-                  <div class="user-name">
-                    {{ item?.userAccountResponse.displayName }}
-                  </div>
-                  <div class="post-date">
-                    {{ item?.createdDate | date: "dd/mm, h:mm a" }}
-                  </div>
-                </div>
-                <div class="comment-content">
-                  What the ...........................What the .
-                </div>
-              </div>
-            </dx-scroll-view> -->
+            <app-comment-list
+              [postId]="item.id"
+              [currentUserId]="currentUserId"
+              [currentUserDisplayname]="currentUserDisplayname"
+            ></app-comment-list>
           </div>
         </div>
       </div>
     </div>
   </ng-container>
 </dx-scroll-view>
+<ng-container *ngIf="currentFilterByPropertyValue">
+  <app-upload-post
+    [closePopupUpload]="closePopupUpload"
+    [courseId]="currentFilterByPropertyValue"
+    [userAccountId]="currentUserId"
+    [title]="'Upload Post Editor'"
+    [isVisible]="isUploadPopupVisible"
+  ></app-upload-post>
+</ng-container>
+<ng-container *ngIf="currentUpdatedPost">
+  <app-update-post
+    [closePopupUpdate]="closePopupUpdate"
+    [post]="currentUpdatedPost"
+    [title]="'Update Post Editor'"
+    [isVisible]="isUpdatePopupVisible"
+  ></app-update-post>
+</ng-container>
+<ng-container *ngIf="currentSelectedPost">
+  <app-post-detail
+    [closeDetailPopup]="closeDetailPopup"
+    [post]="currentSelectedPost"
+    [isVisible]="isDetailPopupVisible"
+  ></app-post-detail>
+</ng-container>
 <dx-speed-dial-action
   icon="arrowup"
   label=""

@@ -6,7 +6,7 @@
 }
 
 .card-container .card {
-  height: 460px;
+  // min-height: 200px;
   margin: 10px;
   padding: 15px;
   background-color: rgba(0, 10, 12, 0.486);
@@ -21,6 +21,7 @@
 
 .card-container .card:hover {
   background-color: rgb(0, 0, 0);
+  border: solid rgb(92, 168, 255) 5px;
 }
 
 .card-container .card .card-header {
@@ -88,77 +89,15 @@
   margin-left: 15px;
 }
 
-.comment-input {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  min-height: 100px;
-  border-bottom: ridge rgb(248, 251, 255) 3px;
-}
-
-.comment-input .user-name {
-  font-size: small;
-  font-weight: bold;
-}
-
-.comment-input .post-date {
-  font-size: x-small;
-  font-family: monospace;
-}
-
-.comment-input .avatar {
-  height: 50px;
+.post-util {
   width: 150px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 5px;
-}
-
-.comment-body {
-  width: 100%;
-  margin: 10px;
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  min-height: 100px;
-  border-bottom: dotted rgb(92, 168, 255) 3px;
-}
-
-.comment-body .user-name {
-  font-size: small;
-  font-weight: bold;
-}
-
-.comment-body .post-date {
-  font-size: x-small;
-  font-family: monospace;
-}
-
-.comment-body .avatar {
-  height: 50px;
-  width: 150px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 5px;
-}
-
-.comment-body .comment-content {
-  font-size: medium;
-  font-family: Hero;
-  font-weight: bold;
-  display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
 }
 
 .button-group {
   width: 50px;
-  // height: 100%;
   font-size: x-small;
   display: flex;
   flex-direction: column;

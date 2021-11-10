@@ -1,0 +1,30 @@
+<dx-popup
+  id="detail-popup"
+  [title]="post?.title"
+  [showTitle]="true"
+  [shading]="true"
+  [position]="'center'"
+  [showCloseButton]="true"
+  [dragEnabled]="false"
+  [height]="'95%'"
+  (onHiding)="closeDetailPopup()"
+  [width]="'95%'"
+  [visible]="isVisible"
+>
+  <div *dxTemplate="let data of 'content'">
+    <dx-scroll-view
+      [direction]="'vertical'"
+      [showScrollbar]="true"
+      [scrollByContent]="true"
+      [scrollByThumb]="true"
+      [bounceEnabled]="false"
+      [height]="'92%'"
+      [width]="'100%'"
+    >
+      <!-- height="320px" -->
+      <dx-html-editor readOnly="true" [value]="postData?.content">
+        <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+      </dx-html-editor>
+    </dx-scroll-view>
+  </div>
+</dx-popup>

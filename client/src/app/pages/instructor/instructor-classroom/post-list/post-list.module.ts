@@ -11,9 +11,14 @@ import {
   DxFormModule,
   DxSelectBoxModule,
   DxTextBoxModule,
+  DxHtmlEditorModule,
+  DxTextAreaModule,
 } from 'devextreme-angular';
 import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module';
 import { CommentListComponent } from './comment-list/comment-list.component';
+import { UploadPostComponent } from './upload-post/upload-post.component';
+import { PostDetailComponent } from './post-detail/post-detail.component';
+import { UpdatePostComponent } from './update-post/update-post.component';
 
 @NgModule({
   imports: [
@@ -21,14 +26,22 @@ import { CommentListComponent } from './comment-list/comment-list.component';
     PostListRoutingModule,
     DxScrollViewModule,
     DxToolbarModule,
+    DxHtmlEditorModule,
     DxButtonModule,
     DxSpeedDialActionModule,
     DxPopupModule,
     DxFormModule,
+    DxTextAreaModule,
     DxSelectBoxModule,
     DxTextBoxModule,
     FormatCurrencyModule,
   ],
-  declarations: [PostListComponent, CommentListComponent],
+  declarations: [
+    PostListComponent,
+    CommentListComponent,
+    UploadPostComponent,
+    UpdatePostComponent,
+    PostDetailComponent,
+  ],
 })
 export class PostListModule {}

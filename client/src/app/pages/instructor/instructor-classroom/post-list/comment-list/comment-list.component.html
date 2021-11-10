@@ -1,4 +1,33 @@
-<ng-container *ngIf="commentList.length !== 0">
+<div class="comment-input">
+  <div class="avatar">
+    <img
+      *ngIf="currentUserId"
+      [src]="mapFileListToUrl(currentUserId)"
+      alt="..."
+      style="height: 35px; width: 35px; border-radius: 35px"
+    />
+    <div class="user-name">
+      {{ currentUserDisplayname }}
+    </div>
+  </div>
+  <dx-text-box
+    [showClearButton]="true"
+    placeholder="Enter comment..."
+    (onEnterKey)="onEnterKey()"
+    valueChangeEvent="keyup"
+    (onValueChanged)="commentInputChanged($event)"
+  ></dx-text-box>
+  <dx-button
+    icon="comment"
+    hint="Click to comment"
+    type="danger"
+    (onClick)="submitComment()"
+  ></dx-button>
+</div>
+<ng-container *ngIf="commentList.length">
+  <div class="comment-count" *ngIf="commentCount !== 0">
+    Showing {{ commentCount }} comments
+  </div>
   <dx-scroll-view
     [direction]="'vertical'"
     [showScrollbar]="true"
@@ -9,13 +38,13 @@
     <div class="comment-body" *ngFor="let item of commentList">
       <div class="avatar">
         <img
-          [src]="mapFileListToUrl(item?.id)"
+          [src]="mapFileListToUrl(item?.userAccountResponse.id)"
           alt="..."
-          style="height: 35px; width: 35px; border-radius: 35px"
+          style="height: 55px; width: 45px; border-radius: 45px"
         />
-        <div class="user-name">HAHA</div>
+        <div class="user-name">{{ item?.userAccountResponse.displayName }}</div>
         <div class="post-date">
-          {{ item?.createdDate | date: "dd/mm, h:mm a" }}
+          {{ item?.createdDate | date: "dd/MM, hh:mm aa" }}
         </div>
       </div>
       <div class="comment-content">

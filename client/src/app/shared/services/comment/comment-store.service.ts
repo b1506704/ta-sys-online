@@ -96,7 +96,9 @@ export class CommentStore extends StateService<CommentState> {
         this.setState({
           commentList: data.data,
         });
-        this.fetchMediaBySourceID(data.data);
+        this.fetchMediaBySourceID(
+          data.data.map((e: any) => e.userAccountResponse)
+        );
         console.log('Current flag: infite list');
         console.log(this.state.commentList);
         this.setState({ totalItems: data.totalRecords });
@@ -112,7 +114,9 @@ export class CommentStore extends StateService<CommentState> {
         this.setState({
           commentList: this.state.commentList.concat(data.data),
         });
-        this.fetchMediaBySourceID(data.data);
+        this.fetchMediaBySourceID(
+          data.data.map((e: any) => e.userAccountResponse)
+        );
         console.log('Infinite list');
         console.log(this.state.commentList);
         console.log('Server response');
@@ -261,17 +265,6 @@ export class CommentStore extends StateService<CommentState> {
     return this.commentService
       .filterCommentByProperty(property, value, page, size)
       .toPromise();
-    // .then((data: any) => {
-    //   this.setState({
-    //     commentList: data.data,
-    //   });
-    //   this.fetchMediaBySourceID(data.data);
-    //   console.log('Current flag: infinite filtered list');
-    //   console.log(this.state.commentList);
-    //   this.setState({ totalItems: data.totalRecords });
-    //   this.setState({ totalPages: data.totalPages });
-    //   this.setState({ currentPage: data.pageNumber });
-    // });
   }
 
   initSearchByPropertyData(
@@ -314,7 +307,9 @@ export class CommentStore extends StateService<CommentState> {
           this.setState({
             commentList: data.data,
           });
-          this.fetchMediaBySourceID(data.data);
+          this.fetchMediaBySourceID(
+            data.data.map((e: any) => e.userAccountResponse)
+          );
         } else {
           this.store.showNotif('No result found!', 'custom');
         }
@@ -365,7 +360,9 @@ export class CommentStore extends StateService<CommentState> {
         this.setState({
           commentList: data.data,
         });
-        this.fetchMediaBySourceID(data.data);
+        this.fetchMediaBySourceID(
+          data.data.map((e: any) => e.userAccountResponse)
+        );
         console.log('Current flag: sort list');
         console.log(this.state.commentList);
         this.setState({ totalItems: data.totalRecords });
@@ -480,6 +477,11 @@ export class CommentStore extends StateService<CommentState> {
         });
       }
     });
+  }
+
+  submitComment(comment: Comment) {
+    this.setIsLoading(true);
+    return this.commentService.uploadComment(comment).toPromise();
   }
 
   updateComment(comment: Comment, page: number, size: number) {
@@ -651,7 +653,9 @@ export class CommentStore extends StateService<CommentState> {
             this.setState({
               commentList: this.state.commentList.concat(data.data),
             });
-            this.fetchMediaBySourceID(data.data);
+            this.fetchMediaBySourceID(
+              data.data.map((e: any) => e.userAccountResponse)
+            );
           }
           console.log('Filtered list');
           console.log(this.state.commentList);
@@ -726,7 +730,9 @@ export class CommentStore extends StateService<CommentState> {
               this.setState({
                 commentList: this.state.commentList.concat(data.data),
               });
-              this.fetchMediaBySourceID(data.data);
+              this.fetchMediaBySourceID(
+                data.data.map((e: any) => e.userAccountResponse)
+              );
             }
           } else {
             this.store.showNotif('No result found!', 'custome');
@@ -800,7 +806,9 @@ export class CommentStore extends StateService<CommentState> {
             this.setState({
               commentList: this.state.commentList.concat(data.data),
             });
-            this.fetchMediaBySourceID(data.data);
+            this.fetchMediaBySourceID(
+              data.data.map((e: any) => e.userAccountResponse)
+            );
           }
           console.log('Infite sorted list');
           console.log(this.state.commentList);

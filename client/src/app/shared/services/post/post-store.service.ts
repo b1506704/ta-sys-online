@@ -15,6 +15,7 @@ interface PostState {
   totalPages: number;
   currentPage: number;
   totalItems: number;
+  isUploading: boolean;
   responseMsg: string;
 }
 const initialState: PostState = {
@@ -25,6 +26,7 @@ const initialState: PostState = {
   totalPages: 0,
   currentPage: 0,
   totalItems: 0,
+  isUploading: undefined,
   responseMsg: '',
 };
 @Injectable({
@@ -96,7 +98,9 @@ export class PostStore extends StateService<PostState> {
         this.setState({
           postList: data.data,
         });
-        this.fetchMediaBySourceID(data.data);
+        this.fetchMediaBySourceID(
+          data.data.map((e: any) => e.userAccountResponse)
+        );
         console.log('Current flag: infite list');
         console.log(this.state.postList);
         this.setState({ totalItems: data.totalRecords });
@@ -112,7 +116,9 @@ export class PostStore extends StateService<PostState> {
         this.setState({
           postList: this.state.postList.concat(data.data),
         });
-        this.fetchMediaBySourceID(data.data);
+        this.fetchMediaBySourceID(
+          data.data.map((e: any) => e.userAccountResponse)
+        );
         console.log('Infinite list');
         console.log(this.state.postList);
         console.log('Server response');
@@ -254,7 +260,6 @@ export class PostStore extends StateService<PostState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
     this.postService
       .filterPostByProperty(property, value, page, size)
       .toPromise()
@@ -262,7 +267,9 @@ export class PostStore extends StateService<PostState> {
         this.setState({
           postList: data.data,
         });
-        this.fetchMediaBySourceID(data.data);
+        this.fetchMediaBySourceID(
+          data.data.map((e: any) => e.userAccountResponse)
+        );
         console.log('Current flag: infinite filtered list');
         console.log(this.state.postList);
         this.setState({ totalItems: data.totalRecords });
@@ -311,7 +318,9 @@ export class PostStore extends StateService<PostState> {
           this.setState({
             postList: data.data,
           });
-          this.fetchMediaBySourceID(data.data);
+          this.fetchMediaBySourceID(
+            data.data.map((e: any) => e.userAccountResponse)
+          );
         } else {
           this.store.showNotif('No result found!', 'custom');
         }
@@ -347,7 +356,9 @@ export class PostStore extends StateService<PostState> {
           this.setState({
             postList: data.data,
           });
-          this.fetchMediaBySourceID(data.data);
+          this.fetchMediaBySourceID(
+            data.data.map((e: any) => e.userAccountResponse)
+          );
         } else {
           this.store.showNotif('No result found!', 'custom');
         }
@@ -398,7 +409,9 @@ export class PostStore extends StateService<PostState> {
         this.setState({
           postList: data.data,
         });
-        this.fetchMediaBySourceID(data.data);
+        this.fetchMediaBySourceID(
+          data.data.map((e: any) => e.userAccountResponse)
+        );
         console.log('Current flag: sort list');
         console.log(this.state.postList);
         this.setState({ totalItems: data.totalRecords });
@@ -481,6 +494,8 @@ export class PostStore extends StateService<PostState> {
   $totalItems: Observable<Number> = this.select((state) => state.totalItems);
 
   $currentPage: Observable<Number> = this.select((state) => state.currentPage);
+
+  $isUploading: Observable<boolean> = this.select((state) => state.isUploading);
 
   $selectedPost: Observable<Object> = this.select(
     (state) => state.selectedPost
@@ -680,7 +695,9 @@ export class PostStore extends StateService<PostState> {
             this.setState({
               postList: this.state.postList.concat(data.data),
             });
-            this.fetchMediaBySourceID(data.data);
+            this.fetchMediaBySourceID(
+              data.data.map((e: any) => e.userAccountResponse)
+            );
           }
           console.log('Filtered list');
           console.log(this.state.postList);
@@ -755,7 +772,9 @@ export class PostStore extends StateService<PostState> {
               this.setState({
                 postList: this.state.postList.concat(data.data),
               });
-              this.fetchMediaBySourceID(data.data);
+              this.fetchMediaBySourceID(
+                data.data.map((e: any) => e.userAccountResponse)
+              );
             }
           } else {
             this.store.showNotif('No result found!', 'custome');
@@ -802,7 +821,9 @@ export class PostStore extends StateService<PostState> {
               this.setState({
                 postList: this.state.postList.concat(data.data),
               });
-              this.fetchMediaBySourceID(data.data);
+              this.fetchMediaBySourceID(
+                data.data.map((e: any) => e.userAccountResponse)
+              );
             }
           } else {
             this.store.showNotif('No result found!', 'custom');
@@ -867,7 +888,9 @@ export class PostStore extends StateService<PostState> {
           this.setState({
             postList: this.state.postList.concat(data.data),
           });
-          this.fetchMediaBySourceID(data.data);
+          this.fetchMediaBySourceID(
+            data.data.map((e: any) => e.userAccountResponse)
+          );
         }
         console.log('Infite sorted list');
         console.log(this.state.postList);
@@ -900,6 +923,10 @@ export class PostStore extends StateService<PostState> {
 
   setExportData(array: Array<Post>) {
     this.setState({ postList: array });
+  }
+
+  setIsUploading(isUploading: boolean) {
+    this.setState({ isUploading: isUploading });
   }
 
   resetState() {

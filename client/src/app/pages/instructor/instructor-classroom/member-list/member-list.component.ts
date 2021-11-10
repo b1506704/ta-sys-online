@@ -14,6 +14,8 @@ import { SubjectHttpService } from 'src/app/shared/services/subject/subject-http
   templateUrl: './member-list.component.html',
   styleUrls: ['./member-list.component.scss'],
 })
+// Show list of member including one instructor and learners, instructor click one of member, show profile detail (popup) with test history and score
+// also showing attendance pdf
 export class MemberListComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   scrollView: DxScrollViewComponent;
