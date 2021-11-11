@@ -1,13 +1,11 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
 import { Test } from 'src/app/shared/models/test';
 import { TestStore } from 'src/app/shared/services/test/test-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
 import { DxScrollViewComponent } from 'devextreme-angular';
 import { File } from 'src/app/shared/models/file';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
-import { Subject } from 'src/app/shared/models/subject';
-import { SubjectHttpService } from 'src/app/shared/services/subject/subject-http.service';
+import { TestHttpService } from 'src/app/shared/services/test/test-http.service';
 
 @Component({
   selector: 'app-test-list',
@@ -18,9 +16,10 @@ export class TestListComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   scrollView: DxScrollViewComponent;
   testList!: Array<Test>;
-  subjectList: Array<Subject> = [];
   currentTestID!: string;
-  pageSize: number = 10;
+  currentUpdatedTest!: Test;
+  currentSelectedTest!: Test;
+  pageSize: number = 5;
   pullDown = false;
   updateContentTimer: any;
   currentIndexFromServer: number;
@@ -29,6 +28,8 @@ export class TestListComponent implements OnInit, OnDestroy {
   isFilteringByPrice: boolean;
   isSortingByName: boolean;
   isSortingByPrice: boolean;
+  isUploadPopupVisible: boolean = false;
+  isUpdatePopupVisible: boolean = false;
   isDetailPopupVisible: boolean = false;
 
   currentCategoryFilterValue: string;
@@ -36,9 +37,9 @@ export class TestListComponent implements OnInit, OnDestroy {
   currentFilterByPropertyValue: string;
   currentSearchByPropertyValue: string;
   currentSortByPropertyValue: string;
-  currentSortProperty: string = 'cost';
+  currentSortProperty: string = 'createdDate';
   currentSearchProperty: string = 'name';
-  currentFilterProperty: string = 'instructorId';
+  currentFilterProperty: string = 'courseId';
 
   searchBoxOptions: any = {
     valueChangeEvent: 'keyup',
@@ -46,7 +47,7 @@ export class TestListComponent implements OnInit, OnDestroy {
     onKeyUp: this.onSearchKeyupHandler.bind(this),
     onValueChanged: this.onSearchValueChanged.bind(this),
     mode: 'search',
-    placeholder: 'Search with name',
+    placeholder: 'Test title...',
   };
 
   refreshButtonOptions: any = {
@@ -54,16 +55,6 @@ export class TestListComponent implements OnInit, OnDestroy {
     icon: 'refresh',
     hint: 'Fetch data from server',
     onClick: this.onRefresh.bind(this),
-  };
-
-  filterSelectBoxOptions: any = {
-    items: this.subjectList,
-    valueExpr: 'id',
-    searchExpr: 'name',
-    displayExpr: 'name',
-    placeholder: 'Filter with subject',
-    searchEnabled: true,
-    onValueChanged: this.onFilterChange.bind(this),
   };
 
   sortSelectBoxOptions: any = {
@@ -76,7 +67,7 @@ export class TestListComponent implements OnInit, OnDestroy {
       { _id: '1', name: 'desc' },
     ],
     valueExpr: 'name',
-    placeholder: 'Sort by price',
+    placeholder: 'Sort by date',
     displayExpr: 'name',
     onValueChanged: this.onSortValueChanged.bind(this),
   };
@@ -95,26 +86,49 @@ export class TestListComponent implements OnInit, OnDestroy {
 
   constructor(
     private testStore: TestStore,
-    private subjectHTTP: SubjectHttpService,
+    private testHTTP: TestHttpService,
     private store: StoreService,
-    private router: Router,
     private fileStore: FileStore
   ) {}
 
-  getUserID() {
-    return this.store.$currentUserId.subscribe((data: string) => {
-      if (data) {
-        this.currentFilterByPropertyValue = data;
+  uploadTest() {
+    this.isUploadPopupVisible = true;
+  }
+
+  updateTest(test: Test) {
+    this.currentUpdatedTest = test;
+    this.isUpdatePopupVisible = true;
+  }
+
+  deleteTest(test: Test) {
+    this.testStore.confirmDialog('').then((confirm: boolean) => {
+      if (confirm) {
+        this.store.setIsLoading(true);
+        this.testHTTP.deleteTest([test.id]).subscribe((data: any) => {
+          this.initData();
+          this.store.showNotif(`${data.responseMessage}`, 'custom');
+          this.store.setIsLoading(false);
+        });
       }
     });
   }
 
-  selectTest(_id: string) {
-    this.currentTestID = _id;
-    this.router.navigate(['test_classroom', this.currentTestID]);
-    console.log('SELECTED ID');
-    console.log(_id);
+  showDetail(test: Test) {
+    this.currentSelectedTest = test;
+    this.isDetailPopupVisible = true;
   }
+
+  closePopupUpload = () => {
+    this.isUploadPopupVisible = false;
+  };
+
+  closePopupUpdate = () => {
+    this.isUpdatePopupVisible = false;
+  };
+
+  closeDetailPopup = () => {
+    this.isDetailPopupVisible = false;
+  };
 
   updateContent = (args: any, eventName: any) => {
     const editorMode = this.checkEditorMode();
@@ -142,6 +156,7 @@ export class TestListComponent implements OnInit, OnDestroy {
       args.component.release();
     }, 500);
   };
+
   updateTopContent = (e: any) => {
     this.updateContent(e, 'PullDown');
   };
@@ -157,7 +172,9 @@ export class TestListComponent implements OnInit, OnDestroy {
       this.isSortingByPrice = false;
       console.log(this.currentSearchByPropertyValue);
       if (this.currentSearchByPropertyValue !== '') {
-        this.testStore.initInfiniteSearchByPropertyData(
+        this.testStore.initInfiniteFilterSearchByPropertyData(
+          this.currentFilterProperty,
+          this.currentFilterByPropertyValue,
           this.currentSearchProperty,
           this.currentSearchByPropertyValue,
           1,
@@ -190,26 +207,6 @@ export class TestListComponent implements OnInit, OnDestroy {
     } else {
       //return to pure editor mode
       this.store.showNotif('SORT MODE OFF', 'custom');
-      this.onRefresh();
-    }
-  }
-
-  onFilterChange(e: any) {
-    this.isFilteringByCategory = true;
-    this.isSearchingByName = false;
-    this.isSortingByPrice = false;
-    this.currentCategoryFilterValue = e.value;
-    console.log(e.value);
-    if (e.value !== '(NONE)') {
-      this.testStore.initInfiniteFilterByPropertyData(
-        this.currentFilterProperty,
-        e.value,
-        1,
-        this.pageSize
-      );
-    } else {
-      //return to pure editor mode
-      this.store.showNotif('FILTER MODE OFF', 'custom');
       this.onRefresh();
     }
   }
@@ -274,14 +271,9 @@ export class TestListComponent implements OnInit, OnDestroy {
       1,
       this.pageSize
     );
-    // this.subjectStore.fetchAll();
   }
 
-  navigateToScheduleList() {
-    this.router.navigate(['/schedule_list']);
-  }
-
-  sourceDataListener() {
+  testDataListener() {
     return this.testStore.$testList.subscribe((data: any) => {
       this.testList = data;
     });
@@ -317,38 +309,45 @@ export class TestListComponent implements OnInit, OnDestroy {
     });
   }
 
+  isUploadingListener() {
+    return this.testStore.$isUploading.subscribe((data: boolean) => {
+      if (data === false) {
+        this.initData();
+      }
+    });
+  }
+
   scrollTop() {
     this.scrollView.instance.scrollTo({ top: 0, left: 0 });
   }
 
   initData() {
-    this.testStore.initInfiniteFilterByPropertyData(
-      this.currentFilterProperty,
-      this.currentFilterByPropertyValue,
-      1,
-      this.pageSize
-    );
-    this.sourceDataListener();
-    this.fileDataListener();
-  }
-
-  filterDataListener() {
-    return this.subjectHTTP.fetchAll().subscribe((data: any) => {
-      this.subjectList = data;
-      console.log(this.subjectList);
+    return this.store.$currentCourseId.subscribe((data: any) => {
+      if (data !== undefined) {
+        this.currentFilterByPropertyValue = data;
+        this.testStore.initInfiniteFilterByPropertyData(
+          this.currentFilterProperty,
+          this.currentFilterByPropertyValue,
+          1,
+          this.pageSize
+        );
+        this.testDataListener();
+        this.fileDataListener();
+      }
     });
   }
 
   ngOnInit(): void {
-    this.getUserID();
-    this.filterDataListener();
+    this.isUploadingListener();
     this.initData();
     this.currentPageListener();
   }
 
   ngOnDestroy(): void {
-    this.sourceDataListener().unsubscribe();
+    this.initData().unsubscribe();
+    this.testDataListener().unsubscribe();
     this.currentPageListener().unsubscribe();
     this.fileDataListener().unsubscribe();
+    this.isUploadingListener().unsubscribe();
   }
 }

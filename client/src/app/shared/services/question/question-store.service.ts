@@ -12,6 +12,7 @@ interface QuestionState {
   exportData: Array<Question>;
   selectedQuestion: Object;
   questionInstance: Question;
+  isUploading: boolean;
   totalPages: number;
   currentPage: number;
   totalItems: number;
@@ -21,6 +22,7 @@ const initialState: QuestionState = {
   questionList: [],
   selectedQuestion: {},
   questionInstance: undefined,
+  isUploading: undefined,
   exportData: [],
   totalPages: 0,
   currentPage: 0,
@@ -258,21 +260,9 @@ export class QuestionStore extends StateService<QuestionState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
-    this.questionService
+    return this.questionService
       .filterQuestionByProperty(property, value, page, size)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          questionList: data.data,
-        });
-        this.fetchMediaBySourceID(data.data);
-        console.log('Current flag: infinite filtered list');
-        console.log(this.state.questionList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-      });
+      .toPromise();
   }
 
   initSearchByPropertyData(
@@ -491,6 +481,8 @@ export class QuestionStore extends StateService<QuestionState> {
   $selectedQuestion: Observable<Object> = this.select(
     (state) => state.selectedQuestion
   );
+
+  $isUploading: Observable<boolean> = this.select((state) => state.isUploading);
 
   $questionInstance: Observable<Question> = this.select(
     (state) => state.questionInstance
@@ -913,6 +905,11 @@ export class QuestionStore extends StateService<QuestionState> {
         console.log(data);
         this.setIsLoading(false);
       });
+  }
+
+  
+  setIsUploading(isUploading: boolean) {
+    this.setState({ isUploading: isUploading });
   }
 
   setExportData(array: Array<Question>) {

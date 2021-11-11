@@ -1,4 +1,5 @@
 export interface Test {
+    id?: string;
     courseId: string;
     name: string;
     description: string;

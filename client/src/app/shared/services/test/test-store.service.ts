@@ -11,6 +11,7 @@ interface TestState {
   testList: Array<Test>;
   exportData: Array<Test>;
   selectedTest: Object;
+  isUploading: boolean;
   testInstance: Test;
   totalPages: number;
   currentPage: number;
@@ -20,6 +21,7 @@ interface TestState {
 const initialState: TestState = {
   testList: [],
   selectedTest: {},
+  isUploading: undefined,
   testInstance: undefined,
   exportData: [],
   totalPages: 0,
@@ -485,6 +487,8 @@ export class TestStore extends StateService<TestState> {
     (state) => state.selectedTest
   );
 
+  $isUploading: Observable<boolean> = this.select((state) => state.isUploading);
+
   $testInstance: Observable<Test> = this.select((state) => state.testInstance);
 
   uploadTest(test: Test, page: number, size: number) {
@@ -895,6 +899,10 @@ export class TestStore extends StateService<TestState> {
         console.log(data);
         this.setIsLoading(false);
       });
+  }
+
+  setIsUploading(isUploading: boolean) {
+    this.setState({ isUploading: isUploading });
   }
 
   setExportData(array: Array<Test>) {

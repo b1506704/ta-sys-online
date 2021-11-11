@@ -1,7 +1,7 @@
 import { Answer } from './answer';
 
 export interface Question {
-  id: string;
+  id?: string;
   testId: string;
   content: string;
   score: number;
