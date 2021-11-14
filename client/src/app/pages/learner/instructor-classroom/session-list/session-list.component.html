@@ -1,0 +1,84 @@
+<dx-toolbar
+  [ngStyle]="{
+    paddingLeft: '25px',
+    marginBottom: '5px'
+  }"
+>
+  <dxi-item
+    [location]="'before'"
+    [text]="'Session List'"
+    style="padding-right: 15px; margin-right: 15px"
+  >
+  </dxi-item>
+  <dxi-item
+    widget="dxButton"
+    [options]="refreshButtonOptions"
+    location="after"
+    [locateInMenu]="'auto'"
+  >
+  </dxi-item>
+
+  <dxi-item location="after" locateInMenu="auto">
+    <dx-button
+      icon="arrowright"
+      type="outline"
+      text="To Subject"
+      hint="Navigate to schedule list "
+      (onClick)="navigateToScheduleList()"
+    >
+    </dx-button>
+  </dxi-item>
+</dx-toolbar>
+<dx-scroll-view
+  [direction]="'vertical'"
+  [showScrollbar]="true"
+  [scrollByContent]="true"
+  [scrollByThumb]="true"
+  [height]="'69vh'"
+  (onPullDown)="updateTopContent($event)"
+  (onReachBottom)="updateBottomContent($event)"
+  [bounceEnabled]="false"
+>
+  <ng-container *ngIf="sessionList">
+    <div class="card-container">
+      <div class="card" *ngFor="let item of sessionList">
+        <div class="card-title">
+          R{{ item?.courseTable.name[0] }}{{ item?.creator.displayName[0]
+          }}{{ item?.id[0] + item?.id[1] | uppercase }}
+        </div>
+        <div class="card-body">
+          <div class="card-text">Course: {{ item?.courseTable.name }}</div>
+          <div class="card-text">
+            Start Time: {{ item?.startTime | date: "dd/MM, hh:mm a" }}
+          </div>
+          <div class="card-text">
+            End Time: {{ item?.endTime | date: "dd/MM, hh:mm a" }}
+          </div>
+        </div>
+        <div class="card-img">
+          <img
+            [src]="mapFileListToUrl(item?.id)"
+            alt="..."
+            style="height: 100%; width: 100%"
+          />
+        </div>
+        <div>
+          <dx-button
+            icon="arrowright"
+            type="outline"
+            text="Join"
+            hint="Click to see session detail"
+            (onClick)="selectSession(item)"
+          ></dx-button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</dx-scroll-view>
+<dx-speed-dial-action
+  icon="arrowup"
+  label=""
+  [index]="1"
+  (onClick)="scrollTop()"
+>
+</dx-speed-dial-action>

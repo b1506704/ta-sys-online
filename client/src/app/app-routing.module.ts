@@ -50,33 +50,18 @@ const routes: Routes = [
     canActivate: [AuthGuardService],
   },
   {
-    path: 'instructor_session',
-    loadChildren: () =>
-      import('./pages/instructor/session-list/session-list.module').then(
-        (m) => m.SessionListModule
-      ),
-  },
-  {
-    path: 'course_streaming/:id',
-    loadChildren: () =>
-      import(
-        './pages/instructor/instructor-streaming/instructor-streaming.module'
-      ).then((m) => m.InstructorStreamingModule),
-  },
-  {
-    path: 'instructor_classroom/:classroom_data',
+    path: 'instructor_classroom',
     loadChildren: () =>
       import(
         './pages/instructor/instructor-classroom/instructor-classroom.module'
       ).then((m) => m.InstructorClassroomModule),
   },
   {
-    path: 'instructor_streaming',
+    path: 'course_streaming',
     loadChildren: () =>
       import(
-        './pages/instructor/instructor-streaming/instructor-streaming.module'
+        './pages/instructor/instructor-classroom/instructor-streaming/instructor-streaming.module'
       ).then((m) => m.InstructorStreamingModule),
-    canActivate: [AuthGuardService],
   },
   {
     path: 'schedule_list',
@@ -156,14 +141,6 @@ const routes: Routes = [
       import('./pages/admin/edit-answer-list/edit-answer-list.module').then(
         (m) => m.EditAnswerListModule
       ),
-    canActivate: [AuthGuardService],
-  },
-  {
-    path: 'edit_curriculum_list',
-    loadChildren: () =>
-      import(
-        './pages/admin/edit-curriculum-list/edit-curriculum-list.module'
-      ).then((m) => m.EditCurriculumListModule),
     canActivate: [AuthGuardService],
   },
   {

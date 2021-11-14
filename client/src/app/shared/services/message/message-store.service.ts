@@ -12,6 +12,7 @@ interface MessageState {
   exportData: Array<Message>;
   selectedMessage: Object;
   messageInstance: Message;
+  isUploading: boolean;
   totalPages: number;
   currentPage: number;
   totalItems: number;
@@ -21,6 +22,7 @@ const initialState: MessageState = {
   messageList: [],
   selectedMessage: {},
   messageInstance: undefined,
+  isUploading: undefined,
   exportData: [],
   totalPages: 0,
   currentPage: 0,
@@ -132,33 +134,31 @@ export class MessageStore extends StateService<MessageState> {
 
   loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
     this.setIsLoading(true);
-    this.messageService
-      .fetchMessageByLearnerID(page, size, learnerID)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({
-            messageList: this.fillEmpty(
-              page - 1,
-              size,
-              this.state.messageList,
-              data.data
-            ),
-          });
-          console.log('Pure list');
-          console.log(this.state.messageList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.messageService.fetchMessageByLearnerID(page, size, learnerID).subscribe({
+      next: (data: any) => {
+        this.setState({
+          messageList: this.fillEmpty(
+            page - 1,
+            size,
+            this.state.messageList,
+            data.data
+          ),
+        });
+        console.log('Pure list');
+        console.log(this.state.messageList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
   initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
@@ -183,28 +183,26 @@ export class MessageStore extends StateService<MessageState> {
     learnerID: string
   ) {
     this.setIsLoading(true);
-    this.messageService
-      .fetchMessageByLearnerID(page, size, learnerID)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({
-            messageList: this.state.messageList.concat(data.data),
-          });
-          console.log('Infinite list');
-          console.log(this.state.messageList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
+    this.messageService.fetchMessageByLearnerID(page, size, learnerID).subscribe({
+      next: (data: any) => {
+        this.setState({
+          messageList: this.state.messageList.concat(data.data),
+        });
+        console.log('Infinite list');
+        console.log(this.state.messageList);
+        console.log('Server response');
+        console.log(data);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+        this.setIsLoading(false);
+      },
+      error: (data: any) => {
+        this.setIsLoading(false);
+        this.store.showNotif(data.error.responseMessage, 'error');
+        console.log(data);
+      },
+    });
   }
 
   initData(page: number, size: number) {
@@ -240,6 +238,7 @@ export class MessageStore extends StateService<MessageState> {
         this.setState({
           messageList: new Array<Message>(data.totalRecords),
         });
+
         console.log('Current flag: filtered list');
         console.log(this.state.messageList);
         this.setState({ totalItems: data.totalRecords });
@@ -257,7 +256,6 @@ export class MessageStore extends StateService<MessageState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
     this.messageService
       .filterMessageByProperty(property, value, page, size)
       .toPromise()
@@ -308,6 +306,42 @@ export class MessageStore extends StateService<MessageState> {
     this.store.showNotif('Searched Mode On', 'custom');
     this.messageService
       .searchMessageByProperty(property, value, page, size)
+      .toPromise()
+      .then((data: any) => {
+        if (data.totalRecords !== 0) {
+          this.setState({
+            messageList: data.data,
+          });
+          this.fetchMediaBySourceID(data.data);
+        } else {
+          this.store.showNotif('No result found!', 'custom');
+        }
+        console.log('Current flag: infitite searched list');
+        console.log(this.state.messageList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+      });
+  }
+
+  initInfiniteFilterSearchByPropertyData(
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
+    page: number,
+    size: number
+  ) {
+    this.store.showNotif('Searched Mode On', 'custom');
+    this.messageService
+      .filterSearchMessageByProperty(
+        filterProperty,
+        filterValue,
+        searchProperty,
+        searchValue,
+        page,
+        size
+      )
       .toPromise()
       .then((data: any) => {
         if (data.totalRecords !== 0) {
@@ -454,6 +488,8 @@ export class MessageStore extends StateService<MessageState> {
   $selectedMessage: Observable<Object> = this.select(
     (state) => state.selectedMessage
   );
+
+  $isUploading: Observable<boolean> = this.select((state) => state.isUploading);
 
   $messageInstance: Observable<Message> = this.select(
     (state) => state.messageInstance
@@ -670,6 +706,53 @@ export class MessageStore extends StateService<MessageState> {
       });
   }
 
+  filterSearchInfiniteMessageByProperty(
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.messageService
+      .filterSearchMessageByProperty(
+        filterProperty,
+        filterValue,
+        searchProperty,
+        searchValue,
+        page,
+        size
+      )
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            if (data.data.length) {
+              this.setState({
+                messageList: this.state.messageList.concat(data.data),
+              });
+              this.fetchMediaBySourceID(data.data);
+            }
+          } else {
+            this.store.showNotif('No result found!', 'custom');
+          }
+          console.log('Infite searched list');
+          console.log(this.state.messageList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
   searchMessageByProperty(
     property: string,
     value: string,
@@ -829,6 +912,10 @@ export class MessageStore extends StateService<MessageState> {
         console.log(data);
         this.setIsLoading(false);
       });
+  }
+
+  setIsUploading(isUploading: boolean) {
+    this.setState({ isUploading: isUploading });
   }
 
   setExportData(array: Array<Message>) {

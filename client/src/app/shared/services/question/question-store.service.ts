@@ -265,6 +265,28 @@ export class QuestionStore extends StateService<QuestionState> {
       .toPromise();
   }
 
+  initInfiniteFilterByPropertyDataForStream(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    return this.questionService
+      .filterQuestionByProperty(property, value, page, size)
+      .toPromise()
+      .then((data: any) => {
+        this.setState({
+          questionList: data.data,
+        });
+        this.fetchMediaBySourceID(data.data);
+        console.log('Current flag: infite list');
+        console.log(this.state.questionList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+      });
+  }
+
   initSearchByPropertyData(
     property: string,
     value: string,
@@ -907,7 +929,6 @@ export class QuestionStore extends StateService<QuestionState> {
       });
   }
 
-  
   setIsUploading(isUploading: boolean) {
     this.setState({ isUploading: isUploading });
   }

@@ -2,14 +2,14 @@
   "name": "ta-sys-online",
   "version": "0.0.0",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve --open --host 0.0.0.0 --disable-host-check",
     "aot": "node --max-old-space-size=8192 ./node_modules/@angular/cli/bin/ng serve --aot",
     "build": "node --max-old-space-size=8192 ./node_modules/@angular/cli/bin/ng build --aot",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
     "build-themes": "devextreme build",
-    "postinstall": "npm run build-themes"
+    "ng": "ng",
+    "postinstall": "npm run build-themes",
+    "start": "ng serve --open --host 0.0.0.0 --disable-host-check",
+    "test": "ng test",
+    "watch": "ng build --watch --configuration development"
   },
   "private": true,
   "dependencies": {

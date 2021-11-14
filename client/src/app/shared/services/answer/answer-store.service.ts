@@ -5,12 +5,14 @@ import { StateService } from '../state.service';
 import { StoreService } from '../store.service';
 import { AnswerHttpService } from './answer-http.service';
 import { confirm } from 'devextreme/ui/dialog';
+import { FileStore } from '../file/file-store.service';
 
 interface AnswerState {
   answerList: Array<Answer>;
   exportData: Array<Answer>;
   selectedAnswer: Object;
   answerInstance: Answer;
+  isUploading: boolean;
   totalPages: number;
   currentPage: number;
   totalItems: number;
@@ -20,6 +22,7 @@ const initialState: AnswerState = {
   answerList: [],
   selectedAnswer: {},
   answerInstance: undefined,
+  isUploading: undefined,
   exportData: [],
   totalPages: 0,
   currentPage: 0,
@@ -32,7 +35,8 @@ const initialState: AnswerState = {
 export class AnswerStore extends StateService<AnswerState> {
   constructor(
     private answerService: AnswerHttpService,
-    private store: StoreService
+    private store: StoreService,
+    private fileStore: FileStore
   ) {
     super(initialState);
   }
@@ -81,6 +85,11 @@ export class AnswerStore extends StateService<AnswerState> {
     return result;
   }
 
+  fetchMediaBySourceID(sourceIDs: Array<string>) {
+    const sourceIds = sourceIDs.map((e: any) => e.id);
+    this.fileStore.getFiles(sourceIds);
+  }
+
   initInfiniteData(page: number, size: number) {
     return this.answerService
       .fetchAnswer(page, size)
@@ -89,6 +98,7 @@ export class AnswerStore extends StateService<AnswerState> {
         this.setState({
           answerList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infite list');
         console.log(this.state.answerList);
         this.setState({ totalItems: data.totalRecords });
@@ -104,6 +114,7 @@ export class AnswerStore extends StateService<AnswerState> {
         this.setState({
           answerList: this.state.answerList.concat(data.data),
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Infinite list');
         console.log(this.state.answerList);
         console.log('Server response');
@@ -123,31 +134,33 @@ export class AnswerStore extends StateService<AnswerState> {
 
   loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
     this.setIsLoading(true);
-    this.answerService.fetchAnswerByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          answerList: this.fillEmpty(
-            page - 1,
-            size,
-            this.state.answerList,
-            data.data
-          ),
-        });
-        console.log('Pure list');
-        console.log(this.state.answerList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.answerService
+      .fetchAnswerByLearnerID(page, size, learnerID)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            answerList: this.fillEmpty(
+              page - 1,
+              size,
+              this.state.answerList,
+              data.data
+            ),
+          });
+          console.log('Pure list');
+          console.log(this.state.answerList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
   initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
@@ -172,26 +185,28 @@ export class AnswerStore extends StateService<AnswerState> {
     learnerID: string
   ) {
     this.setIsLoading(true);
-    this.answerService.fetchAnswerByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          answerList: this.state.answerList.concat(data.data),
-        });
-        console.log('Infinite list');
-        console.log(this.state.answerList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.answerService
+      .fetchAnswerByLearnerID(page, size, learnerID)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            answerList: this.state.answerList.concat(data.data),
+          });
+          console.log('Infinite list');
+          console.log(this.state.answerList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
   initData(page: number, size: number) {
@@ -227,6 +242,7 @@ export class AnswerStore extends StateService<AnswerState> {
         this.setState({
           answerList: new Array<Answer>(data.totalRecords),
         });
+
         console.log('Current flag: filtered list');
         console.log(this.state.answerList);
         this.setState({ totalItems: data.totalRecords });
@@ -244,20 +260,9 @@ export class AnswerStore extends StateService<AnswerState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
-    this.answerService
+    return this.answerService
       .filterAnswerByProperty(property, value, page, size)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          answerList: data.data,
-        });
-        console.log('Current flag: infinite filtered list');
-        console.log(this.state.answerList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-      });
+      .toPromise();
   }
 
   initSearchByPropertyData(
@@ -300,6 +305,43 @@ export class AnswerStore extends StateService<AnswerState> {
           this.setState({
             answerList: data.data,
           });
+          this.fetchMediaBySourceID(data.data);
+        } else {
+          this.store.showNotif('No result found!', 'custom');
+        }
+        console.log('Current flag: infitite searched list');
+        console.log(this.state.answerList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
+      });
+  }
+
+  initInfiniteFilterSearchByPropertyData(
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
+    page: number,
+    size: number
+  ) {
+    this.store.showNotif('Searched Mode On', 'custom');
+    this.answerService
+      .filterSearchAnswerByProperty(
+        filterProperty,
+        filterValue,
+        searchProperty,
+        searchValue,
+        page,
+        size
+      )
+      .toPromise()
+      .then((data: any) => {
+        if (data.totalRecords !== 0) {
+          this.setState({
+            answerList: data.data,
+          });
+          this.fetchMediaBySourceID(data.data);
         } else {
           this.store.showNotif('No result found!', 'custom');
         }
@@ -350,6 +392,7 @@ export class AnswerStore extends StateService<AnswerState> {
         this.setState({
           answerList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: sort list');
         console.log(this.state.answerList);
         this.setState({ totalItems: data.totalRecords });
@@ -438,6 +481,8 @@ export class AnswerStore extends StateService<AnswerState> {
   $selectedAnswer: Observable<Object> = this.select(
     (state) => state.selectedAnswer
   );
+
+  $isUploading: Observable<boolean> = this.select((state) => state.isUploading);
 
   $answerInstance: Observable<Answer> = this.select(
     (state) => state.answerInstance
@@ -631,10 +676,60 @@ export class AnswerStore extends StateService<AnswerState> {
       .filterAnswerByProperty(property, value, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            answerList: this.state.answerList.concat(data),
-          });
+          if (data.data.length) {
+            this.setState({
+              answerList: this.state.answerList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           console.log('Filtered list');
+          console.log(this.state.answerList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
+  }
+
+  filterSearchInfiniteAnswerByProperty(
+    filterProperty: string,
+    filterValue: string,
+    searchProperty: string,
+    searchValue: string,
+    page: number,
+    size: number
+  ) {
+    this.setIsLoading(true);
+    this.answerService
+      .filterSearchAnswerByProperty(
+        filterProperty,
+        filterValue,
+        searchProperty,
+        searchValue,
+        page,
+        size
+      )
+      .subscribe({
+        next: (data: any) => {
+          if (data.totalRecords !== 0) {
+            if (data.data.length) {
+              this.setState({
+                answerList: this.state.answerList.concat(data.data),
+              });
+              this.fetchMediaBySourceID(data.data);
+            }
+          } else {
+            this.store.showNotif('No result found!', 'custom');
+          }
+          console.log('Infite searched list');
           console.log(this.state.answerList);
           console.log('Server response');
           console.log(data);
@@ -703,9 +798,12 @@ export class AnswerStore extends StateService<AnswerState> {
       .subscribe({
         next: (data: any) => {
           if (data.totalRecords !== 0) {
-            this.setState({
-              answerList: this.state.answerList.concat(data),
-            });
+            if (data.data.length) {
+              this.setState({
+                answerList: this.state.answerList.concat(data.data),
+              });
+              this.fetchMediaBySourceID(data.data);
+            }
           } else {
             this.store.showNotif('No result found!', 'custome');
           }
@@ -774,9 +872,12 @@ export class AnswerStore extends StateService<AnswerState> {
       .sortAnswerByProperty(value, order, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            answerList: this.state.answerList.concat(data),
-          });
+          if (data.data.length) {
+            this.setState({
+              answerList: this.state.answerList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           console.log('Infite sorted list');
           console.log(this.state.answerList);
           console.log('Server response');
@@ -804,6 +905,11 @@ export class AnswerStore extends StateService<AnswerState> {
         console.log(data);
         this.setIsLoading(false);
       });
+  }
+
+  
+  setIsUploading(isUploading: boolean) {
+    this.setState({ isUploading: isUploading });
   }
 
   setExportData(array: Array<Answer>) {

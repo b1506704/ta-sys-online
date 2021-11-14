@@ -483,7 +483,7 @@ export class UserInfoStore extends StateService<UserInfoState> {
     });
   }
 
-  updateUserInfo(userInfo: UserInfo, page: number, size: number) {
+  updateUserInfo(userInfo: UserInfo) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);
@@ -491,7 +491,6 @@ export class UserInfoStore extends StateService<UserInfoState> {
           next: (data: any) => {
             this.setState({ responseMsg: data });
             console.log(data);
-            this.loadDataAsync(page, size);
             this.setIsLoading(false);
             this.store.showNotif(data.responseMessage, 'custom');
           },

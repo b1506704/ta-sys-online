@@ -1,7 +1,10 @@
+import { User } from './user';
+
 export interface Message {
+  id?: string;
   content: string;
-  fileURL: string;
-  isSeen:  boolean;
   senderId: string;
+  senderAccountResponse?: User;
+  courseId: string;
   recipientId: string;
 }

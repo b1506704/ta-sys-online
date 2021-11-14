@@ -110,7 +110,8 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   selectCourse(course: Course) {
-    this.router.navigate(['instructor_classroom', JSON.stringify(course)]);
+    this.store.setCurrentCourse(course);
+    this.router.navigate(['instructor_classroom']);
     console.log('SELECTED COURSE');
     console.log(course);
   }

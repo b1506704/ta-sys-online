@@ -78,17 +78,10 @@
     >
     </dxo-pager>
     <dxo-load-panel [enabled]="true"></dxo-load-panel>
-    <dxi-column dataField="content">
-      <dxi-validation-rule type="required"></dxi-validation-rule>
-    </dxi-column>
-    <dxi-column dataField="fileURL">
-      <dxi-validation-rule type="required"></dxi-validation-rule>
-    </dxi-column>
-    <dxi-column dataField="isSeen" dataType="boolean"> </dxi-column>
     <dxi-column dataField="senderId">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column>
-    <dxi-column dataField="recipientId">
+    <dxi-column dataField="content">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column>
     <div *dxTemplate="let data of 'totalMessageCount'">

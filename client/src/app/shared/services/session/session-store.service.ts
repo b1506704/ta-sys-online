@@ -5,6 +5,7 @@ import { StateService } from '../state.service';
 import { StoreService } from '../store.service';
 import { SessionHttpService } from './session-http.service';
 import { confirm } from 'devextreme/ui/dialog';
+import { FileStore } from '../file/file-store.service';
 
 interface SessionState {
   sessionList: Array<Session>;
@@ -32,7 +33,8 @@ const initialState: SessionState = {
 export class SessionStore extends StateService<SessionState> {
   constructor(
     private sessionService: SessionHttpService,
-    private store: StoreService
+    private store: StoreService,
+    private fileStore: FileStore
   ) {
     super(initialState);
   }
@@ -81,6 +83,11 @@ export class SessionStore extends StateService<SessionState> {
     return result;
   }
 
+  fetchMediaBySourceID(sourceIDs: Array<string>) {
+    const sourceIds = sourceIDs.map((e: any) => e.id);
+    this.fileStore.getFiles(sourceIds);
+  }
+
   initInfiniteData(page: number, size: number) {
     return this.sessionService
       .fetchSession(page, size)
@@ -123,31 +130,33 @@ export class SessionStore extends StateService<SessionState> {
 
   loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
     this.setIsLoading(true);
-    this.sessionService.fetchSessionByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          sessionList: this.fillEmpty(
-            page - 1,
-            size,
-            this.state.sessionList,
-            data.data
-          ),
-        });
-        console.log('Pure list');
-        console.log(this.state.sessionList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.sessionService
+      .fetchSessionByLearnerID(page, size, learnerID)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            sessionList: this.fillEmpty(
+              page - 1,
+              size,
+              this.state.sessionList,
+              data.data
+            ),
+          });
+          console.log('Pure list');
+          console.log(this.state.sessionList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
   initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
@@ -172,26 +181,28 @@ export class SessionStore extends StateService<SessionState> {
     learnerID: string
   ) {
     this.setIsLoading(true);
-    this.sessionService.fetchSessionByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          sessionList: this.state.sessionList.concat(data.data),
-        });
-        console.log('Infinite list');
-        console.log(this.state.sessionList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
+    this.sessionService
+      .fetchSessionByLearnerID(page, size, learnerID)
+      .subscribe({
+        next: (data: any) => {
+          this.setState({
+            sessionList: this.state.sessionList.concat(data.data),
+          });
+          console.log('Infinite list');
+          console.log(this.state.sessionList);
+          console.log('Server response');
+          console.log(data);
+          this.setState({ totalItems: data.totalRecords });
+          this.setState({ totalPages: data.totalPages });
+          this.setState({ currentPage: data.pageNumber });
+          this.setIsLoading(false);
+        },
+        error: (data: any) => {
+          this.setIsLoading(false);
+          this.store.showNotif(data.error.responseMessage, 'error');
+          console.log(data);
+        },
+      });
   }
 
   initData(page: number, size: number) {
@@ -631,9 +642,12 @@ export class SessionStore extends StateService<SessionState> {
       .filterSessionByProperty(property, value, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            sessionList: this.state.sessionList.concat(data),
-          });
+          if (data.data.length) {
+            this.setState({
+              sessionList: this.state.sessionList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           console.log('Filtered list');
           console.log(this.state.sessionList);
           console.log('Server response');

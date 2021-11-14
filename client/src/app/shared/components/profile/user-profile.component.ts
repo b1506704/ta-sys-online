@@ -129,7 +129,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   onUserInfoSubmit = (e: any) => {
     e.preventDefault();
     // also update file
-    this.userInfoStore.updateUserInfo(this.userInfoData, 1, 5);
+    this.userInfoStore.updateUserInfo(this.userInfoData);
     this.fileStore.uploadFiles([this.fileData]);
   };
 

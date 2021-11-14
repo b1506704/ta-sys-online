@@ -47,35 +47,7 @@ export const navigationInstructor = [
     icon: 'home',
   },
   {
-    text: 'Manage Course',
-    icon: 'edit',
-    items: [
-      {
-        text: 'Edit Test',
-        path: '/edit_test_list',
-      },
-      {
-        text: 'Edit Lesson',
-        path: '/edit_lesson_list',
-      },
-    ],
-  },
-  {
-    text: 'Live Streaming',
-    icon: 'like',
-    items: [
-      {
-        text: 'Current Session',
-        path: '/instructor_streaming',
-      },
-      {
-        text: 'Session List',
-        path: '/instructor_session',
-      },
-    ],
-  },
-  {
-    text: 'Course List',
+    text: 'Course Management',
     icon: 'edit',
     path: '/course_instructor',
   },
@@ -98,17 +70,17 @@ export const navigationAdmin = [
       {
         text: 'Edit User',
         path: '/edit_user_list',
-      }      
+      },
     ],
   },
   {
     text: 'Finance',
     icon: 'money',
-    items: [     
+    items: [
       {
         text: 'Edit Cart',
         path: '/edit_cart_list',
-      },     
+      },
     ],
   },
   {
@@ -141,10 +113,6 @@ export const navigationAdmin = [
       {
         text: 'Edit Subject',
         path: '/edit_subject_list',
-      },
-      {
-        text: 'Edit Curriculum',
-        path: '/edit_curriculum_list',
       },
       {
         text: 'Edit Course',

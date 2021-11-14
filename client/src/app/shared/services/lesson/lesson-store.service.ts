@@ -12,6 +12,7 @@ interface LessonState {
   exportData: Array<Lesson>;
   selectedLesson: Object;
   lessonInstance: Lesson;
+  isUploading: boolean;
   totalPages: number;
   currentPage: number;
   totalItems: number;
@@ -21,6 +22,7 @@ const initialState: LessonState = {
   lessonList: [],
   selectedLesson: {},
   lessonInstance: undefined,
+  isUploading: undefined,
   exportData: [],
   totalPages: 0,
   currentPage: 0,
@@ -112,6 +114,7 @@ export class LessonStore extends StateService<LessonState> {
         this.setState({
           lessonList: this.state.lessonList.concat(data.data),
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Infinite list');
         console.log(this.state.lessonList);
         console.log('Server response');
@@ -235,6 +238,7 @@ export class LessonStore extends StateService<LessonState> {
         this.setState({
           lessonList: new Array<Lesson>(data.totalRecords),
         });
+
         console.log('Current flag: filtered list');
         console.log(this.state.lessonList);
         this.setState({ totalItems: data.totalRecords });
@@ -252,7 +256,6 @@ export class LessonStore extends StateService<LessonState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
     this.lessonService
       .filterLessonByProperty(property, value, page, size)
       .toPromise()
@@ -485,6 +488,8 @@ export class LessonStore extends StateService<LessonState> {
   $selectedLesson: Observable<Object> = this.select(
     (state) => state.selectedLesson
   );
+
+  $isUploading: Observable<boolean> = this.select((state) => state.isUploading);
 
   $lessonInstance: Observable<Lesson> = this.select(
     (state) => state.lessonInstance
@@ -907,6 +912,10 @@ export class LessonStore extends StateService<LessonState> {
         console.log(data);
         this.setIsLoading(false);
       });
+  }
+
+  setIsUploading(isUploading: boolean) {
+    this.setState({ isUploading: isUploading });
   }
 
   setExportData(array: Array<Lesson>) {

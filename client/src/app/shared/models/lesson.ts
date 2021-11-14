@@ -4,4 +4,5 @@ export interface Lesson {
   description: string;
   backText: string;
   frontText: string;
+  courseId: string;
 }

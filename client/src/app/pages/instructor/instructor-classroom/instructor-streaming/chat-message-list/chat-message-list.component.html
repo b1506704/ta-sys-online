@@ -1,0 +1,52 @@
+<dx-popup
+  id="chat-shortcut-popup"
+  [title]="title"
+  [showTitle]="true"
+  [shading]="true"
+  [position]="'right'"
+  [showCloseButton]="true"
+  [dragEnabled]="true"
+  [height]="'80%'"
+  (onHiding)="closePopupChat()"
+  [width]="'30%'"
+  [visible]="isVisible"
+>
+  <div *dxTemplate="let data of 'content'">
+    <dx-scroll-view
+      [scrollByContent]="true"
+      [scrollByThumb]="true"
+      bounceEnabled="true"
+      [height]="'92%'"
+      [width]="'100%'"
+    >
+      <div class="message-list" *ngFor="let item of chatMessageList">
+        <div>{{ item?.userEntry.displayName }}</div>
+        <div class="message-body">
+          <dx-html-editor
+            readOnly="true"
+            [value]="item?.message"
+            [height]="'90%'"
+            [width]="'90%'"
+          >
+            <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+          </dx-html-editor>
+        </div>
+        <div>{{ item?.date }}</div>
+      </div>
+    </dx-scroll-view>
+    <div class="chat-input-container">
+      <dx-html-editor
+        [height]="50"
+        [width]="'80%'"
+        style="border-radius: 25px; background: transparent"
+        (onValueChanged)="onChatInputChanged($event)"
+      >
+        <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+      </dx-html-editor>
+      <dx-button
+        (onClick)="sendChatMessage()"
+        [icon]="'arrowright'"
+      ></dx-button>
+    </div>
+  </div>
+</dx-popup>

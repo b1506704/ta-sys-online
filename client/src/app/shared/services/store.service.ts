@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
 import notify from 'devextreme/ui/notify';
 import { Observable } from 'rxjs';
+import { Course } from '../models/course';
+import { Session } from '../models/session';
 import { StateService } from './state.service';
 
 interface StoreState {
   currentUser: string;
   currentUserId: string;
-  currentCourseId: string;
+  currentCourse: Course;
+
+  currentSession: Session;
   responseList: Array<Object>;
   responseEventType: string;
   responseProgress: number;
@@ -24,7 +28,8 @@ const initialState: StoreState = {
   responseEventType: undefined,
   currentUser: undefined,
   currentUserId: undefined,
-  currentCourseId: undefined,
+  currentCourse: undefined,
+  currentSession: undefined,
   currentRoleId: undefined,
   currentRoleName: undefined,
   isLoading: false,
@@ -56,8 +61,12 @@ export class StoreService extends StateService<StoreState> {
     (state) => state.currentUserId
   );
 
-  $currentCourseId: Observable<string> = this.select(
-    (state) => state.currentCourseId
+  $currentCourse: Observable<Course> = this.select(
+    (state) => state.currentCourse
+  );
+
+  $currentSession: Observable<Session> = this.select(
+    (state) => state.currentSession
   );
 
   $currentRoleId: Observable<string> = this.select(
@@ -125,8 +134,12 @@ export class StoreService extends StateService<StoreState> {
     this.setState({ currentUserId: id });
   }
 
-  setCurrentCourseId(id: string) {
-    this.setState({ currentCourseId: id });
+  setCurrentCourse(course: Course) {
+    this.setState({ currentCourse: course });
+  }
+
+  setCurrentSession(session: Session) {
+    this.setState({ currentSession: session });
   }
 
   setCurrentUserRoleId(id: string) {

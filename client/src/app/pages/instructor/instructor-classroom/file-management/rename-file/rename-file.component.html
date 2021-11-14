@@ -1,0 +1,51 @@
+<div
+  [ngClass]="{
+    'photo-popup-content': isUploading === false,
+    'photo-popup-loading': isUploading === true
+  }"
+>
+  <div class="container">
+    <form id="form-container" (submit)="onSubmit($event)">
+      <dx-form
+        id="form"
+        [formData]="fileData"
+        [showValidationSummary]="true"
+        validationGroup="updateFolder"
+      >
+        <dxi-item itemType="group">
+          <dxi-item itemType="group" caption="Type in new name">
+            <dxi-item
+              dataField="fileName"
+              [label]="{ text: 'File Name' }"
+              editorType="dxTextBox"
+            >
+              <dxi-validation-rule
+                type="required"
+                message="Folder name is required"
+              >
+              </dxi-validation-rule>
+            </dxi-item>
+            <dxi-item
+              itemType="group"
+              [colCount]="2"
+              [cssClass]="'buttonGroup'"
+            >
+              <dxi-item
+                itemType="button"
+                horizontalAlignment="center"
+                [buttonOptions]="submitButtonOptions"
+              >
+              </dxi-item>
+              <dxi-item
+                itemType="button"
+                horizontalAlignment="center"
+                [buttonOptions]="resetButtonOptions"
+              >
+              </dxi-item>
+            </dxi-item>
+          </dxi-item>
+        </dxi-item>
+      </dx-form>
+    </form>
+  </div>
+</div>
