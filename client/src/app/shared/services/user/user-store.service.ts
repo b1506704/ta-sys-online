@@ -281,7 +281,7 @@ export class UserStore extends StateService<UserState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
+    //;
     this.store.setIsLoading(true);
     this.userService
       .filterUserByProperty(property, value, page, size)
@@ -307,7 +307,7 @@ export class UserStore extends StateService<UserState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
+    //;
     this.store.setIsLoading(true);
     this.userService
       .filterUserByProperty(property, value, page, size)
@@ -333,7 +333,7 @@ export class UserStore extends StateService<UserState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.store.setIsLoading(true);
     this.userService
       .searchUserByProperty(property, value, page, size)
@@ -359,7 +359,7 @@ export class UserStore extends StateService<UserState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.store.setIsLoading(true);
     this.userService
       .searchUserByProperty(property, value, page, size)
@@ -387,7 +387,7 @@ export class UserStore extends StateService<UserState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.store.setIsLoading(true);
     this.userService
       .sortUserByProperty(value, order, page, size)
@@ -413,7 +413,7 @@ export class UserStore extends StateService<UserState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.store.setIsLoading(true);
     this.userService
       .sortUserByProperty(value, order, page, size)

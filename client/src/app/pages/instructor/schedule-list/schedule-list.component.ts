@@ -189,7 +189,7 @@ export class ScheduleListComponent implements OnInit, OnDestroy {
         );
       } else {
         //return to pure editor mode
-        this.store.showNotif('SEARCH MODE OFF', 'custom');
+        //
         this.onRefresh();
       }
     }, 1250);
@@ -213,7 +213,7 @@ export class ScheduleListComponent implements OnInit, OnDestroy {
       );
     } else {
       //return to pure editor mode
-      this.store.showNotif('SORT MODE OFF', 'custom');
+      //
       this.onRefresh();
     }
   }
@@ -233,7 +233,7 @@ export class ScheduleListComponent implements OnInit, OnDestroy {
       );
     } else {
       //return to pure editor mode
-      this.store.showNotif('FILTER MODE OFF', 'custom');
+      //
       this.onRefresh();
     }
   }

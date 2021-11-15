@@ -230,7 +230,7 @@ export class MessageStore extends StateService<MessageState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
+    //;
     this.messageService
       .filterMessageByProperty(property, value, page, size)
       .toPromise()
@@ -278,7 +278,7 @@ export class MessageStore extends StateService<MessageState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.messageService
       .searchMessageByProperty(property, value, page, size)
       .toPromise()
@@ -303,7 +303,7 @@ export class MessageStore extends StateService<MessageState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.messageService
       .searchMessageByProperty(property, value, page, size)
       .toPromise()
@@ -332,7 +332,7 @@ export class MessageStore extends StateService<MessageState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.messageService
       .filterSearchMessageByProperty(
         filterProperty,
@@ -366,7 +366,7 @@ export class MessageStore extends StateService<MessageState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.messageService
       .sortMessageByProperty(value, order, page, size)
       .toPromise()
@@ -391,7 +391,7 @@ export class MessageStore extends StateService<MessageState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.messageService
       .sortMessageByProperty(value, order, page, size)
       .toPromise()

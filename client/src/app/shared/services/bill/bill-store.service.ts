@@ -219,7 +219,7 @@ export class BillStore extends StateService<BillState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
+    //;
     this.billService
       .filterBillByProperty(property, value, page, size)
       .toPromise()
@@ -244,7 +244,7 @@ export class BillStore extends StateService<BillState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
+    //;
     this.billService
       .filterBillByProperty(property, value, page, size)
       .toPromise()
@@ -266,7 +266,7 @@ export class BillStore extends StateService<BillState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.billService
       .searchBillByProperty(property, value, page, size)
       .toPromise()
@@ -291,7 +291,7 @@ export class BillStore extends StateService<BillState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.billService
       .searchBillByProperty(property, value, page, size)
       .toPromise()
@@ -317,7 +317,7 @@ export class BillStore extends StateService<BillState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.billService
       .sortBillByProperty(value, order, page, size)
       .toPromise()
@@ -342,7 +342,7 @@ export class BillStore extends StateService<BillState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.billService
       .sortBillByProperty(value, order, page, size)
       .toPromise()

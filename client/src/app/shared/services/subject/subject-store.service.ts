@@ -234,7 +234,7 @@ export class SubjectStore extends StateService<SubjectState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
+    //;
     this.subjectService
       .filterSubjectByProperty(property, value, page, size)
       .toPromise()
@@ -259,7 +259,7 @@ export class SubjectStore extends StateService<SubjectState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
+    //;
     this.subjectService
       .filterSubjectByProperty(property, value, page, size)
       .toPromise()
@@ -284,7 +284,7 @@ export class SubjectStore extends StateService<SubjectState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.subjectService
       .searchSubjectByProperty(property, value, page, size)
       .toPromise()
@@ -309,7 +309,7 @@ export class SubjectStore extends StateService<SubjectState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.subjectService
       .searchSubjectByProperty(property, value, page, size)
       .toPromise()
@@ -338,7 +338,7 @@ export class SubjectStore extends StateService<SubjectState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.subjectService
       .sortSubjectByProperty(value, order, page, size)
       .toPromise()
@@ -363,7 +363,7 @@ export class SubjectStore extends StateService<SubjectState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.subjectService
       .sortSubjectByProperty(value, order, page, size)
       .toPromise()

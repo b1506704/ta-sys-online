@@ -234,7 +234,7 @@ export class AnswerStore extends StateService<AnswerState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
+    //;
     this.answerService
       .filterAnswerByProperty(property, value, page, size)
       .toPromise()
@@ -271,7 +271,7 @@ export class AnswerStore extends StateService<AnswerState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.answerService
       .searchAnswerByProperty(property, value, page, size)
       .toPromise()
@@ -296,7 +296,7 @@ export class AnswerStore extends StateService<AnswerState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.answerService
       .searchAnswerByProperty(property, value, page, size)
       .toPromise()
@@ -325,7 +325,7 @@ export class AnswerStore extends StateService<AnswerState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.answerService
       .filterSearchAnswerByProperty(
         filterProperty,
@@ -359,7 +359,7 @@ export class AnswerStore extends StateService<AnswerState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.answerService
       .sortAnswerByProperty(value, order, page, size)
       .toPromise()
@@ -384,7 +384,7 @@ export class AnswerStore extends StateService<AnswerState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.answerService
       .sortAnswerByProperty(value, order, page, size)
       .toPromise()

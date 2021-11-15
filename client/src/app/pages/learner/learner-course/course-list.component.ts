@@ -78,11 +78,11 @@ export class CourseListComponent implements OnInit, OnDestroy {
     });
   }
 
-  selectCourse(_id: string) {
-    this.currentCourseID = _id;
-    this.router.navigate(['course_session', this.currentCourseID]);
-    console.log('SELECTED ID');
-    console.log(_id);
+  selectCourse(course: Course) {
+    this.store.setCurrentCourse(course);
+    this.router.navigate(['learner_classroom']);
+    console.log('SELECTED COURSE');
+    console.log(course);
   }
 
   updateContent = (args: any, eventName: any) => {
@@ -124,7 +124,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
       );
     } else {
       //return to pure editor mode
-      this.store.showNotif('FILTER MODE OFF', 'custom');
+      //
       this.onRefresh();
     }
   }
@@ -184,8 +184,8 @@ export class CourseListComponent implements OnInit, OnDestroy {
     return this.fileStore.$fileList.subscribe((data: any) => {
       if (data.length !== 0) {
         this.fileList = data;
-        console.log('IMAGE LIST OF DOCTOR');
-        console.log(this.fileList);
+        //
+        //
       }
     });
   }

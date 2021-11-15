@@ -1,0 +1,59 @@
+<dx-popup
+  id="detail-popup"
+  [title]="lesson?.name"
+  [showTitle]="true"
+  [shading]="true"
+  [position]="'center'"
+  [showCloseButton]="true"
+  [dragEnabled]="false"
+  [height]="'95%'"
+  (onHiding)="closeDetailPopup()"
+  [width]="'95%'"
+  [visible]="isVisible"
+>
+  <div *dxTemplate="let data of 'content'">
+    <div class="card-body">
+      <div class="lesson-content">
+        <dx-scroll-view
+          [direction]="'vertical'"
+          [showScrollbar]="true"
+          [scrollByContent]="true"
+          [scrollByThumb]="true"
+          [bounceEnabled]="false"
+          [height]="'92%'"
+          [width]="'100%'"
+        >
+          <div class="container">
+            <dx-html-editor [value]="lessonData?.description" readOnly="true">
+              <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+            </dx-html-editor>
+          </div>
+        </dx-scroll-view>
+      </div>
+      <!-- <div class="flash-card">
+        <div class="front-container">
+          <div class="front-text">Front Text</div>
+          <dx-html-editor
+            [value]="lesson?.frontText"
+            [height]="'90%'"
+            [width]="'100%'"
+            readOnly="true"
+          >
+            <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+          </dx-html-editor>
+        </div>
+        <div class="back-container">
+          <div class="back-text">Back Text</div>
+          <dx-html-editor
+            [value]="lesson?.backText"
+            [height]="'90%'"
+            [width]="'100%'"
+            readOnly="true"
+          >
+            <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+          </dx-html-editor>
+        </div>
+      </div> -->
+    </div>
+  </div>
+</dx-popup>

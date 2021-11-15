@@ -199,7 +199,7 @@ export class EditCurriculumListComponent implements OnInit, OnDestroy {
         );
       } else {
         //return to pure editor mode
-        this.store.showNotif('SEARCH MODE OFF', 'custom');
+        //
         this.onRefresh();
       }
     }, 1250);
@@ -223,7 +223,7 @@ export class EditCurriculumListComponent implements OnInit, OnDestroy {
       );
     } else {
       //return to pure editor mode
-      this.store.showNotif('SORT MODE OFF', 'custom');
+      //
       this.onRefresh();
     }
   }
@@ -242,7 +242,7 @@ export class EditCurriculumListComponent implements OnInit, OnDestroy {
         this.pageSize
       );
     } else {
-      this.store.showNotif('FILTER MODE OFF', 'custom');
+      //
       this.onRefresh();
     }
   }

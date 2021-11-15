@@ -234,7 +234,7 @@ export class QuestionStore extends StateService<QuestionState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
+    //;
     this.questionService
       .filterQuestionByProperty(property, value, page, size)
       .toPromise()
@@ -293,7 +293,7 @@ export class QuestionStore extends StateService<QuestionState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.questionService
       .searchQuestionByProperty(property, value, page, size)
       .toPromise()
@@ -318,7 +318,7 @@ export class QuestionStore extends StateService<QuestionState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.questionService
       .searchQuestionByProperty(property, value, page, size)
       .toPromise()
@@ -347,7 +347,7 @@ export class QuestionStore extends StateService<QuestionState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.questionService
       .filterSearchQuestionByProperty(
         filterProperty,
@@ -381,7 +381,7 @@ export class QuestionStore extends StateService<QuestionState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.questionService
       .sortQuestionByProperty(value, order, page, size)
       .toPromise()
@@ -406,7 +406,7 @@ export class QuestionStore extends StateService<QuestionState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.questionService
       .sortQuestionByProperty(value, order, page, size)
       .toPromise()

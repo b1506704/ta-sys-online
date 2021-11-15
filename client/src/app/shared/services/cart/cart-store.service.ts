@@ -147,7 +147,7 @@ export class CartStore extends StateService<CartState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
+    //;
     this.cartService
       .filterCartByProperty(property, value, page, size)
       .toPromise()
@@ -172,7 +172,7 @@ export class CartStore extends StateService<CartState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
+    //;
     this.cartService
       .filterCartByProperty(property, value, page, size)
       .toPromise()
@@ -194,7 +194,7 @@ export class CartStore extends StateService<CartState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.cartService
       .searchCartByProperty(property, value, page, size)
       .toPromise()
@@ -219,7 +219,7 @@ export class CartStore extends StateService<CartState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.cartService
       .searchCartByProperty(property, value, page, size)
       .toPromise()
@@ -245,7 +245,7 @@ export class CartStore extends StateService<CartState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.cartService
       .sortCartByProperty(value, order, page, size)
       .toPromise()
@@ -270,7 +270,7 @@ export class CartStore extends StateService<CartState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.cartService
       .sortCartByProperty(value, order, page, size)
       .toPromise()

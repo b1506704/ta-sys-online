@@ -237,7 +237,7 @@ export class CommentStore extends StateService<CommentState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
+    //;
     this.commentService
       .filterCommentByProperty(property, value, page, size)
       .toPromise()
@@ -273,7 +273,7 @@ export class CommentStore extends StateService<CommentState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.commentService
       .searchCommentByProperty(property, value, page, size)
       .toPromise()
@@ -298,7 +298,7 @@ export class CommentStore extends StateService<CommentState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.commentService
       .searchCommentByProperty(property, value, page, size)
       .toPromise()
@@ -327,7 +327,7 @@ export class CommentStore extends StateService<CommentState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.commentService
       .sortCommentByProperty(value, order, page, size)
       .toPromise()
@@ -352,7 +352,7 @@ export class CommentStore extends StateService<CommentState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.commentService
       .sortCommentByProperty(value, order, page, size)
       .toPromise()

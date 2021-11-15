@@ -55,7 +55,7 @@
             type="outline"
             text="Detail"
             hint="Click to see course detail"
-            (onClick)="selectCourse(item?.id)"
+            (onClick)="selectCourse(item)"
           ></dx-button>
         </div>
       </div>
@@ -69,20 +69,3 @@
   (onClick)="scrollTop()"
 >
 </dx-speed-dial-action>
-<dx-popup
-  [(visible)]="isDetailPopupVisible"
-  [height]="'80%'"
-  [width]="'80%'"
-  [showTitle]="true"
-  [shading]="true"
-  [title]="'Course Detail'"
-  [dragEnabled]="true"
-  [closeOnOutsideClick]="false"
-  [showCloseButton]="true"
->
-  <div *dxTemplate="let data of 'content'">
-    <ng-container *ngIf="currentCourseID">
-      <app-course-detail [courseID]="currentCourseID"> </app-course-detail>
-    </ng-container>
-  </div>
-</dx-popup>

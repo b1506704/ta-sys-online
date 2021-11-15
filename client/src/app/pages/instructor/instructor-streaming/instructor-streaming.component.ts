@@ -192,8 +192,8 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     return this.fileStore.$fileList.subscribe((data: any) => {
       if (data.length !== 0) {
         this.fileList = data;
-        // console.log('IMAGE LIST OF DOCTOR');
-        // console.log(this.fileList);
+        // //
+        // //
       }
     });
   }

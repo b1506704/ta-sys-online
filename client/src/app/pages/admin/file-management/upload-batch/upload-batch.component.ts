@@ -83,7 +83,7 @@ export class UploadBatchComponent implements OnInit, OnDestroy, OnChanges {
       this.fileList[i].data = base64Url.split(',')[1];
     }
     console.log(this.imageList);
-    console.log(this.fileList);
+    //
   }
 
   handleReaderLoaded(e: any) {

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LearnerClassroomRoutingModule } from './learner-classroom-routing.module';
-import { LearnerClassroomComponent } from './learner-classroom.component';
+import { LearnerClassroomRoutingModule } from './Learner-classroom-routing.module';
+import { LearnerClassroomComponent } from './Learner-classroom.component';
 import {
   DxButtonModule,
   DxFormModule,

@@ -144,7 +144,7 @@ export class InstructorListComponent implements OnInit, OnDestroy {
         );
       } else {
         //return to pure editor mode
-        this.store.showNotif('SEARCH MODE OFF', 'custom');
+        //
         this.onRefresh();
       }
     }, 1250);
@@ -170,7 +170,7 @@ export class InstructorListComponent implements OnInit, OnDestroy {
       );
     } else {
       //return to pure editor mode
-      this.store.showNotif('SORT MODE OFF', 'custom');
+      //
       this.onRefresh();
     }
   }
@@ -265,8 +265,8 @@ export class InstructorListComponent implements OnInit, OnDestroy {
     return this.fileStore.$fileList.subscribe((data: any) => {
       if (data.length !== 0) {
         this.fileList = data;
-        console.log('IMAGE LIST OF DOCTOR');
-        console.log(this.fileList);
+        //
+        //
       }
     });
   }

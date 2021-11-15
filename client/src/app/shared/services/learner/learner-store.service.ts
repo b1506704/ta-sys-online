@@ -248,7 +248,7 @@ export class LearnerStore extends StateService<LearnerState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
+    //;
     this.learnerService
       .filterLearnerByProperty(property, value, page, size)
       .toPromise()
@@ -273,7 +273,7 @@ export class LearnerStore extends StateService<LearnerState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Filtered Mode On', 'custom');
+    //;
     this.learnerService
       .filterLearnerByProperty(property, value, page, size)
       .toPromise()
@@ -296,7 +296,7 @@ export class LearnerStore extends StateService<LearnerState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.learnerService
       .searchLearnerByProperty(property, value, page, size)
       .toPromise()
@@ -323,7 +323,7 @@ export class LearnerStore extends StateService<LearnerState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Searched Mode On', 'custom');
+    //
     this.userService
       .filterSearchUserByProperty(
         filterProperty,
@@ -357,7 +357,7 @@ export class LearnerStore extends StateService<LearnerState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.learnerService
       .sortLearnerByProperty(value, order, page, size)
       .toPromise()
@@ -384,7 +384,7 @@ export class LearnerStore extends StateService<LearnerState> {
     page: number,
     size: number
   ) {
-    this.store.showNotif('Sort Mode On', 'custom');
+    //
     this.userService
       .filterSortUserByProperty(
         filterProperty,

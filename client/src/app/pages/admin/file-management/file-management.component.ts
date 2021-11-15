@@ -515,7 +515,7 @@ export class FileManagementComponent implements OnInit {
       if (data.length !== 0) {
         this.fileList = data;
         console.log('FILE LIST OF FILE MANAGEMENT');
-        console.log(this.fileList);
+        //
       }
     });
   }

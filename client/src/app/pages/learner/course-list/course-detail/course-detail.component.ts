@@ -5,6 +5,9 @@ import { File } from 'src/app/shared/models/file';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
 import { CartStore } from 'src/app/shared/services/cart/cart-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
+import { User } from 'src/app/shared/models/user';
+import { UserInfo } from 'src/app/shared/models/userinfo';
+import { UserInfoStore } from 'src/app/shared/services/user-info/user-info-store.service';
 @Component({
   selector: 'app-course-detail',
   templateUrl: 'course-detail.component.html',
@@ -15,6 +18,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy, OnChanges {
   courseData!: Course;
   fieldList: Array<Object> = [];
   userId!: string;
+  instructorData: UserInfo;
   currency: string = '$';
   fileData: File = {
     sourceID: '',
@@ -30,6 +34,8 @@ export class CourseDetailComponent implements OnInit, OnDestroy, OnChanges {
   isLogin: boolean;
   constructor(
     private courseStore: CourseStore,
+
+    private userStore: UserInfoStore,
     private fileStore: FileStore,
     private store: StoreService,
     private cartStore: CartStore
@@ -38,6 +44,16 @@ export class CourseDetailComponent implements OnInit, OnDestroy, OnChanges {
   courseDataListener() {
     return this.courseStore.$courseInstance.subscribe((data: any) => {
       this.courseData = data;
+      this.userStore.getUserInfo(this.courseData.instructorId);
+      this.instructorDataListener();
+    });
+  }
+
+  instructorDataListener() {
+    return this.userStore.$userInfoInstance.subscribe((data: any) => {
+      if (data) {
+        this.instructorData = data;
+      }
     });
   }
 
@@ -89,5 +105,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnDestroy(): void {
     this.courseDataListener().unsubscribe();
+    this.instructorDataListener().unsubscribe();
   }
 }

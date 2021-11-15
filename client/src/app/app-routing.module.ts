@@ -32,6 +32,20 @@ const routes: Routes = [
         (m) => m.CourseListModule
       ),
   },
+  {
+    path: 'learner_classroom',
+    loadChildren: () =>
+      import('./pages/learner/learner-classroom/learner-classroom.module').then(
+        (m) => m.LearnerClassroomModule
+      ),
+  },
+  {
+    path: 'course_learner_streaming',
+    loadChildren: () =>
+      import(
+        './pages/learner/learner-classroom/learner-streaming/learner-streaming.module'
+      ).then((m) => m.LearnerStreamingModule),
+  },
   // instructor route
   {
     path: 'instructor_home',

@@ -1,0 +1,110 @@
+<dx-toolbar
+  [ngStyle]="{
+    paddingLeft: '25px',
+    marginBottom: '5px'
+  }"
+>
+  <dxi-item
+    [location]="'before'"
+    [text]="'Test'"
+    style="padding-right: 15px; margin-right: 15px"
+  >
+  </dxi-item>
+  <dxi-item widget="dxTextBox" [options]="searchBoxOptions" location="before">
+  </dxi-item>
+  <dxi-item
+    widget="dxButton"
+    [options]="refreshButtonOptions"
+    location="after"
+    [locateInMenu]="'auto'"
+  >
+  </dxi-item>
+  <dxi-item [locateInMenu]="'auto'" [location]="'after'">
+    <dx-button icon="event" type="normal" [disabled]="true"> </dx-button>
+  </dxi-item>
+  <dxi-item
+    widget="dxSelectBox"
+    [options]="sortSelectBoxOptions"
+    location="after"
+    [locateInMenu]="'auto'"
+  >
+  </dxi-item>
+</dx-toolbar>
+<dx-scroll-view
+  [direction]="'vertical'"
+  [showScrollbar]="true"
+  [scrollByContent]="true"
+  [scrollByThumb]="true"
+  [width]="'100%'"
+  [height]="'73vh'"
+  (onPullDown)="updateTopContent($event)"
+  (onReachBottom)="updateBottomContent($event)"
+  [bounceEnabled]="false"
+>
+  <ng-container *ngIf="testList.length">
+    <div class="card-container">
+      <div class="card" *ngFor="let item of testList">
+        <div class="card-header">
+          <div class="avatar">
+            <img
+              [src]="mapFileListToUrl(item?.id)"
+              alt="..."
+              style="height: 50px; width: 50px; border-radius: 50px"
+            />
+            <div class="user-name">{{ item?.allocatedTime }} minutes</div>
+            <div class="test-date">
+              {{ item?.deadline | date: "dd/MM, hh:mm aa" }}
+            </div>
+          </div>
+          <div class="card-title">{{ item?.name }}</div>
+          <div class="test-util">
+            <div class="button-group">
+              <dx-button
+                icon="like"
+                type="danger"
+                hint="Click to take test"
+                (onClick)="takeTest(item)"
+              ></dx-button>
+              <div class="like-count">-</div>
+              <dx-button
+                icon="fullscreen"
+                type="normal"
+                hint="Click to see test detail"
+                (onClick)="showDetail(item)"
+              ></dx-button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="test-content">
+            <dx-scroll-view
+              [showScrollbar]="true"
+              [scrollByContent]="true"
+              [scrollByThumb]="true"
+              [height]="300"
+            >
+              <dx-html-editor readOnly="true" [value]="item?.description">
+                <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+              </dx-html-editor>
+            </dx-scroll-view>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</dx-scroll-view>
+
+<ng-container *ngIf="currentSelectedTest">
+  <app-test-detail
+    [closeDetailPopup]="closeDetailPopup"
+    [test]="currentSelectedTest"
+    [isVisible]="isDetailPopupVisible"
+  ></app-test-detail>
+</ng-container>
+<dx-speed-dial-action
+  icon="arrowup"
+  label=""
+  [index]="1"
+  (onClick)="scrollTop()"
+>
+</dx-speed-dial-action>
