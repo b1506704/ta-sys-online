@@ -16,7 +16,7 @@ import { UserInfoStore } from 'src/app/shared/services/user-info/user-info-store
 export class CourseDetailComponent implements OnInit, OnDestroy, OnChanges {
   @Input() courseID!: string;
   courseData!: Course;
-  fieldList: Array<Object> = [];
+  //
   userId!: string;
   instructorData: UserInfo;
   currency: string = '$';

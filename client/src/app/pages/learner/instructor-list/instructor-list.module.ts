@@ -9,6 +9,7 @@ import {
   DxSpeedDialActionModule,
   DxPopupModule,
   DxFormModule,
+  DxHtmlEditorModule,
 } from 'devextreme-angular';
 import { InstructorDetailComponent } from './instructor-detail/instructor-detail.component';
 
@@ -19,9 +20,10 @@ import { InstructorDetailComponent } from './instructor-detail/instructor-detail
     DxScrollViewModule,
     DxToolbarModule,
     DxButtonModule,
+    DxHtmlEditorModule,
     DxSpeedDialActionModule,
     DxPopupModule,
-    DxFormModule
+    DxFormModule,
   ],
   declarations: [InstructorListComponent, InstructorDetailComponent],
 })

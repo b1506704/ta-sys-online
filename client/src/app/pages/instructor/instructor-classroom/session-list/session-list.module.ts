@@ -10,8 +10,11 @@ import {
   DxPopupModule,
   DxFormModule,
   DxSelectBoxModule,
+  DxDateBoxModule,
 } from 'devextreme-angular';
 import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module';
+import { EditSessionComponent } from './edit-session/edit-session.component';
+import { UploadSessionComponent } from './upload-session/upload-session.component';
 
 @NgModule({
   imports: [
@@ -23,9 +26,14 @@ import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module
     DxSpeedDialActionModule,
     DxPopupModule,
     DxFormModule,
+    DxDateBoxModule,
     DxSelectBoxModule,
     FormatCurrencyModule,
   ],
-  declarations: [SessionListComponent],
+  declarations: [
+    SessionListComponent,
+    EditSessionComponent,
+    UploadSessionComponent,
+  ],
 })
 export class SessionListModule {}

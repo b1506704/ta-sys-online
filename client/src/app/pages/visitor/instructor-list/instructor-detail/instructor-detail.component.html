@@ -17,20 +17,6 @@
             </div>
           </div>
         </dxi-item>
-        <dxi-item name="gender">
-          <dxo-label text="Gender"></dxo-label>
-          <div *dxTemplate>
-            <div class="responsive-field">
-              {{
-                instructorData?.gender === "0"
-                  ? "Male"
-                  : instructorData?.gender === "1"
-                  ? "Female"
-                  : "Not mentioned"
-              }}
-            </div>
-          </div>
-        </dxi-item>
         <dxi-item name="dateOfBirth">
           <dxo-label text="Birthdate"></dxo-label>
           <div *dxTemplate>
@@ -55,11 +41,21 @@
             </div>
           </div>
         </dxi-item>
+        <dxi-item name="email">
+          <dxo-label text="Email"></dxo-label>
+          <div *dxTemplate>
+            <div class="responsive-field">
+              {{ instructorData?.email }}
+            </div>
+          </div>
+        </dxi-item>
         <dxi-item name="bio">
           <dxo-label text="Biography"></dxo-label>
           <div *dxTemplate>
             <div class="responsive-field">
-              {{ instructorData?.bio }}
+              <dx-html-editor readOnly="true" [value]="instructorData?.bio">
+                <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+              </dx-html-editor>
             </div>
           </div>
         </dxi-item>

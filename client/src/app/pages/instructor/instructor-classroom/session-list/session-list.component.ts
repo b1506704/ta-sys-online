@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Session } from 'src/app/shared/models/session';
 import { SessionStore } from 'src/app/shared/services/session/session-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
@@ -7,8 +7,8 @@ import { DxScrollViewComponent } from 'devextreme-angular';
 import { File } from 'src/app/shared/models/file';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
 import { Subject } from 'src/app/shared/models/subject';
-import { SubjectHttpService } from 'src/app/shared/services/subject/subject-http.service';
 import { Course } from 'src/app/shared/models/course';
+import { SessionHttpService } from 'src/app/shared/services/session/session-http.service';
 
 @Component({
   selector: 'app-session-list',
@@ -31,6 +31,10 @@ export class SessionListComponent implements OnInit, OnDestroy {
   isSortingByName: boolean;
   isSortingByPrice: boolean;
   isDetailPopupVisible: boolean = false;
+
+  isUpdatePopupVisible: boolean = false;
+
+  isUploadPopupVisible: boolean = false;
 
   currentCategoryFilterValue: string;
   timeout: any;
@@ -56,6 +60,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
 
   constructor(
     private sessionStore: SessionStore,
+    private sessionHTTP: SessionHttpService,
     private store: StoreService,
     private router: Router,
     private fileStore: FileStore
@@ -70,11 +75,39 @@ export class SessionListComponent implements OnInit, OnDestroy {
     });
   }
 
+  uploadPost() {
+    this.isUploadPopupVisible = true;
+  }
+
   selectSession(session: Session) {
     this.store.setCurrentSession(session);
     this.router.navigate(['course_streaming']);
     console.log('Selected session:');
     console.log(session);
+  }
+
+  uploadSession() {
+    this.isUploadPopupVisible = true;
+  }
+
+  deleteSession(session: Session) {
+    this.sessionStore.confirmDialog('').then((confirm: boolean) => {
+      if (confirm) {
+        this.store.setIsLoading(true);
+        this.sessionHTTP.deleteSession([session.id]).subscribe((data: any) => {
+          this.initData();
+          this.store.showNotif(`${data.responseMessage}`, 'custom');
+          this.store.setIsLoading(false);
+        });
+      }
+    });
+  }
+
+  editSession(_id: string) {
+    this.currentSessionID = _id;
+    console.log('SELECTED ID');
+    console.log(_id);
+    this.isUpdatePopupVisible = true;
   }
 
   updateContent = (args: any, eventName: any) => {

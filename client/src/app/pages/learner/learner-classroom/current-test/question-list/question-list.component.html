@@ -1,0 +1,13 @@
+<ng-container *ngIf="questionList.length">
+  <div class="question-body" *ngFor="let item of questionList; index as i">
+    <div class="question-content">
+      <div class="question-number">{{ i + 1 }}</div>
+      <dx-html-editor readOnly="true" [value]="item?.content" [width]="'100%'">
+        <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+      </dx-html-editor>
+    </div>
+    <div class="answer-container">
+      <app-answer-list [questionId]="item?.id"></app-answer-list>
+    </div>
+  </div>
+</ng-container>

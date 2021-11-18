@@ -16,7 +16,7 @@ import { Course } from 'src/app/shared/models/course';
 export class PostListComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   scrollView: DxScrollViewComponent;
-  postList!: Array<Post>;
+  postList: Array<Post> = [];
   currentPostID!: string;
   currentUpdatedPost!: Post;
   currentSelectedPost!: Post;

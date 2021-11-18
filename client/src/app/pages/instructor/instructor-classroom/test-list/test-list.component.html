@@ -45,7 +45,7 @@
   (onReachBottom)="updateBottomContent($event)"
   [bounceEnabled]="false"
 >
-  <ng-container *ngIf="testList.length">
+  <ng-container *ngIf="testList?.length">
     <div class="card-container">
       <div class="card" *ngFor="let item of testList">
         <div class="card-header">

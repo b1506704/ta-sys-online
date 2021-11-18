@@ -109,6 +109,15 @@ export class CourseListComponent implements OnInit, OnDestroy {
     this.isDetailPopupVisible = true;
   }
 
+  getMetaData() {
+    return this.store.$currentCourse.subscribe((data: Course) => {
+      if (data) {
+        this.currentFilterByPropertyValue = data.id;
+        this.initData();
+      }
+    });
+  }
+
   updateContent = (args: any, eventName: any) => {
     const editorMode = this.checkEditorMode();
     const currentIndex = this.currentIndexFromServer;
@@ -126,7 +135,6 @@ export class CourseListComponent implements OnInit, OnDestroy {
             this.paginateSearchData(currentIndex + 1);
             break;
           case 'SORT':
-            this.paginateSortData(currentIndex + 1);
             break;
           default:
             break;
@@ -220,7 +228,12 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   paginatePureData(index: number) {
-    this.courseStore.loadInfiniteDataAsync(index, this.pageSize);
+    this.courseStore.filterInfiniteCourseByProperty(
+      this.currentFilterProperty,
+      this.currentFilterByPropertyValue,
+      index,
+      this.pageSize
+    );
   }
 
   paginateFilterData(index: number) {
@@ -233,29 +246,25 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   paginateSearchData(index: number) {
-    this.courseStore.searchInfiniteCourseByProperty(
+    this.courseStore.filterSearchInfiniteCourseByProperty(
+      this.currentFilterProperty,
+      this.currentFilterByPropertyValue,
       this.currentSearchProperty,
       this.currentSearchByPropertyValue,
       index,
       this.pageSize
     );
   }
-
-  paginateSortData(index: number) {
-    this.courseStore.sortInfiniteCourseByProperty(
-      this.currentSortProperty,
-      this.currentSortByPropertyValue,
-      index,
-      this.pageSize
-    );
-  }
-
   onRefresh() {
     this.isFilteringByCategory = false;
     this.isSearchingByName = false;
     this.isSortingByPrice = false;
-    this.courseStore.initInfiniteData(1, this.pageSize);
-    // this.subjectStore.fetchAll();
+    this.courseStore.initInfiniteFilterByPropertyData(
+      this.currentFilterProperty,
+      this.currentFilterByPropertyValue,
+      1,
+      this.pageSize
+    );
   }
 
   navigateToSubject() {
@@ -303,26 +312,23 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   initData() {
-    this.courseStore.initInfiniteData(1, this.pageSize).then(() => {
-      this.sourceDataListener();
-      this.fileDataListener();
-    });
-  }
-
-  filterDataListener() {
-    return this.subjectHTTP.fetchAll().subscribe((data: any) => {
-      this.subjectList = data;
-      console.log(this.subjectList);
-    });
+    this.courseStore.initInfiniteFilterByPropertyData(
+      this.currentFilterProperty,
+      this.currentFilterByPropertyValue,
+      1,
+      this.pageSize
+    );
+    this.sourceDataListener();
+    this.fileDataListener();
   }
 
   ngOnInit(): void {
-    this.filterDataListener();
-    this.initData();
+    this.getMetaData();
     this.currentPageListener();
   }
 
   ngOnDestroy(): void {
+    this.getMetaData().unsubscribe();
     this.sourceDataListener().unsubscribe();
     this.currentPageListener().unsubscribe();
     this.fileDataListener().unsubscribe();

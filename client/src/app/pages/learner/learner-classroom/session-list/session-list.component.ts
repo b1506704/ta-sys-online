@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Session } from 'src/app/shared/models/session';
 import { SessionStore } from 'src/app/shared/services/session/session-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
@@ -7,7 +7,6 @@ import { DxScrollViewComponent } from 'devextreme-angular';
 import { File } from 'src/app/shared/models/file';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
 import { Subject } from 'src/app/shared/models/subject';
-import { SubjectHttpService } from 'src/app/shared/services/subject/subject-http.service';
 import { Course } from 'src/app/shared/models/course';
 
 @Component({

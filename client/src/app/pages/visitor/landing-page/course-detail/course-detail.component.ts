@@ -15,7 +15,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy, OnChanges {
   @Input() courseID!: string;
   courseData!: Course;
   instructorData!: User;
-  fieldList: Array<Object> = [];
+  //
   currency: string = '$';
   fileData: File = {
     sourceID: '',

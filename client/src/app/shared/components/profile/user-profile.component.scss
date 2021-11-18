@@ -6,9 +6,11 @@
   margin-top: 20px;
 }
 ::ng-deep .signupForm {
-  background-color: transparent;
   box-shadow: $box-shadow;
   padding-left: 15px;
+  background-color: rgba(59, 21, 65, 0.486);
+  border-radius: 10px;
+  border: 2px solid rgb(165, 173, 243);
   width: 70%;
   padding-right: 15px;
 }
@@ -76,4 +78,8 @@
 }
 .img-input:active::before {
   background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
+}
+
+.responsive-field {
+  width: 100%;
 }

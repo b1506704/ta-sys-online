@@ -1,0 +1,89 @@
+<div
+  style="
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    font-size: large;
+    font-weight: bold;
+  "
+  *ngIf="!testData"
+>
+  There is no active test at the moment. Please select one at test list menu to
+  begin test.
+</div>
+<div *ngIf="testData">
+  <dx-toolbar
+    [ngStyle]="{
+      paddingLeft: '25px',
+      marginBottom: '5px'
+    }"
+  >
+    <dxi-item
+      [location]="'before'"
+      [text]="testData?.name"
+      style="margin-right: 15px"
+    >
+    </dxi-item>
+    <dxi-item
+      [location]="'center'"
+      [text]="'Timeleft: ' + testData?.allocatedTime + 'minutes'"
+      style="margin-right: 15px"
+    >
+    </dxi-item>
+  </dx-toolbar>
+  <div class="test-container">
+    <div class="question-list-container">
+      <dx-scroll-view
+        [direction]="'vertical'"
+        [showScrollbar]="true"
+        [scrollByContent]="true"
+        [scrollByThumb]="true"
+        [width]="'100%'"
+        [height]="'80vh'"
+        [bounceEnabled]="false"
+      >
+        <ng-container *ngIf="testData">
+          <app-question-list
+            [currentPage]="currentPage"
+            [testId]="testData.id"
+            [pageSize]="pageSize"
+          ></app-question-list>
+        </ng-container>
+      </dx-scroll-view>
+    </div>
+    <div class="question-panel">
+      <div class="question-control">
+        0{{ saveQuestions?.length }} / {{ testData?.totalQuestions }}
+      </div>
+      <div class="total-question">
+        0{{ saveQuestions?.length }} / {{ testData?.totalQuestions }}
+      </div>
+      <dx-scroll-view
+        [direction]="'vertical'"
+        [showScrollbar]="true"
+        [scrollByContent]="true"
+        [scrollByThumb]="true"
+        [width]="'100%'"
+        [height]="300"
+        [bounceEnabled]="false"
+      >
+        <ng-container *ngIf="totalPages?.length">
+          <div class="question-page-container">
+            <div class="question-button" *ngFor="let item of totalPages">
+              <dx-button (onClick)="selectPage(item)">{{ item }}</dx-button>
+            </div>
+          </div>
+        </ng-container>
+      </dx-scroll-view>
+    </div>
+  </div>
+  <dx-speed-dial-action
+    icon="arrowup"
+    label=""
+    [index]="1"
+    (onClick)="scrollTop()"
+  >
+  </dx-speed-dial-action>
+</div>

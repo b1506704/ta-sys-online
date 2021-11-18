@@ -7,12 +7,12 @@
   <dxi-item [location]="'before'" [text]="'Cart List'"> </dxi-item>
   <dxi-item [location]="'before'">
     <div style="font-size: medium; font-weight: bold; padding: 5px">
-      | Total Cost: {{ cartList.totalCost | formatCurrency: "$" }} |
+      | Total Cost: {{ cartList?.totalCost | formatCurrency: "$" }} |
     </div>
   </dxi-item>
   <dxi-item [location]="'before'">
     <div style="font-size: medium; font-weight: bold; padding: 5px">
-      | Total Courses: {{ cartList.totalCourse }} |
+      | Total Courses: {{ cartList?.totalCourse }} |
     </div>
   </dxi-item>
   <dxi-item location="center" locateInMenu="auto">
@@ -30,16 +30,6 @@
     >
     </dx-button>
   </dxi-item>
-  <dxi-item location="after" locateInMenu="auto">
-    <dx-button
-      icon="arrowright"
-      type="outline"
-      text="To Classroom"
-      hint="Navigate to purchased courses"
-      (onClick)="navigateToClassroom()"
-    >
-    </dx-button>
-  </dxi-item>
 </dx-toolbar>
 <dx-scroll-view
   [direction]="'vertical'"
@@ -50,7 +40,7 @@
   [width]="'100%'"
   [bounceEnabled]="false"
 >
-  <ng-container *ngIf="cartList.courses?.length">
+  <ng-container *ngIf="cartList?.courses?.length">
     <div class="card-container">
       <div class="card" *ngFor="let item of cartList.courses">
         <div class="card-title">{{ item?.name }}</div>
@@ -85,7 +75,7 @@
       </div>
     </div>
   </ng-container>
-  <ng-container *ngIf="cartList.courses?.length === 0">
+  <ng-container *ngIf="cartList?.courses?.length === 0">
     <div style="width: 100%; text-align: center; margin: 25px">
       No item in cart
     </div>

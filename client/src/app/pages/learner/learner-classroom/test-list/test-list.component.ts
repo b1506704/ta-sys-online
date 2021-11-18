@@ -6,6 +6,7 @@ import { DxScrollViewComponent } from 'devextreme-angular';
 import { File } from 'src/app/shared/models/file';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
 import { Course } from 'src/app/shared/models/course';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-test-list',
@@ -85,12 +86,18 @@ export class TestListComponent implements OnInit, OnDestroy {
   constructor(
     private testStore: TestStore,
     private store: StoreService,
+    private router: Router,
     private fileStore: FileStore
   ) {}
 
   showDetail(test: Test) {
     this.currentSelectedTest = test;
     this.isDetailPopupVisible = true;
+  }
+
+  takeTest(test: Test) {
+    this.store.setCurrentTest(test);
+    this.router.navigate(['learner_do_test']);
   }
 
   closeDetailPopup = () => {

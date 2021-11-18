@@ -1,0 +1,14 @@
+<ng-container *ngIf="answerList.length">
+  <div class="answer-body" *ngFor="let item of answerList; index as i">
+    <div class="answer-content">
+      <div class="answer-number">{{ i + 1 }}</div>
+      <dx-html-editor readOnly="true" [value]="item?.content" [width]="'100%'">
+        <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+      </dx-html-editor>
+      <div class="button-group">
+        <dx-button [icon]="'isblank'"></dx-button>
+        <!-- <dx-button [icon]="'isnotblank'"></dx-button> -->
+      </div>
+    </div>
+  </div>
+</ng-container>

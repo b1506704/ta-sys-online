@@ -2,15 +2,21 @@ import { Injectable } from '@angular/core';
 import notify from 'devextreme/ui/notify';
 import { Observable } from 'rxjs';
 import { Course } from '../models/course';
+import { Question } from '../models/question';
 import { Session } from '../models/session';
+import { Subject } from '../models/subject';
+import { Test } from '../models/test';
 import { StateService } from './state.service';
 
 interface StoreState {
   currentUser: string;
   currentUserId: string;
   currentCourse: Course;
-
+  currentSubject: Subject;
   currentSession: Session;
+  currentTest: Test;
+
+  savedQuestions: Array<Question>;
   responseList: Array<Object>;
   responseEventType: string;
   responseProgress: number;
@@ -29,7 +35,10 @@ const initialState: StoreState = {
   currentUser: undefined,
   currentUserId: undefined,
   currentCourse: undefined,
+  currentSubject: undefined,
   currentSession: undefined,
+  currentTest: undefined,
+  savedQuestions: undefined,
   currentRoleId: undefined,
   currentRoleName: undefined,
   isLoading: false,
@@ -65,8 +74,18 @@ export class StoreService extends StateService<StoreState> {
     (state) => state.currentCourse
   );
 
+  $currentSubject: Observable<Subject> = this.select(
+    (state) => state.currentSubject
+  );
+
   $currentSession: Observable<Session> = this.select(
     (state) => state.currentSession
+  );
+
+  $currentTest: Observable<Test> = this.select((state) => state.currentTest);
+
+  $savedQuestions: Observable<Array<Question>> = this.select(
+    (state) => state.savedQuestions
   );
 
   $currentRoleId: Observable<string> = this.select(
@@ -138,8 +157,20 @@ export class StoreService extends StateService<StoreState> {
     this.setState({ currentCourse: course });
   }
 
+  setCurrentSubject(subject: Subject) {
+    this.setState({ currentSubject: subject });
+  }
+
   setCurrentSession(session: Session) {
     this.setState({ currentSession: session });
+  }
+
+  setCurrentTest(test: Test) {
+    this.setState({ currentTest: test });
+  }
+
+  setSavedQuestion(listQuestion: Array<Question>) {
+    this.setState({ savedQuestions: listQuestion });
   }
 
   setCurrentUserRoleId(id: string) {

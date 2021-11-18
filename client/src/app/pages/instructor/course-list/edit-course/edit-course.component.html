@@ -1,0 +1,163 @@
+<dx-scroll-view
+  [bounceEnabled]="true"
+  [scrollByContent]="true"
+  [scrollByThumb]="true"
+>
+  <form
+    id="course-form-container"
+    [classList]="['course-form']"
+    (submit)="onSubmit($event)"
+  >
+    <dx-form id="course-form" [formData]="courseData">
+      <dxi-item itemType="group" caption="Course Summary">
+        <dxi-item name="avatar">
+          <div *dxTemplate>
+            <div class="img-container">
+              <img [src]="fileData?.url" alt="..." />
+              <input
+                class="img-input"
+                type="file"
+                id="img"
+                accept="image/*"
+                (change)="handleInputChange($event)"
+              />
+            </div>
+          </div>
+        </dxi-item>
+        <dxi-item name="courseName">
+          <dxo-label text="Course Name"></dxo-label>
+          <div *dxTemplate>
+            <div class="responsive-field">
+              {{ courseData?.name }}
+            </div>
+          </div>
+        </dxi-item>
+        <dxi-item name="instructorName">
+          <dxo-label text="Instructor"></dxo-label>
+          <div *dxTemplate>
+            <div class="responsive-field">
+              {{ instructorData?.fullName }}
+            </div>
+          </div>
+        </dxi-item>
+        <dxi-item name="duration">
+          <dxo-label text="Duration"></dxo-label>
+          <div *dxTemplate>
+            <div class="responsive-field">
+              {{ courseData?.duration }} week(s)
+            </div>
+          </div>
+        </dxi-item>
+        <dxi-item name="cost">
+          <dxo-label text="Cost"></dxo-label>
+          <div *dxTemplate>
+            <div class="responsive-field">
+              {{ courseData?.cost | formatCurrency: currency }}
+            </div>
+          </div>
+        </dxi-item>
+        <dxi-item name="availableSlot">
+          <dxo-label text="Available Slot"></dxo-label>
+          <div *dxTemplate>
+            <div class="responsive-field">
+              {{ courseData?.availableSlot }}
+            </div>
+          </div>
+        </dxi-item>
+        <dxi-item name="maxSlot">
+          <dxo-label text="Max Slot"></dxo-label>
+          <div *dxTemplate>
+            <div class="responsive-field">
+              {{ courseData?.maxSlot }}
+            </div>
+          </div>
+        </dxi-item>
+        <dxi-item name="description">
+          <dxo-label text="Description"></dxo-label>
+          <div *dxTemplate>
+            <div style="width: 100%">
+              <dx-html-editor
+                [value]="courseData?.description"
+                (onValueChanged)="onEditorValueChanged($event)"
+              >
+                <dxo-toolbar [multiline]="isMultiline">
+                  <dxi-item name="undo"></dxi-item>
+                  <dxi-item name="redo"></dxi-item>
+                  <dxi-item name="separator"></dxi-item>
+                  <dxi-item
+                    name="size"
+                    [acceptedValues]="[
+                      '8pt',
+                      '10pt',
+                      '12pt',
+                      '14pt',
+                      '18pt',
+                      '24pt',
+                      '36pt'
+                    ]"
+                  ></dxi-item>
+                  <dxi-item
+                    name="font"
+                    [acceptedValues]="[
+                      'Arial',
+                      'Courier New',
+                      'Georgia',
+                      'Impact',
+                      'Lucida Console',
+                      'Tahoma',
+                      'Times New Roman',
+                      'Verdana'
+                    ]"
+                  ></dxi-item>
+                  <dxi-item name="separator"></dxi-item>
+                  <dxi-item name="bold"></dxi-item>
+                  <dxi-item name="italic"></dxi-item>
+                  <dxi-item name="strike"></dxi-item>
+                  <dxi-item name="underline"></dxi-item>
+                  <dxi-item name="separator"></dxi-item>
+                  <dxi-item name="alignLeft"></dxi-item>
+                  <dxi-item name="alignCenter"></dxi-item>
+                  <dxi-item name="alignRight"></dxi-item>
+                  <dxi-item name="alignJustify"></dxi-item>
+                  <dxi-item name="separator"></dxi-item>
+                  <dxi-item name="orderedList"></dxi-item>
+                  <dxi-item name="bulletList"></dxi-item>
+                  <dxi-item name="separator"></dxi-item>
+                  <dxi-item
+                    name="header"
+                    [acceptedValues]="[false, 1, 2, 3, 4, 5]"
+                  ></dxi-item>
+                  <dxi-item name="separator"></dxi-item>
+                  <dxi-item name="color"></dxi-item>
+                  <dxi-item name="background"></dxi-item>
+                  <dxi-item name="separator"></dxi-item>
+                  <dxi-item name="link"></dxi-item>
+                  <dxi-item name="image"></dxi-item>
+                  <dxi-item name="separator"></dxi-item>
+                  <dxi-item name="clear"></dxi-item>
+                  <dxi-item name="codeBlock"></dxi-item>
+                  <dxi-item name="blockquote"></dxi-item>
+                </dxo-toolbar>
+                <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+              </dx-html-editor>
+            </div>
+          </div>
+        </dxi-item>
+      </dxi-item>
+      <dxi-item itemType="group" [colCount]="2" [cssClass]="'buttonGroup'">
+        <dxi-item
+          itemType="button"
+          horizontalAlignment="center"
+          [buttonOptions]="submitButtonOptions"
+        >
+        </dxi-item>
+        <dxi-item
+          itemType="button"
+          horizontalAlignment="center"
+          [buttonOptions]="resetButtonOptions"
+        >
+        </dxi-item>
+      </dxi-item>
+    </dx-form>
+  </form>
+</dx-scroll-view>

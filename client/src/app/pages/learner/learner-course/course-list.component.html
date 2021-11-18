@@ -12,16 +12,6 @@
     [locateInMenu]="'auto'"
   >
   </dxi-item>
-  <dxi-item location="after" locateInMenu="auto">
-    <dx-button
-      icon="arrowright"
-      type="outline"
-      text="To Subject"
-      hint="Navigate to schedule list "
-      (onClick)="navigateToScheduleList()"
-    >
-    </dx-button>
-  </dxi-item>
 </dx-toolbar>
 <dx-scroll-view
   [direction]="'vertical'"
@@ -38,9 +28,9 @@
       <div class="card" *ngFor="let item of courseList">
         <div class="card-title">{{ item?.name }}</div>
         <div class="card-body">
-          <div class="card-text">
+          <!-- <div class="card-text">
             Price: {{ item?.cost | formatCurrency: currency }}
-          </div>
+          </div> -->
         </div>
         <div class="card-img">
           <img
@@ -53,8 +43,8 @@
           <dx-button
             icon="arrowright"
             type="outline"
-            text="Detail"
-            hint="Click to see course detail"
+            text="Enter"
+            hint="Click to enter classroom"
             (onClick)="selectCourse(item)"
           ></dx-button>
         </div>

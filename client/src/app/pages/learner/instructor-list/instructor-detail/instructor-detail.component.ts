@@ -13,7 +13,7 @@ import { FileStore } from 'src/app/shared/services/file/file-store.service';
 export class InstructorDetailComponent implements OnInit, OnDestroy, OnChanges {
   @Input() instructorID!: string;
   instructorData!: UserInfo;
-  fieldList: Array<Object> = [];
+  //
   fileData: File = {
     sourceID: '',
     container: '',

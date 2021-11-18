@@ -1,0 +1,38 @@
+.answer-body {
+  width: 100%;
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 50px;
+  background-color: rgba(59, 21, 65, 0.486);
+  border: 2px solid rgb(165, 173, 243);
+}
+
+.answer-body .answer-content {
+  font-size: medium;
+  font-weight: bold;
+  display: flex;
+  width: 100%;
+  justify-content: stretch;
+  align-items: stretch;
+}
+
+.answer-number {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  background-color: rgb(132, 161, 241);
+  width: 80px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  background-color: rgb(132, 161, 241);
+  width: 80px;
+}

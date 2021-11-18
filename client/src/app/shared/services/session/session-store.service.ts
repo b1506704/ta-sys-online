@@ -263,6 +263,7 @@ export class SessionStore extends StateService<SessionState> {
         this.setState({
           sessionList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infinite filtered list');
         console.log(this.state.sessionList);
         this.setState({ totalItems: data.totalRecords });

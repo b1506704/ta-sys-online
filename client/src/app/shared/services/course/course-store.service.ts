@@ -687,9 +687,12 @@ export class CourseStore extends StateService<CourseState> {
       .filterCourseByProperty(property, value, page, size)
       .subscribe({
         next: (data: any) => {
-          this.setState({
-            courseList: this.state.courseList.concat(data),
-          });
+          if (data.data.length) {
+            this.setState({
+              courseList: this.state.courseList.concat(data.data),
+            });
+            this.fetchMediaBySourceID(data.data);
+          }
           this.fetchMediaBySourceID(data.data);
           console.log('Filtered list');
           console.log(this.state.courseList);

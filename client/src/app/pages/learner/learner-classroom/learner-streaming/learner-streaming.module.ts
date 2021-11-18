@@ -14,7 +14,6 @@ import {
   DxTextBoxModule,
   DxToolbarModule,
 } from 'devextreme-angular';
-import { ChatUserListModule } from 'src/app/shared/components/chat-user-list/chat-user-list.component';
 import { ChatMessageListComponent } from './chat-message-list/chat-message-list.component';
 import { DxiToolbarItemModule } from 'devextreme-angular/ui/nested';
 import { LessonListComponent } from './lesson-list/lesson-list.component';
@@ -26,7 +25,6 @@ import { TestListComponent } from './test-list/test-list.component';
     CommonModule,
     LearnerStreamingRoutingModule,
     DxButtonModule,
-    ChatUserListModule,
     DxScrollViewModule,
     DxListModule,
     DxFormModule,

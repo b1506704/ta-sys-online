@@ -10,11 +10,11 @@ export const navigationLearner = [
     items: [
       {
         text: 'Instructor',
-        path: '/instructor_list',
+        path: '/learner_instructor_list',
       },
       {
         text: 'Subject',
-        path: '/subject_list',
+        path: '/learner_subject_list',
       },
     ],
   },

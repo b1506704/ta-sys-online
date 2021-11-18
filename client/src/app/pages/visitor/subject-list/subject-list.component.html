@@ -15,16 +15,6 @@
   >
   </dxi-item>
   <dxi-item [locateInMenu]="'auto'" [location]="'after'">
-    <dx-button icon="filter" type="normal" [disabled]="true"> </dx-button>
-  </dxi-item>
-  <dxi-item
-    widget="dxSelectBox"
-    [locateInMenu]="'auto'"
-    [options]="filterSelectBoxOptions"
-    location="after"
-  >
-  </dxi-item>
-  <dxi-item [locateInMenu]="'auto'" [location]="'after'">
     <dx-button icon="group" type="normal" [disabled]="true"> </dx-button>
   </dxi-item>
   <dxi-item
@@ -33,16 +23,6 @@
     location="after"
     [locateInMenu]="'auto'"
   >
-  </dxi-item>
-  <dxi-item location="after" locateInMenu="auto">
-    <dx-button
-      icon="arrowright"
-      type="outline"
-      text="To Instructor"
-      hint="Navigate to instructor list "
-      (onClick)="navigateToInstructor()"
-    >
-    </dx-button>
   </dxi-item>
 </dx-toolbar>
 <dx-scroll-view
@@ -71,8 +51,8 @@
             icon="arrowright"
             type="outline"
             text="Detail"
-            hint="Click to see subject detail"
-            (onClick)="selectSubject(item?.id)"
+            hint="Click to see courses of this subject"
+            (onClick)="selectSubject(item)"
           ></dx-button>
         </div>
       </div>

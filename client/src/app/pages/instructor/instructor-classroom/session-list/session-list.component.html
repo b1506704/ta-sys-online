@@ -10,6 +10,14 @@
     style="padding-right: 15px; margin-right: 15px"
   >
   </dxi-item>
+  <dxi-item [locateInMenu]="'auto'" [location]="'after'">
+    <dx-button
+      icon="plus"
+      type="danger"
+      hint="Click to upload session"
+      (onClick)="uploadSession()"
+    ></dx-button>
+  </dxi-item>
   <dxi-item
     widget="dxButton"
     [options]="refreshButtonOptions"
@@ -62,12 +70,23 @@
             style="height: 100%; width: 100%"
           />
         </div>
-        <div>
+        <div class="button-group">
+          <dx-button
+            icon="edit"
+            type="outline"
+            hint="Click to edit session"
+            (onClick)="editSession(item?.id)"
+          ></dx-button>
+          <dx-button
+            icon="trash"
+            type="outline"
+            hint="Click to delete session"
+            (onClick)="deleteSession(item)"
+          ></dx-button>
           <dx-button
             icon="arrowright"
             type="outline"
-            text="Join"
-            hint="Click to see session detail"
+            hint="Click to join session"
             (onClick)="selectSession(item)"
           ></dx-button>
         </div>
@@ -75,6 +94,42 @@
     </div>
   </ng-container>
 </dx-scroll-view>
+<dx-popup
+  [(visible)]="isUploadPopupVisible"
+  [height]="'90%'"
+  [width]="'90%'"
+  [showTitle]="true"
+  [shading]="true"
+  [title]="'Upload Session'"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="false"
+  [showCloseButton]="true"
+>
+  <div *dxTemplate="let data of 'content'">
+    <ng-container *ngIf="currentFilterByPropertyValue">
+      <app-upload-session
+        [courseId]="currentFilterByPropertyValue"
+      ></app-upload-session>
+    </ng-container>
+  </div>
+</dx-popup>
+<dx-popup
+  [(visible)]="isUpdatePopupVisible"
+  [height]="'90%'"
+  [width]="'90%'"
+  [showTitle]="true"
+  [shading]="true"
+  [title]="'Edit Session'"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="false"
+  [showCloseButton]="true"
+>
+  <div *dxTemplate="let data of 'content'">
+    <ng-container *ngIf="currentSessionID">
+      <app-edit-session [sessionID]="currentSessionID"> </app-edit-session>
+    </ng-container>
+  </div>
+</dx-popup>
 <dx-speed-dial-action
   icon="arrowup"
   label=""

@@ -15,7 +15,7 @@ import { SubjectStore } from 'src/app/shared/services/subject/subject-store.serv
 export class SubjectListComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   scrollView: DxScrollViewComponent;
-  subjectList!: Array<Subject>;
+  subjectList: Array<Subject> = [];
   currentSubjectID!: string;
   pageSize: number = 10;
   pullDown = false;
@@ -33,10 +33,8 @@ export class SubjectListComponent implements OnInit, OnDestroy {
   currentFilterByPropertyValue: string;
   currentSearchByPropertyValue: string;
   currentSortByPropertyValue: string;
-  currentSortProperty: string = 'cost';
+  currentSortProperty: string = 'name';
   currentSearchProperty: string = 'name';
-  currentFilterProperty: string = 'subjectId';
-  currency: string = '$';
 
   searchBoxOptions: any = {
     valueChangeEvent: 'keyup',
@@ -52,14 +50,6 @@ export class SubjectListComponent implements OnInit, OnDestroy {
     icon: 'refresh',
     hint: 'Fetch data from server',
     onClick: this.onRefresh.bind(this),
-  };
-
-  filterSelectBoxOptions: any = {
-    items: this.subjectList,
-    valueExpr: 'name',
-    displayExpr: 'name',
-    placeholder: 'Filter with subject',
-    onValueChanged: this.onFilterChange.bind(this),
   };
 
   sortSelectBoxOptions: any = {
@@ -91,16 +81,16 @@ export class SubjectListComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: StoreService,
-    private subjectStore: SubjectStore,
     private router: Router,
+    private subjectStore: SubjectStore,
     private fileStore: FileStore
   ) {}
 
-  selectSubject(_id: string) {
-    this.currentSubjectID = _id;
-    console.log('SELECTED ID');
-    console.log(_id);
-    this.isDetailPopupVisible = true;
+  selectSubject(subject: Subject) {
+    this.store.setCurrentSubject(subject);
+    this.router.navigate(['visitor_course_list']);
+    console.log('Selected subject:');
+    console.log(subject);
   }
 
   updateContent = (args: any, eventName: any) => {
@@ -114,7 +104,6 @@ export class SubjectListComponent implements OnInit, OnDestroy {
             this.paginatePureData(currentIndex + 1);
             break;
           case 'FILTER':
-            this.paginateFilterData(currentIndex + 1);
             break;
           case 'SEARCH':
             this.paginateSearchData(currentIndex + 1);
@@ -181,26 +170,6 @@ export class SubjectListComponent implements OnInit, OnDestroy {
     }
   }
 
-  onFilterChange(e: any) {
-    this.isFilteringByCategory = true;
-    this.isSearchingByName = false;
-    this.isSortingByPrice = false;
-    this.currentCategoryFilterValue = e.value;
-    console.log(e.value);
-    if (e.value !== '(NONE)') {
-      this.subjectStore.initInfiniteFilterByPropertyData(
-        this.currentFilterProperty,
-        e.value,
-        1,
-        this.pageSize
-      );
-    } else {
-      //return to pure editor mode
-      //
-      this.onRefresh();
-    }
-  }
-
   checkEditorMode() {
     if (this.isFilteringByCategory === true) {
       return 'FILTER';
@@ -215,15 +184,6 @@ export class SubjectListComponent implements OnInit, OnDestroy {
 
   paginatePureData(index: number) {
     this.subjectStore.loadInfiniteDataAsync(index, this.pageSize);
-  }
-
-  paginateFilterData(index: number) {
-    this.subjectStore.filterInfiniteSubjectByProperty(
-      this.currentFilterProperty,
-      this.currentCategoryFilterValue,
-      index,
-      this.pageSize
-    );
   }
 
   paginateSearchData(index: number) {
@@ -279,8 +239,6 @@ export class SubjectListComponent implements OnInit, OnDestroy {
     return this.fileStore.$fileList.subscribe((data: any) => {
       if (data.length !== 0) {
         this.fileList = data;
-        //
-        //
       }
     });
   }

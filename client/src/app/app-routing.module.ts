@@ -12,6 +12,20 @@ const routes: Routes = [
       ),
   },
   {
+    path: 'learner_instructor_list',
+    loadChildren: () =>
+      import('./pages/learner/instructor-list/instructor-list.module').then(
+        (m) => m.InstructorListModule
+      ),
+  },
+  {
+    path: 'learner_subject_list',
+    loadChildren: () =>
+      import('./pages/learner/subject-list/subject-list.module').then(
+        (m) => m.SubjectListModule
+      ),
+  },
+  {
     path: 'cart_list',
     loadChildren: () =>
       import('./pages/learner/cart-list/cart-list.module').then(
@@ -45,6 +59,13 @@ const routes: Routes = [
       import(
         './pages/learner/learner-classroom/learner-streaming/learner-streaming.module'
       ).then((m) => m.LearnerStreamingModule),
+  },
+  {
+    path: 'learner_do_test',
+    loadChildren: () =>
+      import(
+        './pages/learner/learner-classroom/current-test/current-test.module'
+      ).then((m) => m.CurrentTestModule),
   },
   // instructor route
   {
@@ -206,14 +227,14 @@ const routes: Routes = [
       ),
   },
   {
-    path: 'instructor_list',
+    path: 'visiter_instructor_list',
     loadChildren: () =>
       import('./pages/visitor/instructor-list/instructor-list.module').then(
         (m) => m.InstructorListModule
       ),
   },
   {
-    path: 'course_list',
+    path: 'visitor_course_list',
     loadChildren: () =>
       import('./pages/visitor/course-list/course-list.module').then(
         (m) => m.CourseListModule

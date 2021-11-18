@@ -236,22 +236,78 @@
             >
             </dxi-validation-rule>
           </dxi-item>
-          <dxi-item
-            dataField="bio"
-            [label]="{ text: 'Biography' }"
-            editorType="dxTextBox"
-          >
-            <dxi-validation-rule
-              type="required"
-              message="Biography is required"
-            >
-            </dxi-validation-rule>
-            <dxi-validation-rule
-              type="stringLength"
-              message="Biography cannot lower than 1 letter!"
-              [min]="1"
-            >
-            </dxi-validation-rule>
+          <dxi-item name="bio">
+            <dxo-label text="Biography"></dxo-label>
+            <div *dxTemplate>
+              <div class="responsive-field">
+                <dx-html-editor
+                  [width]="'100%'"
+                  [height]="520"
+                  [value]="userInfoData?.bio"
+                  (onValueChanged)="onEditorValueChanged($event)"
+                >
+                  <dxo-toolbar [multiline]="isMultiline">
+                    <dxi-item name="undo"></dxi-item>
+                    <dxi-item name="redo"></dxi-item>
+                    <dxi-item name="separator"></dxi-item>
+                    <dxi-item
+                      name="size"
+                      [acceptedValues]="[
+                        '8pt',
+                        '10pt',
+                        '12pt',
+                        '14pt',
+                        '18pt',
+                        '24pt',
+                        '36pt'
+                      ]"
+                    ></dxi-item>
+                    <dxi-item
+                      name="font"
+                      [acceptedValues]="[
+                        'Arial',
+                        'Courier New',
+                        'Georgia',
+                        'Impact',
+                        'Lucida Console',
+                        'Tahoma',
+                        'Times New Roman',
+                        'Verdana'
+                      ]"
+                    ></dxi-item>
+                    <dxi-item name="separator"></dxi-item>
+                    <dxi-item name="bold"></dxi-item>
+                    <dxi-item name="italic"></dxi-item>
+                    <dxi-item name="strike"></dxi-item>
+                    <dxi-item name="underline"></dxi-item>
+                    <dxi-item name="separator"></dxi-item>
+                    <dxi-item name="alignLeft"></dxi-item>
+                    <dxi-item name="alignCenter"></dxi-item>
+                    <dxi-item name="alignRight"></dxi-item>
+                    <dxi-item name="alignJustify"></dxi-item>
+                    <dxi-item name="separator"></dxi-item>
+                    <dxi-item name="orderedList"></dxi-item>
+                    <dxi-item name="bulletList"></dxi-item>
+                    <dxi-item name="separator"></dxi-item>
+                    <dxi-item
+                      name="header"
+                      [acceptedValues]="[false, 1, 2, 3, 4, 5]"
+                    ></dxi-item>
+                    <dxi-item name="separator"></dxi-item>
+                    <dxi-item name="color"></dxi-item>
+                    <dxi-item name="background"></dxi-item>
+                    <dxi-item name="separator"></dxi-item>
+                    <dxi-item name="link"></dxi-item>
+                    <dxi-item name="image"></dxi-item>
+                    <dxi-item name="separator"></dxi-item>
+                    <dxi-item name="clear"></dxi-item>
+                    <dxi-item name="codeBlock"></dxi-item>
+                    <dxi-item name="blockquote"></dxi-item>
+                  </dxo-toolbar>
+                  <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+                </dx-html-editor>
+              </div>
+            </div>
           </dxi-item>
           <dxi-item itemType="group" [colCount]="2" [cssClass]="'buttonGroup'">
             <dxi-item

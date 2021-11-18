@@ -49,7 +49,7 @@
   (onReachBottom)="updateBottomContent($event)"
   [bounceEnabled]="false"
 >
-  <ng-container *ngIf="postList.length">
+  <ng-container *ngIf="postList?.length">
     <div class="card-container">
       <div class="card" *ngFor="let item of postList">
         <div class="card-header">

@@ -98,6 +98,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     url: '../../../../assets/imgs/profile.png',
   };
 
+  tempUrl: string = '';
+
   constructor(
     private store: StoreService,
     private userAccountStore: UserStore,
@@ -123,14 +125,18 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   onUserAccountSubmit = (e: any) => {
     e.preventDefault();
     this.userAccountStore.updateUser(this.userAccountData, 1, 5);
-    // this.fileStore.uploadFiles([this.fileData]);
   };
 
   onUserInfoSubmit = (e: any) => {
     e.preventDefault();
     // also update file
     this.userInfoStore.updateUserInfo(this.userInfoData);
-    this.fileStore.uploadFiles([this.fileData]);
+    if (
+      this.fileData.url !== '../../../../assets/imgs/profile.png' &&
+      this.fileData.url !== this.tempUrl
+    ) {
+      this.fileStore.uploadFiles([this.fileData]);
+    }
   };
 
   handleInputChange(e: any) {
@@ -168,6 +174,10 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     this.fileData.url = reader.result;
     console.log('SOURCE ID');
     console.log(this.fileData.sourceID);
+  }
+
+  onEditorValueChanged(e: any) {
+    this.userInfoData.bio = e.value;
   }
 
   userAccountDataListener() {
@@ -213,6 +223,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     this.fileStore.getFile(id).then((data: any) => {
       if (data !== null) {
         this.fileData = data.data[0];
+        this.tempUrl = this.fileData.url;
       }
     });
   }

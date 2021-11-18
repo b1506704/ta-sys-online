@@ -24,16 +24,6 @@
     [locateInMenu]="'auto'"
   >
   </dxi-item>
-  <dxi-item location="after" locateInMenu="auto">
-    <dx-button
-      icon="arrowright"
-      type="outline"
-      text="To Course"
-      hint="Navigate to course list "
-      (onClick)="navigateToCourse()"
-    >
-    </dx-button>
-  </dxi-item>
 </dx-toolbar>
 <dx-scroll-view
   [direction]="'vertical'"
@@ -49,9 +39,6 @@
     <div class="card-container">
       <div class="card" *ngFor="let item of instructorList">
         <div class="card-title">{{ item?.displayName }}</div>
-        <!-- <div class="card-body">
-          <div class="card-text">Role: {{ item?.department }}</div>
-        </div> -->
         <div class="card-img">
           <img
             [src]="mapFileListToUrl(item?.id)"

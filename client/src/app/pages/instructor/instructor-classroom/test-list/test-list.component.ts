@@ -16,7 +16,7 @@ import { Course } from 'src/app/shared/models/course';
 export class TestListComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   scrollView: DxScrollViewComponent;
-  testList!: Array<Test>;
+  testList: Array<Test> = [];
   currentTestID!: string;
   currentUpdatedTest!: Test;
   currentSelectedTest!: Test;

@@ -13,7 +13,6 @@ import {
   DxTextBoxModule,
   DxToolbarModule,
 } from 'devextreme-angular';
-import { ChatUserListModule } from 'src/app/shared/components/chat-user-list/chat-user-list.component';
 import { DxiToolbarItemModule } from 'devextreme-angular/ui/nested';
 
 @NgModule({
@@ -21,7 +20,6 @@ import { DxiToolbarItemModule } from 'devextreme-angular/ui/nested';
     CommonModule,
     InstructorClassroomRoutingModule,
     DxButtonModule,
-    ChatUserListModule,
     DxScrollViewModule,
     DxListModule,
     DxFormModule,
@@ -33,8 +31,6 @@ import { DxiToolbarItemModule } from 'devextreme-angular/ui/nested';
     DxTextBoxModule,
     DxButtonModule,
   ],
-  declarations: [
-    InstructorClassroomComponent,
-  ],
+  declarations: [InstructorClassroomComponent],
 })
 export class InstructorClassroomModule {}

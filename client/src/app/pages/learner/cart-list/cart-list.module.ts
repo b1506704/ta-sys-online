@@ -10,6 +10,7 @@ import {
   DxPopupModule,
   DxFormModule,
   DxSelectBoxModule,
+  DxHtmlEditorModule,
 } from 'devextreme-angular';
 import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module';
 import { NgxPayPalModule } from 'ngx-paypal';
@@ -23,6 +24,7 @@ import { CourseDetailComponent } from './course-detail/course-detail.component';
     DxToolbarModule,
     DxButtonModule,
     DxSpeedDialActionModule,
+    DxHtmlEditorModule,
     DxPopupModule,
     NgxPayPalModule,
     FormatCurrencyModule,

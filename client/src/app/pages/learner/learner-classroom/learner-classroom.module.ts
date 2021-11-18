@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LearnerClassroomRoutingModule } from './Learner-classroom-routing.module';
-import { LearnerClassroomComponent } from './Learner-classroom.component';
+import { LearnerClassroomRoutingModule } from './learner-classroom-routing.module';
+import { LearnerClassroomComponent } from './learner-classroom.component';
 import {
   DxButtonModule,
   DxFormModule,
@@ -13,7 +13,6 @@ import {
   DxTextBoxModule,
   DxToolbarModule,
 } from 'devextreme-angular';
-import { ChatUserListModule } from 'src/app/shared/components/chat-user-list/chat-user-list.component';
 import { DxiToolbarItemModule } from 'devextreme-angular/ui/nested';
 
 @NgModule({
@@ -21,7 +20,6 @@ import { DxiToolbarItemModule } from 'devextreme-angular/ui/nested';
     CommonModule,
     LearnerClassroomRoutingModule,
     DxButtonModule,
-    ChatUserListModule,
     DxScrollViewModule,
     DxListModule,
     DxFormModule,
@@ -33,8 +31,6 @@ import { DxiToolbarItemModule } from 'devextreme-angular/ui/nested';
     DxTextBoxModule,
     DxButtonModule,
   ],
-  declarations: [
-    LearnerClassroomComponent,
-  ],
+  declarations: [LearnerClassroomComponent],
 })
 export class LearnerClassroomModule {}

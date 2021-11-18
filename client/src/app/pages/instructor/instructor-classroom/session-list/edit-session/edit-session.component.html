@@ -1,0 +1,72 @@
+<dx-scroll-view
+  [bounceEnabled]="true"
+  [scrollByContent]="true"
+  [scrollByThumb]="true"
+>
+  <form
+    id="session-form-container"
+    [classList]="['session-form']"
+    (submit)="onSubmit($event)"
+  >
+    <dx-form id="session-form" [formData]="sessionData">
+      <dxi-item itemType="group" caption="Session Summary">
+        <dxi-item name="avatar">
+          <div *dxTemplate>
+            <div class="img-container">
+              <img [src]="fileData?.url" alt="..." />
+              <input
+                class="img-input"
+                type="file"
+                id="img"
+                accept="image/*"
+                (change)="handleInputChange($event)"
+              />
+            </div>
+          </div>
+        </dxi-item>
+        <dxi-item name="startTime">
+          <dxo-label text="Start Time"></dxo-label>
+          <div *dxTemplate>
+            <div class="responsive-field">
+              <dx-date-box
+                [value]="now"
+                type="datetime"
+                [value]="sessionData?.startTime"
+                (onValueChanged)="onStartTimeValueChange($event)"
+              >
+              </dx-date-box>
+            </div>
+          </div>
+        </dxi-item>
+        <dxi-item name="endTime">
+          <dxo-label text="End Time"></dxo-label>
+          <div *dxTemplate>
+            <div class="responsive-field">
+              <dx-date-box
+                [value]="now"
+                type="datetime"
+                [value]="sessionData?.endTime"
+                (onValueChanged)="onEndTimeValueChange($event)"
+              >
+              </dx-date-box>
+            </div>
+          </div>
+        </dxi-item>
+      </dxi-item>
+      <dxi-item itemType="group" [colCount]="2" [cssClass]="'buttonGroup'">
+        <dxi-item
+          itemType="button"
+          horizontalAlignment="center"
+          [buttonOptions]="submitButtonOptions"
+        >
+        </dxi-item>
+        <dxi-item
+          itemType="button"
+          horizontalAlignment="center"
+          [buttonOptions]="resetButtonOptions"
+        >
+        </dxi-item>
+      </dxi-item>
+    </dx-form>
+  </form>
+</dx-scroll-view>

@@ -10,8 +10,10 @@ import {
   DxPopupModule,
   DxFormModule,
   DxSelectBoxModule,
+  DxHtmlEditorModule,
 } from 'devextreme-angular';
 import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module';
+import { EditCourseComponent } from './edit-course/edit-course.component';
 
 @NgModule({
   imports: [
@@ -23,9 +25,10 @@ import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module
     DxSpeedDialActionModule,
     DxPopupModule,
     DxFormModule,
+    DxHtmlEditorModule,
     DxSelectBoxModule,
     FormatCurrencyModule,
   ],
-  declarations: [CourseListComponent],
+  declarations: [CourseListComponent, EditCourseComponent],
 })
 export class CourseListModule {}
