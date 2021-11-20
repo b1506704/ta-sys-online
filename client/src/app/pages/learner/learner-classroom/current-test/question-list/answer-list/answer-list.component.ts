@@ -17,6 +17,10 @@ export class AnswerListComponent implements OnInit, OnDestroy, OnChanges {
   currentSelectedAnswer!: Answer;
   constructor(private answerStore: AnswerStore, private store: StoreService) {}
 
+  submitAnswer(answer: Answer) {
+
+  }
+
   initData() {
     if (this.questionId) {
       console.log('CURRENT POST ID');

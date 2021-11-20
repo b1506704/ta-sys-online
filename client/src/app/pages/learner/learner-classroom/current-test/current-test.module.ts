@@ -13,6 +13,7 @@ import {
   DxTextBoxModule,
   DxHtmlEditorModule,
   DxTextAreaModule,
+  DxCheckBoxModule,
 } from 'devextreme-angular';
 import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module';
 import { QuestionListComponent } from './question-list/question-list.component';
@@ -25,6 +26,7 @@ import { AnswerListComponent } from './question-list/answer-list/answer-list.com
     DxScrollViewModule,
     DxToolbarModule,
     DxHtmlEditorModule,
+    DxCheckBoxModule,
     DxButtonModule,
     DxSpeedDialActionModule,
     DxPopupModule,

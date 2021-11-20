@@ -86,10 +86,10 @@ export class InstructorClassroomComponent implements OnInit, OnDestroy {
   }
 
   navigateCurrentSession() {
-    const outlet = {
-      outlets: { conditionOutlet: ['current_session'] },
-    };
-    this.router.navigate([outlet], { relativeTo: this.route.parent });
+    // const outlet = {
+    //   outlets: { conditionOutlet: ['course_streaming'] },
+    // };
+    this.router.navigate(['course_streaming']);
   }
 
   navigateAsset() {

@@ -103,18 +103,18 @@
                   </dxi-validation-rule>
                 </dxi-item>
                 <dxi-item
-                  dataField="totalQuestions"
-                  [label]="{ text: 'Total Question' }"
+                  dataField="maxQuestion"
+                  [label]="{ text: 'Max Question' }"
                   editorType="dxNumberBox"
                 >
                   <dxi-validation-rule
                     type="required"
-                    message="Total question is required"
+                    message="Max question is required"
                   >
                   </dxi-validation-rule>
                   <dxi-validation-rule
                     type="range"
-                    message="Total question cannot smaller than 1!"
+                    message="Max question cannot smaller than 1!"
                     [min]="1"
                   >
                   </dxi-validation-rule>

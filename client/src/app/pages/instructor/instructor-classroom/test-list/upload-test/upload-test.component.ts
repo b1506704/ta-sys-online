@@ -73,7 +73,7 @@ export class UploadTestComponent implements OnInit, OnDestroy {
       allocatedTime: 0,
       deadline: new Date(),
       maxAttempt: 0,
-      totalQuestions: 0,
+      maxQuestion: 0,
       maxScore: 0,
       name: 'Blank Test',
     };

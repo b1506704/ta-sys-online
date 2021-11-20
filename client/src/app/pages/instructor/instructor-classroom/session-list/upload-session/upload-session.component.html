@@ -10,20 +10,6 @@
   >
     <dx-form id="session-form" [formData]="sessionData">
       <dxi-item itemType="group" caption="Session Summary">
-        <dxi-item name="avatar">
-          <div *dxTemplate>
-            <div class="img-container">
-              <img [src]="fileData?.url" alt="..." />
-              <input
-                class="img-input"
-                type="file"
-                id="img"
-                accept="image/*"
-                (change)="handleInputChange($event)"
-              />
-            </div>
-          </div>
-        </dxi-item>
         <dxi-item name="startTime">
           <dxo-label text="Start Time"></dxo-label>
           <div *dxTemplate>

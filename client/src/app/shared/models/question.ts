@@ -5,6 +5,6 @@ export interface Question {
   testId: string;
   content: string;
   score: number;
-  totalCorrectAnswer: number;
+  totalCorrectAnswer?: number;
   answerRequests?: Array<Answer>;
 }

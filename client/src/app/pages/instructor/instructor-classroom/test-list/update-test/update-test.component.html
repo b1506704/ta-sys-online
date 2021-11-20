@@ -103,6 +103,23 @@
                   </dxi-validation-rule>
                 </dxi-item>
                 <dxi-item
+                  dataField="maxQuestion"
+                  [label]="{ text: 'Max Question' }"
+                  editorType="dxNumberBox"
+                >
+                  <dxi-validation-rule
+                    type="required"
+                    message="Max question is required"
+                  >
+                  </dxi-validation-rule>
+                  <dxi-validation-rule
+                    type="range"
+                    message="Max question cannot smaller than 1!"
+                    [min]="1"
+                  >
+                  </dxi-validation-rule>
+                </dxi-item>
+                <dxi-item
                   dataField="deadline"
                   [label]="{ text: 'Deadline' }"
                   editorType="dxDateBox"

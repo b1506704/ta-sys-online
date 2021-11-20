@@ -24,7 +24,7 @@ export class EditCartListComponent implements OnInit, OnDestroy {
   cartList!: Array<Cart>;
   subjectList: Array<Object> = [];
   selectedRows: string[];
-  isSelectInfoVisible: boolean;
+  isSelectInfoVisible: boolean = false;
   selectInfoText: string;
   selectedCellRow: Object;
   pageSize: number = 5;

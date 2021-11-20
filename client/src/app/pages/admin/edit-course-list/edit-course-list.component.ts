@@ -12,6 +12,7 @@ import { CourseHttpService } from 'src/app/shared/services/course/course-http.se
 import { CourseStore } from 'src/app/shared/services/course/course-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
 import { SubjectStore } from 'src/app/shared/services/subject/subject-store.service';
+import { FileStore } from 'src/app/shared/services/file/file-store.service';
 
 @Component({
   selector: 'app-edit-course-list',
@@ -24,7 +25,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
   courseList!: Array<Course>;
   subjectList: Array<Object> = [];
   selectedRows: string[];
-  isSelectInfoVisible: boolean;
+  isSelectInfoVisible: boolean = false;
   selectInfoText: string;
   selectedCellRow: Object;
   pageSize: number = 5;
@@ -49,6 +50,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
     private store: StoreService,
     private courseHTTP: CourseHttpService,
     private subjectStore: SubjectStore,
+    private fileStore: FileStore,
     private router: Router
   ) {}
 
@@ -371,19 +373,16 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
     if (e.changes.length) {
       switch (e.changes[0].type) {
         case 'insert':
-          const customCourse = e.changes[0].data;
-          customCourse.scheduleIds = [
-            '083ebbdf-b196-4d4f-82da-5c719c0f7265',
-            '09962710-72f7-4bb6-b47c-764cf9685841',
-            '0c612031-44d0-4eb2-bfbd-86a706127a40',
-            '0ccecaf3-c8ad-4c76-ae2c-26635cae160f',
-          ];
           this.courseStore.uploadCourse(
-            customCourse,
+            e.changes[0].data,
             this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
-          console.log(customCourse);
+          const containerData: any = {
+            name: e.changes[0].data.name.replace(/\s/g, '').toLowerCase(),
+          };
+          console.log(e.changes[0].data.name.replace(/\s/g, '').toLowerCase());
+          this.fileStore.uploadContainer(containerData);
           break;
         case 'update':
           console.log(e.changes[0]);

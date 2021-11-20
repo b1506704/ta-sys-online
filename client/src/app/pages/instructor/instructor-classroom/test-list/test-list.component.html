@@ -4,7 +4,11 @@
     marginBottom: '5px'
   }"
 >
-  <dxi-item [location]="'before'" [text]="'Test'" style="padding-right: 15px; margin-right: 15px;">
+  <dxi-item
+    [location]="'before'"
+    [text]="'Test'"
+    style="padding-right: 15px; margin-right: 15px"
+  >
   </dxi-item>
   <dxi-item widget="dxTextBox" [options]="searchBoxOptions" location="before">
   </dxi-item>
@@ -34,18 +38,32 @@
   >
   </dxi-item>
 </dx-toolbar>
-<dx-scroll-view
-  [direction]="'vertical'"
-  [showScrollbar]="true"
-  [scrollByContent]="true"
-  [scrollByThumb]="true"
-  [width]="'100%'"
-  [height]="'73vh'"
-  (onPullDown)="updateTopContent($event)"
-  (onReachBottom)="updateBottomContent($event)"
-  [bounceEnabled]="false"
+<div
+  style="
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    font-size: large;
+    font-weight: bold;
+  "
+  *ngIf="!testList"
 >
-  <ng-container *ngIf="testList?.length">
+  There is no test at the moment. Please add tests to the course.
+</div>
+<div *ngIf="testList?.length">
+  <dx-scroll-view
+    [direction]="'vertical'"
+    [showScrollbar]="true"
+    [scrollByContent]="true"
+    [scrollByThumb]="true"
+    [width]="'100%'"
+    [height]="'73vh'"
+    (onPullDown)="updateTopContent($event)"
+    (onReachBottom)="updateBottomContent($event)"
+    [bounceEnabled]="false"
+  >
     <div class="card-container">
       <div class="card" *ngFor="let item of testList">
         <div class="card-header">
@@ -113,8 +131,8 @@
         </div>
       </div>
     </div>
-  </ng-container>
-</dx-scroll-view>
+  </dx-scroll-view>
+</div>
 <ng-container *ngIf="currentFilterByPropertyValue">
   <app-upload-test
     [closePopupUpload]="closePopupUpload"

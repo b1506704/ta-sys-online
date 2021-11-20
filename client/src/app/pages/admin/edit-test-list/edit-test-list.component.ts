@@ -24,7 +24,7 @@ export class EditTestListComponent implements OnInit, OnDestroy {
   testList!: Array<Test>;
   subjectList: Array<Object> = [];
   selectedRows: string[];
-  isSelectInfoVisible: boolean;
+  isSelectInfoVisible: boolean = false;
   selectInfoText: string;
   selectedCellRow: Object;
   pageSize: number = 5;

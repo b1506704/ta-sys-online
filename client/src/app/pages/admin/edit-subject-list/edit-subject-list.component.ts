@@ -27,7 +27,7 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
     { _id: '1', name: 'NO' },
   ];
   selectedRows: string[];
-  isSelectInfoVisible: boolean;
+  isSelectInfoVisible: boolean = false;
   selectInfoText: string;
   selectedCellRow: Object;
   pageSize: number = 5;
@@ -77,17 +77,6 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
         widget: 'dxButton',
         options: {
           type: 'danger',
-          icon: 'trash',
-          hint: 'Delete all items',
-          onClick: this.deleteAll.bind(this),
-        },
-      },
-      {
-        location: 'after',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'danger',
           icon: 'parentfolder',
           hint: 'Generate random 100+ items',
           onClick: this.onAddRandom.bind(this),
@@ -125,61 +114,6 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
           onValueChanged: this.onSearchValueChanged.bind(this),
           mode: 'search',
           placeholder: 'Search name',
-        },
-      },
-      {
-        location: 'center',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'filter',
-          disabled: true,
-          hint: 'Filter with ...',
-        },
-      },
-      {
-        location: 'center',
-        locateInMenu: 'auto',
-        widget: 'dxSelectBox',
-        options: {
-          items: this.discountList,
-          valueExpr: 'name',
-          searchExpr: 'name',
-          displayExpr: 'name',
-          placeholder: 'Filter with ...',
-          searchEnabled: true,
-          onValueChanged: this.onFilterChange.bind(this),
-        },
-      },
-      {
-        location: 'center',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'card',
-          disabled: true,
-          hint: 'Sort by total cost',
-        },
-      },
-      {
-        location: 'center',
-        locateInMenu: 'auto',
-        widget: 'dxSelectBox',
-        options: {
-          items: [
-            {
-              id: '-1',
-              name: '(NONE)',
-            },
-            { id: '0', name: 'asc' },
-            { id: '1', name: 'desc' },
-          ],
-          valueExpr: 'name',
-          placeholder: 'Sort by name',
-          displayExpr: 'name',
-          onValueChanged: this.onSortValueChanged.bind(this),
         },
       }
     );

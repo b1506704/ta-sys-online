@@ -15,9 +15,24 @@
 <div class="classroom-container" *ngIf="currentCourseId">
   <div class="session-user shadow">
     <ng-container *ngIf="chatUserList.length">
-      <div class="participant shadow" *ngFor="let item of chatUserList">
-        {{ item?.displayName }}
-      </div>
+      <dx-gallery
+        [dataSource]="chatUserList"
+        [height]="'100%'"
+        [loop]="false"
+        [width]="'100%'"
+        [initialItemWidth]="100"
+        [showNavButtons]="true"
+        [showIndicator]="false"
+      >
+        <div class="participant shadow" *dxTemplate="let item of 'item'">
+          <div class="participant-img">
+            <img [src]="fileData?.url" alt="..." />
+          </div>
+          <div class="display-name">
+            {{ item?.displayName }}
+          </div>
+        </div>
+      </dx-gallery>
     </ng-container>
   </div>
   <div class="session-blackboard box-shadow">
@@ -48,8 +63,8 @@
                     <dx-html-editor
                       readOnly="true"
                       [value]="item?.frontText"
-                      [height]="'90%'"
-                      [width]="'90%'"
+                      [height]="'100%'"
+                      [width]="'100%'"
                     >
                       <dxo-media-resizing [enabled]="true">
                       </dxo-media-resizing>
@@ -60,9 +75,9 @@
                   <div class="asset-body">
                     <dx-html-editor
                       readOnly="true"
+                      [height]="'100%'"
+                      [width]="'100%'"
                       [value]="item?.backText"
-                      [height]="'300px'"
-                      [width]="'330px'"
                     >
                       <dxo-media-resizing [enabled]="true">
                       </dxo-media-resizing>
@@ -217,9 +232,14 @@
       </dx-scroll-view>
     </div>
   </ng-container>
-  <div class="session-coacher">
+  <div class="session-instructor">
     <div class="participant neon">
-      {{ userEntry?.displayName }}
+      <div class="instructor-img">
+        <img [src]="fileData?.url" alt="..." />
+      </div>
+      <div class="display-name">
+        {{ userEntry?.displayName }}
+      </div>
     </div>
     <div class="desk">
       <div class="desk-asset-container box-shadow">

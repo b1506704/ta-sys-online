@@ -54,7 +54,6 @@
                       <dxo-label text="Content"></dxo-label>
                       <div *dxTemplate>
                         <div class="responsive-field">
-                          <!-- height="320px" -->
                           <dx-html-editor
                             [value]="questionData?.content"
                             (onValueChanged)="onEditorValueChanged($event)"
@@ -157,8 +156,8 @@
           </div>
         </dx-scroll-view>
       </div>
-      <div class="test-question" *ngIf="questionData">
-        <app-answer-list [questionId]="questionData?.id"></app-answer-list>
+      <div class="test-question">
+        <app-answer-list [questionId]="question?.id"></app-answer-list>
       </div>
     </div>
   </div>

@@ -24,7 +24,7 @@ export class EditLessonListComponent implements OnInit, OnDestroy {
   lessonList!: Array<Lesson>;
   subjectList: Array<Object> = [];
   selectedRows: string[];
-  isSelectInfoVisible: boolean;
+  isSelectInfoVisible: boolean = false;
   selectInfoText: string;
   selectedCellRow: Object;
   pageSize: number = 5;

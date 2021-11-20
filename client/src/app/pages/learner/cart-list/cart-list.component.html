@@ -31,6 +31,21 @@
     </dx-button>
   </dxi-item>
 </dx-toolbar>
+<div
+  style="
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    font-size: large;
+    font-weight: bold;
+  "
+  *ngIf="!cartList"
+>
+  There is no item in cart at the moment. Please add any courses in course list
+  to begin transaction.
+</div>
 <dx-scroll-view
   [direction]="'vertical'"
   [showScrollbar]="true"
@@ -40,7 +55,7 @@
   [width]="'100%'"
   [bounceEnabled]="false"
 >
-  <ng-container *ngIf="cartList?.courses?.length">
+  <ng-container *ngIf="cartList">
     <div class="card-container">
       <div class="card" *ngFor="let item of cartList.courses">
         <div class="card-title">{{ item?.name }}</div>

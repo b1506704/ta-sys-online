@@ -5,7 +5,7 @@ export interface Test {
     description: string;
     allocatedTime: number;
     deadline: Date;
-    totalQuestions: number;
+    maxQuestion: number;
     maxScore: number;
     maxAttempt: number;
 }

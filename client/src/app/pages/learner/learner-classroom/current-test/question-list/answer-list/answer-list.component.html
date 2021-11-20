@@ -6,7 +6,10 @@
         <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
       </dx-html-editor>
       <div class="button-group">
-        <dx-button [icon]="'isblank'"></dx-button>
+        <dx-button
+          [icon]="'isblank'"
+          (onClick)="submitAnswer(item)"
+        ></dx-button>
         <!-- <dx-button [icon]="'isnotblank'"></dx-button> -->
       </div>
     </div>

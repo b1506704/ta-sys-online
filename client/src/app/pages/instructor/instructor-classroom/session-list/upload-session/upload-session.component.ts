@@ -8,11 +8,8 @@ import {
 } from '@angular/core';
 import { Session } from 'src/app/shared/models/session';
 import { SessionStore } from '../../../../../shared/services/session/session-store.service';
-import { File } from 'src/app/shared/models/file';
-import { FileStore } from 'src/app/shared/services/file/file-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
 import { UserInfo } from 'src/app/shared/models/userinfo';
-import { UserInfoStore } from 'src/app/shared/services/user-info/user-info-store.service';
 import { DxScrollViewComponent, DxFormComponent } from 'devextreme-angular';
 import { SessionHttpService } from 'src/app/shared/services/session/session-http.service';
 @Component({
@@ -31,19 +28,6 @@ export class UploadSessionComponent implements OnInit, OnDestroy, OnChanges {
   userId!: string;
   instructorData: UserInfo;
   currency: string = '$';
-  fileData: File = {
-    sourceID: '',
-    container: '',
-    category: '',
-    title: '',
-    fileName: '',
-    fileSize: 0,
-    fileType: '',
-    url: '../../../../assets/imgs/profile.png',
-  };
-
-  tempUrl: string = '';
-
   submitButtonOptions: any = {
     text: 'Submit',
     icon: 'save',
@@ -64,7 +48,6 @@ export class UploadSessionComponent implements OnInit, OnDestroy, OnChanges {
     private sessionStore: SessionStore,
 
     private sessionHTTP: SessionHttpService,
-    private fileStore: FileStore,
     private store: StoreService
   ) {}
 
@@ -81,65 +64,7 @@ export class UploadSessionComponent implements OnInit, OnDestroy, OnChanges {
   onEndTimeValueChange(e: any) {
     this.sessionData.endTime = e.value;
   }
-
-  handleInputChange(e: any) {
-    var file = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0];
-    console.log(file);
-    if (file !== undefined) {
-      if (file.size <= 2000000) {
-        this.fileData.fileSize = file.size;
-        this.fileData.fileType = file.type;
-        this.fileData.fileName = file.name;
-        var pattern = /image-*/;
-        var reader = new FileReader();
-
-        if (!file.type.match(pattern)) {
-          this.store.showNotif('Invalid format!', 'custom');
-          return;
-        }
-        reader.onload = this.handleReaderLoaded.bind(this);
-        reader.readAsDataURL(file);
-      } else {
-        this.store.showNotif('File cannot exceed 2MB', 'custom');
-      }
-    }
-  }
-
-  handleReaderLoaded(e: any) {
-    var reader = e.target;
-    console.log('READER');
-    console.log(reader);
-    this.fileData.sourceID = this.sessionData.id;
-    this.fileData.container = 'images';
-    this.fileData.category = 'images';
-    this.fileData.title = this.sessionData?.startTime.toString();
-    this.fileData.data = reader.result.split(',')[1];
-    this.fileData.url = reader.result;
-    console.log('SOURCE ID');
-    console.log(this.fileData.sourceID);
-  }
-
-  getUserMediaData(id: string) {
-    this.fileStore.getFile(id).then((data: any) => {
-      if (data.data) {
-        this.fileData = data.data[0];
-        this.tempUrl = this.fileData.url;
-      }
-    });
-  }
-
   renderSourceData() {
-    // this.sessionData = null;
-    this.fileData = {
-      sourceID: '',
-      container: '',
-      category: '',
-      title: '',
-      fileName: '',
-      fileSize: 0,
-      fileType: '',
-      url: '../../../../assets/imgs/profile.png',
-    };
     this.sessionData = {
       courseId: this.courseId,
       creatorId: this.userId,
@@ -167,12 +92,6 @@ export class UploadSessionComponent implements OnInit, OnDestroy, OnChanges {
             this.store.showNotif(`${data.responseMessage}`, 'custom');
             this.store.setIsLoading(false);
           });
-        if (
-          this.fileData.url !== '../../../../assets/imgs/profile.png' &&
-          this.fileData.url !== this.tempUrl
-        ) {
-          this.fileStore.uploadFiles([this.fileData]);
-        }
       }
     });
   };
@@ -182,9 +101,7 @@ export class UploadSessionComponent implements OnInit, OnDestroy, OnChanges {
     this.renderSourceData();
   }
 
-  ngOnChanges(): void {
-    // this.renderSourceData();
-  }
+  ngOnChanges(): void {}
 
   ngOnDestroy(): void {
     this.sessionDataListener().unsubscribe();

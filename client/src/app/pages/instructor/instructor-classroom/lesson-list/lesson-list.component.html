@@ -38,18 +38,32 @@
   >
   </dxi-item>
 </dx-toolbar>
-<dx-scroll-view
-  [direction]="'vertical'"
-  [showScrollbar]="true"
-  [scrollByContent]="true"
-  [scrollByThumb]="true"
-  [width]="'100%'"
-  [height]="'73vh'"
-  (onPullDown)="updateTopContent($event)"
-  (onReachBottom)="updateBottomContent($event)"
-  [bounceEnabled]="false"
+<div
+  style="
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    font-size: large;
+    font-weight: bold;
+  "
+  *ngIf="!lessonList"
 >
-  <ng-container *ngIf="lessonList?.length">
+  There is no lesson at the moment. Please add lessons to the course.
+</div>
+<div *ngIf="lessonList">
+  <dx-scroll-view
+    [direction]="'vertical'"
+    [showScrollbar]="true"
+    [scrollByContent]="true"
+    [scrollByThumb]="true"
+    [width]="'100%'"
+    [height]="'73vh'"
+    (onPullDown)="updateTopContent($event)"
+    (onReachBottom)="updateBottomContent($event)"
+    [bounceEnabled]="false"
+  >
     <div class="card-container">
       <div class="card" *ngFor="let item of lessonList; index as i">
         <div class="card-header">
@@ -138,8 +152,8 @@
         </div>
       </div>
     </div>
-  </ng-container>
-</dx-scroll-view>
+  </dx-scroll-view>
+</div>
 <ng-container *ngIf="currentFilterByPropertyValue">
   <app-upload-lesson
     [closePopupUpload]="closePopupUpload"

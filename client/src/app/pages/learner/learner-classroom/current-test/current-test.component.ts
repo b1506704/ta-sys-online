@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Test } from 'src/app/shared/models/test';
 import { TestStore } from 'src/app/shared/services/test/test-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
-import { Router } from '@angular/router';
 import { QuestionStore } from 'src/app/shared/services/question/question-store.service';
 import { Question } from 'src/app/shared/models/question';
 import { DxScrollViewComponent } from 'devextreme-angular';
@@ -18,6 +17,7 @@ export class CurrentTestComponent implements OnInit, OnDestroy {
   testData: Test;
   pageSize: number = 5;
   totalPages: Array<number> = [];
+  totalQuestions: number;
 
   savedQuestions: Array<Question> = [];
 
@@ -26,9 +26,12 @@ export class CurrentTestComponent implements OnInit, OnDestroy {
   constructor(
     private testStore: TestStore,
     private store: StoreService,
-    private router: Router,
     private questionStore: QuestionStore
   ) {}
+
+  saveTest() {}
+
+  submitTest() {}
 
   getMetaData() {
     return this.store.$currentTest.subscribe((data: Test) => {
@@ -42,6 +45,7 @@ export class CurrentTestComponent implements OnInit, OnDestroy {
             this.pageSize
           )
           .then((data: any) => {
+            this.totalQuestions = data.totalRecords;
             if (data.data) {
               for (let index = 0; index < data.totalPages; index++) {
                 this.totalPages.push(index + 1);

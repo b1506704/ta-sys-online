@@ -74,7 +74,20 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   };
   currentCourseId: string;
 
-  chatUserList: Array<UserEntry> = [];
+  // chatUserList: Array<UserEntry> = [];
+
+  chatUserList: Array<UserEntry> = [
+    { id: '0d0ea585-e59f-4a79-76a4-08d9abdd6f9a', displayName: 'N.H.Hoa' },
+    { id: '1', displayName: 'N.H.Hoa' },
+    { id: '1', displayName: 'N.H.Hoa' },
+    { id: '1', displayName: 'N.H.Hoa' },
+    { id: '1', displayName: 'N.H.Hoa' },
+    { id: '1', displayName: 'N.H.Hoa' },
+    { id: '1', displayName: 'N.H.Hoa' },
+    { id: '1', displayName: 'N.H.Hoa' },
+    { id: '1', displayName: 'N.H.Hoa' },
+    { id: '1', displayName: 'N.H.Hoa' },
+  ];
   messageList: Array<ChatMessage> = [];
   assetList: Array<any> = [];
   quizList: Array<any> = [];
@@ -91,6 +104,8 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     fileType: '',
     url: '../../../../assets/imgs/profile.png',
   };
+
+  currentUserImg: File;
   fileList: Array<File> = [];
   courseData!: Course;
   creatorData!: any;
@@ -159,10 +174,19 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     this.isPopupTestVisible = false;
   };
 
+  getUserMediaData(id: string) {
+    this.fileStore.getFile(id).then((data: any) => {
+      if (data !== null) {
+        this.currentUserImg = data.data[0];
+      }
+    });
+  }
+
   getUserID() {
     return this.store.$currentUserId.subscribe((data: string) => {
       if (data) {
         this.userEntry.id = data;
+        this.getUserMediaData(this.userEntry.id);
       }
     });
   }
@@ -193,7 +217,6 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     return this.fileStore.$fileList.subscribe((data: any) => {
       if (data.length !== 0) {
         this.fileList = data;
-        // //
       }
     });
   }

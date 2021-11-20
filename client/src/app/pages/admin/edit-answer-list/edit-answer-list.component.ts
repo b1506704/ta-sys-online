@@ -24,7 +24,7 @@ export class EditAnswerListComponent implements OnInit, OnDestroy {
   answerList!: Array<Answer>;
   subjectList: Array<Object> = [];
   selectedRows: string[];
-  isSelectInfoVisible: boolean;
+  isSelectInfoVisible: boolean = false;
   selectInfoText: string;
   selectedCellRow: Object;
   pageSize: number = 5;

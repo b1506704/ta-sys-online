@@ -28,7 +28,7 @@
     </dxi-item>
     <dxi-item
       [location]="'center'"
-      [text]="'Timeleft: ' + testData?.allocatedTime + 'minutes'"
+      [text]="'Time left: ' + testData?.allocatedTime + ' minutes'"
       style="margin-right: 15px"
     >
     </dxi-item>
@@ -54,11 +54,21 @@
       </dx-scroll-view>
     </div>
     <div class="question-panel">
-      <div class="question-control">
-        0{{ saveQuestions?.length }} / {{ testData?.totalQuestions }}
-      </div>
       <div class="total-question">
-        0{{ saveQuestions?.length }} / {{ testData?.totalQuestions }}
+        0{{ saveQuestions?.length }} / {{ totalQuestions }}
+      </div>
+      <div class="question-control">
+        <dx-button (onClick)="saveTest()">Save</dx-button>
+        <dx-button
+          (onClick)="submitTest()"
+          *ngIf="saveQuestions?.length === totalQuestions"
+          >Submit</dx-button
+        >
+        <dx-button
+          [disabled]="true"
+          *ngIf="saveQuestions?.length !== totalQuestions"
+          >Submit</dx-button
+        >
       </div>
       <dx-scroll-view
         [direction]="'vertical'"

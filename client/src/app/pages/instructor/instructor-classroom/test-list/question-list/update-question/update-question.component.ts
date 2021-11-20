@@ -65,7 +65,7 @@ export class UpdateQuestionComponent implements OnInit, OnDestroy, OnChanges {
           content: this.questionData.content,
           score: this.questionData.score,
           testId: this.questionData.testId,
-          totalCorrectAnswer: this.questionData.totalCorrectAnswer,
+          // totalCorrectAnswer: this.questionData.totalCorrectAnswer,
         };
         this.questionHTTP
           .updateQuestion(questionWithoutAnswer)
