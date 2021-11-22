@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import notify from 'devextreme/ui/notify';
+import { confirm } from 'devextreme/ui/dialog';
 import { Observable } from 'rxjs';
+import { ChatMessage } from '../models/chat-message';
 import { Course } from '../models/course';
 import { Question } from '../models/question';
 import { Session } from '../models/session';
@@ -15,6 +17,14 @@ interface StoreState {
   currentSubject: Subject;
   currentSession: Session;
   currentTest: Test;
+  messageList: Array<ChatMessage>;
+  assetList: Array<any>;
+  quizList: Array<any>;
+
+  blackBoard: Array<any>;
+  resultBoard: Array<any>;
+
+  operationFlag: any;
 
   savedQuestions: Array<Question>;
   responseList: Array<Object>;
@@ -39,6 +49,12 @@ const initialState: StoreState = {
   currentSession: undefined,
   currentTest: undefined,
   savedQuestions: undefined,
+  messageList: undefined,
+  assetList: undefined,
+  quizList: undefined,
+  blackBoard: undefined,
+  resultBoard: undefined,
+  operationFlag: undefined,
   currentRoleId: undefined,
   currentRoleName: undefined,
   isLoading: false,
@@ -88,6 +104,24 @@ export class StoreService extends StateService<StoreState> {
     (state) => state.savedQuestions
   );
 
+  $blackBoard: Observable<Array<any>> = this.select(
+    (state) => state.blackBoard
+  );
+
+  $assetList: Observable<Array<any>> = this.select((state) => state.assetList);
+
+  $resultBoard: Observable<Array<any>> = this.select(
+    (state) => state.resultBoard
+  );
+
+  $quizList: Observable<Array<any>> = this.select((state) => state.quizList);
+
+  $messageList: Observable<Array<ChatMessage>> = this.select(
+    (state) => state.messageList
+  );
+
+  $operationFlag: Observable<any> = this.select((state) => state.operationFlag);
+
   $currentRoleId: Observable<string> = this.select(
     (state) => state.currentRoleId
   );
@@ -107,6 +141,13 @@ export class StoreService extends StateService<StoreState> {
   $responseEventType: Observable<string> = this.select(
     (state) => state.responseEventType
   );
+
+  confirmDialog(msg: string) {
+    if (msg != '') {
+      return confirm(`<b>${msg}</b>`, 'Confirm changes');
+    }
+    return confirm(`<b>Are you sure?</b>`, 'Confirm changes');
+  }
 
   loadDataAsync() {}
 
@@ -179,6 +220,30 @@ export class StoreService extends StateService<StoreState> {
 
   setCurrentUserRoleName(role: string) {
     this.setState({ currentRoleName: role });
+  }
+
+  setBlackboard(item: any) {
+    this.setState({ blackBoard: item });
+  }
+
+  setResultBoard(item: any) {
+    this.setState({ resultBoard: item });
+  }
+
+  setQuizList(item: any) {
+    this.setState({ quizList: item });
+  }
+
+  setAssetList(item: any) {
+    this.setState({ assetList: item });
+  }
+
+  setMessageList(item: any) {
+    this.setState({ messageList: item });
+  }
+
+  setOperationFlag(item: any) {
+    this.setState({ operationFlag: item });
   }
 
   showNotif(message: string, type: string) {

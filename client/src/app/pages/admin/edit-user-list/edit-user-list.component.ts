@@ -73,7 +73,7 @@ export class EditUserListComponent implements OnInit, OnDestroy {
         locateInMenu: 'auto',
         widget: 'dxButton',
         options: {
-          type: 'danger',
+          type: 'normal',
           icon: 'trash',
           hint: 'Delete all items',
           onClick: this.deleteAll.bind(this),
@@ -84,7 +84,7 @@ export class EditUserListComponent implements OnInit, OnDestroy {
         locateInMenu: 'auto',
         widget: 'dxButton',
         options: {
-          type: 'danger',
+          type: 'normal',
           icon: 'parentfolder',
           hint: 'Generate random 100+ items',
           onClick: this.onAddRandom.bind(this),

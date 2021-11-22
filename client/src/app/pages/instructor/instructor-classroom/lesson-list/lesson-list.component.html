@@ -15,7 +15,7 @@
   <dxi-item [locateInMenu]="'auto'" [location]="'after'">
     <dx-button
       icon="plus"
-      type="danger"
+      type="normal"
       hint="Click to add lesson lesson detail"
       (onClick)="uploadLesson()"
     ></dx-button>
@@ -80,10 +80,10 @@
           </div>
           <div class="card-title">{{ item?.name }}</div>
           <div class="lesson-util">
-            <div class="button-group">
+            <!-- <div class="button-group">
               <dx-button
                 icon="like"
-                type="danger"
+                type="normal"
                 hint="Click to like lesson"
                 (onClick)="likeLesson(item)"
               ></dx-button>
@@ -94,18 +94,18 @@
                 hint="Click to see lesson detail"
                 (onClick)="showDetail(item)"
               ></dx-button>
-            </div>
+            </div> -->
             <div class="button-group">
               <dx-button
                 icon="trash"
-                type="danger"
+                type="normal"
                 hint="Click to delete lesson"
                 (onClick)="deleteLesson(item)"
               ></dx-button>
               <div class="like-count">-</div>
               <dx-button
                 icon="edit"
-                type="danger"
+                type="normal"
                 hint="Click to edit lesson"
                 (onClick)="updateLesson(item)"
               ></dx-button>

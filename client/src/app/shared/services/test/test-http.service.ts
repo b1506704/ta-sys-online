@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Test } from '../../models/test';
+import { TestRequest } from '../../models/testRequest';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +11,8 @@ export class TestHttpService {
   constructor(private http: HttpClient) {}
   // apiUrl = 'https://ta-sys-online-server.azurewebsites.net/api/Test';
   apiUrl = 'https://localhost:5001/api/Test';
+
+  testResultUrl = 'https://localhost:5001/api/TestResult';
 
   fetchTest(page: number, size: number): Observable<Test> {
     const params = new HttpParams()
@@ -161,6 +164,13 @@ export class TestHttpService {
 
   updateTest(test: Test): Observable<Test> {
     return this.http.put<Test>(this.apiUrl, test, {
+      reportProgress: true,
+      observe: 'body',
+    });
+  }
+
+  doTest(testRequest: TestRequest): Observable<TestRequest> {
+    return this.http.post<TestRequest>(this.testResultUrl, testRequest, {
       reportProgress: true,
       observe: 'body',
     });

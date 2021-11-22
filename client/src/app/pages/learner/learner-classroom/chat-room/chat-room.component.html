@@ -4,11 +4,14 @@
     marginBottom: '5px'
   }"
 >
-  <dxi-item [location]="'before'" [text]="'Chat Room'"  style="padding-right: 15px; margin-right: 15px;"> </dxi-item>
+  <dxi-item
+    [location]="'before'"
+    [text]="'Chat Room'"
+    style="padding-right: 15px; margin-right: 15px"
+  >
+  </dxi-item>
 </dx-toolbar>
 <div class="chat-room-layout">
-  <!-- (onPullDown)="updateTopContent($event)"
-  (onReachBottom)="updateBottomContent($event)" -->
   <div class="message-list-container">
     <div class="message-history box-shadow">
       <dx-scroll-view
@@ -18,13 +21,12 @@
         [scrollByThumb]="true"
         [bounceEnabled]="false"
         [width]="'100%'"
-        [height]="'50vh'"
+        [height]="'74vh'"
       >
         <ng-container *ngIf="currentFilterByPropertyValue">
           <div class="message-list" *ngFor="let item of messageList">
-            <div>Test A</div>
+            <div>{{ item?.sender.displayName }}</div>
             <div class="message-body">
-              <!-- [height]="50" -->
               <dx-html-editor
                 [width]="'100%'"
                 readOnly="true"
@@ -39,6 +41,35 @@
         </ng-container>
       </dx-scroll-view>
     </div>
+  </div>
+  <div class="online-user-container">
+    <div class="online-user-header">Member List</div>
+    <div class="online-user-list">
+      <dx-scroll-view
+        [direction]="'vertical'"
+        [showScrollbar]="true"
+        [scrollByContent]="true"
+        [scrollByThumb]="true"
+        [width]="'100%'"
+        [height]="'58vh'"
+      >
+        <div class="online-user-body" *ngFor="let item of chatUserList">
+          <img
+            *ngIf="currentUserId"
+            [src]="mapFileListToUrl(item?.id)"
+            alt="..."
+            style="height: 50px; width: 50px; border-radius: 50px"
+          />
+          <div class="online-user-name">
+            {{ item?.displayName }}
+          </div>
+          <dx-button
+            (onClick)="sendPrivateChatMessage()"
+            [icon]="'arrowright'"
+          ></dx-button>
+        </div>
+      </dx-scroll-view>
+    </div>
     <div class="chat-input-container">
       <div class="avatar">
         <img
@@ -51,54 +82,17 @@
           {{ currentUserDisplayname }}
         </div>
       </div>
-      <dx-html-editor
-        [height]="100"
-        [width]="'80%'"
-        style="border-radius: 25px; background: transparent"
+      <dx-text-box
         (onValueChanged)="onChatInputChanged($event)"
+        [showClearButton]="true"
+        (onEnterKey)="onEnterKey()"
+        [placeholder]="'Enter message...'"
       >
-        <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
-      </dx-html-editor>
+      </dx-text-box>
       <dx-button
         (onClick)="sendChatMessage()"
         [icon]="'arrowright'"
       ></dx-button>
     </div>
   </div>
-  <div class="online-user-container">
-    <div class="online-user-header">Member List</div>
-    <div class="online-user-list">
-      <dx-scroll-view
-        [direction]="'vertical'"
-        [showScrollbar]="true"
-        [scrollByContent]="true"
-        [scrollByThumb]="true"
-        [width]="'100%'"
-      >
-        <div class="online-user-body">
-          <img
-            *ngIf="currentUserId"
-            [src]="mapFileListToUrl(currentUserId)"
-            alt="..."
-            style="height: 50px; width: 50px; border-radius: 50px"
-          />
-          <div class="online-user-name">
-            {{ currentUserDisplayname }}
-          </div>
-          <dx-button
-            (onClick)="sendPrivateChatMessage()"
-            [icon]="'arrowright'"
-          ></dx-button>
-        </div>
-      </dx-scroll-view>
-    </div>
-  </div>
 </div>
-
-<dx-speed-dial-action
-  icon="arrowup"
-  label=""
-  [index]="1"
-  (onClick)="scrollTop()"
->
-</dx-speed-dial-action>

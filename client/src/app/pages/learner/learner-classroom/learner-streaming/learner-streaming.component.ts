@@ -55,7 +55,7 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
   isPopupChatVisible: boolean;
   isPopupLessonVisible: boolean;
   isPopupTestVisible: boolean;
-  isPopupRoomVisible: boolean;
+  isPopupSettingVisible: boolean;
   isPopupVideoVisible: boolean;
   isShowingLesson: boolean = false;
   isShowingQuestion: boolean = false;
@@ -63,9 +63,9 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
   isShowingCorrectAnswer: boolean = false;
   isShowingResult: boolean = false;
   isPresenting: boolean = false;
+  selectedPresenter!: UserEntry;
   selectedTestId: string = '';
   selectedQuestion!: any;
-  selectedPresenter!: UserEntry;
   receiveChatUserEntry!: UserEntry;
 
   userEntry: UserEntry = {
@@ -75,6 +75,19 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
   currentCourseId: string;
 
   chatUserList: Array<UserEntry> = [];
+
+  // chatUserList: Array<UserEntry> = [
+  //   { id: '0d0ea585-e59f-4a79-76a4-08d9abdd6f9a', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  // ];
   messageList: Array<ChatMessage> = [];
   assetList: Array<any> = [];
   quizList: Array<any> = [];
@@ -82,6 +95,17 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
   resultBoard: Array<any> = [];
 
   fileData: File = {
+    sourceID: '',
+    container: '',
+    category: '',
+    title: '',
+    fileName: '',
+    fileSize: 0,
+    fileType: '',
+    url: '../../../../assets/imgs/profile.png',
+  };
+
+  currentUserImg: File = {
     sourceID: '',
     container: '',
     category: '',
@@ -100,10 +124,42 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
   constructor(
     private signaling: SignalrService,
     private store: StoreService,
-    private fileStore: FileStore,
     private router: Router,
-    private route: ActivatedRoute
+    private fileStore: FileStore
   ) {}
+
+  getLatestBlackboard() {
+    if (this.isShowingQuestion) {
+      this.signaling.invoke('GetQuestion', this.room.name);
+      this.store.showNotif('Fetching data', 'custom');
+    }
+    if (this.isShowingLesson)
+      this.signaling.invoke('GetLesson', this.room.name);
+    if (this.isShowingResult)
+      this.signaling.invoke('GetTestResult', this.room.name);
+  }
+
+  getOperationFlag(data: any) {
+    this.isShowingLesson = data.isShowingLesson;
+    this.isShowingQuestion = data.isShowingQuestion;
+    this.isShowingAnswer = data.isShowingAnswer;
+    this.isShowingCorrectAnswer = data.isShowingCorrectAnswer;
+    this.isShowingResult = data.isShowingResult;
+    console.log('CURRENT FLAG');
+    console.log(data);
+    this.store.showNotif('Fetching data', 'custom');
+  }
+
+  setOperationFlag() {
+    const operationFlag = {
+      isShowingLesson: this.isShowingLesson,
+      isShowingQuestion: this.isShowingQuestion,
+      isShowingAnswer: this.isShowingAnswer,
+      isShowingCorrectAnswer: this.isShowingCorrectAnswer,
+      isShowingResult: this.isShowingResult,
+    };
+    this.signaling.invoke('SetOperationFlag', this.room.name, operationFlag);
+  }
 
   getMetaData() {
     return this.store.$currentSession.subscribe((data: Session) => {
@@ -123,24 +179,16 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
     this.isPopupVideoVisible = true;
   }
 
-  openPopupTest() {
-    this.isPopupTestVisible = true;
-  }
-
-  openPopupLesson() {
-    this.isPopupLessonVisible = true;
-  }
-
   openPopupChat() {
     this.isPopupChatVisible = true;
   }
 
-  openPopupRoom() {
-    this.isPopupRoomVisible = true;
+  openPopupSetting() {
+    this.isPopupSettingVisible = true;
   }
 
-  closePopupRoom = () => {
-    this.isPopupRoomVisible = false;
+  closePopupSetting = () => {
+    this.isPopupSettingVisible = false;
   };
 
   closePopupVideo = () => {
@@ -151,18 +199,18 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
     this.isPopupChatVisible = false;
   };
 
-  closePopupLesson = () => {
-    this.isPopupLessonVisible = false;
-  };
-
-  closePopupTest = () => {
-    this.isPopupTestVisible = false;
-  };
-
+  getUserMediaData(id: string) {
+    this.fileStore.getFile(id).then((data: any) => {
+      if (data !== null) {
+        this.currentUserImg = data.data[0];
+      }
+    });
+  }
   getUserID() {
     return this.store.$currentUserId.subscribe((data: string) => {
       if (data) {
         this.userEntry.id = data;
+        this.getUserMediaData(this.userEntry.id);
       }
     });
   }
@@ -193,7 +241,6 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
     return this.fileStore.$fileList.subscribe((data: any) => {
       if (data.length !== 0) {
         this.fileList = data;
-        // //
       }
     });
   }
@@ -202,21 +249,6 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
     const sourceIds = sourceIDs.map((e: any) => e.id);
     this.fileStore.getFiles(sourceIds);
   }
-
-  onSubmit(e: any) {
-    e.preventDefault();
-    this.start();
-  }
-
-  insertAsset = (e: any, type: string, thumbnail: string) => {
-    this.assetList = this.assetList.concat({ asset: e, type, thumbnail });
-  };
-
-  insertQuiz = (e: any, type: string, thumbnail: string) => {
-    this.selectedTestId = e.testId;
-    console.log(this.selectedTestId);
-    this.quizList = this.quizList.concat({ quiz: e.question, type, thumbnail });
-  };
 
   submitAnswer(obj: { q: Question; e: Answer }) {
     const mapAnswerRequest = {
@@ -240,73 +272,12 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
     };
     console.log(doTestRequest);
     this.signaling.invoke('DoTest', this.room.name, doTestRequest);
-  }
-
-  showAnswerChoice(isShow: boolean) {
-    this.signaling.invoke('ShowAnswerChoice', this.room.name, isShow);
-  }
-
-  showCorrectAnswer(isShow: boolean) {
-    this.signaling.invoke('ShowCorrectAnswer', this.room.name, isShow);
+    this.isShowingResult = true;
+    this.setOperationFlag();
   }
 
   clearBoard() {
     this.blackBoard = [];
-  }
-
-  writeBoard(e: any) {
-    switch (e.type) {
-      case 'lesson':
-        this.addLesson(e.asset.id);
-        break;
-      case 'question':
-        this.addQuestion(e.quiz.id);
-        break;
-      default:
-        break;
-    }
-    // this.blackBloard = this.blackBloard.concat(e);
-  }
-
-  removeAsset(e: any) {
-    this.assetList = this.assetList.filter(
-      (a: any) => a.asset.id !== e.asset.id
-    );
-    this.store.showNotif(`Removed ${e.asset.name}`, 'custom');
-  }
-
-  removeQuiz(e: any) {
-    this.quizList = this.quizList.filter((a: any) => a.quiz.id !== e.quiz.id);
-    this.store.showNotif(`Removed ${e.quiz.content}`, 'custom');
-  }
-
-  addLesson(id: string) {
-    this.signaling.invoke('AddLesson', this.room.name, id);
-  }
-
-  removeLesson(id: string) {
-    this.signaling.invoke('RemoveLesson', this.room.name, id);
-  }
-
-  flipLesson(id: string, isFront: boolean) {
-    this.signaling.invoke('UpdateLesson', this.room.name, isFront, id);
-  }
-
-  addQuestion(id: string) {
-    this.signaling.invoke('AddQuestion', this.room.name, id);
-  }
-
-  removeQuestion(id: string) {
-    this.signaling.invoke('RemoveQuestion', this.room.name, id);
-  }
-
-  invitePresenting(userEntry: UserEntry, isPresenting: boolean) {
-    this.signaling.invoke(
-      'InviteForPresenting',
-      this.room.name,
-      userEntry,
-      isPresenting
-    );
   }
 
   sendMessage = (message: any) => {
@@ -388,6 +359,15 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
     // #2 define signaling communication
     this.defineSignaling();
 
+    // this.signaling.invoke('GetOperationFlag', this.room.name).then(() => {
+    //   this.signaling.define('operationFlag', (flag: any) => {
+    //     this.getOperationFlag(flag);
+    //     setTimeout(() => {
+    //       this.getLatestBlackboard();
+    //     }, 500);
+    //     console.log(flag);
+    //   });
+    // });
     this.openPopupVideo();
 
     // #3 get media from current client
@@ -404,6 +384,7 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
       console.log(userEntryList);
       this.chatUserList = userEntryList;
       this.isInitiator = true;
+      this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
 
     this.signaling.define('joined', (userEntryList: any) => {
@@ -411,13 +392,14 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
       console.log(userEntryList);
       this.chatUserList = userEntryList;
       this.isChannelReady = true;
+      this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
 
     this.signaling.define('left', (userEntryList: any) => {
       console.log('CURRENT USER ENTRY LIST');
       console.log(userEntryList);
       this.chatUserList = userEntryList;
-      // this.isChannelReady = true;
+      this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
 
     this.signaling.define('isShowAnswerChoice', (isShow: boolean) => {
@@ -449,11 +431,7 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
       this.resultBoard = list;
       const displayName = list[list.length].userAccountResponse.displayName;
       this.store.showNotif(`${displayName} has submitted an answer`, 'custom');
-      // console.log(this.blackBoard);
-      // const stringIds = list.map(
-      //   (e: any) => e.userAccountResponse.id
-      // );
-      // console.log(stringIds);
+
       this.fetchMediaBySourceID(list.map((e: any) => e.userAccountResponse.id));
       this.dxScrollView.instance.scrollBy(150);
     });
@@ -470,7 +448,6 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
       this.blackBoard.push(question);
       console.log(this.blackBoard);
       this.fetchMediaBySourceID([question]);
-      // console.log(this.lessonList);
     });
 
     this.signaling.define(
@@ -699,17 +676,31 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
   }
 
   hangup(): void {
-    console.log('Hanging up.');
-    this.stopPeerConnection();
-    // this.sendMessage(`${this.userEntry.DisplayName} has left.`);
-    console.log(this.room.name);
-    console.log(this.userEntry);
-    this.signaling
-      .invoke('LeaveRoom', this.room.name, this.userEntry)
-      .then(() => {
-        // setTimeout(() => {
-        this.signaling.disconnect();
-        // }, 5000);
+    this.store
+      .confirmDialog('Do you want to disconnect?')
+      .then((confirm: boolean) => {
+        if (confirm) {
+          if (this.localStream && this.localStream.active) {
+            this.localStream.getTracks().forEach((track) => {
+              track.stop();
+            });
+          }
+          if (this.remoteStream && this.remoteStream.active) {
+            this.remoteStream.getTracks().forEach((track) => {
+              track.stop();
+            });
+          }
+          console.log('Hanging up.');
+          this.stopPeerConnection();
+          console.log(this.room.name);
+          console.log(this.userEntry);
+          this.signaling
+            .invoke('LeaveRoom', this.room.name, this.userEntry)
+            .then(() => {
+              this.signaling.disconnect();
+            });
+          this.router.navigate(['learner_classroom']);
+        }
       });
   }
 
@@ -732,16 +723,8 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
     this.getUserID().unsubscribe();
     this.getDisplayName().unsubscribe();
     this.getMetaData().unsubscribe();
-    this.hangup();
-    if (this.localStream && this.localStream.active) {
-      this.localStream.getTracks().forEach((track) => {
-        track.stop();
-      });
-    }
-    if (this.remoteStream && this.remoteStream.active) {
-      this.remoteStream.getTracks().forEach((track) => {
-        track.stop();
-      });
+    if (this.signaling.isConnected()) {
+      this.hangup();
     }
   }
 }

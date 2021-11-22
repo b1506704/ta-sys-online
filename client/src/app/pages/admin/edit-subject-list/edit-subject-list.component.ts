@@ -76,7 +76,7 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
         locateInMenu: 'auto',
         widget: 'dxButton',
         options: {
-          type: 'danger',
+          type: 'normal',
           icon: 'parentfolder',
           hint: 'Generate random 100+ items',
           onClick: this.onAddRandom.bind(this),

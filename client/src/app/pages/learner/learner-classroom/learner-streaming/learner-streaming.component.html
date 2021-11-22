@@ -15,9 +15,25 @@
 <div class="classroom-container" *ngIf="currentCourseId">
   <div class="session-user shadow">
     <ng-container *ngIf="chatUserList.length">
-      <div class="participant shadow" *ngFor="let item of chatUserList">
-        {{ item?.displayName }}
-      </div>
+      <dx-gallery
+        [dataSource]="chatUserList"
+        [height]="'100%'"
+        [loop]="false"
+        [width]="'100%'"
+        [initialItemWidth]="100"
+        [showNavButtons]="true"
+        [showIndicator]="false"
+      >
+        <div class="participant shadow" *dxTemplate="let item of 'item'">
+          <div class="participant-img">
+            <img [src]="mapFileListToUrl(item?.id)" alt="..." />
+            <!-- style="height: 100%; width: 100%" -->
+          </div>
+          <div class="display-name">
+            {{ item?.displayName }}
+          </div>
+        </div>
+      </dx-gallery>
     </ng-container>
   </div>
   <div class="session-blackboard box-shadow">
@@ -27,9 +43,9 @@
         [height]="'100%'"
         [loop]="false"
         [width]="'100%'"
-        [initialItemWidth]="450"
         [showNavButtons]="true"
         [showIndicator]="false"
+        [initialItemWidth]="'80%'"
       >
         <div *dxTemplate="let item of 'item'">
           <ng-container *ngIf="isShowingLesson">
@@ -48,8 +64,8 @@
                     <dx-html-editor
                       readOnly="true"
                       [value]="item?.frontText"
-                      [height]="'90%'"
-                      [width]="'90%'"
+                      [height]="'100%'"
+                      [width]="'100%'"
                     >
                       <dxo-media-resizing [enabled]="true">
                       </dxo-media-resizing>
@@ -60,92 +76,63 @@
                   <div class="asset-body">
                     <dx-html-editor
                       readOnly="true"
+                      [height]="'100%'"
+                      [width]="'100%'"
                       [value]="item?.backText"
-                      [height]="'300px'"
-                      [width]="'330px'"
                     >
                       <dxo-media-resizing [enabled]="true">
                       </dxo-media-resizing>
                     </dx-html-editor>
                   </div>
                 </div>
-                <div class="asset-button">
-                  <dx-button
-                    icon="refresh"
-                    type="normal"
-                    hint="Click to flip"
-                    (onClick)="flipLesson(item.id, !item.isFront)"
-                  ></dx-button>
-                  <dx-button
-                    icon="trash"
-                    type="normal"
-                    hint="Click to delete"
-                    (onClick)="removeLesson(item.id)"
-                  ></dx-button>
-                </div>
+                <div class="asset-button"></div>
               </div>
             </div>
           </ng-container>
           <ng-container *ngIf="isShowingQuestion">
             <div
               [ngClass]="{
-                'asset-container': isShowingAnswer === false,
-                'asset-container-flip': isShowingAnswer === true
+                'question-container': isShowingAnswer === false,
+                'question-container-flip': isShowingAnswer === true
               }"
             >
-              <div class="asset-card">
-                <div class="asset-front">
-                  <div class="asset-title">
+              <div class="question-card">
+                <div class="question-front">
+                  <div class="question-body">
                     <dx-html-editor
                       readOnly="true"
                       [value]="item?.content"
-                      [height]="'300px'"
-                      [width]="'330px'"
+                      [height]="'100%'"
+                      [width]="'100%'"
                     >
                       <dxo-media-resizing [enabled]="true">
                       </dxo-media-resizing>
                     </dx-html-editor>
                   </div>
-                  <div class="asset-body" *ngIf="isShowingAnswer === true">
-                    <div
-                      class="answer-container shadow"
-                      *ngFor="let answer of item?.answerResponses"
-                    >
-                      <dx-button
-                        [ngClass]="{
-                          'answer-body': isShowingAnswer === true,
-                          'answer-body-correct':
-                            isShowingCorrectAnswer === true &&
-                            answer.isCorrect === true
-                        }"
-                        (onClick)="submitAnswer({ q: item, e: answer })"
-                      >
-                        <dx-html-editor
-                          readOnly="true"
-                          [value]="answer?.content"
-                          [height]="'90%'"
-                          [width]="'90%'"
-                        >
-                          <dxo-media-resizing [enabled]="true">
-                          </dxo-media-resizing>
-                        </dx-html-editor>
-                      </dx-button>
-                    </div>
-                  </div>
                 </div>
-                <div class="asset-button">
+                <div class="asset-button"></div>
+              </div>
+              <div class="answer-container" *ngIf="isShowingAnswer === true">
+                <div *ngFor="let answer of item?.answerResponses">
                   <dx-button
-                    icon="upload"
-                    type="normal"
-                    hint="Click to show answer choice"
-                    (onClick)="showAnswerChoice(!isShowingAnswer)"
-                  ></dx-button>
-                  <dx-button
-                    icon="check"
-                    type="normal"
-                    hint="Click to show correct answer"
-                    (onClick)="showCorrectAnswer(!isShowingCorrectAnswer)"
-                  ></dx-button>
+                    [ngClass]="{
+                      'answer-body': isShowingAnswer === true,
+                      'answer-body-correct':
+                        isShowingCorrectAnswer === true &&
+                        answer.isCorrect === true
+                    }"
+                    (onClick)="submitAnswer({ q: item, e: answer })"
+                  >
+                    <dx-html-editor
+                      readOnly="true"
+                      [value]="answer?.content"
+                      [height]="'100%'"
+                      [width]="'100%'"
+                    >
+                      <dxo-media-resizing [enabled]="true">
+                      </dxo-media-resizing>
+                    </dx-html-editor>
+                  </dx-button>
                 </div>
               </div>
             </div>
@@ -162,7 +149,7 @@
         [scrollByThumb]="true"
         bounceEnabled="true"
         [height]="280"
-        [width]="150"
+        [width]="350"
       >
         <div class="result-card shadow" *ngFor="let item of resultBoard">
           <div class="result-front">
@@ -176,195 +163,62 @@
                 style="height: 100%; width: 100%"
               />
             </div>
-            <!-- *ngFor="let answer of item.answerResponses" -->
-            <div class="asset-body">
+            <div class="result-body">
               <div class="answer-container shadow">
-                Choice: {{ item?.questionResponses[0].content }}
+                Choice:
+                <dx-html-editor
+                  readOnly="true"
+                  [value]="
+                    item?.questionResponses[0].answerResponses[0].content
+                  "
+                  [height]="'100%'"
+                  [width]="'100%'"
+                >
+                  <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+                </dx-html-editor>
               </div>
               <div class="answer-container shadow">
                 Score: {{ item?.score }}
               </div>
             </div>
           </div>
-          <div class="asset-button">
-            <dx-button
-              icon="upload"
-              type="normal"
-              hint="Click to invite for presenting"
-              (onClick)="
-                invitePresenting(
-                  {
-                    id: item?.userAccountResponse.id,
-                    displayName: item?.userAccountResponse.displayName
-                  },
-                  !isPresenting
-                )
-              "
-            ></dx-button>
-            <dx-button
-              icon="arrowright"
-              type="normal"
-              hint="Click to send private message"
-              (onClick)="
-                privateMessage({
-                  id: item?.userAccountResponse.id,
-                  displayName: item?.userAccountResponse.displayName
-                })
-              "
-            ></dx-button>
-          </div>
+          <div class="asset-button"></div>
         </div>
       </dx-scroll-view>
     </div>
   </ng-container>
-  <div class="session-instructor">
-    <div class="participant neon">
-      {{ userEntry?.displayName }}
-    </div>
-    <div class="desk">
-      <div class="desk-asset-container box-shadow">
-        <div class="desk-title neon">Lesson Asset</div>
-        <ng-container *ngIf="assetList.length">
-          <dx-gallery
-            [dataSource]="assetList"
-            [height]="'100%'"
-            [loop]="false"
-            [width]="'100%'"
-            [initialItemWidth]="150"
-            [showNavButtons]="true"
-            [showIndicator]="false"
-          >
-            <div *dxTemplate="let item of 'item'">
-              <div class="card-container">
-                <div class="card">
-                  <div class="card-title">{{ item?.asset.name }}</div>
-                  <div class="card-img">
-                    <img
-                      [src]="item?.thumbnail"
-                      alt="..."
-                      style="height: 100%; width: 100%"
-                    />
-                  </div>
-                  <div class="card-button">
-                    <dx-button
-                      icon="upload"
-                      type="normal"
-                      hint="Click to import to desk"
-                      (onClick)="writeBoard(item)"
-                    ></dx-button>
-                    <dx-button
-                      icon="trash"
-                      type="normal"
-                      hint="Click to remove lesson from desk"
-                      (onClick)="removeAsset(item)"
-                    ></dx-button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </dx-gallery>
-        </ng-container>
-      </div>
-      <div class="desk-asset-container box-shadow">
-        <div class="desk-title neon">Quiz Asset</div>
-        <ng-container *ngIf="quizList.length">
-          <dx-gallery
-            [dataSource]="quizList"
-            [height]="'100%'"
-            [loop]="false"
-            [width]="'100%'"
-            [initialItemWidth]="150"
-            [showNavButtons]="true"
-            [showIndicator]="false"
-          >
-            <div *dxTemplate="let item of 'item'">
-              <div class="card-container">
-                <div class="card">
-                  <div class="card-title">
-                    <dx-html-editor
-                      readOnly="true"
-                      [value]="item?.quiz.content"
-                      [height]="'80px'"
-                      [width]="'150px'"
-                    >
-                      <dxo-media-resizing [enabled]="true">
-                      </dxo-media-resizing>
-                    </dx-html-editor>
-                  </div>
-                  <div class="card-button">
-                    <dx-button
-                      icon="upload"
-                      type="normal"
-                      hint="Click to import to desk"
-                      (onClick)="writeBoard(item)"
-                    ></dx-button>
-                    <dx-button
-                      icon="trash"
-                      type="normal"
-                      hint="Click to remove quiz from desk"
-                      (onClick)="removeQuiz(item)"
-                    ></dx-button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </dx-gallery>
-        </ng-container>
-      </div>
-    </div>
-  </div>
 </div>
 
 <dx-popup
-  id="room-shortcut-popup"
-  [title]="'Join Room'"
+  id="webcam-popup"
+  [title]="'Media Check'"
   [showTitle]="true"
   [shading]="true"
-  [position]="'right'"
+  [position]="'center'"
   [showCloseButton]="true"
-  (onHiding)="closePopupRoom()"
+  (onHiding)="closePopupSetting()"
   [dragEnabled]="true"
-  [height]="'50%'"
-  [width]="'20%'"
-  [visible]="isPopupRoomVisible"
+  [height]="'70%'"
+  [width]="'60%'"
+  [visible]="isPopupSettingVisible"
 >
   <div *dxTemplate="let data of 'content'">
-    <form (submit)="onSubmit($event)">
-      <dx-form [formData]="room">
-        <dxi-item
-          dataField="name"
-          [label]="{ text: 'Room Name' }"
-          editorType="dxTextBox"
-        >
-          <dxi-validation-rule type="required" message="Room name is required">
-          </dxi-validation-rule>
-          <dxi-validation-rule
-            type="stringLength"
-            message="Room name cannot lower than 1 letter!"
-            [min]="1"
-          >
-          </dxi-validation-rule>
-        </dxi-item>
-        <dxi-item itemType="group" [colCount]="1" [cssClass]="'buttonGroup'">
-          <dxi-item
-            itemType="button"
-            horizontalAlignment="center"
-            [buttonOptions]="submitRoomButtonOptions"
-          >
-          </dxi-item>
-        </dxi-item>
-      </dx-form>
-    </form>
+    <div *ngIf="!localStream">
+      Please grant us permission to access camera and audio.
+    </div>
+    <div *ngIf="localStream" class="media-check">
+      <video #localVideo id="localVideo" autoplay></video>
+    </div>
   </div>
 </dx-popup>
 <dx-popup
   id="webcam-popup"
-  [title]="'Webcam'"
+  [title]="'Webcam Setting'"
   [showTitle]="true"
   [shading]="true"
-  [position]="'left'"
+  [position]="'center'"
   [showCloseButton]="true"
-  (onHiding)="closePopupVideo()"
+  (onHiding)="closePopupSetting()"
   [dragEnabled]="true"
   [height]="'70%'"
   [width]="'60%'"
@@ -388,61 +242,19 @@
   [userEntry]="userEntry"
   [isVisible]="isPopupChatVisible"
 ></app-chat-message-list>
-<app-lesson-list
-  [closePopupLesson]="closePopupLesson"
-  [insertAsset]="insertAsset"
-  [courseId]="currentCourseId"
-  [title]="'Lesson List'"
-  [isVisible]="isPopupLessonVisible"
-></app-lesson-list>
-<app-test-list
-  [closePopupTest]="closePopupTest"
-  [insertQuiz]="insertQuiz"
-  [courseId]="currentCourseId"
-  [title]="'Test List'"
-  [isVisible]="isPopupTestVisible"
-></app-test-list>
-<!-- <ng-container *ngIf="isStarted">
-  <dx-speed-dial-action
-    icon="like"
-    label="Leave Room"
-    [index]="1"
-    (onClick)="hangup()"
-  >
-  </dx-speed-dial-action>
-</ng-container> -->
+
 <dx-speed-dial-action
-  icon="like"
-  label="Join Room"
-  [index]="0"
-  (onClick)="openPopupRoom()"
->
-</dx-speed-dial-action>
-<dx-speed-dial-action
-  icon="like"
-  label="Add Lesson"
-  [index]="1"
-  (onClick)="openPopupLesson()"
->
-</dx-speed-dial-action>
-<dx-speed-dial-action
-  icon="like"
-  label="Add Test"
-  [index]="2"
-  (onClick)="openPopupTest()"
->
-</dx-speed-dial-action>
-<dx-speed-dial-action
-  icon="like"
+  icon="comment"
   label="Show Chat"
-  [index]="3"
+  [index]="1"
   (onClick)="openPopupChat()"
 >
 </dx-speed-dial-action>
+
 <dx-speed-dial-action
   icon="like"
-  label="Show Video"
-  [index]="4"
-  (onClick)="openPopupVideo()"
+  label="Leave Room"
+  [index]="2"
+  (onClick)="hangup()"
 >
 </dx-speed-dial-action>

@@ -3,8 +3,7 @@ import {
   Input,
   OnChanges,
   OnDestroy,
-  OnInit,
-  ViewChild,
+  OnInit,  
 } from '@angular/core';
 import { Question } from 'src/app/shared/models/question';
 import { QuestionStore } from 'src/app/shared/services/question/question-store.service';
@@ -57,55 +56,9 @@ export class QuestionListComponent implements OnInit, OnDestroy, OnChanges {
     private questionHTTP: QuestionHttpService
   ) {}
 
-  refresh() {
-    this.initData();
-  }
+ 
 
-  updateQuestion(question: Question) {
-    this.currentUpdatedQuestion = question;
-    this.isUpdatePopupVisible = true;
-  }
-
-  deleteQuestion(question: Question) {
-    this.questionStore.confirmDialog('').then((confirm: boolean) => {
-      if (confirm) {
-        this.store.setIsLoading(true);
-        this.questionHTTP
-          .deleteQuestion([question.id])
-          .subscribe((data: any) => {
-            this.initData();
-            this.store.showNotif(`${data.responseMessage}`, 'custom');
-            this.store.setIsLoading(false);
-          });
-      }
-    });
-  }
-
-  uploadQuestion() {
-    this.isUploadPopupVisible = true;
-  }
-
-  isSavingListener() {
-    return this.questionStore.$isUploading.subscribe((data: any) => {
-      if (data === false) {
-        this.initData();
-      }
-    });
-  }
-
-  mapFileListToUrl(_id: string) {
-    if (this.fileList.length !== 0) {
-      const fetchedFile = this.fileList.find(
-        (e: any) => e.sourceID === _id
-      )?.url;
-      if (fetchedFile) {
-        return fetchedFile;
-      } else {
-        return this.fileData.url;
-      }
-    }
-    return this.fileData.url;
-  }
+  
 
   initData() {
     if (this.testId) {
@@ -131,10 +84,10 @@ export class QuestionListComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
-    this.isSavingListener();
+   
   }
 
   ngOnDestroy(): void {
-    this.isSavingListener().unsubscribe();
+    
   }
 }

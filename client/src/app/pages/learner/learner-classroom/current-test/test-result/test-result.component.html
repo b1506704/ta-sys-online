@@ -1,0 +1,65 @@
+<dx-popup
+  id="detail-popup"
+  [title]="'Congratulations! You have finished the test!'"
+  [showTitle]="true"
+  [shading]="true"
+  [position]="'center'"
+  [showCloseButton]="false"
+  [dragEnabled]="false"
+  [height]="'95%'"
+  [width]="'95%'"
+  [visible]="isVisible"
+>
+  <div *dxTemplate="let data of 'content'">
+    <dx-scroll-view
+      [direction]="'vertical'"
+      [showScrollbar]="true"
+      [scrollByContent]="true"
+      [scrollByThumb]="true"
+      [bounceEnabled]="false"
+      [height]="'85%'"
+      [width]="'100%'"
+    >
+      <div class="result-container shadow">
+        <div class="total-score">Total Score: {{ testResultData?.score }}</div>
+        <div
+          class="question-container shadow"
+          *ngFor="let item of testResultData?.questionResponses; index as i"
+        >
+          <div class="question-content">
+            Question {{ i + 1 }}:
+            <dx-html-editor
+              readOnly="true"
+              [value]="item?.content"
+              [height]="'100%'"
+              [width]="'100%'"
+            >
+              <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+            </dx-html-editor>
+          </div>
+          <div class="answer-content">
+            Your Answer:
+            <dx-button
+              [icon]="item?.answerResponses[0].isCorrect ? 'check' : 'close'"
+            ></dx-button>
+            <dx-html-editor
+              readOnly="true"
+              [value]="item?.answerResponses[0].content"
+              [height]="'100%'"
+              [width]="'100%'"
+            >
+              <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+            </dx-html-editor>
+          </div>
+        </div>
+      </div>
+    </dx-scroll-view>
+    <div class="button-group">
+      <dx-button
+        style="width: 250px; height: 50px; border-radius: 5px"
+        (onClick)="finishReview()"
+        >Finish Review</dx-button
+      >
+    </div>
+  </div>
+</dx-popup>

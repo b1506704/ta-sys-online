@@ -76,7 +76,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
         locateInMenu: 'auto',
         widget: 'dxButton',
         options: {
-          type: 'danger',
+          type: 'normal',
           icon: 'trash',
           hint: 'Delete all items',
           onClick: this.deleteAll.bind(this),
@@ -87,7 +87,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
         locateInMenu: 'auto',
         widget: 'dxButton',
         options: {
-          type: 'danger',
+          type: 'normal',
           icon: 'parentfolder',
           hint: 'Generate random item',
           onClick: this.onAddRandom.bind(this),

@@ -12,7 +12,7 @@
   <dxi-item location="center" locateInMenu="auto">
     <dx-button
       icon="trash"
-      type="danger"
+      type="normal"
       [visible]="isSelectInfoVisible"
       hint="Delete current selected items"
       (onClick)="deleteSelectedItems()"
@@ -75,7 +75,7 @@
     <dxi-column dataField="summary">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column>
-    <dxi-column dataField="duration" dataType="number">
+    <dxi-column dataField="duration" dataType="number" caption="Duration (weeks)">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column>
     <dxi-column dataField="description">

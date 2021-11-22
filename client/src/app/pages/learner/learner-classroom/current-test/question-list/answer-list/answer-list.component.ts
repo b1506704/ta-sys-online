@@ -1,7 +1,9 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { Answer } from 'src/app/shared/models/answer';
+import { Question } from 'src/app/shared/models/question';
 import { AnswerStore } from 'src/app/shared/services/answer/answer-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
+import { TestStore } from 'src/app/shared/services/test/test-store.service';
 
 @Component({
   selector: 'app-answer-list',
@@ -10,15 +12,39 @@ import { StoreService } from 'src/app/shared/services/store.service';
 })
 export class AnswerListComponent implements OnInit, OnDestroy, OnChanges {
   @Input() questionId: string;
+
+  @Input() question: Question;
   answerList: Array<Answer> = [];
+
+  answerIds: Array<string> = [];
   pageSize: number = 100;
   currentFilterByPropertyValue: string;
   currentFilterProperty: string = 'questionId';
   currentSelectedAnswer!: Answer;
-  constructor(private answerStore: AnswerStore, private store: StoreService) {}
+  constructor(
+    private answerStore: AnswerStore,
+    private store: StoreService,
+    private testStore: TestStore
+  ) {}
 
   submitAnswer(answer: Answer) {
+    const question = this.question;
+    question.answerRequests = [answer];
+    this.testStore.addAnswerIds(answer.id);
+    this.testStore.addQuestionToTestRequest(question);
+  }
 
+  findSelectedAnswerId(id: String) {
+    return this.answerIds.find((e: any) => e === id);
+  }
+
+  answerIdsListener() {
+    return this.testStore.$saveAnswerIds.subscribe((data: any) => {
+      if (data) {
+        this.answerIds = data;
+        console.log(this.answerIds);
+      }
+    });
   }
 
   initData() {
@@ -44,7 +70,11 @@ export class AnswerListComponent implements OnInit, OnDestroy, OnChanges {
     this.initData();
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.answerIdsListener();
+  }
 
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    this.answerIdsListener().unsubscribe();
+  }
 }

@@ -15,7 +15,7 @@
   <dxi-item [locateInMenu]="'auto'" [location]="'after'">
     <dx-button
       icon="plus"
-      type="danger"
+      type="normal"
       hint="Click to add post post detail"
       (onClick)="uploadPost()"
     ></dx-button>
@@ -85,7 +85,7 @@
             <div class="button-group">
               <dx-button
                 icon="like"
-                type="danger"
+                type="normal"
                 hint="Click to like post"
                 (onClick)="likePost(item)"
               ></dx-button>
@@ -103,14 +103,14 @@
             >
               <dx-button
                 icon="trash"
-                type="danger"
+                type="normal"
                 hint="Click to delete post"
                 (onClick)="deletePost(item)"
               ></dx-button>
               <div class="like-count">-</div>
               <dx-button
                 icon="edit"
-                type="danger"
+                type="normal"
                 hint="Click to edit post"
                 (onClick)="updatePost(item)"
               ></dx-button>

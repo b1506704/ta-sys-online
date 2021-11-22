@@ -55,7 +55,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   isPopupChatVisible: boolean;
   isPopupLessonVisible: boolean;
   isPopupTestVisible: boolean;
-  isPopupRoomVisible: boolean;
+  isPopupSettingVisible: boolean;
   isPopupVideoVisible: boolean;
   isShowingLesson: boolean = false;
   isShowingQuestion: boolean = false;
@@ -63,9 +63,9 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   isShowingCorrectAnswer: boolean = false;
   isShowingResult: boolean = false;
   isPresenting: boolean = false;
+  selectedPresenter!: UserEntry;
   selectedTestId: string = '';
   selectedQuestion!: any;
-  selectedPresenter!: UserEntry;
   receiveChatUserEntry!: UserEntry;
 
   userEntry: UserEntry = {
@@ -74,20 +74,20 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   };
   currentCourseId: string;
 
-  // chatUserList: Array<UserEntry> = [];
+  chatUserList: Array<UserEntry> = [];
 
-  chatUserList: Array<UserEntry> = [
-    { id: '0d0ea585-e59f-4a79-76a4-08d9abdd6f9a', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-  ];
+  // chatUserList: Array<UserEntry> = [
+  //   { id: '0d0ea585-e59f-4a79-76a4-08d9abdd6f9a', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  // ];
   messageList: Array<ChatMessage> = [];
   assetList: Array<any> = [];
   quizList: Array<any> = [];
@@ -105,7 +105,16 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     url: '../../../../assets/imgs/profile.png',
   };
 
-  currentUserImg: File;
+  currentUserImg: File = {
+    sourceID: '',
+    container: '',
+    category: '',
+    title: '',
+    fileName: '',
+    fileSize: 0,
+    fileType: '',
+    url: '../../../../assets/imgs/profile.png',
+  };
   fileList: Array<File> = [];
   courseData!: Course;
   creatorData!: any;
@@ -115,10 +124,34 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   constructor(
     private signaling: SignalrService,
     private store: StoreService,
-    private fileStore: FileStore,
     private router: Router,
-    private route: ActivatedRoute
+    private fileStore: FileStore
   ) {}
+
+  // getLatestBlackboard() {
+  //   if (this.isShowingQuestion) this.signaling.invoke('GetQuestion', this.room.name);
+  //   if (this.isShowingLesson) this.signaling.invoke('GetLesson', this.room.name);
+  //   if (this.isShowingResult) this.signaling.invoke('GetTestResult', this.room.name);
+  // }
+
+  // getOperationFlag(data: any) {
+  //   this.isShowingLesson = data.isShowingLesson;
+  //   this.isShowingQuestion = data.isShowingQuestion;
+  //   this.isShowingAnswer = data.isShowingAnswer;
+  //   this.isShowingCorrectAnswer = data.isShowingCorrectAnswer;
+  //   this.isShowingResult = data.isShowingResult;
+  // }
+
+  setOperationFlag() {
+    const operationFlag = {
+      isShowingLesson: this.isShowingLesson,
+      isShowingQuestion: this.isShowingQuestion,
+      isShowingAnswer: this.isShowingAnswer,
+      isShowingCorrectAnswer: this.isShowingCorrectAnswer,
+      isShowingResult: this.isShowingResult,
+    };
+    this.signaling.invoke('SetOperationFlag', this.room.name, operationFlag);
+  }
 
   getMetaData() {
     return this.store.$currentSession.subscribe((data: Session) => {
@@ -150,12 +183,12 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     this.isPopupChatVisible = true;
   }
 
-  openPopupRoom() {
-    this.isPopupRoomVisible = true;
+  openPopupSetting() {
+    this.isPopupSettingVisible = true;
   }
 
-  closePopupRoom = () => {
-    this.isPopupRoomVisible = false;
+  closePopupSetting = () => {
+    this.isPopupSettingVisible = false;
   };
 
   closePopupVideo = () => {
@@ -226,11 +259,6 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     this.fileStore.getFiles(sourceIds);
   }
 
-  onSubmit(e: any) {
-    e.preventDefault();
-    this.start();
-  }
-
   insertAsset = (e: any, type: string, thumbnail: string) => {
     this.assetList = this.assetList.concat({ asset: e, type, thumbnail });
   };
@@ -263,14 +291,20 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     };
     console.log(doTestRequest);
     this.signaling.invoke('DoTest', this.room.name, doTestRequest);
+    this.isShowingResult = true;
+    // this.setOperationFlag();
   }
 
   showAnswerChoice(isShow: boolean) {
     this.signaling.invoke('ShowAnswerChoice', this.room.name, isShow);
+    this.isShowingAnswer = isShow;
+    // this.setOperationFlag();
   }
 
   showCorrectAnswer(isShow: boolean) {
     this.signaling.invoke('ShowCorrectAnswer', this.room.name, isShow);
+    this.isShowingCorrectAnswer = isShow;
+    // this.setOperationFlag();
   }
 
   clearBoard() {
@@ -288,7 +322,6 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       default:
         break;
     }
-    // this.blackBloard = this.blackBloard.concat(e);
   }
 
   removeAsset(e: any) {
@@ -317,10 +350,14 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
   addQuestion(id: string) {
     this.signaling.invoke('AddQuestion', this.room.name, id);
+    this.isShowingQuestion = true;
+    // this.setOperationFlag();
   }
 
   removeQuestion(id: string) {
     this.signaling.invoke('RemoveQuestion', this.room.name, id);
+    this.isShowingQuestion = false;
+    // this.setOperationFlag();
   }
 
   invitePresenting(userEntry: UserEntry, isPresenting: boolean) {
@@ -415,6 +452,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
     // #3 get media from current client
     this.getUserMedia();
+    this.signaling.invoke('GetOperationFlag', this.room.name);
   }
 
   defineSignaling(): void {
@@ -422,11 +460,18 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       console.log(message);
     });
 
+    // this.signaling.define('operationFlag', (flag: any) => {
+    //   this.getOperationFlag(flag);
+    //   this.getLatestBlackboard();
+    //   console.log(flag);
+    // });
+
     this.signaling.define('created', (userEntryList: any) => {
       console.log('CURRENT USER ENTRY LIST');
       console.log(userEntryList);
       this.chatUserList = userEntryList;
       this.isInitiator = true;
+      this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
 
     this.signaling.define('joined', (userEntryList: any) => {
@@ -434,21 +479,24 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       console.log(userEntryList);
       this.chatUserList = userEntryList;
       this.isChannelReady = true;
+      this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
 
     this.signaling.define('left', (userEntryList: any) => {
       console.log('CURRENT USER ENTRY LIST');
       console.log(userEntryList);
       this.chatUserList = userEntryList;
-      // this.isChannelReady = true;
+      this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
 
     this.signaling.define('isShowAnswerChoice', (isShow: boolean) => {
       this.isShowingAnswer = isShow;
+      // this.setOperationFlag();
     });
 
     this.signaling.define('isShowCorrectAnswer', (isShow: boolean) => {
       this.isShowingCorrectAnswer = isShow;
+      // this.setOperationFlag();
     });
 
     this.signaling.define('lesson', (list: any) => {
@@ -458,6 +506,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       this.isShowingCorrectAnswer = false;
       this.isShowingResult = false;
       this.blackBoard = list;
+      this.setOperationFlag();
       console.log(this.blackBoard);
       this.fetchMediaBySourceID(list);
     });
@@ -468,15 +517,12 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       // this.isShowingAnswer = true;
       // this.isShowingCorrectAnswer = true;
       this.isShowingResult = true;
+      this.setOperationFlag();
       console.log(list);
       this.resultBoard = list;
       const displayName = list[list.length].userAccountResponse.displayName;
       this.store.showNotif(`${displayName} has submitted an answer`, 'custom');
-      // console.log(this.blackBoard);
-      // const stringIds = list.map(
-      //   (e: any) => e.userAccountResponse.id
-      // );
-      // console.log(stringIds);
+
       this.fetchMediaBySourceID(list.map((e: any) => e.userAccountResponse.id));
       this.dxScrollView.instance.scrollBy(150);
     });
@@ -492,8 +538,8 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
       this.blackBoard.push(question);
       console.log(this.blackBoard);
+      this.setOperationFlag();
       this.fetchMediaBySourceID([question]);
-      // console.log(this.lessonList);
     });
 
     this.signaling.define(
@@ -722,17 +768,31 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   }
 
   hangup(): void {
-    console.log('Hanging up.');
-    this.stopPeerConnection();
-    // this.sendMessage(`${this.userEntry.DisplayName} has left.`);
-    console.log(this.room.name);
-    console.log(this.userEntry);
-    this.signaling
-      .invoke('LeaveRoom', this.room.name, this.userEntry)
-      .then(() => {
-        // setTimeout(() => {
-        this.signaling.disconnect();
-        // }, 5000);
+    this.store
+      .confirmDialog('Do you want to disconnect?')
+      .then((confirm: boolean) => {
+        if (confirm) {
+          if (this.localStream && this.localStream.active) {
+            this.localStream.getTracks().forEach((track) => {
+              track.stop();
+            });
+          }
+          if (this.remoteStream && this.remoteStream.active) {
+            this.remoteStream.getTracks().forEach((track) => {
+              track.stop();
+            });
+          }
+          console.log('Hanging up.');
+          this.stopPeerConnection();
+          console.log(this.room.name);
+          console.log(this.userEntry);
+          this.signaling
+            .invoke('LeaveRoom', this.room.name, this.userEntry)
+            .then(() => {
+              this.signaling.disconnect();
+            });
+          this.router.navigate(['instructor_classroom']);
+        }
       });
   }
 
@@ -755,16 +815,8 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     this.getUserID().unsubscribe();
     this.getDisplayName().unsubscribe();
     this.getMetaData().unsubscribe();
-    this.hangup();
-    if (this.localStream && this.localStream.active) {
-      this.localStream.getTracks().forEach((track) => {
-        track.stop();
-      });
-    }
-    if (this.remoteStream && this.remoteStream.active) {
-      this.remoteStream.getTracks().forEach((track) => {
-        track.stop();
-      });
+    if (this.signaling.isConnected()) {
+      this.hangup();
     }
   }
 }

@@ -24,33 +24,35 @@
             </div>
           </div>
         </dxi-item>
-        <dxi-item name="startTime">
-          <dxo-label text="Start Time"></dxo-label>
-          <div *dxTemplate>
-            <div class="responsive-field">
-              <dx-date-box
-                [value]="now"
-                type="datetime"
-                [value]="sessionData?.startTime"
-                (onValueChanged)="onStartTimeValueChange($event)"
-              >
-              </dx-date-box>
+        <dxi-item itemType="group" caption="Schedule" colCount="2">
+          <dxi-item name="startTime">
+            <dxo-label text="Start Time"></dxo-label>
+            <div *dxTemplate>
+              <div class="responsive-field">
+                <dx-date-box
+                  [value]="now"
+                  type="datetime"
+                  [value]="sessionData?.startTime"
+                  (onValueChanged)="onStartTimeValueChange($event)"
+                >
+                </dx-date-box>
+              </div>
             </div>
-          </div>
-        </dxi-item>
-        <dxi-item name="endTime">
-          <dxo-label text="End Time"></dxo-label>
-          <div *dxTemplate>
-            <div class="responsive-field">
-              <dx-date-box
-                [value]="now"
-                type="datetime"
-                [value]="sessionData?.endTime"
-                (onValueChanged)="onEndTimeValueChange($event)"
-              >
-              </dx-date-box>
+          </dxi-item>
+          <dxi-item name="endTime">
+            <dxo-label text="End Time"></dxo-label>
+            <div *dxTemplate>
+              <div class="responsive-field">
+                <dx-date-box
+                  [value]="now"
+                  type="datetime"
+                  [value]="sessionData?.endTime"
+                  (onValueChanged)="onEndTimeValueChange($event)"
+                >
+                </dx-date-box>
+              </div>
             </div>
-          </div>
+          </dxi-item>
         </dxi-item>
       </dxi-item>
       <dxi-item itemType="group" [colCount]="2" [cssClass]="'buttonGroup'">

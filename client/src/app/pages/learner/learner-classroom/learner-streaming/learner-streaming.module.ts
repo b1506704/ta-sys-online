@@ -16,9 +16,6 @@ import {
 } from 'devextreme-angular';
 import { ChatMessageListComponent } from './chat-message-list/chat-message-list.component';
 import { DxiToolbarItemModule } from 'devextreme-angular/ui/nested';
-import { LessonListComponent } from './lesson-list/lesson-list.component';
-import { QuestionListComponent } from './question-list/question-list.component';
-import { TestListComponent } from './test-list/test-list.component';
 
 @NgModule({
   imports: [
@@ -40,9 +37,6 @@ import { TestListComponent } from './test-list/test-list.component';
   declarations: [
     LearnerStreamingComponent,
     ChatMessageListComponent,
-    LessonListComponent,
-    QuestionListComponent,
-    TestListComponent,
   ],
 })
 export class LearnerStreamingModule {}

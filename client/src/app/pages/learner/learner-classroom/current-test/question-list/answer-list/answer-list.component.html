@@ -7,10 +7,9 @@
       </dx-html-editor>
       <div class="button-group">
         <dx-button
-          [icon]="'isblank'"
+          [icon]="!findSelectedAnswerId(item?.id) ? 'isblank' : 'isnotblank'"
           (onClick)="submitAnswer(item)"
         ></dx-button>
-        <!-- <dx-button [icon]="'isnotblank'"></dx-button> -->
       </div>
     </div>
   </div>

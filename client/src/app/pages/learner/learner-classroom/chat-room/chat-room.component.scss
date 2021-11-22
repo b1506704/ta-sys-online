@@ -8,11 +8,14 @@
 
 .message-list-container {
   height: 100%;
-  width: 65%;
+  width: 75%;
   display: flex;
+  background-color: rgba(59, 21, 65, 0.486);
+  border-radius: 10px;
+  border: 2px solid rgb(165, 173, 243);
   flex-direction: column;
   justify-content: stretch;
-  align-content: center;
+  align-content: stretch;
 }
 
 .message-list {
@@ -44,10 +47,13 @@
 
 .chat-input-container {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  height: 100px;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 75px;
   width: 100%;
+  background-color: rgba(59, 21, 65, 0.486);
+  border-radius: 10px;
+  border: 2px solid rgb(165, 173, 243);
 }
 
 .chat-input-container .user-name {
@@ -67,7 +73,10 @@
 
 .online-user-container {
   height: 100%;
-  width: 35%;
+  width: 25%;
+  background-color: rgba(59, 21, 65, 0.486);
+  border-radius: 10px;
+  border: 2px solid rgb(165, 173, 243);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -76,14 +85,14 @@
 
 .online-user-header {
   width: 100%;
-  height: 50px;
+  // height: 50px;
   display: flex;
   border-radius: 5px;
-  background-color: rgba(160, 228, 240, 0.473);
+  background-color: rgba(157, 181, 248, 0.63);
   justify-content: center;
   align-content: center;
   font-weight: bold;
-  font-size: large;
+  font-size: medium;
 }
 
 .online-user-list {
@@ -92,10 +101,14 @@
 
 .online-user-body {
   display: flex;
-  width: 100%;
+  width: 250px;
+  height: 60px;
+  margin-bottom: 15px;
   border-radius: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
   background-color: rgb(25, 31, 49);
-  justify-content: stretch;
+  justify-content: space-between;
   align-items: center;
 }
 

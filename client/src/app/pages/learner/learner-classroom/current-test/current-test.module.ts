@@ -18,6 +18,7 @@ import {
 import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module';
 import { QuestionListComponent } from './question-list/question-list.component';
 import { AnswerListComponent } from './question-list/answer-list/answer-list.component';
+import { TestResultDetailComponent } from './test-result/test-result.component';
 
 @NgModule({
   imports: [
@@ -39,6 +40,7 @@ import { AnswerListComponent } from './question-list/answer-list/answer-list.com
   declarations: [
     CurrentTestComponent,
     QuestionListComponent,
+    TestResultDetailComponent,
     AnswerListComponent,
   ],
 })

@@ -6,20 +6,30 @@ import { StoreService } from '../store.service';
 import { TestHttpService } from './test-http.service';
 import { confirm } from 'devextreme/ui/dialog';
 import { FileStore } from '../file/file-store.service';
+import { TestRequest } from '../../models/testRequest';
+import { Question } from '../../models/question';
 
 interface TestState {
   testList: Array<Test>;
+  testRequest: TestRequest;
   exportData: Array<Test>;
   selectedTest: Object;
   isUploading: boolean;
   testInstance: Test;
   totalPages: number;
+  savedAnswerIds: Array<string>;
   currentPage: number;
   totalItems: number;
   responseMsg: string;
 }
 const initialState: TestState = {
   testList: [],
+  testRequest: {
+    testId: '',
+    userId: '',
+    questionRequest: [],
+  },
+  savedAnswerIds: [],
   selectedTest: {},
   isUploading: undefined,
   testInstance: undefined,
@@ -472,6 +482,13 @@ export class TestStore extends StateService<TestState> {
   }
 
   $testList: Observable<Array<Test>> = this.select((state) => state.testList);
+  $testRequest: Observable<TestRequest> = this.select(
+    (state) => state.testRequest
+  );
+
+  $saveAnswerIds: Observable<Array<string>> = this.select(
+    (state) => state.savedAnswerIds
+  );
 
   $exportData: Observable<Array<Test>> = this.select(
     (state) => state.exportData
@@ -899,6 +916,51 @@ export class TestStore extends StateService<TestState> {
         console.log(data);
         this.setIsLoading(false);
       });
+  }
+
+  findIndexByProperty(data: Array<any>, key: any, value: any) {
+    for (var i = 0; i < data.length; i++) {
+      if (data[i][key] == value) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  addQuestionToTestRequest(question: Question) {
+    const currentTestRequest = this.state.testRequest;
+    var updatedIndex = this.findIndexByProperty(
+      currentTestRequest.questionRequest,
+      'id',
+      question.id
+    );
+    if (updatedIndex > -1) {
+      currentTestRequest.questionRequest[updatedIndex] = question;
+    } else {
+      currentTestRequest.questionRequest.push(question);
+    }
+    this.setState({ testRequest: currentTestRequest });
+    console.log(this.state.testRequest);
+  }
+
+  addAnswerIds(id: string) {
+    const currentAnswerIds = this.state.savedAnswerIds;
+    var updatedIndex = this.state.savedAnswerIds.findIndex(
+      (e: string) => e === id
+    );
+    if (updatedIndex > -1) {
+      currentAnswerIds[updatedIndex] = id;
+    } else {
+      currentAnswerIds.push(id);
+    }
+    this.setState({ savedAnswerIds: currentAnswerIds });
+    console.log(this.state.savedAnswerIds);
+  }
+
+  setTestRequestId(testId: string) {
+    const currentTestRequest = this.state.testRequest;
+    currentTestRequest.testId = testId;
+    this.setState({ testRequest: currentTestRequest });
   }
 
   setIsUploading(isUploading: boolean) {

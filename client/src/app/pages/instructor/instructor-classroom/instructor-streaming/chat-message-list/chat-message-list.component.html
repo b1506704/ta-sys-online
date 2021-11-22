@@ -35,14 +35,13 @@
       </div>
     </dx-scroll-view>
     <div class="chat-input-container">
-      <dx-html-editor
-        [height]="50"
-        [width]="'80%'"
-        style="border-radius: 25px; background: transparent"
+      <dx-text-box
         (onValueChanged)="onChatInputChanged($event)"
+        [showClearButton]="true"
+        (onEnterKey)="onEnterKey()"
+        [placeholder]="'Enter message...'"
       >
-        <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
-      </dx-html-editor>
+      </dx-text-box>
       <dx-button
         (onClick)="sendChatMessage()"
         [icon]="'arrowright'"
