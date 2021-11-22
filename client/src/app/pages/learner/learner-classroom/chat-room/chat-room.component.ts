@@ -9,7 +9,6 @@ import { MessageHttpService } from 'src/app/shared/services/message/message-http
 import { UserEntry } from 'src/app/shared/models/user-entry';
 import { Course } from 'src/app/shared/models/course';
 import { SignalrService } from 'src/app/shared/services/streaming/signalr.service';
-import { signalRConfig } from 'src/app/shared/services/streaming/signalr.config';
 import { ChatMessage } from 'src/app/shared/models/chat-message';
 @Component({
   selector: 'app-chat-room',
@@ -21,26 +20,26 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   scrollView: DxScrollViewComponent;
   @ViewChild(DxTextBoxComponent, { static: false })
   dxTextBox: DxTextBoxComponent;
-  @Input() userEntry: UserEntry = {
+  userEntry: UserEntry = {
     id: '',
     displayName: '',
   };
-  messageList: Array<Message> = [];
+  messageList: Array<any> = [];
 
-  chatUserList: Array<UserEntry> = [
-    { id: '0d0ea585-e59f-4a79-76a4-08d9abdd6f9a', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-    { id: '1', displayName: 'N.H.Hoa' },
-  ];
+  // chatUserList: Array<UserEntry> = [
+  //   { id: '0d0ea585-e59f-4a79-76a4-08d9abdd6f9a', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  // ];
 
-  // chatUserList: Array<UserEntry> = [];
+  chatUserList: Array<UserEntry> = [];
 
   message: Message;
   currentChatInput: string = '';
@@ -98,18 +97,20 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     return this.store.$currentUserId.subscribe((data: string) => {
       if (data) {
         this.currentUserId = data;
+        this.userEntry.id = data;
       }
     });
   }
 
-  getUserDisplayName() {
+  getDisplayName() {
     return this.store.$currentUser.subscribe((data: string) => {
       if (data) {
-        this.currentUserDisplayname = data;
+        this.userEntry.displayName = data;
+        console.log(this.userEntry.displayName);
+        this.initData();
       }
     });
   }
-
   deleteMessage(message: Message) {
     this.messageStore.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
@@ -181,15 +182,21 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   }
 
   onChatInputChanged(e: any) {
+    console.log(e.value);
     this.message.content = e.value;
   }
 
   sendChatMessage() {
     if (this.message.content.trim() !== '') {
-      this.messageHTTP.uploadMessage(this.message);
+      this.messageHTTP.uploadMessage(this.message).subscribe((data: any) => {
+        console.log(data.responseMessage);
+      });
+      console.log(this.message.content);
       this.scrollView.instance.scrollBy(
         this.scrollView.instance.scrollHeight() + 100
       );
+      this.signaling.invoke('SendMessage', this.room.name, this.message);
+      this.dxTextBox.instance.reset();
     }
   }
 
@@ -204,7 +211,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
   messageDataListener() {
     return this.messageStore.$messageList.subscribe((data: any) => {
-      this.messageList = data;
+      if (data) {
+        this.messageList = data.reverse();
+      }
       console.log('LESSON VALUE');
       console.log(data);
     });
@@ -320,11 +329,15 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
       this.chatUserList = userEntryList;
     });
 
-    this.signaling.define('message', (chatMessage: any, userEntry: any) => {
-      const date = new Date().toLocaleDateString();
+    this.signaling.define('message', (userEntry: any, chatMessage: any) => {
+      const date = new Date().toLocaleTimeString();
       console.log(chatMessage);
-      const message: Message = {
-        sender: chatMessage.sender,
+      console.log(userEntry);
+      const message: any = {
+        sender: {
+          id: userEntry.id,
+          displayName: userEntry.displayName,
+        },
         courseId: this.currentFilterByPropertyValue,
         recipientId: chatMessage.recipientId,
         senderId: chatMessage.senderId,
@@ -332,6 +345,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         date: date,
       };
       this.messageList = this.messageList.concat(message);
+      this.scrollView.instance.scrollBy(
+        this.scrollView.instance.scrollHeight() + 100
+      );
     });
 
     this.signaling.define(
@@ -363,14 +379,16 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.getUserID();
-    this.getUserDisplayName();
-    this.initData();
     this.currentPageListener();
+    this.getUserID();
+    this.getDisplayName();
+    // this.initData();
   }
 
   ngOnDestroy(): void {
     this.initData().unsubscribe();
+    this.getUserID().unsubscribe();
+    this.getDisplayName().unsubscribe();
     this.messageDataListener().unsubscribe();
     this.currentPageListener().unsubscribe();
     this.fileDataListener().unsubscribe();

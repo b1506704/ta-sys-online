@@ -357,7 +357,6 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   removeQuestion(id: string) {
     this.signaling.invoke('RemoveQuestion', this.room.name, id);
     this.isShowingQuestion = false;
-    // this.setOperationFlag();
   }
 
   invitePresenting(userEntry: UserEntry, isPresenting: boolean) {

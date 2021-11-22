@@ -152,89 +152,96 @@
               </div>
             </div>
           </dxi-item>
-          <dxi-item
-            dataField="fullName"
-            [label]="{ text: 'Full Name' }"
-            editorType="dxTextBox"
-          >
-            <dxi-validation-rule
-              type="required"
-              message="Full name is required"
+          <dxi-item itemType="group" colCount="2">
+            <dxi-item
+              dataField="fullName"
+              [label]="{ text: 'Full Name' }"
+              editorType="dxTextBox"
             >
-            </dxi-validation-rule>
-            <dxi-validation-rule
-              type="stringLength"
-              message="Full name cannot lower than 1 letter!"
-              [min]="1"
+              <dxi-validation-rule
+                type="required"
+                message="Full name is required"
+              >
+              </dxi-validation-rule>
+              <dxi-validation-rule
+                type="stringLength"
+                message="Full name cannot lower than 1 letter!"
+                [min]="1"
+              >
+              </dxi-validation-rule>
+            </dxi-item>
+            <dxi-item name="gender">
+              <dxo-label text="Gender"></dxo-label>
+              <dx-select-box
+                (onValueChanged)="onGenderChange($event)"
+                [displayExpr]="'name'"
+                [valueExpr]="'id'"
+                [dataSource]="genderList"
+                [value]="userInfoData?.gender"
+              >
+              </dx-select-box>
+            </dxi-item>
+            <dxi-item
+              dataField="dateOfBirth"
+              [label]="{ text: 'Birthdate' }"
+              editorType="dxDateBox"
             >
-            </dxi-validation-rule>
+              <dxi-validation-rule
+                type="required"
+                message="Birthdate is required"
+              >
+              </dxi-validation-rule>
+            </dxi-item>
           </dxi-item>
-          <dxi-item name="gender">
-            <dxo-label text="Gender"></dxo-label>
-            <dx-select-box
-              (onValueChanged)="onGenderChange($event)"
-              [displayExpr]="'name'"
-              [valueExpr]="'id'"
-              [dataSource]="genderList"
-              [value]="userInfoData?.gender"
+          <dxi-item itemType="group" colCount="2">
+            <dxi-item
+              dataField="address"
+              [label]="{ text: 'Address' }"
+              editorType="dxTextBox"
             >
-            </dx-select-box>
-          </dxi-item>
-          <dxi-item
-            dataField="dateOfBirth"
-            [label]="{ text: 'Birthdate' }"
-            editorType="dxDateBox"
-          >
-            <dxi-validation-rule
-              type="required"
-              message="Birthdate is required"
+              <dxi-validation-rule
+                type="required"
+                message="Address is required"
+              >
+              </dxi-validation-rule>
+              <dxi-validation-rule
+                type="stringLength"
+                message="Address cannot lower than 1 letter!"
+                [min]="1"
+              >
+              </dxi-validation-rule>
+            </dxi-item>
+            <dxi-item
+              dataField="email"
+              [label]="{ text: 'Email' }"
+              editorType="dxTextBox"
             >
-            </dxi-validation-rule>
-          </dxi-item>
-          <dxi-item
-            dataField="address"
-            [label]="{ text: 'Address' }"
-            editorType="dxTextBox"
-          >
-            <dxi-validation-rule type="required" message="Address is required">
-            </dxi-validation-rule>
-            <dxi-validation-rule
-              type="stringLength"
-              message="Address cannot lower than 1 letter!"
-              [min]="1"
+              <dxi-validation-rule type="required" message="Email is required">
+              </dxi-validation-rule>
+              <dxi-validation-rule
+                type="stringLength"
+                message="Email cannot lower than 1 letter!"
+                [min]="1"
+              >
+              </dxi-validation-rule>
+            </dxi-item>
+            <dxi-item
+              dataField="phone"
+              [label]="{ text: 'Phone Number' }"
+              editorType="dxTextBox"
             >
-            </dxi-validation-rule>
-          </dxi-item>
-          <dxi-item
-            dataField="email"
-            [label]="{ text: 'Email' }"
-            editorType="dxTextBox"
-          >
-            <dxi-validation-rule type="required" message="Email is required">
-            </dxi-validation-rule>
-            <dxi-validation-rule
-              type="stringLength"
-              message="Email cannot lower than 1 letter!"
-              [min]="1"
-            >
-            </dxi-validation-rule>
-          </dxi-item>
-          <dxi-item
-            dataField="phone"
-            [label]="{ text: 'Phone Number' }"
-            editorType="dxTextBox"
-          >
-            <dxi-validation-rule
-              type="required"
-              message="Phone number is required"
-            >
-            </dxi-validation-rule>
-            <dxi-validation-rule
-              type="stringLength"
-              message="Phone number cannot lower than 1 letter!"
-              [min]="1"
-            >
-            </dxi-validation-rule>
+              <dxi-validation-rule
+                type="required"
+                message="Phone number is required"
+              >
+              </dxi-validation-rule>
+              <dxi-validation-rule
+                type="stringLength"
+                message="Phone number cannot lower than 1 letter!"
+                [min]="1"
+              >
+              </dxi-validation-rule>
+            </dxi-item>
           </dxi-item>
           <dxi-item name="bio">
             <dxo-label text="Biography"></dxo-label>

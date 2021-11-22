@@ -24,7 +24,11 @@
   align-items: flex-end;
   flex-direction: column;
   margin-bottom: 15px;
+  margin-left: 10px;
+  margin-right: 10px;
   padding-right: 10px;
+  background-color: rgba(59, 21, 65, 0.486);
+  border: 2px solid rgb(0, 1, 7);
   border-radius: 5px;
 }
 
@@ -49,8 +53,9 @@
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-  height: 75px;
+  height: 85px;
   width: 100%;
+  padding-right: 25px;
   background-color: rgba(59, 21, 65, 0.486);
   border-radius: 10px;
   border: 2px solid rgb(165, 173, 243);
@@ -81,6 +86,16 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.neon {
+  text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #9dd7e6,
+    0 0 20px rgb(123, 163, 204);
+}
+
+.online-user-name {
+  font-weight: bold;
+  font-size: medium;
 }
 
 .online-user-header {
