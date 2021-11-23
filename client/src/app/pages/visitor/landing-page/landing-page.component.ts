@@ -26,13 +26,8 @@ gsap.registerPlugin(ScrollTrigger);
   styleUrls: ['./landing-page.component.scss'],
 })
 export class LandingPageComponent implements OnInit {
-  // @ViewChild('intro', { static: true }) intro: ElementRef<HTMLDivElement>;
-  // @ViewChild('title', { static: true }) title: ElementRef<HTMLDivElement>;
-  // @ViewChild('subtitle', { static: true }) subtitle: ElementRef<HTMLDivElement>;
+ 
   @ViewChild('feature1', { static: true }) feature1: ElementRef<HTMLDivElement>;
-  // @ViewChild('feature2', { static: true }) feature2: ElementRef<HTMLDivElement>;
-  // @ViewChild('organization1', { static: true })
-  // organization1: ElementRef<HTMLDivElement>;
   @ViewChild('organization2', { static: true })
   organization2: ElementRef<HTMLDivElement>;
   constructor(

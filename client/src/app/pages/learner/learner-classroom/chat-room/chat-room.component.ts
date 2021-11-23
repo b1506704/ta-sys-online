@@ -25,20 +25,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     displayName: '',
   };
   messageList: Array<any> = [];
-
-  // chatUserList: Array<UserEntry> = [
-  //   { id: '0d0ea585-e59f-4a79-76a4-08d9abdd6f9a', displayName: 'N.H.Hoa' },
-  //   { id: '1', displayName: 'N.H.Hoa' },
-  //   { id: '1', displayName: 'N.H.Hoa' },
-  //   { id: '1', displayName: 'N.H.Hoa' },
-  //   { id: '1', displayName: 'N.H.Hoa' },
-  //   { id: '1', displayName: 'N.H.Hoa' },
-  //   { id: '1', displayName: 'N.H.Hoa' },
-  //   { id: '1', displayName: 'N.H.Hoa' },
-  //   { id: '1', displayName: 'N.H.Hoa' },
-  //   { id: '1', displayName: 'N.H.Hoa' },
-  // ];
-
   chatUserList: Array<UserEntry> = [];
 
   message: Message;

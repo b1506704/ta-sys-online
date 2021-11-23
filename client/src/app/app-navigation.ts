@@ -1,22 +1,13 @@
 export const navigationLearner = [
   {
-    text: 'Home',
-    path: '/learner_home',
-    icon: 'home',
+    text: 'Classroom',
+    icon: 'group',
+    path: '/learner_course',
   },
   {
-    text: 'Help Center',
-    icon: 'help',
-    items: [
-      {
-        text: 'Instructor',
-        path: '/learner_instructor_list',
-      },
-      {
-        text: 'Subject',
-        path: '/learner_subject_list',
-      },
-    ],
+    text: 'Instructor',
+    icon: 'user',
+    path: '/learner_instructor_list',
   },
   {
     text: 'Cart List',
@@ -28,11 +19,7 @@ export const navigationLearner = [
     icon: 'product',
     path: '/learner_course_list',
   },
-  {
-    text: 'Classroom',
-    icon: 'group',
-    path: '/learner_course',
-  },
+
   {
     text: 'Schedule List',
     icon: 'event',
@@ -41,11 +28,6 @@ export const navigationLearner = [
 ];
 
 export const navigationInstructor = [
-  {
-    text: 'Home',
-    path: '/instructor_home',
-    icon: 'home',
-  },
   {
     text: 'Course Management',
     icon: 'edit',
@@ -58,11 +40,6 @@ export const navigationInstructor = [
   },
 ];
 export const navigationAdmin = [
-  {
-    text: 'Home',
-    path: '/admin_home',
-    icon: 'home',
-  },
   {
     text: 'User',
     icon: 'user',
@@ -140,11 +117,6 @@ export const navigationAdmin = [
     text: 'File Storage',
     path: '/file_management',
     icon: 'file',
-  },
-  {
-    text: 'Statistics',
-    path: '/statistics',
-    icon: 'chart',
   },
 ];
 export const navigationNonUser = [

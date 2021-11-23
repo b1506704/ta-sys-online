@@ -54,26 +54,7 @@ export class UserStore extends StateService<UserState> {
       }
     });
   }
-  /**
-   * This is a function which fills the items received from pagination in a specific store's state variable.
-   * 
-   * @author Le Bao Anh
-   * @version 1.0.0
-   * @param {number} startIndex - The current page of ss pagination
-   * @param {number} endIndex - The page size of ss pagination
-   * @param {Array<Object>} sourceArray - The source array/state in a specific store service
-   * @param {Array<Object>} addedArray - The array of items received from ss pagination
-   * @return {Array<Object>} Return an array with filled items from ss pagination
-   * @example
-   * this.setState({
-            pendingCheckupList: this.fillEmpty(
-              page,
-              size,
-              this.state.pendingCheckupList,
-              data.items
-            ),
-          });
-   */
+  //
   fillEmpty(
     startIndex: number,
     endIndex: number,
@@ -121,13 +102,13 @@ export class UserStore extends StateService<UserState> {
       this.store.setCurrentUserRoleName(roleName);
       switch (roleName) {
         case 'Admin':
-          this.router.navigate(['/admin_home']);
+          this.router.navigate(['/edit_user_list']);
           break;
         case 'Instructor':
-          this.router.navigate(['/instructor_home']);
+          this.router.navigate(['/course_instructor']);
           break;
         case 'Learner':
-          this.router.navigate(['/learner_home']);
+          this.router.navigate(['/learner_course']);
           break;
         case undefined:
           this.router.navigate(['/landing_page']);
@@ -324,8 +305,6 @@ export class UserStore extends StateService<UserState> {
         this.store.setIsLoading(false);
       });
   }
-
-  
 
   initSearchByPropertyData(
     property: string,

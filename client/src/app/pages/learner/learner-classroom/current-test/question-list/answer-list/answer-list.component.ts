@@ -25,7 +25,7 @@ export class AnswerListComponent implements OnInit, OnDestroy, OnChanges {
     private answerStore: AnswerStore,
     private store: StoreService,
     private testStore: TestStore
-  ) {}
+  ) {} 
 
   submitAnswer(answer: Answer) {
     const question = this.question;

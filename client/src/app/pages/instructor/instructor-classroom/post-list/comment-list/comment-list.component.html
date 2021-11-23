@@ -4,9 +4,9 @@
       *ngIf="currentUserId"
       [src]="mapFileListToUrl(currentUserId)"
       alt="..."
-      style="height: 35px; width: 35px; border-radius: 35px"
+      style="height: 55px; width: 45px; border-radius: 45px"
     />
-    <div class="user-name">
+    <div class="user-name neon">
       {{ currentUserDisplayname }}
     </div>
   </div>
@@ -45,7 +45,7 @@
           alt="..."
           style="height: 55px; width: 45px; border-radius: 45px"
         />
-        <div class="user-name">{{ item?.userAccountResponse.displayName }}</div>
+        <div class="user-name neon">{{ item?.userAccountResponse.displayName }}</div>
         <div class="post-date">
           {{ item?.createdDate | date: "dd/MM, hh:mm aa" }}
         </div>

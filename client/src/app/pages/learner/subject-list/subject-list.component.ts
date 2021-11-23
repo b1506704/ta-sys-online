@@ -88,7 +88,7 @@ export class SubjectListComponent implements OnInit, OnDestroy {
 
   selectSubject(subject: Subject) {
     this.store.setCurrentSubject(subject);
-    this.router.navigate(['visitor_course_list']);
+    this.router.navigate(['learner_course_list']);
     console.log('Selected subject:');
     console.log(subject);
   }

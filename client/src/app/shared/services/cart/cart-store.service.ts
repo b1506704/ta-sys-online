@@ -37,26 +37,7 @@ export class CartStore extends StateService<CartState> {
   ) {
     super(initialState);
   }
-  /**
-   * This is a function which fills the items received from pagination in a specific store's state variable.
-   * 
-   * @author Le Bao Anh
-   * @version 1.0.0
-   * @param {number} startIndex - The current page of ss pagination
-   * @param {number} endIndex - The page size of ss pagination
-   * @param {Array<Object>} sourceArray - The source array/state in a specific store service
-   * @param {Array<Object>} addedArray - The array of items received from ss pagination
-   * @return {Array<Object>} Return an array with filled items from ss pagination
-   * @example
-   * this.setState({
-            sourceList: this.fillEmpty(
-              page - 1,
-              size,
-              this.state.sourceList,
-              arrayItemFromServer
-            ),
-          });
-   */
+  //
   fillEmpty(
     startIndex: number,
     endIndex: number,

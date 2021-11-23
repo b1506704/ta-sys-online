@@ -100,7 +100,16 @@ export class CartListComponent implements OnInit, OnDestroy, AfterViewInit {
       totalCost: this.cartList.totalCost,
       totalItem: this.cartList.totalCourse,
     };
-    this.billStore.uploadBill(bill);
+    this.billStore.uploadBill(bill).then((data: any) => {
+      this.store.showNotif(data.responseMessage, 'custom');
+      this.store
+        .confirmDialog('Visit classroom now?')
+        .then((confirm: boolean) => {
+          if (confirm) {
+            this.router.navigate(['learner_classroom']);
+          }
+        });
+    });
   }
 
   initData() {

@@ -124,10 +124,10 @@ export class ScheduleListComponent implements OnInit, OnDestroy {
   }
 
   onAppointmentClick(e: any) {
-    this.store.showNotif(
-      `Room: ${e.targetedAppointmentData.maxParticipants}`,
-      'custom'
-    );
+    // this.store.showNotif(
+    //   `Room: ${e.targetedAppointmentData.maxParticipants}`,
+    //   'custom'
+    // );
   }
 
   onAppointmentDblClick(e: any) {

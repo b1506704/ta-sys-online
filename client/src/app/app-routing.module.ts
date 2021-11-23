@@ -5,13 +5,6 @@ import { AuthGuardService } from './shared/services/auth-guard.service';
 
 const routes: Routes = [
   {
-    path: 'learner_home',
-    loadChildren: () =>
-      import('./pages/learner/learner-home/learner-home.module').then(
-        (m) => m.LearnerHomeModule
-      ),
-  },
-  {
     path: 'learner_instructor_list',
     loadChildren: () =>
       import('./pages/learner/instructor-list/instructor-list.module').then(
@@ -106,14 +99,6 @@ const routes: Routes = [
       ),
   },
   // admin route
-  {
-    path: 'admin_home',
-    loadChildren: () =>
-      import('./pages/admin/admin-home/admin-home.module').then(
-        (m) => m.AdminHomeModule
-      ),
-    canActivate: [AuthGuardService],
-  },
   {
     path: 'edit_user_list',
     loadChildren: () =>

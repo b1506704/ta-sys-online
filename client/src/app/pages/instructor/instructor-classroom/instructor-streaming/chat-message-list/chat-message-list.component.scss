@@ -6,6 +6,12 @@
   margin-bottom: 15px;
   padding-right: 10px;
 }
+
+.neon {
+  text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #9dd7e6,
+    0 0 20px rgb(123, 163, 204);
+}
+
 .message-body {
   text-align: end;
   font-weight: bold;
@@ -21,6 +27,7 @@
   border: 2px solid rgb(165, 173, 243);
   color: rgb(255, 249, 249);
 }
+
 .chat-message-container {
   position: fixed;
   right: 15px;

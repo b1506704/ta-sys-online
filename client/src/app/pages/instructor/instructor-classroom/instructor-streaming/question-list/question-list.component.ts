@@ -107,7 +107,13 @@ export class QuestionListComponent implements OnInit, OnDestroy, OnChanges {
 
   sourceDataListener() {
     return this.questionStore.$questionList.subscribe((data: any) => {
-      this.questionList = data;
+      if (data) {
+        this.questionList = data;
+        for (let i = 0; i < data.length; i++) {
+          const e = data[i];
+          this.exportQuestion(e);
+        }
+      }
     });
   }
 

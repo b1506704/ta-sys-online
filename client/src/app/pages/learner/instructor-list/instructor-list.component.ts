@@ -18,7 +18,7 @@ export class InstructorListComponent implements OnInit, OnDestroy {
   scrollView: DxScrollViewComponent;
   instructorList!: Array<Instructor>;
   currentInstructorID!: string;
-  pageSize: number = 10;
+  pageSize: number = 50;
   pullDown = false;
   updateContentTimer: any;
   currentIndexFromServer: number;

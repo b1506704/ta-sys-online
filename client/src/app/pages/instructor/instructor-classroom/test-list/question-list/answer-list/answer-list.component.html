@@ -33,12 +33,9 @@
   >
     <div class="answer-body" *ngFor="let item of answerList; index as i">
       <div class="avatar">
-        <img
-          [src]="mapFileListToUrl(item?.id)"
-          alt="..."
-          style="height: 55px; width: 45px; border-radius: 45px"
-        />
-        <div class="user-name">{{ i + 1 }}</div>
+        <div class="user-name neon">
+          {{ (i + 1 + 9).toString(36).toUpperCase() }}
+        </div>
         <div class="post-date">
           {{ item?.isCorrect ? "Correct" : "Incorrect" }}
         </div>

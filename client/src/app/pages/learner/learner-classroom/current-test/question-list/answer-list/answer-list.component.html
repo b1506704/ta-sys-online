@@ -1,7 +1,7 @@
 <ng-container *ngIf="answerList.length">
   <div class="answer-body" *ngFor="let item of answerList; index as i">
     <div class="answer-content">
-      <div class="answer-number">{{ i + 1 }}</div>
+      <div class="answer-number">{{ (i + 1 + 9).toString(36).toUpperCase() }}</div>
       <dx-html-editor readOnly="true" [value]="item?.content" [width]="'100%'">
         <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
       </dx-html-editor>

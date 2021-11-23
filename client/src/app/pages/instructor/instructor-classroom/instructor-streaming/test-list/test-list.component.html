@@ -39,9 +39,7 @@
         <div class="card" *ngFor="let item of testList">
           <div class="card-title">{{ item?.name }}</div>
           <div class="card-body">
-            <div class="card-text">
-              Max Question: {{ item?.maxQuestion }}
-            </div>
+            <div class="card-text">Max Question: {{ item?.maxQuestion }}</div>
             <div class="card-text">
               <dx-html-editor
                 readOnly="true"

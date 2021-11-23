@@ -20,7 +20,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   courseList!: Array<Course>;
   subjectList: Array<Subject> = [];
   currentCourseID!: string;
-  pageSize: number = 10;
+  pageSize: number = 50;
   pullDown = false;
   updateContentTimer: any;
   currentIndexFromServer: number;
@@ -110,7 +110,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   getMetaData() {
-    return this.store.$currentCourse.subscribe((data: Course) => {
+    return this.store.$currentSubject.subscribe((data: Course) => {
       if (data) {
         this.currentFilterByPropertyValue = data.id;
         this.initData();

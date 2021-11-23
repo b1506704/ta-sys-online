@@ -17,7 +17,7 @@ export class SubjectListComponent implements OnInit, OnDestroy {
   scrollView: DxScrollViewComponent;
   subjectList: Array<Subject> = [];
   currentSubjectID!: string;
-  pageSize: number = 10;
+  pageSize: number = 50;
   pullDown = false;
   updateContentTimer: any;
   currentIndexFromServer: number;

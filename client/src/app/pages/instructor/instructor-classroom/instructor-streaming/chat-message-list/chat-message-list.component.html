@@ -8,7 +8,7 @@
   [dragEnabled]="true"
   [height]="'80%'"
   (onHiding)="closePopupChat()"
-  [width]="'30%'"
+  [width]="'35%'"
   [visible]="isVisible"
 >
   <div *dxTemplate="let data of 'content'">
@@ -20,7 +20,7 @@
       [width]="'100%'"
     >
       <div class="message-list" *ngFor="let item of chatMessageList">
-        <div>{{ item?.userEntry.displayName }}</div>
+        <div class="neon">{{ item?.userEntry.displayName }}</div>
         <div class="message-body">
           <dx-html-editor
             readOnly="true"

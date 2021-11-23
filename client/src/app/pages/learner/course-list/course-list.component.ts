@@ -20,7 +20,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   courseList!: Array<Course>;
   subjectList: Array<Subject> = [];
   currentCourseID!: string;
-  pageSize: number = 10;
+  pageSize: number = 50;
   pullDown = false;
   updateContentTimer: any;
   currentIndexFromServer: number;

@@ -19,10 +19,10 @@
   [scrollByContent]="true"
   [scrollByThumb]="true"
   [height]="'69vh'"
-  (onPullDown)="updateTopContent($event)"
-  (onReachBottom)="updateBottomContent($event)"
   [bounceEnabled]="false"
->
+  >
+  <!-- (onPullDown)="updateTopContent($event)"
+  (onReachBottom)="updateBottomContent($event)" -->
   <ng-container *ngIf="courseList">
     <div class="card-container">
       <div class="card" *ngFor="let item of courseList">

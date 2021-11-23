@@ -190,11 +190,6 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   closePopupSetting = () => {
     this.isPopupSettingVisible = false;
   };
-
-  closePopupVideo = () => {
-    this.isPopupVideoVisible = false;
-  };
-
   closePopupChat = () => {
     this.isPopupChatVisible = false;
   };
@@ -328,12 +323,12 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     this.assetList = this.assetList.filter(
       (a: any) => a.asset.id !== e.asset.id
     );
-    this.store.showNotif(`Removed ${e.asset.name}`, 'custom');
+    this.store.showNotif(`Lesson removed`, 'custom');
   }
 
   removeQuiz(e: any) {
     this.quizList = this.quizList.filter((a: any) => a.quiz.id !== e.quiz.id);
-    this.store.showNotif(`Removed ${e.quiz.content}`, 'custom');
+    this.store.showNotif(`Quiz removed`, 'custom');
   }
 
   addLesson(id: string) {
@@ -447,7 +442,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     // #2 define signaling communication
     this.defineSignaling();
 
-    this.openPopupVideo();
+    this.openPopupSetting();
 
     // #3 get media from current client
     this.getUserMedia();
@@ -764,6 +759,20 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     this.remoteStream = stream;
     this.remoteVideo.nativeElement.srcObject = this.remoteStream;
     this.remoteVideo.nativeElement.muted = 'muted';
+  }
+
+  adjustLocalVideoStream() {
+    if (this.localStream && this.localStream.active) {
+      this.localStream.getVideoTracks()[0].enabled =
+        !this.localStream.getVideoTracks()[0].enabled;
+    }
+  }
+
+  adjustLocalAudioStream() {
+    if (this.localStream && this.localStream.active) {
+      this.localStream.getAudioTracks()[0].enabled =
+        !this.localStream.getAudioTracks()[0].enabled;
+    }
   }
 
   hangup(): void {

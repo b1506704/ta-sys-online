@@ -116,7 +116,12 @@ export class TestListComponent implements OnInit, OnDestroy, OnChanges {
 
   sourceDataListener() {
     return this.testStore.$testList.subscribe((data: any) => {
+      // if (data) {
       this.testList = data;
+      if (data.length) {
+        this.currentTestId = data[0].id;
+      }
+      // }
     });
   }
 

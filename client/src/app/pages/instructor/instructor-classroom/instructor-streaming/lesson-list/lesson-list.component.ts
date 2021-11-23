@@ -107,6 +107,12 @@ export class LessonListComponent implements OnInit, OnDestroy, OnChanges {
   sourceDataListener() {
     return this.lessonStore.$lessonList.subscribe((data: any) => {
       this.lessonList = data;
+      if (data) {
+        for (let i = 0; i < data.length; i++) {
+          const e = data[i];
+          this.exportLesson(e);
+        }
+      }
     });
   }
 

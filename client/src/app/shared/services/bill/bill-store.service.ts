@@ -36,26 +36,7 @@ export class BillStore extends StateService<BillState> {
   ) {
     super(initialState);
   }
-  /**
-   * This is a function which fills the items received from pagination in a specific store's state variable.
-   * 
-   * @author Le Bao Anh
-   * @version 1.0.0
-   * @param {number} startIndex - The current page of ss pagination
-   * @param {number} endIndex - The page size of ss pagination
-   * @param {Array<Object>} sourceArray - The source array/state in a specific store service
-   * @param {Array<Object>} addedArray - The array of items received from ss pagination
-   * @return {Array<Object>} Return an array with filled items from ss pagination
-   * @example
-   * this.setState({
-            sourceList: this.fillEmpty(
-              page - 1,
-              size,
-              this.state.sourceList,
-              arrayItemFromServer
-            ),
-          });
-   */
+  //
   fillEmpty(
     startIndex: number,
     endIndex: number,
@@ -440,24 +421,7 @@ export class BillStore extends StateService<BillState> {
   $billInstance: Observable<Bill> = this.select((state) => state.billInstance);
 
   uploadBill(bill: Bill) {
-    this.confirmDialog('').then((confirm: boolean) => {
-      if (confirm) {
-        this.setIsLoading(true);
-        this.billService.uploadBill(bill).subscribe({
-          next: (data: any) => {
-            this.setState({ responseMsg: data });
-            console.log(data);
-            this.setIsLoading(false);
-            this.store.showNotif(data.responseMessage, 'custom');
-          },
-          error: (data: any) => {
-            this.setIsLoading(false);
-            this.store.showNotif(data.error.responseMessage, 'error');
-            console.log(data);
-          },
-        });
-      }
-    });
+    return this.billService.uploadBill(bill).toPromise();
   }
 
   updateBill(bill: Bill, page: number, size: number) {
