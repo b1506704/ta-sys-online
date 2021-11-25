@@ -10,6 +10,7 @@ const routes: Routes = [
       import('./pages/learner/instructor-list/instructor-list.module').then(
         (m) => m.InstructorListModule
       ),
+    canActivate: [AuthGuardService],
   },
   {
     path: 'learner_subject_list',
@@ -17,6 +18,7 @@ const routes: Routes = [
       import('./pages/learner/subject-list/subject-list.module').then(
         (m) => m.SubjectListModule
       ),
+    canActivate: [AuthGuardService],
   },
   {
     path: 'cart_list',
@@ -24,6 +26,7 @@ const routes: Routes = [
       import('./pages/learner/cart-list/cart-list.module').then(
         (m) => m.CartListModule
       ),
+    canActivate: [AuthGuardService],
   },
   {
     path: 'learner_course_list',
@@ -31,6 +34,7 @@ const routes: Routes = [
       import('./pages/learner/course-list/course-list.module').then(
         (m) => m.CourseListModule
       ),
+    canActivate: [AuthGuardService],
   },
   {
     path: 'learner_course',
@@ -38,6 +42,7 @@ const routes: Routes = [
       import('./pages/learner/learner-course/course-list.module').then(
         (m) => m.CourseListModule
       ),
+    canActivate: [AuthGuardService],
   },
   {
     path: 'learner_classroom',
@@ -45,6 +50,7 @@ const routes: Routes = [
       import('./pages/learner/learner-classroom/learner-classroom.module').then(
         (m) => m.LearnerClassroomModule
       ),
+    canActivate: [AuthGuardService],
   },
   {
     path: 'course_learner_streaming',
@@ -52,6 +58,7 @@ const routes: Routes = [
       import(
         './pages/learner/learner-classroom/learner-streaming/learner-streaming.module'
       ).then((m) => m.LearnerStreamingModule),
+    canActivate: [AuthGuardService],
   },
   {
     path: 'learner_do_test',
@@ -59,16 +66,25 @@ const routes: Routes = [
       import(
         './pages/learner/learner-classroom/current-test/current-test.module'
       ).then((m) => m.CurrentTestModule),
+    canActivate: [AuthGuardService],
   },
-  // instructor route
   {
-    path: 'instructor_home',
+    path: 'learner_test_history',
     loadChildren: () =>
-      import('./pages/instructor/instructor-home/instructor-home.module').then(
-        (m) => m.InstructorHomeModule
+      import(
+        './pages/learner/learner-classroom/test-result/test-result.module'
+      ).then((m) => m.TestResultModule),
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'learner_schedule_list',
+    loadChildren: () =>
+      import('./pages/learner/schedule-list/schedule-list.module').then(
+        (m) => m.ScheduleListModule
       ),
     canActivate: [AuthGuardService],
   },
+  // instructor route
   {
     path: 'course_instructor',
     loadChildren: () =>
@@ -83,6 +99,7 @@ const routes: Routes = [
       import(
         './pages/instructor/instructor-classroom/instructor-classroom.module'
       ).then((m) => m.InstructorClassroomModule),
+    canActivate: [AuthGuardService],
   },
   {
     path: 'course_streaming',
@@ -90,6 +107,15 @@ const routes: Routes = [
       import(
         './pages/instructor/instructor-classroom/instructor-streaming/instructor-streaming.module'
       ).then((m) => m.InstructorStreamingModule),
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'instructor_test_history',
+    loadChildren: () =>
+      import(
+        './pages/instructor/instructor-classroom/test-result/test-result.module'
+      ).then((m) => m.TestResultModule),
+    canActivate: [AuthGuardService],
   },
   {
     path: 'schedule_list',
@@ -97,6 +123,7 @@ const routes: Routes = [
       import('./pages/instructor/schedule-list/schedule-list.module').then(
         (m) => m.ScheduleListModule
       ),
+    canActivate: [AuthGuardService],
   },
   // admin route
   {

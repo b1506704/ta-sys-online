@@ -1,0 +1,43 @@
+<dx-scheduler
+  timeZone="Asia/Ho_Chi_Minh"
+  [dataSource]="sessionList"
+  [shadeUntilCurrentTime]="true"
+  currentView="Timeline"
+  [cellDuration]="60"
+  [scrolling]="{
+    mode: 'virtual'
+  }"
+  [views]="[
+    {
+      type: 'timelineWorkWeek',
+      name: 'Timeline',
+      groupOrientation: 'horizontal'
+    },
+    {
+      type: 'week',
+      name: 'Week',
+      groupOrientation: 'vertical'
+    },
+    {
+      type: 'month',
+      groupOrientation: 'horizontal'
+    }
+  ]"
+  [showAllDayPanel]="false"
+  [currentDate]="currentDate"
+  [startDayHour]="7"
+  [endDayHour]="24"
+  textExpr="courseTable.name"
+  [startDateExpr]="'startTime'"
+  [endDateExpr]="'endTime'"
+  descriptionExpr="creator.displayName"
+  firstDayOfWeek="1"
+  dateSerializationFormat="yyyy-MM-ddTHH:mm:ssZ"
+  [editing]="false"
+  [height]="550"
+  (onOptionChanged)="onOptionChanged($event)"
+  (onAppointmentClick)="onAppointmentClick($event)"
+  (onAppointmentDblClick)="onAppointmentDblClick($event)"
+>
+  <dxo-editing [allowUpdating]="false"> </dxo-editing>
+</dx-scheduler>

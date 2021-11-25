@@ -1,24 +1,63 @@
 .media-check {
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.videos {
-  video {
-    width: 250px;
-    height: 250px;
-    margin: 3px;
-  }
+.remote-video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  flex-direction: column;
+  left: 5px;
+  height: 340px;
+  width: 130px;
+  background-color: rgba(217, 121, 255, 0.486);
+  border: 2px solid rgb(165, 173, 243);
+  border-radius: 10px;
+  top: 28%;
+}
+
+.video-container video {
+  height: 100%;
+  width: 100%;
+  border: 2px solid rgb(165, 173, 243);
+  border-radius: 5px;
+}
+
+.media-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60%;
+}
+
+#localVideo {
+  width: 250px;
+  height: 250px;
+}
+
+.time-counter {
+  position: absolute;
+  right: 15px;
+  top: 3%;
+  z-index: 5;
+  font-size: medium;
+  font-weight: bold;
 }
 
 .session-blackboard {
   position: fixed;
-  bottom: 0;
+  top: 20%;  
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: row;
-  height: 75%;
+  height: 80%;
   width: 100%;
   background-image: url("../../../../../assets/imgs/blackboard.jpg");
   background-repeat: no-repeat;
@@ -37,7 +76,7 @@
   align-items: center;
   flex-wrap: nowrap;
   width: 100%;
-  height: 20%;
+  height: 16%;
 }
 .session-instructor .participant {
   width: 20%;
@@ -64,12 +103,15 @@
 }
 
 .desk {
-  width: 80%;
-  min-height: 90%;
+  position: fixed;
+  bottom: 5px;
+  width: 100%;
+  height: 150px;
   display: flex;
   justify-content: space-evenly;
   align-items: flex-start;
   flex-wrap: nowrap;
+  // margin-bottom: 20px;
   flex-direction: row;
 }
 
@@ -77,23 +119,34 @@
   width: 45%;
   min-height: 90%;
   display: flex;
+  background-color: rgba(217, 121, 255, 0.486);
+  border: 2px solid rgb(165, 173, 243);
+  border-radius: 10px;
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
 }
 
 .desk-title {
+  display: flex;
+  top: 0;
   width: 100%;
-  text-align: center;
-  font-size: small;
-  color: #fff;
-  background-color: rgba(0, 0, 0, 0.363);
+  height: 20px;
+  font-size: medium;
+  border-radius: 10px;
+  font-weight: bold;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.781);
 }
 
 .session-user {
   position: absolute;
   top: 0px;
   // z-index: 10;
+  background-color: rgba(59, 21, 65, 0.486);
+  border-radius: 10px;
+  border: 2px solid rgb(165, 173, 243);
   display: flex;
   flex-direction: row;
   // color: #000;
@@ -101,7 +154,7 @@
   align-items: center;
   flex-wrap: wrap;
   width: 100%;
-  height: 15%;
+  height: 10%;
 }
 .session-user .participant {
   flex-direction: column;
@@ -130,17 +183,21 @@
   box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px,
     rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
 }
+
 .neon {
   text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #9dd7e6,
     0 0 20px rgb(123, 163, 204);
 }
+
 .card-container {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  background-color: rgb(57, 59, 65);
-  justify-content: center;
+  background-color: rgb(53, 69, 114);
   border-radius: 10px;
+  margin-right: 50px;
+  border: 2px solid rgb(165, 173, 243);
+  justify-content: center;
   align-items: flex-start;
 }
 
@@ -186,7 +243,7 @@
   flex-direction: column;
   justify-content: stretch;
   align-items: stretch;
-  background-color: rgb(57, 59, 65);
+  background-color: rgb(53, 69, 114);
   border-radius: 10px;
   border: 2px solid rgb(165, 173, 243);
   padding: 5px;
@@ -197,7 +254,7 @@
   flex-direction: column;
   justify-content: stretch;
   align-items: stretch;
-  background-color: rgb(57, 59, 65);
+  background-color: rgb(53, 69, 114);
   border-radius: 10px;
   border: 2px solid rgb(165, 173, 243);
   padding: 5px;
@@ -241,7 +298,7 @@
 }
 
 .asset-card {
-  height: 300px;
+  height: 320px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -272,6 +329,7 @@
 
 .question-front {
   display: flex;
+  flex-direction: column;
   justify-content: stretch;
   align-items: stretch;
   flex-wrap: nowrap;
@@ -283,8 +341,9 @@
   flex-wrap: nowrap;
   justify-content: stretch;
   align-items: stretch;
-  // width: 80vw;
-  background-color: rgb(57, 59, 65);
+  width: 72%;
+  height: 340px;
+  background-color: rgb(53, 69, 114);
   border-radius: 10px;
   border: 2px solid rgb(165, 173, 243);
   padding: 5px;
@@ -292,12 +351,14 @@
 
 .question-container-flip {
   display: flex;
+  height: 340px;
   flex-direction: row;
   flex-wrap: nowrap;
+  width: 72%;
   // width: 80vw;
   justify-content: stretch;
   align-items: stretch;
-  background-color: rgb(57, 59, 65);
+  background-color: rgb(53, 69, 114);
   border-radius: 10px;
   border: 2px solid rgb(165, 173, 243);
   padding: 5px;
@@ -341,7 +402,7 @@
 }
 
 .question-card {
-  height: 350px;
+  // height: 350px;
   min-width: 50%;
   max-width: 100%;
   display: flex;
@@ -352,12 +413,36 @@
   border-right: 2px solid;
 }
 
+.question-title {
+  display: flex;
+  width: 100%;
+  border-radius: 10px;
+  height: 20px;
+  font-size: medium;
+  font-weight: bold;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.781);
+}
+
 .question-body {
   display: flex;
   height: 250px;
   width: 380px;
   justify-content: center;
   align-items: center;
+}
+
+.lesson-title {
+  display: flex;
+  width: 100%;
+  height: 20px;
+  border-radius: 10px;
+  font-size: medium;
+  font-weight: bold;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.781);
 }
 
 .asset-body {
@@ -445,25 +530,46 @@
   animation: borderAnimation 1s infinite linear;
 }
 
+.answer-menu-title {
+  position: sticky;
+  display: flex;
+  top: 0;
+  width: 100%;
+  height: 20px;
+  border-radius: 10px;
+  font-size: medium;
+  font-weight: bold;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.781);
+}
+
 .result-view {
   position: fixed;
-  right: 5%;
-  top: 20%;
-  color: black;
+  right: 1.5%;
+  top: 28%;
+  // color: black;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border-radius: 15px;
-  background-color: rgb(163, 205, 253);
+  background-color: rgb(53, 69, 114);
+  border-radius: 10px;
+  border: 2px solid rgb(165, 173, 243);
 }
 
 .result-title {
+  position: sticky;
+  display: flex;
+  top: 0;
   width: 100%;
+  height: 20px;
+  border-radius: 10px;
   font-size: medium;
-  margin-bottom: 10px;
-  text-align: center;
-  height: 50px;
+  font-weight: bold;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.781);
 }
 
 .result-card {
@@ -495,8 +601,7 @@
 .result-user {
   width: 100%;
   font-weight: bold;
-  color: #000;
-  font-size: small;
+  font-size: medium;
   text-align: center;
 }
 

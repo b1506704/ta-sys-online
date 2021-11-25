@@ -49,6 +49,7 @@
             [currentPage]="currentPage"
             [testId]="testData.id"
             [pageSize]="pageSize"
+            [currentPage]="currentPage"
           ></app-question-list>
         </ng-container>
       </dx-scroll-view>
@@ -58,7 +59,6 @@
         {{ testRequest?.questionRequest.length }} / {{ totalQuestions }}
       </div>
       <div class="question-control">
-        <dx-button (onClick)="saveTest()">Save</dx-button>
         <dx-button (onClick)="submitTest()" *ngIf="!isShowTestResult"
           >Submit</dx-button
         >
@@ -96,5 +96,6 @@
   <app-test-result
     [isVisible]="isShowTestResult"
     [testResult]="testResult"
+    [maxScore]="testData?.maxScore"
   ></app-test-result>
 </ng-container>

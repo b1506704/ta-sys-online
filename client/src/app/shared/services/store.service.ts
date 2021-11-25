@@ -17,6 +17,8 @@ interface StoreState {
   currentSubject: Subject;
   currentSession: Session;
   currentTest: Test;
+
+  currentTestHistory: Test;
   messageList: Array<ChatMessage>;
   assetList: Array<any>;
   quizList: Array<any>;
@@ -48,6 +50,7 @@ const initialState: StoreState = {
   currentSubject: undefined,
   currentSession: undefined,
   currentTest: undefined,
+  currentTestHistory: undefined,
   savedQuestions: undefined,
   messageList: undefined,
   assetList: undefined,
@@ -99,6 +102,10 @@ export class StoreService extends StateService<StoreState> {
   );
 
   $currentTest: Observable<Test> = this.select((state) => state.currentTest);
+
+  $currentTestHistory: Observable<Test> = this.select(
+    (state) => state.currentTestHistory
+  );
 
   $savedQuestions: Observable<Array<Question>> = this.select(
     (state) => state.savedQuestions
@@ -208,6 +215,10 @@ export class StoreService extends StateService<StoreState> {
 
   setCurrentTest(test: Test) {
     this.setState({ currentTest: test });
+  }
+
+  setCurrentTestHistory(test: Test) {
+    this.setState({ currentTestHistory: test });
   }
 
   setSavedQuestion(listQuestion: Array<Question>) {

@@ -20,9 +20,8 @@
 }
 
 .card-container .card .card-title {
-  font-size: large;
-  font-weight: bold;
-  font-style: oblique;
+  font-size: large; width: 100%; background-color: rgba(59, 21, 65, 1);
+  font-weight: bold; display:flex; justify-content:center; align-items: center;
 }
 
 .card-container .card .card-img {

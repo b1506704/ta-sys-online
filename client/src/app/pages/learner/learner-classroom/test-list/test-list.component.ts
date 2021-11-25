@@ -100,6 +100,11 @@ export class TestListComponent implements OnInit, OnDestroy {
     this.router.navigate(['learner_do_test']);
   }
 
+  viewHistory(test: Test) {
+    this.store.setCurrentTestHistory(test);
+    this.router.navigate(['learner_test_history']);
+  }
+
   closeDetailPopup = () => {
     this.isDetailPopupVisible = false;
   };

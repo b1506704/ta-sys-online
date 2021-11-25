@@ -13,6 +13,7 @@
   There is no streaming at the moment. Please join one to continue.
 </div>
 <div class="classroom-container" *ngIf="currentCourseId">
+  <div class="time-counter neon">{{ lastingTime }}</div>
   <div class="session-user shadow">
     <ng-container *ngIf="chatUserList.length">
       <dx-gallery
@@ -27,7 +28,6 @@
         <div class="participant shadow" *dxTemplate="let item of 'item'">
           <div class="participant-img">
             <img [src]="mapFileListToUrl(item?.id)" alt="..." />
-            <!-- style="height: 100%; width: 100%" -->
           </div>
           <div class="display-name">
             {{ item?.displayName }}
@@ -40,14 +40,14 @@
     <ng-container *ngIf="blackBoard.length">
       <dx-gallery
         [dataSource]="blackBoard"
-        [height]="'100%'"
+        [height]="'80%'"
         [loop]="false"
-        [width]="'100%'"
+        [width]="'80%'"
         [showNavButtons]="true"
         [showIndicator]="false"
-        [initialItemWidth]="'80%'"
+        [initialItemWidth]="isShowingLesson ? '400' : '80%'"
       >
-        <div *dxTemplate="let item of 'item'">
+        <div *dxTemplate="let item of 'item'; index as i">
           <ng-container *ngIf="isShowingLesson">
             <div
               [ngClass]="{
@@ -56,6 +56,7 @@
               }"
             >
               <div class="asset-card">
+                <div class="lesson-title">Flashcard {{ i + 1 }}</div>
                 <div class="asset-front" *ngIf="item?.isFront === true">
                   <div class="asset-title">
                     {{ item?.name }}
@@ -64,7 +65,7 @@
                     <dx-html-editor
                       readOnly="true"
                       [value]="item?.frontText"
-                      [height]="'100%'"
+                      [height]="'90%'"
                       [width]="'100%'"
                     >
                       <dxo-media-resizing [enabled]="true">
@@ -98,11 +99,12 @@
             >
               <div class="question-card">
                 <div class="question-front">
+                  <div class="question-title">Question</div>
                   <div class="question-body">
                     <dx-html-editor
                       readOnly="true"
                       [value]="item?.content"
-                      [height]="'100%'"
+                      [height]="'90%'"
                       [width]="'100%'"
                     >
                       <dxo-media-resizing [enabled]="true">
@@ -113,7 +115,8 @@
                 <div class="asset-button"></div>
               </div>
               <div class="answer-container" *ngIf="isShowingAnswer === true">
-                <div *ngFor="let answer of item?.answerResponses">
+                <div class="answer-menu-title">Please select an answer</div>
+                <div *ngFor="let answer of item?.answerResponses; index as i">
                   <dx-button
                     [ngClass]="{
                       'answer-body': isShowingAnswer === true,
@@ -121,13 +124,17 @@
                         isShowingCorrectAnswer === true &&
                         answer.isCorrect === true
                     }"
+                    [disabled]="isSubmitAnswer"
                     (onClick)="submitAnswer({ q: item, e: answer })"
                   >
+                    <div class="answer-number neon">
+                      {{ (i + 1 + 9).toString(36).toUpperCase() }}
+                    </div>
                     <dx-html-editor
                       readOnly="true"
                       [value]="answer?.content"
-                      [height]="'100%'"
-                      [width]="'100%'"
+                      [height]="150"
+                      [width]="150"
                     >
                       <dxo-media-resizing [enabled]="true">
                       </dxo-media-resizing>
@@ -141,14 +148,14 @@
       </dx-gallery>
     </ng-container>
   </div>
-  <ng-container *ngIf="isShowingResult">
+  <ng-container *ngIf="isShowingQuestion">
     <div class="result-view box-shadow">
-      <div class="result-title neon">Test Result</div>
+      <div class="result-title">Test Result</div>
       <dx-scroll-view
         [scrollByContent]="true"
         [scrollByThumb]="true"
         bounceEnabled="true"
-        [height]="280"
+        [height]="310"
         [width]="350"
       >
         <div class="result-card shadow" *ngFor="let item of resultBoard">
@@ -177,7 +184,10 @@
                   <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
                 </dx-html-editor>
               </div>
-              <div class="answer-container shadow">
+              <div
+                class="answer-container shadow"
+                *ngIf="isShowingCorrectAnswer"
+              >
                 Score: {{ item?.score }}
               </div>
             </div>
@@ -191,49 +201,53 @@
 
 <dx-popup
   id="webcam-popup"
-  [title]="'Media Check'"
+  [title]="'Media Setting'"
   [showTitle]="true"
   [shading]="true"
   [position]="'center'"
   [showCloseButton]="true"
   (onHiding)="closePopupSetting()"
   [dragEnabled]="true"
-  [height]="'70%'"
-  [width]="'60%'"
+  [height]="'60%'"
+  [width]="'40%'"
   [visible]="isPopupSettingVisible"
 >
   <div *dxTemplate="let data of 'content'">
     <div *ngIf="!localStream">
       Please grant us permission to access camera and audio.
     </div>
-    <div *ngIf="localStream" class="media-check">
+    <div class="media-check">
       <video #localVideo id="localVideo" autoplay></video>
-    </div>
-  </div>
-</dx-popup>
-<dx-popup
-  id="webcam-popup"
-  [title]="'Webcam Setting'"
-  [showTitle]="true"
-  [shading]="true"
-  [position]="'center'"
-  [showCloseButton]="true"
-  (onHiding)="closePopupSetting()"
-  [dragEnabled]="true"
-  [height]="'70%'"
-  [width]="'60%'"
-  [visible]="isPopupVideoVisible"
->
-  <div *dxTemplate="let data of 'content'">
-    <div class="content">
-      <div class="videos">
-        <video #localVideo id="localVideo" autoplay controls></video>
-        <video #remoteVideo id="remoteVideo" autoplay controls></video>
+      <div class="media-button">
+        <dx-button (onClick)="adjustLocalVideoStream()"
+          >On/Off Camera</dx-button
+        >
+        <dx-button
+          [icon]="localStream?.getVideoTracks()[0].enabled ? 'todo' : 'remove'"
+        ></dx-button>
+        <dx-button (onClick)="adjustLocalAudioStream()">On/Off Micro</dx-button>
+        <dx-button
+          [icon]="localStream?.getAudioTracks()[0].enabled ? 'todo' : 'remove'"
+        ></dx-button>
       </div>
     </div>
   </div>
 </dx-popup>
-
+<div class="remote-video-container">
+  <ng-container *ngIf="remoteStream">
+    <dx-scroll-view
+      [scrollByContent]="true"
+      [scrollByThumb]="true"
+      bounceEnabled="true"
+      [height]="340"
+      [width]="130"
+    >
+      <div class="video-container" *ngFor="let item of remoteStream">
+        <video class="remote-video" autoplay [srcObject]="item"></video>
+      </div>
+    </dx-scroll-view>
+  </ng-container>
+</div>
 <app-chat-message-list
   [chatMessageList]="messageList"
   [sendMessage]="sendMessage"
@@ -246,15 +260,21 @@
 <dx-speed-dial-action
   icon="comment"
   label="Show Chat"
-  [index]="1"
+  [index]="3"
   (onClick)="openPopupChat()"
 >
 </dx-speed-dial-action>
-
 <dx-speed-dial-action
-  icon="like"
+  icon="tel"
+  label="Check Media"
+  [index]="4"
+  (onClick)="openPopupSetting()"
+>
+</dx-speed-dial-action>
+<dx-speed-dial-action
+  icon="runner"
   label="Leave Room"
-  [index]="2"
+  [index]="5"
   (onClick)="hangup()"
 >
 </dx-speed-dial-action>

@@ -1,12 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SignalrService } from 'src/app/shared/services/streaming/signalr.service';
-import { signalRConfig } from 'src/app/shared/services/streaming/signalr.config';
 import { StoreService } from 'src/app/shared/services/store.service';
-import { UserEntry } from 'src/app/shared/models/user-entry';
-import { ChatMessage } from 'src/app/shared/models/chat-message';
-import { FileStore } from 'src/app/shared/services/file/file-store.service';
-import { File } from 'src/app/shared/models/file';
-import { DxScrollViewComponent } from 'devextreme-angular';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Course } from 'src/app/shared/models/course';
 
@@ -18,7 +12,6 @@ export class InstructorClassroomComponent implements OnInit, OnDestroy {
   constructor(
     private signaling: SignalrService,
     private store: StoreService,
-    private fileStore: FileStore,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -104,7 +97,7 @@ export class InstructorClassroomComponent implements OnInit, OnDestroy {
       outlets: { conditionOutlet: ['chat_room'] },
     };
     this.router.navigate([outlet], { relativeTo: this.route.parent });
-  }
+  } 
 
   navigateToScheduleList() {
     this.router.navigate(['/schedule_list']);

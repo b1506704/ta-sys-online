@@ -23,7 +23,7 @@ export const navigationLearner = [
   {
     text: 'Schedule List',
     icon: 'event',
-    path: '/schedule_list',
+    path: '/learner_schedule_list',
   },
 ];
 

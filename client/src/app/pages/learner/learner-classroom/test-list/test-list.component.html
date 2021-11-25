@@ -47,7 +47,7 @@
         <div class="card-header">
           <div class="avatar">
             <img
-              [src]="mapFileListToUrl(item?.id)"
+              src="../../../../../assets/imgs/test.jpg"
               alt="..."
               style="height: 50px; width: 50px; border-radius: 50px"
             />
@@ -67,10 +67,10 @@
               ></dx-button>
               <div class="like-count">-</div>
               <dx-button
-                icon="fullscreen"
+                icon="clock"
                 type="normal"
-                hint="Click to see test detail"
-                (onClick)="showDetail(item)"
+                hint="Click to see history of this test"
+                (onClick)="viewHistory(item)"
               ></dx-button>
             </div>
           </div>

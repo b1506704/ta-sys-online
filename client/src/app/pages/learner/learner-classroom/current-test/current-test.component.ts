@@ -26,6 +26,8 @@ export class CurrentTestComponent implements OnInit, OnDestroy {
   timeLeft: any;
   testRequest: TestRequest;
 
+  timeCounterInterval: any;
+
   isShowTestResult: boolean = false;
 
   testResult: any;
@@ -46,9 +48,6 @@ export class CurrentTestComponent implements OnInit, OnDestroy {
       }
     });
   }
-
-  saveTest() {}
-
   submitTest() {
     this.store.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
@@ -56,6 +55,7 @@ export class CurrentTestComponent implements OnInit, OnDestroy {
         const newTestRequest: TestRequest = {
           testId: this.testRequest.testId,
           userId: this.currentUserId,
+          isPractice: false,
           questionRequest: this.testRequest.questionRequest,
         };
         console.log(newTestRequest);
@@ -68,6 +68,9 @@ export class CurrentTestComponent implements OnInit, OnDestroy {
             this.testResult = data;
             this.store.showNotif(`${data.responseMessage}`, 'custom');
             this.isShowTestResult = true;
+          })
+          .catch((error: any) => {
+            this.store.showNotif(`${error.error.responseMessage}`, 'custom');
           });
       }
     });
@@ -84,7 +87,7 @@ export class CurrentTestComponent implements OnInit, OnDestroy {
 
   timeCounter() {
     let totalSeconds = this.testData?.allocatedTime * 60;
-    setInterval(() => {
+    this.timeCounterInterval = setInterval(() => {
       totalSeconds--;
       if (totalSeconds >= 0) {
         var time = new Date(totalSeconds * 1000);
@@ -138,6 +141,7 @@ export class CurrentTestComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    clearInterval(this.timeCounterInterval);
     this.testRequestListener().unsubscribe();
   }
 }

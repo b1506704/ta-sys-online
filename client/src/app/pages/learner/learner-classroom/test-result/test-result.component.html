@@ -1,0 +1,76 @@
+<dx-toolbar
+  [ngStyle]="{
+    paddingLeft: '25px',
+    marginBottom: '5px'
+  }"
+>
+  <dxi-item
+    [location]="'before'"
+    [text]="testData?.name + ' History'"
+    style="padding-right: 15px; margin-right: 15px"
+  >
+  </dxi-item>
+  <dxi-item
+    widget="dxButton"
+    [options]="refreshButtonOptions"
+    location="after"
+    [locateInMenu]="'auto'"
+  >
+  </dxi-item>
+</dx-toolbar>
+<div
+  style="
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    font-size: large;
+    font-weight: bold;
+  "
+  *ngIf="!testResultList"
+>
+  There is no test result for this tesk.
+</div>
+<div *ngIf="testResultList">
+  <dx-scroll-view
+    [direction]="'vertical'"
+    [showScrollbar]="true"
+    [scrollByContent]="true"
+    [scrollByThumb]="true"
+    (onPullDown)="updateTopContent($event)"
+    (onReachBottom)="updateBottomContent($event)"
+    [bounceEnabled]="false"
+    [height]="'80vh'"
+  >
+    <div class="card-container">
+      <div class="card" *ngFor="let item of testResultList; index as i">
+        <div class="card-title">Attempt Number: {{ i + 1 }}</div>
+        <div class="card-body">
+          <div class="card-text">
+            Total Score: {{ item?.score }} / {{ testData?.maxScore }}
+          </div>
+          <div class="card-text">
+            Submitted Date: {{ item?.createdDate | date: "dd/MM, hh:mm a" }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </dx-scroll-view>
+</div>
+
+<dx-speed-dial-action
+  icon="arrowup"
+  label=""
+  [index]="1"
+  (onClick)="scrollTop()"
+>
+</dx-speed-dial-action>
+
+<ng-container *ngIf="testResult">
+  <app-test-result-detail
+    [isVisible]="isShowTestResult"
+    [testResult]="testResult"
+    [maxScore]="testData?.maxScore"
+  ></app-test-result-detail>
+</ng-container>

@@ -25,6 +25,7 @@ export class QuestionListComponent implements OnInit, OnDestroy, OnChanges {
   @Input() currentPage: number;
 
   @Input() pageSize: number;
+  
   questionList: Array<Question> = [];
   currentFilterByPropertyValue: string;
   currentFilterProperty: string = 'testId';

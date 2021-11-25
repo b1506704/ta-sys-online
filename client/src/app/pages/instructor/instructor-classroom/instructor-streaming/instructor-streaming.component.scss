@@ -7,6 +7,28 @@
   align-items: center;
 }
 
+.remote-video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  flex-direction: column;
+  left: 5px;
+  height: 340px;
+  width: 130px;
+  background-color: rgba(217, 121, 255, 0.486);
+  border: 2px solid rgb(165, 173, 243);
+  border-radius: 10px;
+  top: 21%;
+}
+
+.video-container video {
+  height: 100%;
+  width: 100%;
+  border: 2px solid rgb(165, 173, 243);
+  border-radius: 5px;
+}
+
 .media-button {
   display: flex;
   justify-content: center;
@@ -19,12 +41,13 @@
   height: 250px;
 }
 
-.videos {
-  video {
-    width: 250px;
-    height: 250px;
-    margin: 3px;
-  }
+.time-counter {
+  position: absolute;
+  right: 15px;
+  top: 3%;
+  z-index: 5;
+  font-size: medium;
+  font-weight: bold;
 }
 
 .session-blackboard {

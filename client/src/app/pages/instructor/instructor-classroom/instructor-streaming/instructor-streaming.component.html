@@ -13,6 +13,7 @@
   There is no streaming at the moment. Please join one to continue.
 </div>
 <div class="classroom-container" *ngIf="currentCourseId">
+  <div class="time-counter neon">{{ lastingTime }}</div>
   <div class="session-user shadow">
     <ng-container *ngIf="chatUserList.length">
       <dx-gallery
@@ -27,7 +28,6 @@
         <div class="participant shadow" *dxTemplate="let item of 'item'">
           <div class="participant-img">
             <img [src]="mapFileListToUrl(item?.id)" alt="..." />
-            <!-- style="height: 100%; width: 100%" -->
           </div>
           <div class="display-name">
             {{ item?.displayName }}
@@ -42,10 +42,10 @@
         [dataSource]="blackBoard"
         [height]="'100%'"
         [loop]="false"
-        [width]="'100%'"
+        [width]="'80%'"
         [showNavButtons]="true"
         [showIndicator]="false"
-        [initialItemWidth]="isShowingLesson ? '500' : '80%'"
+        [initialItemWidth]="isShowingLesson ? '400' : '80%'"
       >
         <div *dxTemplate="let item of 'item'; index as i">
           <ng-container *ngIf="isShowingLesson">
@@ -150,7 +150,6 @@
                         isShowingCorrectAnswer === true &&
                         answer.isCorrect === true
                     }"
-                    (onClick)="submitAnswer({ q: item, e: answer })"
                   >
                     <div class="answer-number neon">
                       {{ (i + 1 + 9).toString(36).toUpperCase() }}
@@ -183,10 +182,13 @@
         [height]="310"
         [width]="350"
       >
-        <div class="result-card shadow" *ngFor="let item of resultBoard">
+        <div
+          class="result-card shadow"
+          *ngFor="let item of resultBoard; index as i"
+        >
           <div class="result-front">
             <div class="result-user">
-              {{ item?.userAccountResponse.displayName }}
+              {{ i + 1 }}. {{ item?.userAccountResponse.displayName }}
             </div>
             <div class="result-img">
               <img
@@ -383,7 +385,22 @@
     </div>
   </div>
 </dx-popup>
-<video #remoteVideo id="remoteVideo" autoplay controls></video>
+<div class="remote-video-container">
+  <ng-container *ngIf="remoteStream">
+    <dx-scroll-view
+      [scrollByContent]="true"
+      [scrollByThumb]="true"
+      bounceEnabled="true"
+      [height]="340"
+      [width]="130"
+    >
+      <!-- controls -->
+      <div class="video-container" *ngFor="let item of remoteStream">
+        <video class="remote-video" autoplay [srcObject]="item"></video>
+      </div>
+    </dx-scroll-view>
+  </ng-container>
+</div>
 <app-chat-message-list
   [chatMessageList]="messageList"
   [sendMessage]="sendMessage"

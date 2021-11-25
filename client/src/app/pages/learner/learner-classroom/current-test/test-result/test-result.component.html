@@ -21,7 +21,9 @@
       [width]="'100%'"
     >
       <div class="result-container shadow">
-        <div class="total-score">Total Score: {{ testResultData?.score }}</div>
+        <div class="total-score">
+          Total Score: {{ testResultData?.score }} / {{ maxScore }}
+        </div>
         <div
           class="question-container shadow"
           *ngFor="let item of testResultData?.questionResponses; index as i"

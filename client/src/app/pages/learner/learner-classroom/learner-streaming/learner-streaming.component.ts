@@ -19,23 +19,19 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Course } from 'src/app/shared/models/course';
 import { Subject } from 'src/app/shared/models/subject';
 import { Session } from 'src/app/shared/models/session';
-// import { DOCUMENT } from '@angular/common';
-// import { gsap } from 'gsap';
-// import { ScrollTrigger } from 'gsap/ScrollTrigger';
-// import { Router } from '@angular/router';
+
 @Component({
   templateUrl: 'learner-streaming.component.html',
   styleUrls: ['./learner-streaming.component.scss'],
 })
 export class LearnerStreamingComponent implements OnInit, OnDestroy {
   @ViewChild('localVideo') localVideo: ElementRef;
-  @ViewChild('remoteVideo') remoteVideo: ElementRef;
   @ViewChild(DxScrollViewComponent, { static: false })
   dxScrollView: DxScrollViewComponent;
   // @ViewChild(DxTextBoxComponent, { static: false })
   // dxTextBox: DxTextBoxComponent;
   localStream: MediaStream;
-  remoteStream: MediaStream;
+  remoteStream: Array<MediaStream> = [];
   @ViewChild('feature1', { static: true }) feature1: ElementRef<HTMLDivElement>;
 
   room: any = {
@@ -120,6 +116,11 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
   creatorData!: any;
   subjectData!: Subject;
   streamSessionData!: any;
+  totalSeconds = 0;
+
+  timerInterval: any;
+  lastingTime: string | number;
+  isSubmitAnswer: boolean = false;
 
   constructor(
     private signaling: SignalrService,
@@ -128,37 +129,18 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
     private fileStore: FileStore
   ) {}
 
-  getLatestBlackboard() {
-    if (this.isShowingQuestion) {
-      this.signaling.invoke('GetQuestion', this.room.name);
-      this.store.showNotif('Fetching data', 'custom');
-    }
-    if (this.isShowingLesson)
-      this.signaling.invoke('GetLesson', this.room.name);
-    if (this.isShowingResult)
-      this.signaling.invoke('GetTestResult', this.room.name);
-  }
-
-  getOperationFlag(data: any) {
-    this.isShowingLesson = data.isShowingLesson;
-    this.isShowingQuestion = data.isShowingQuestion;
-    this.isShowingAnswer = data.isShowingAnswer;
-    this.isShowingCorrectAnswer = data.isShowingCorrectAnswer;
-    this.isShowingResult = data.isShowingResult;
-    console.log('CURRENT FLAG');
-    console.log(data);
-    this.store.showNotif('Fetching data', 'custom');
-  }
-
-  setOperationFlag() {
-    const operationFlag = {
-      isShowingLesson: this.isShowingLesson,
-      isShowingQuestion: this.isShowingQuestion,
-      isShowingAnswer: this.isShowingAnswer,
-      isShowingCorrectAnswer: this.isShowingCorrectAnswer,
-      isShowingResult: this.isShowingResult,
-    };
-    this.signaling.invoke('SetOperationFlag', this.room.name, operationFlag);
+  timeCounter() {
+    this.timerInterval = setInterval(() => {
+      this.totalSeconds++;
+      if (this.totalSeconds >= 0) {
+        var time = new Date(this.totalSeconds * 1000);
+        var m: number | string = time.getMinutes();
+        m = m < 10 ? '0' + m : m;
+        var s: number | string = time.getSeconds();
+        s = s < 10 ? `0${s}` : s;
+        this.lastingTime = m + ':' + s;
+      }
+    }, 1000);
   }
 
   getMetaData() {
@@ -179,6 +161,14 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
     this.isPopupVideoVisible = true;
   }
 
+  openPopupTest() {
+    this.isPopupTestVisible = true;
+  }
+
+  openPopupLesson() {
+    this.isPopupLessonVisible = true;
+  }
+
   openPopupChat() {
     this.isPopupChatVisible = true;
   }
@@ -190,13 +180,16 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
   closePopupSetting = () => {
     this.isPopupSettingVisible = false;
   };
-
-  closePopupVideo = () => {
-    this.isPopupVideoVisible = false;
-  };
-
   closePopupChat = () => {
     this.isPopupChatVisible = false;
+  };
+
+  closePopupLesson = () => {
+    this.isPopupLessonVisible = false;
+  };
+
+  closePopupTest = () => {
+    this.isPopupTestVisible = false;
   };
 
   getUserMediaData(id: string) {
@@ -206,6 +199,7 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
       }
     });
   }
+
   getUserID() {
     return this.store.$currentUserId.subscribe((data: string) => {
       if (data) {
@@ -250,6 +244,16 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
     this.fileStore.getFiles(sourceIds);
   }
 
+  insertAsset = (e: any, type: string, thumbnail: string) => {
+    this.assetList = this.assetList.concat({ asset: e, type, thumbnail });
+  };
+
+  insertQuiz = (e: any, type: string, thumbnail: string) => {
+    this.selectedTestId = e.testId;
+    console.log(this.selectedTestId);
+    this.quizList = this.quizList.concat({ quiz: e.question, type, thumbnail });
+  };
+
   submitAnswer(obj: { q: Question; e: Answer }) {
     const mapAnswerRequest = {
       id: obj.e.id,
@@ -268,16 +272,86 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
     const doTestRequest = {
       testId: obj.q.testId,
       userId: this.userEntry.id,
+      isPractice: true,
       questionRequest: [questionWithAnswerChoice],
     };
     console.log(doTestRequest);
     this.signaling.invoke('DoTest', this.room.name, doTestRequest);
     this.isShowingResult = true;
-    this.setOperationFlag();
+    this.isSubmitAnswer = true;
+  }
+
+  showAnswerChoice(isShow: boolean) {
+    this.signaling.invoke('ShowAnswerChoice', this.room.name, isShow);
+    this.isShowingAnswer = isShow;
+    // this.setOperationFlag();
+  }
+
+  showCorrectAnswer(isShow: boolean) {
+    this.signaling.invoke('ShowCorrectAnswer', this.room.name, isShow);
+    this.isShowingCorrectAnswer = isShow;
+    // this.setOperationFlag();
   }
 
   clearBoard() {
     this.blackBoard = [];
+  }
+
+  writeBoard(e: any) {
+    switch (e.type) {
+      case 'lesson':
+        this.addLesson(e.asset.id);
+        break;
+      case 'question':
+        this.addQuestion(e.quiz.id);
+        break;
+      default:
+        break;
+    }
+  }
+
+  removeAsset(e: any) {
+    this.assetList = this.assetList.filter(
+      (a: any) => a.asset.id !== e.asset.id
+    );
+    this.store.showNotif(`Lesson removed`, 'custom');
+  }
+
+  removeQuiz(e: any) {
+    this.quizList = this.quizList.filter((a: any) => a.quiz.id !== e.quiz.id);
+    this.store.showNotif(`Quiz removed`, 'custom');
+  }
+
+  addLesson(id: string) {
+    this.signaling.invoke('AddLesson', this.room.name, id);
+  }
+
+  removeLesson(id: string) {
+    this.signaling.invoke('RemoveLesson', this.room.name, id);
+  }
+
+  flipLesson(id: string, isFront: boolean) {
+    this.signaling.invoke('UpdateLesson', this.room.name, isFront, id);
+  }
+
+  addQuestion(id: string) {
+    this.signaling.invoke('AddQuestion', this.room.name, id);
+    this.isShowingQuestion = true;
+    // this.setOperationFlag();
+  }
+
+  removeQuestion(id: string) {
+    this.signaling.invoke('RemoveQuestion', this.room.name, id);
+    this.isShowingQuestion = false;
+  }
+
+  invitePresenting(userEntry: UserEntry, isPresenting: boolean) {
+    this.signaling.invoke(
+      'InviteForPresenting',
+      this.room.name,
+      userEntry,
+      isPresenting
+    );
   }
 
   sendMessage = (message: any) => {
@@ -356,19 +430,12 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.timeCounter();
+
     // #2 define signaling communication
     this.defineSignaling();
 
-    // this.signaling.invoke('GetOperationFlag', this.room.name).then(() => {
-    //   this.signaling.define('operationFlag', (flag: any) => {
-    //     this.getOperationFlag(flag);
-    //     setTimeout(() => {
-    //       this.getLatestBlackboard();
-    //     }, 500);
-    //     console.log(flag);
-    //   });
-    // });
-    this.openPopupVideo();
+    this.openPopupSetting();
 
     // #3 get media from current client
     this.getUserMedia();
@@ -383,7 +450,7 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
       console.log('CURRENT USER ENTRY LIST');
       console.log(userEntryList);
       this.chatUserList = userEntryList;
-      this.isInitiator = true;
+      // this.isInitiator = true;
       this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
 
@@ -404,16 +471,19 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
 
     this.signaling.define('isShowAnswerChoice', (isShow: boolean) => {
       this.isShowingAnswer = isShow;
+      // this.setOperationFlag();
     });
 
     this.signaling.define('isShowCorrectAnswer', (isShow: boolean) => {
       this.isShowingCorrectAnswer = isShow;
+      // this.setOperationFlag();
     });
 
     this.signaling.define('lesson', (list: any) => {
       this.isShowingQuestion = false;
       this.isShowingLesson = true;
       this.isShowingAnswer = false;
+      this.isSubmitAnswer = false;
       this.isShowingCorrectAnswer = false;
       this.isShowingResult = false;
       this.blackBoard = list;
@@ -442,6 +512,7 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
       this.isShowingAnswer = false;
       this.isShowingCorrectAnswer = false;
       this.isShowingResult = false;
+      this.isSubmitAnswer = false;
       console.log(question);
       this.clearBoard();
 
@@ -463,7 +534,7 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
         this.isPopupChatVisible = true;
         // console.log(this.messageList);
         if (chatMessage == 'got user media') {
-          this.initiateCall();
+          // this.initiateCall();
         } else if (chatMessage.type == 'offer') {
           if (!this.isStarted) {
             this.initiateCall();
@@ -576,9 +647,9 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
       );
 
       this.isStarted = true;
-      if (this.isInitiator) {
-        this.sendOffer();
-      }
+      // if (this.isInitiator) {
+      //   this.sendOffer();
+      // }
     }
   }
 
@@ -612,15 +683,14 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
     }
   }
 
-  sendOffer(): void {
-    console.log('Sending offer to peer.');
-    this.addTransceivers();
-    this.peerConnection.createOffer().then((sdp: RTCSessionDescriptionInit) => {
-      this.peerConnection.setLocalDescription(sdp);
-      // console.log(sdp.sdp);
-      this.sendMessage(sdp);
-    });
-  }
+  // sendOffer(): void {
+  //   console.log('Sending offer to peer.');
+  //   this.addTransceivers();
+  //   this.peerConnection.createOffer().then((sdp: RTCSessionDescriptionInit) => {
+  //     this.peerConnection.setLocalDescription(sdp);
+  //     this.sendMessage(sdp);
+  //   });
+  // }
 
   sendAnswer(): void {
     console.log('Sending answer to peer.');
@@ -670,9 +740,21 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
 
   addRemoteStream(stream: MediaStream): void {
     console.log('Remote stream added.');
-    this.remoteStream = stream;
-    this.remoteVideo.nativeElement.srcObject = this.remoteStream;
-    this.remoteVideo.nativeElement.muted = 'muted';
+    this.remoteStream.push(stream);
+  }
+
+  adjustLocalVideoStream() {
+    if (this.localStream && this.localStream.active) {
+      this.localStream.getVideoTracks()[0].enabled =
+        !this.localStream.getVideoTracks()[0].enabled;
+    }
+  }
+
+  adjustLocalAudioStream() {
+    if (this.localStream && this.localStream.active) {
+      this.localStream.getAudioTracks()[0].enabled =
+        !this.localStream.getAudioTracks()[0].enabled;
+    }
   }
 
   hangup(): void {
@@ -685,9 +767,13 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
               track.stop();
             });
           }
-          if (this.remoteStream && this.remoteStream.active) {
-            this.remoteStream.getTracks().forEach((track) => {
-              track.stop();
+          if (this.remoteStream) {
+            this.remoteStream.forEach((stream: MediaStream) => {
+              if (stream.active) {
+                stream.getTracks().forEach((track) => {
+                  track.stop();
+                });
+              }
             });
           }
           console.log('Hanging up.');
@@ -707,7 +793,7 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
   handleRemoteHangup(): void {
     console.log('Session terminated by remote peer.');
     this.stopPeerConnection();
-    this.isInitiator = true;
+    // this.isInitiator = true;
   }
 
   stopPeerConnection(): void {
@@ -723,8 +809,9 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
     this.getUserID().unsubscribe();
     this.getDisplayName().unsubscribe();
     this.getMetaData().unsubscribe();
-    if (this.signaling.isConnected()) {
-      this.hangup();
-    }
+    clearInterval(this.timerInterval);
+    // if (this.signaling.isConnected()) {
+    this.hangup();
+    // }
   }
 }

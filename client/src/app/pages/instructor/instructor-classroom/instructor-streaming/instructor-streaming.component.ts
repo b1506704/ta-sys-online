@@ -19,23 +19,19 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Course } from 'src/app/shared/models/course';
 import { Subject } from 'src/app/shared/models/subject';
 import { Session } from 'src/app/shared/models/session';
-// import { DOCUMENT } from '@angular/common';
-// import { gsap } from 'gsap';
-// import { ScrollTrigger } from 'gsap/ScrollTrigger';
-// import { Router } from '@angular/router';
+
 @Component({
   templateUrl: 'instructor-streaming.component.html',
   styleUrls: ['./instructor-streaming.component.scss'],
 })
 export class InstructorStreamingComponent implements OnInit, OnDestroy {
   @ViewChild('localVideo') localVideo: ElementRef;
-  @ViewChild('remoteVideo') remoteVideo: ElementRef;
   @ViewChild(DxScrollViewComponent, { static: false })
   dxScrollView: DxScrollViewComponent;
   // @ViewChild(DxTextBoxComponent, { static: false })
   // dxTextBox: DxTextBoxComponent;
   localStream: MediaStream;
-  remoteStream: MediaStream;
+  remoteStream: Array<MediaStream> = [];
   @ViewChild('feature1', { static: true }) feature1: ElementRef<HTMLDivElement>;
 
   room: any = {
@@ -120,6 +116,10 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   creatorData!: any;
   subjectData!: Subject;
   streamSessionData!: any;
+  totalSeconds = 0;
+
+  timerInterval: any;
+  lastingTime: string | number;
 
   constructor(
     private signaling: SignalrService,
@@ -128,20 +128,19 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     private fileStore: FileStore
   ) {}
 
-  // getLatestBlackboard() {
-  //   if (this.isShowingQuestion) this.signaling.invoke('GetQuestion', this.room.name);
-  //   if (this.isShowingLesson) this.signaling.invoke('GetLesson', this.room.name);
-  //   if (this.isShowingResult) this.signaling.invoke('GetTestResult', this.room.name);
-  // }
-
-  // getOperationFlag(data: any) {
-  //   this.isShowingLesson = data.isShowingLesson;
-  //   this.isShowingQuestion = data.isShowingQuestion;
-  //   this.isShowingAnswer = data.isShowingAnswer;
-  //   this.isShowingCorrectAnswer = data.isShowingCorrectAnswer;
-  //   this.isShowingResult = data.isShowingResult;
-  // }
-
+  timeCounter() {
+    this.timerInterval = setInterval(() => {
+      this.totalSeconds++;
+      if (this.totalSeconds >= 0) {
+        var time = new Date(this.totalSeconds * 1000);
+        var m: number | string = time.getMinutes();
+        m = m < 10 ? '0' + m : m;
+        var s: number | string = time.getSeconds();
+        s = s < 10 ? `0${s}` : s;
+        this.lastingTime = m + ':' + s;
+      }
+    }, 1000);
+  }
   setOperationFlag() {
     const operationFlag = {
       isShowingLesson: this.isShowingLesson,
@@ -281,6 +280,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     };
     const doTestRequest = {
       testId: obj.q.testId,
+      isPractice: true,
       userId: this.userEntry.id,
       questionRequest: [questionWithAnswerChoice],
     };
@@ -439,6 +439,8 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.timeCounter();
+
     // #2 define signaling communication
     this.defineSignaling();
 
@@ -446,19 +448,12 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
     // #3 get media from current client
     this.getUserMedia();
-    this.signaling.invoke('GetOperationFlag', this.room.name);
   }
 
   defineSignaling(): void {
     this.signaling.define('log', (message: any) => {
       console.log(message);
     });
-
-    // this.signaling.define('operationFlag', (flag: any) => {
-    //   this.getOperationFlag(flag);
-    //   this.getLatestBlackboard();
-    //   console.log(flag);
-    // });
 
     this.signaling.define('created', (userEntryList: any) => {
       console.log('CURRENT USER ENTRY LIST');
@@ -703,7 +698,6 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     this.addTransceivers();
     this.peerConnection.createOffer().then((sdp: RTCSessionDescriptionInit) => {
       this.peerConnection.setLocalDescription(sdp);
-      // console.log(sdp.sdp);
       this.sendMessage(sdp);
     });
   }
@@ -756,9 +750,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
   addRemoteStream(stream: MediaStream): void {
     console.log('Remote stream added.');
-    this.remoteStream = stream;
-    this.remoteVideo.nativeElement.srcObject = this.remoteStream;
-    this.remoteVideo.nativeElement.muted = 'muted';
+    this.remoteStream.push(stream);
   }
 
   adjustLocalVideoStream() {
@@ -785,9 +777,13 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
               track.stop();
             });
           }
-          if (this.remoteStream && this.remoteStream.active) {
-            this.remoteStream.getTracks().forEach((track) => {
-              track.stop();
+          if (this.remoteStream) {
+            this.remoteStream.forEach((stream: MediaStream) => {
+              if (stream.active) {
+                stream.getTracks().forEach((track) => {
+                  track.stop();
+                });
+              }
             });
           }
           console.log('Hanging up.');
@@ -823,6 +819,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     this.getUserID().unsubscribe();
     this.getDisplayName().unsubscribe();
     this.getMetaData().unsubscribe();
+    clearInterval(this.timerInterval);
     if (this.signaling.isConnected()) {
       this.hangup();
     }

@@ -27,6 +27,7 @@ const initialState: TestState = {
   testRequest: {
     testId: '',
     userId: '',
+    isPractice: false,
     questionRequest: [],
   },
   savedAnswerIds: [],

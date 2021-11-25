@@ -86,10 +86,7 @@ export class LearnerClassroomComponent implements OnInit, OnDestroy {
   }
 
   navigateCurrentSession() {
-    const outlet = {
-      outlets: { conditionOutlet: ['current_session'] },
-    };
-    this.router.navigate([outlet], { relativeTo: this.route.parent });
+    this.router.navigate(['course_learner_streaming']);
   }
 
   navigateAsset() {
@@ -105,7 +102,6 @@ export class LearnerClassroomComponent implements OnInit, OnDestroy {
     };
     this.router.navigate([outlet], { relativeTo: this.route.parent });
   }
-
   navigateToScheduleList() {
     this.router.navigate(['/schedule_list']);
   }

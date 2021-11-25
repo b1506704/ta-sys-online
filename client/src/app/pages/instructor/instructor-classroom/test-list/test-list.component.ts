@@ -7,6 +7,7 @@ import { File } from 'src/app/shared/models/file';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
 import { TestHttpService } from 'src/app/shared/services/test/test-http.service';
 import { Course } from 'src/app/shared/models/course';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-test-list',
@@ -89,7 +90,8 @@ export class TestListComponent implements OnInit, OnDestroy {
     private testStore: TestStore,
     private testHTTP: TestHttpService,
     private store: StoreService,
-    private fileStore: FileStore
+    private fileStore: FileStore,
+    private router: Router
   ) {}
 
   uploadTest() {
@@ -117,6 +119,11 @@ export class TestListComponent implements OnInit, OnDestroy {
   showDetail(test: Test) {
     this.currentSelectedTest = test;
     this.isDetailPopupVisible = true;
+  }
+
+  viewHistory(test: Test) {
+    this.store.setCurrentTestHistory(test);
+    this.router.navigate(['instructor_test_history']);
   }
 
   closePopupUpload = () => {

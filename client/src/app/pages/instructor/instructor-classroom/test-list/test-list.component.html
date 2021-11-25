@@ -80,12 +80,12 @@
           </div>
           <div class="card-title">{{ item?.name }}</div>
           <div class="test-util">
-            <!-- <div class="button-group">
+            <div class="button-group">
               <dx-button
-                icon="like"
+                icon="clock"
                 type="normal"
-                hint="Click to take test"
-                (onClick)="takeTest(item)"
+                hint="Click to see history of this test"
+                (onClick)="viewHistory(item)"
               ></dx-button>
               <div class="like-count">-</div>
               <dx-button
@@ -94,7 +94,7 @@
                 hint="Click to see test detail"
                 (onClick)="showDetail(item)"
               ></dx-button>
-            </div> -->
+            </div>
             <div class="button-group">
               <dx-button
                 icon="trash"

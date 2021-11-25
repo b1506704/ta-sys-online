@@ -20,6 +20,9 @@ export class TestResultDetailComponent implements OnInit, OnDestroy, OnChanges {
   dxScrollView: DxScrollViewComponent;
 
   @Input() testResult: any;
+
+  @Input() maxScore: any;
+  
   @Input() isVisible: boolean;
   testResultData: any;
 
