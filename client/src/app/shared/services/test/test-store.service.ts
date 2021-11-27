@@ -82,121 +82,6 @@ export class TestStore extends StateService<TestState> {
     this.fileStore.getFiles(sourceIds);
   }
 
-  initInfiniteData(page: number, size: number) {
-    return this.testService
-      .fetchTest(page, size)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          testList: data.data,
-        });
-        this.fetchMediaBySourceID(data.data);
-        console.log('Current flag: infite list');
-        console.log(this.state.testList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-      });
-  }
-
-  loadInfiniteDataAsync(page: number, size: number) {
-    this.setIsLoading(true);
-    this.testService.fetchTest(page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          testList: this.state.testList.concat(data.data),
-        });
-        this.fetchMediaBySourceID(data.data);
-        console.log('Infinite list');
-        console.log(this.state.testList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
-    this.setIsLoading(true);
-    this.testService.fetchTestByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          testList: this.fillEmpty(
-            page - 1,
-            size,
-            this.state.testList,
-            data.data
-          ),
-        });
-        console.log('Pure list');
-        console.log(this.state.testList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
-    return this.testService
-      .fetchTestByLearnerID(page, size, learnerID)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          testList: data.data,
-        });
-        console.log('Current flag: infite list');
-        console.log(this.state.testList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-      });
-  }
-
-  loadInfiniteDataAsyncByLearnerID(
-    page: number,
-    size: number,
-    learnerID: string
-  ) {
-    this.setIsLoading(true);
-    this.testService.fetchTestByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          testList: this.state.testList.concat(data.data),
-        });
-        console.log('Infinite list');
-        console.log(this.state.testList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
   initData(page: number, size: number) {
     this.testService
       .fetchTest(page, size)
@@ -213,6 +98,29 @@ export class TestStore extends StateService<TestState> {
       })
       .then(() => {
         this.loadDataAsync(page, size);
+      });
+  }
+
+  initInfiniteFilterByPropertyData(
+    property: string,
+    value: string,
+    page: number,
+    size: number
+  ) {
+    //;
+    this.testService
+      .filterTestByProperty(property, value, page, size)
+      .toPromise()
+      .then((data: any) => {
+        this.setState({
+          testList: data.data,
+        });
+        this.fetchMediaBySourceID(data.data);
+        console.log('Current flag: infinite filtered list');
+        console.log(this.state.testList);
+        this.setState({ totalItems: data.totalRecords });
+        this.setState({ totalPages: data.totalPages });
+        this.setState({ currentPage: data.pageNumber });
       });
   }
 
@@ -241,26 +149,28 @@ export class TestStore extends StateService<TestState> {
       });
   }
 
-  initInfiniteFilterByPropertyData(
-    property: string,
+  initSortByPropertyData(
     value: string,
+    order: string,
     page: number,
     size: number
   ) {
-    //;
+    //
     this.testService
-      .filterTestByProperty(property, value, page, size)
+      .sortTestByProperty(value, order, page, size)
       .toPromise()
       .then((data: any) => {
         this.setState({
-          testList: data.data,
+          testList: new Array<Test>(data.totalRecords),
         });
-        this.fetchMediaBySourceID(data.data);
-        console.log('Current flag: infinite filtered list');
+        console.log('Current flag: sort list');
         console.log(this.state.testList);
         this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
         this.setState({ currentPage: data.pageNumber });
+      })
+      .then(() => {
+        this.sortTestByProperty(value, order, page, size);
       });
   }
 
@@ -286,33 +196,6 @@ export class TestStore extends StateService<TestState> {
       })
       .then(() => {
         this.searchTestByProperty(property, value, page, size);
-      });
-  }
-
-  initInfiniteSearchByPropertyData(
-    property: string,
-    value: string,
-    page: number,
-    size: number
-  ) {
-    //
-    this.testService
-      .searchTestByProperty(property, value, page, size)
-      .toPromise()
-      .then((data: any) => {
-        if (data.totalRecords !== 0) {
-          this.setState({
-            testList: data.data,
-          });
-          this.fetchMediaBySourceID(data.data);
-        } else {
-          this.store.showNotif('No result found!', 'custom');
-        }
-        console.log('Current flag: infitite searched list');
-        console.log(this.state.testList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
       });
   }
 
@@ -349,31 +232,6 @@ export class TestStore extends StateService<TestState> {
         this.setState({ totalItems: data.totalRecords });
         this.setState({ totalPages: data.totalPages });
         this.setState({ currentPage: data.pageNumber });
-      });
-  }
-
-  initSortByPropertyData(
-    value: string,
-    order: string,
-    page: number,
-    size: number
-  ) {
-    //
-    this.testService
-      .sortTestByProperty(value, order, page, size)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          testList: new Array<Test>(data.totalRecords),
-        });
-        console.log('Current flag: sort list');
-        console.log(this.state.testList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-      })
-      .then(() => {
-        this.sortTestByProperty(value, order, page, size);
       });
   }
 
@@ -429,36 +287,6 @@ export class TestStore extends StateService<TestState> {
     });
   }
 
-  refresh(page: number, size: number) {
-    this.setIsLoading(true);
-    this.testService.fetchTest(page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          testList: this.fillEmpty(
-            page - 1,
-            size,
-            this.state.testList,
-            data.data
-          ),
-        });
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        console.log('Pure list');
-        console.log(this.state.testList);
-        console.log('Server response');
-        console.log(data);
-        this.store.showNotif('Refresh successfully', 'custom');
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
   setIsLoading(_isLoading: boolean) {
     this.store.setIsLoading(_isLoading);
   }
@@ -472,23 +300,9 @@ export class TestStore extends StateService<TestState> {
     (state) => state.savedAnswerIds
   );
 
-  $exportData: Observable<Array<Test>> = this.select(
-    (state) => state.exportData
-  );
-
-  $totalPages: Observable<Number> = this.select((state) => state.totalPages);
-
-  $totalItems: Observable<Number> = this.select((state) => state.totalItems);
-
   $currentPage: Observable<Number> = this.select((state) => state.currentPage);
 
-  $selectedTest: Observable<Object> = this.select(
-    (state) => state.selectedTest
-  );
-
   $isUploading: Observable<boolean> = this.select((state) => state.isUploading);
-
-  $testInstance: Observable<Test> = this.select((state) => state.testInstance);
 
   uploadTest(test: Test, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
@@ -542,33 +356,6 @@ export class TestStore extends StateService<TestState> {
     return confirm(`<b>Are you sure?</b>`, 'Confirm changes');
   }
 
-  deleteSelectedTests(
-    selectedTests: Array<string>,
-    page: number,
-    size: number
-  ) {
-    this.confirmDialog('').then((confirm: boolean) => {
-      if (confirm) {
-        this.setIsLoading(true);
-        this.testService.deleteTest(selectedTests).subscribe({
-          next: (data: any) => {
-            this.setState({ responseMsg: data });
-            console.log(data);
-            this.loadDataAsync(page, size);
-            console.log(this.state.testList);
-            this.setIsLoading(false);
-            this.store.showNotif(data.responseMessage, 'custom');
-          },
-          error: (data: any) => {
-            this.setIsLoading(false);
-            this.store.showNotif(data.error.responseMessage, 'error');
-            console.log(data);
-          },
-        });
-      }
-    });
-  }
-
   deleteAll() {
     this.confirmDialog('Delete all items?').then((confirm: boolean) => {
       if (confirm) {
@@ -613,20 +400,8 @@ export class TestStore extends StateService<TestState> {
     });
   }
 
-  selectTest(_test: Test) {
-    this.setState({ selectedTest: _test });
-  }
-
-  setTotalPages(_totalPages: number) {
-    this.setState({ totalPages: _totalPages });
-  }
-
   setTotalItems(_totalItems: number) {
     this.setState({ totalItems: _totalItems });
-  }
-
-  setCurrentPage(_currentPage: number) {
-    this.setState({ currentPage: _currentPage });
   }
 
   filterTestByProperty(
@@ -788,44 +563,6 @@ export class TestStore extends StateService<TestState> {
       });
   }
 
-  searchInfiniteTestByProperty(
-    property: string,
-    value: string,
-    page: number,
-    size: number
-  ) {
-    this.setIsLoading(true);
-    this.testService
-      .searchTestByProperty(property, value, page, size)
-      .subscribe({
-        next: (data: any) => {
-          if (data.totalRecords !== 0) {
-            if (data.data.length) {
-              this.setState({
-                testList: this.state.testList.concat(data.data),
-              });
-              this.fetchMediaBySourceID(data.data);
-            }
-          } else {
-            this.store.showNotif('No result found!', 'custome');
-          }
-          console.log('Infite searched list');
-          console.log(this.state.testList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
-  }
-
   sortTestByProperty(value: string, order: string, page: number, size: number) {
     this.setIsLoading(true);
     this.testService.sortTestByProperty(value, order, page, size).subscribe({
@@ -886,18 +623,6 @@ export class TestStore extends StateService<TestState> {
         console.log(data);
       },
     });
-  }
-
-  getTest(id: string) {
-    this.setIsLoading(true);
-    return this.testService
-      .getTest(id)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({ testInstance: data });
-        console.log(data);
-        this.setIsLoading(false);
-      });
   }
 
   findIndexByProperty(data: Array<any>, key: any, value: any) {

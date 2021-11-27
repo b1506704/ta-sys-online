@@ -23,22 +23,6 @@ export class CommentHttpService {
     });
   }
 
-  fetchCommentByLearnerID(
-    page: number,
-    size: number,
-    id: string
-  ): Observable<Comment> {
-    const params = new HttpParams()
-      .set('PageNumber', page)
-      .set('PageSize', size)
-      .set('Id', id);
-    console.log(params.toString());
-    return this.http.get<Comment>(this.apiUrl + '/byLearnerID', {
-      params: params,
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
 
   searchCommentByProperty(
     property: string,
@@ -102,17 +86,6 @@ export class CommentHttpService {
       reportProgress: true,
       observe: 'body',
     });
-  }
-
-  generateRandomComment(): Observable<Comment> {
-    return this.http.post<any>(
-      'https://localhost:5001/api/Generate/generate-comment-data',
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
   }
 
   deleteComment(id: Array<string>): Observable<Object> {

@@ -77,17 +77,6 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
         widget: 'dxButton',
         options: {
           type: 'normal',
-          icon: 'parentfolder',
-          hint: 'Generate random 100+ items',
-          onClick: this.onAddRandom.bind(this),
-        },
-      },
-      {
-        location: 'after',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
           icon: 'exportpdf',
           hint: 'Export to PDF',
           onClick: this.exportGridToPdf.bind(this),
@@ -114,6 +103,36 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
           onValueChanged: this.onSearchValueChanged.bind(this),
           mode: 'search',
           placeholder: 'Search name',
+        },
+      },
+      {
+        location: 'center',
+        locateInMenu: 'auto',
+        widget: 'dxButton',
+        options: {
+          type: 'normal',
+          icon: 'card',
+          disabled: true,
+          hint: 'Sort by name',
+        },
+      },
+      {
+        location: 'center',
+        locateInMenu: 'auto',
+        widget: 'dxSelectBox',
+        options: {
+          items: [
+            {
+              id: '-1',
+              name: '(NONE)',
+            },
+            { id: '0', name: 'asc' },
+            { id: '1', name: 'desc' },
+          ],
+          valueExpr: 'name',
+          placeholder: 'Sort by name',
+          displayExpr: 'name',
+          onValueChanged: this.onSortValueChanged.bind(this),
         },
       }
     );
@@ -433,32 +452,6 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
       this.dataGrid.instance.pageIndex() + 1,
       this.pageSize
     );
-  }
-
-  onAddRandom() {
-    this.subjectStore
-      .confirmDialog(
-        'This will generate random 100+ items in database. Are you sure'
-      )
-      .then((result: boolean) => {
-        if (result) {
-          this.isFilteringByCategory = false;
-          this.store.setIsLoading(true);
-          this.subjectHTTP
-            .generateRandomSubject()
-            .toPromise()
-            .then(() => {
-              this.subjectStore.initData(
-                this.dataGrid.instance.pageIndex() + 1,
-                this.pageSize
-              );
-            })
-            .then(() => {
-              this.store.setIsLoading(false);
-              this.store.showNotif('Generated 100+ random items', 'custom');
-            });
-        }
-      });
   }
 
   exportDataGridToExcel() {

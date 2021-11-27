@@ -68,28 +68,7 @@ export class EditUserListComponent implements OnInit, OnDestroy {
           onClick: this.onRefresh.bind(this),
         },
       },
-      {
-        location: 'after',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'trash',
-          hint: 'Delete all items',
-          onClick: this.deleteAll.bind(this),
-        },
-      },
-      {
-        location: 'after',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'parentfolder',
-          hint: 'Generate random 100+ items',
-          onClick: this.onAddRandom.bind(this),
-        },
-      },
+      //     
       {
         location: 'after',
         locateInMenu: 'auto',
@@ -121,7 +100,7 @@ export class EditUserListComponent implements OnInit, OnDestroy {
           onKeyUp: this.onSearchKeyupHandler.bind(this),
           onValueChanged: this.onSearchValueChanged.bind(this),
           mode: 'search',
-          placeholder: 'Search name',
+          placeholder: 'Search username',
         },
       },
       {
@@ -132,7 +111,7 @@ export class EditUserListComponent implements OnInit, OnDestroy {
           type: 'normal',
           icon: 'filter',
           disabled: true,
-          hint: 'Filter with subject',
+          hint: 'Filter with role',
         },
       },
       {
@@ -157,7 +136,7 @@ export class EditUserListComponent implements OnInit, OnDestroy {
           type: 'normal',
           icon: 'card',
           disabled: true,
-          hint: 'Sort by total cost',
+          hint: 'Sort by total username',
         },
       },
       {
@@ -174,7 +153,7 @@ export class EditUserListComponent implements OnInit, OnDestroy {
             { id: '1', name: 'desc' },
           ],
           valueExpr: 'name',
-          placeholder: 'Sort by name',
+          placeholder: 'Sort by username',
           displayExpr: 'name',
           onValueChanged: this.onSortValueChanged.bind(this),
         },
@@ -504,32 +483,6 @@ export class EditUserListComponent implements OnInit, OnDestroy {
       this.dataGrid.instance.pageIndex() + 1,
       this.pageSize
     );
-  }
-
-  onAddRandom() {
-    this.userStore
-      .confirmDialog(
-        'This will generate random 100+ items in database. Are you sure'
-      )
-      .then((result: boolean) => {
-        if (result) {
-          this.isFilteringByCategory = false;
-          this.store.setIsLoading(true);
-          this.userHTTP
-            .generateRandomUser()
-            .toPromise()
-            .then(() => {
-              this.userStore.initData(
-                this.dataGrid.instance.pageIndex() + 1,
-                this.pageSize
-              );
-            })
-            .then(() => {
-              this.store.setIsLoading(false);
-              this.store.showNotif('Generated 100+ random items', 'custom');
-            });
-        }
-      });
   }
 
   exportDataGridToExcel() {

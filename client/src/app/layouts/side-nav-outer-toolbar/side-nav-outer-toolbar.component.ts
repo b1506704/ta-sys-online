@@ -51,15 +51,15 @@ export class SideNavOuterToolbarComponent implements OnInit {
 
   ngOnInit() {
     // this.updateDrawer();
-    this.userStore.$isLoggedIn.subscribe((data: any) => {
-      this.isSideMenuVisible = data;
-      if (data === false) {
-        this.temporaryMenuOpened = false;
-        this.menuOpened = false;
-      }
-      console.log('IS LOGGED IN');
-      console.log(data);
-    });
+    // this.userStore.$isLoggedIn.subscribe((data: any) => {
+    //   this.isSideMenuVisible = data;
+    //   if (data === false) {
+    //     this.temporaryMenuOpened = false;
+    //     this.menuOpened = false;
+    //   }
+    //   console.log('IS LOGGED IN');
+    //   console.log(data);
+    // });
     this.menuOpened = this.screen.sizes['screen-large'];
 
     this.router.events.subscribe((val) => {

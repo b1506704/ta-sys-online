@@ -20,10 +20,7 @@
   <app-side-navigation-menu
     [compactMode]="!menuOpened"
     [selectedItem]="selectedRoute"
-    [ngClass]="{
-      menu: isSideMenuVisible === true,
-      hidden: isSideMenuVisible === false
-    }"
+    class="menu"
     *dxTemplate="let dataMenu of 'panel'"
     (selectedItemChanged)="navigationChanged($event)"
     (openMenu)="navigationClick()"

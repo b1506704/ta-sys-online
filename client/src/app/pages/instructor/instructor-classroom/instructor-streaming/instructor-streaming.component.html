@@ -141,7 +141,7 @@
                 </div>
               </div>
               <div class="answer-container" *ngIf="isShowingAnswer === true">
-                <div class="answer-menu-title">Please select an answer</div>
+                <div class="answer-menu-title">Answer Choices</div>
                 <div *ngFor="let answer of item?.answerResponses; index as i">
                   <dx-button
                     [ngClass]="{
@@ -175,6 +175,19 @@
   <ng-container *ngIf="isShowingQuestion">
     <div class="result-view box-shadow">
       <div class="result-title">Test Result</div>
+      <div
+        *ngIf="!resultBoard"
+        style="
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 30px;
+          font-size: medium;
+        "
+      >
+        Waiting for learners' answer...
+      </div>
       <dx-scroll-view
         [scrollByContent]="true"
         [scrollByThumb]="true"
@@ -334,12 +347,12 @@
                       hint="Click to import to desk"
                       (onClick)="writeBoard(item)"
                     ></dx-button>
-                    <dx-button
+                    <!-- <dx-button
                       icon="trash"
                       type="normal"
                       hint="Click to remove quiz from desk"
                       (onClick)="removeQuiz(item)"
-                    ></dx-button>
+                    ></dx-button> -->
                   </div>
                 </div>
               </div>
@@ -433,7 +446,7 @@
 </dx-speed-dial-action>
 <dx-speed-dial-action
   icon="edit"
-  label="Add Test"
+  label="Add Question"
   [index]="2"
   (onClick)="openPopupTest()"
 >

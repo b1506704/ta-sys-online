@@ -24,23 +24,6 @@ export class PostHttpService {
     });
   }
 
-  fetchPostByLearnerID(
-    page: number,
-    size: number,
-    id: string
-  ): Observable<Post> {
-    const params = new HttpParams()
-      .set('PageNumber', page)
-      .set('PageSize', size)
-      .set('Id', id);
-    console.log(params.toString());
-    return this.http.get<Post>(this.apiUrl + '/byLearnerID', {
-      params: params,
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
   searchPostByProperty(
     property: string,
     value: string,
@@ -139,16 +122,6 @@ export class PostHttpService {
     );
   }
 
-  generateRandomPost(): Observable<Post> {
-    return this.http.post<any>(
-      'https://localhost:5001/api/Generate/generate-post-data',
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
 
   deletePost(id: Array<string>): Observable<Object> {
     return this.http.post<Object>(this.apiUrl + '/delete', id, {
@@ -159,13 +132,6 @@ export class PostHttpService {
 
   deleteAll(): Observable<ArrayBuffer> {
     return this.http.delete<ArrayBuffer>(this.apiUrl, {
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
-  getPost(id: string): Observable<Post> {
-    return this.http.get<Post>(this.apiUrl + `/${id}`, {
       reportProgress: true,
       observe: 'body',
     });

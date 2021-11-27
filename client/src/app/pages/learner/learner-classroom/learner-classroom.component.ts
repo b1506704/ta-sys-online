@@ -1,12 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SignalrService } from 'src/app/shared/services/streaming/signalr.service';
-import { signalRConfig } from 'src/app/shared/services/streaming/signalr.config';
 import { StoreService } from 'src/app/shared/services/store.service';
-import { UserEntry } from 'src/app/shared/models/user-entry';
-import { ChatMessage } from 'src/app/shared/models/chat-message';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
-import { File } from 'src/app/shared/models/file';
-import { DxScrollViewComponent } from 'devextreme-angular';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Course } from 'src/app/shared/models/course';
 

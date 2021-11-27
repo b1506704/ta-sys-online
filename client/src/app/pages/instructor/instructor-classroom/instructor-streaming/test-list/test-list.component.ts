@@ -29,13 +29,15 @@ export class TestListComponent implements OnInit, OnDestroy, OnChanges {
   @Input() insertQuiz: (quiz: any, type: string, thumbnail: string) => void;
   @Input() closePopupTest: () => void;
   testList!: Array<Test>;
-  pageSize: number = 20;
+  pageSize: number = 100;
   currentFilterByPropertyValue: string;
   currentFilterProperty: string = 'courseId';
   currentSearchByPropertyValue: string;
   currentSearchProperty: string = 'name';
   currentTestOutput: string = '';
   currentTestId: string = '';
+
+  currentQuestionTestId: string = '';
   isSearchingByName: boolean;
   isFilteringByCategory: boolean;
   pullDown = false;
@@ -73,8 +75,8 @@ export class TestListComponent implements OnInit, OnDestroy, OnChanges {
 
   selectTest(e: any) {
     this.currentTestId = e.id;
-    this.openPopupQuestion();
-  }
+    // this.openPopupQuestion();
+  }  
 
   checkEditorMode() {
     if (this.isSearchingByName === true) {

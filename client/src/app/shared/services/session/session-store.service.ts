@@ -109,83 +109,6 @@ export class SessionStore extends StateService<SessionState> {
     });
   }
 
-  loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
-    this.setIsLoading(true);
-    this.sessionService
-      .fetchSessionByLearnerID(page, size, learnerID)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({
-            sessionList: this.fillEmpty(
-              page - 1,
-              size,
-              this.state.sessionList,
-              data.data
-            ),
-          });
-          console.log('Pure list');
-          console.log(this.state.sessionList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
-  }
-
-  initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
-    return this.sessionService
-      .fetchSessionByLearnerID(page, size, learnerID)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          sessionList: data.data,
-        });
-        console.log('Current flag: infite list');
-        console.log(this.state.sessionList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-      });
-  }
-
-  loadInfiniteDataAsyncByLearnerID(
-    page: number,
-    size: number,
-    learnerID: string
-  ) {
-    this.setIsLoading(true);
-    this.sessionService
-      .fetchSessionByLearnerID(page, size, learnerID)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({
-            sessionList: this.state.sessionList.concat(data.data),
-          });
-          console.log('Infinite list');
-          console.log(this.state.sessionList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
-  }
-
   initData(page: number, size: number) {
     this.sessionService
       .fetchSession(page, size)
@@ -380,36 +303,6 @@ export class SessionStore extends StateService<SessionState> {
     });
   }
 
-  refresh(page: number, size: number) {
-    this.setIsLoading(true);
-    this.sessionService.fetchSession(page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          sessionList: this.fillEmpty(
-            page - 1,
-            size,
-            this.state.sessionList,
-            data.data
-          ),
-        });
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        console.log('Pure list');
-        console.log(this.state.sessionList);
-        console.log('Server response');
-        console.log(data);
-        this.store.showNotif('Refresh successfully', 'custom');
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
   setIsLoading(_isLoading: boolean) {
     this.store.setIsLoading(_isLoading);
   }
@@ -418,19 +311,7 @@ export class SessionStore extends StateService<SessionState> {
     (state) => state.sessionList
   );
 
-  $exportData: Observable<Array<Session>> = this.select(
-    (state) => state.exportData
-  );
-
-  $totalPages: Observable<Number> = this.select((state) => state.totalPages);
-
-  $totalItems: Observable<Number> = this.select((state) => state.totalItems);
-
   $currentPage: Observable<Number> = this.select((state) => state.currentPage);
-
-  $selectedSession: Observable<Object> = this.select(
-    (state) => state.selectedSession
-  );
 
   $sessionInstance: Observable<Session> = this.select(
     (state) => state.sessionInstance
@@ -488,33 +369,6 @@ export class SessionStore extends StateService<SessionState> {
     return confirm(`<b>Are you sure?</b>`, 'Confirm changes');
   }
 
-  deleteSelectedSessions(
-    selectedSessions: Array<string>,
-    page: number,
-    size: number
-  ) {
-    this.confirmDialog('').then((confirm: boolean) => {
-      if (confirm) {
-        this.setIsLoading(true);
-        this.sessionService.deleteSession(selectedSessions).subscribe({
-          next: (data: any) => {
-            this.setState({ responseMsg: data });
-            console.log(data);
-            this.loadDataAsync(page, size);
-            console.log(this.state.sessionList);
-            this.setIsLoading(false);
-            this.store.showNotif(data.responseMessage, 'custom');
-          },
-          error: (data: any) => {
-            this.setIsLoading(false);
-            this.store.showNotif(data.error.responseMessage, 'error');
-            console.log(data);
-          },
-        });
-      }
-    });
-  }
-
   deleteAll() {
     this.confirmDialog('Delete all items?').then((confirm: boolean) => {
       if (confirm) {
@@ -559,20 +413,8 @@ export class SessionStore extends StateService<SessionState> {
     });
   }
 
-  selectSession(_session: Session) {
-    this.setState({ selectedSession: _session });
-  }
-
-  setTotalPages(_totalPages: number) {
-    this.setState({ totalPages: _totalPages });
-  }
-
   setTotalItems(_totalItems: number) {
     this.setState({ totalItems: _totalItems });
-  }
-
-  setCurrentPage(_currentPage: number) {
-    this.setState({ currentPage: _currentPage });
   }
 
   filterSessionByProperty(

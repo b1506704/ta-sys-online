@@ -23,23 +23,6 @@ export class AnswerHttpService {
     });
   }
 
-  fetchAnswerByLearnerID(
-    page: number,
-    size: number,
-    id: string
-  ): Observable<Answer> {
-    const params = new HttpParams()
-      .set('PageNumber', page)
-      .set('PageSize', size)
-      .set('Id', id);
-    console.log(params.toString());
-    return this.http.get<Answer>(this.apiUrl + '/byLearnerID', {
-      params: params,
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
   searchAnswerByProperty(
     property: string,
     value: string,
@@ -78,29 +61,6 @@ export class AnswerHttpService {
     });
   }
 
-  filterSearchAnswerByProperty(
-    filterProperty: string,
-    filterValue: string,
-    searchProperty: string,
-    searchValue: string,
-    page: number,
-    size: number
-  ): Observable<Answer> {
-    const params = new HttpParams()
-      .set('FilterValue', filterValue)
-      .set('FilterProperty', filterProperty)
-      .set('SearchValue', searchValue)
-      .set('SearchProperty', searchProperty)
-      .set('PageNumber', page)
-      .set('PageSize', size);
-    console.log(params.toString());
-    return this.http.get<Answer>(this.apiUrl + '/filter-search', {
-      params: params,
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
   sortAnswerByProperty(
     value: string,
     order: string,
@@ -127,17 +87,6 @@ export class AnswerHttpService {
     });
   }
 
-  generateRandomAnswer(): Observable<Answer> {
-    return this.http.post<any>(
-      'https://localhost:5001/api/Generate/generate-answer-data',
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
   deleteAnswer(id: Array<string>): Observable<Object> {
     return this.http.post<Object>(this.apiUrl + '/delete', id, {
       reportProgress: true,
@@ -151,14 +100,6 @@ export class AnswerHttpService {
       observe: 'body',
     });
   }
-
-  getAnswer(id: string): Observable<Answer> {
-    return this.http.get<Answer>(this.apiUrl + `/${id}`, {
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
   updateAnswer(answer: Answer): Observable<Answer> {
     return this.http.put<Answer>(this.apiUrl, answer, {
       reportProgress: true,

@@ -23,23 +23,6 @@ export class MessageHttpService {
     });
   }
 
-  fetchMessageByLearnerID(
-    page: number,
-    size: number,
-    id: string
-  ): Observable<Message> {
-    const params = new HttpParams()
-      .set('PageNumber', page)
-      .set('PageSize', size)
-      .set('Id', id);
-    console.log(params.toString());
-    return this.http.get<Message>(this.apiUrl + '/byLearnerID', {
-      params: params,
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
   searchMessageByProperty(
     property: string,
     value: string,
@@ -78,29 +61,6 @@ export class MessageHttpService {
     });
   }
 
-  filterSearchMessageByProperty(
-    filterProperty: string,
-    filterValue: string,
-    searchProperty: string,
-    searchValue: string,
-    page: number,
-    size: number
-  ): Observable<Message> {
-    const params = new HttpParams()
-      .set('FilterValue', filterValue)
-      .set('FilterProperty', filterProperty)
-      .set('SearchValue', searchValue)
-      .set('SearchProperty', searchProperty)
-      .set('PageNumber', page)
-      .set('PageSize', size);
-    console.log(params.toString());
-    return this.http.get<Message>(this.apiUrl + '/filter-search', {
-      params: params,
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
   sortMessageByProperty(
     value: string,
     order: string,
@@ -127,17 +87,6 @@ export class MessageHttpService {
     });
   }
 
-  generateRandomMessage(): Observable<Message> {
-    return this.http.post<any>(
-      'https://localhost:5001/api/Generate/generate-message-data',
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
   deleteMessage(id: Array<string>): Observable<Object> {
     return this.http.post<Object>(this.apiUrl + '/delete', id, {
       reportProgress: true,
@@ -147,13 +96,6 @@ export class MessageHttpService {
 
   deleteAll(): Observable<ArrayBuffer> {
     return this.http.delete<ArrayBuffer>(this.apiUrl, {
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
-  getMessage(id: string): Observable<Message> {
-    return this.http.get<Message>(this.apiUrl + `/${id}`, {
       reportProgress: true,
       observe: 'body',
     });

@@ -40,8 +40,8 @@ export class EditMessageListComponent implements OnInit, OnDestroy {
   currentFilterByPropertyValue: string;
   currentSearchByPropertyValue: string;
   currentSortByPropertyValue: string;
-  currentSortProperty: string = 'name';
-  currentSearchProperty: string = 'name';
+  currentSortProperty: string = 'content';
+  currentSearchProperty: string = 'content';
   currentFilterProperty: string = 'subjectId';
 
   constructor(
@@ -69,28 +69,7 @@ export class EditMessageListComponent implements OnInit, OnDestroy {
           onClick: this.onRefresh.bind(this),
         },
       },
-      {
-        location: 'after',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'trash',
-          hint: 'Delete all items',
-          onClick: this.deleteAll.bind(this),
-        },
-      },
-      {
-        location: 'after',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'parentfolder',
-          hint: 'Generate random 100+ items',
-          onClick: this.onAddRandom.bind(this),
-        },
-      },
+      //      
       {
         location: 'after',
         locateInMenu: 'auto',
@@ -122,34 +101,9 @@ export class EditMessageListComponent implements OnInit, OnDestroy {
           onKeyUp: this.onSearchKeyupHandler.bind(this),
           onValueChanged: this.onSearchValueChanged.bind(this),
           mode: 'search',
-          placeholder: 'Search name',
+          placeholder: 'Search content',
         },
-      },
-      {
-        location: 'center',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'filter',
-          disabled: true,
-          hint: 'Filter with subject',
-        },
-      },
-      {
-        location: 'center',
-        locateInMenu: 'auto',
-        widget: 'dxSelectBox',
-        options: {
-          items: this.subjectList,
-          valueExpr: 'id',
-          searchExpr: 'name',
-          displayExpr: 'name',
-          placeholder: 'Filter with subject',
-          searchEnabled: true,
-          onValueChanged: this.onFilterChange.bind(this),
-        },
-      },
+      },      
       {
         location: 'center',
         locateInMenu: 'auto',
@@ -158,7 +112,7 @@ export class EditMessageListComponent implements OnInit, OnDestroy {
           type: 'normal',
           icon: 'card',
           disabled: true,
-          hint: 'Sort by total cost',
+          hint: 'Sort by content',
         },
       },
       {
@@ -175,7 +129,7 @@ export class EditMessageListComponent implements OnInit, OnDestroy {
             { id: '1', name: 'desc' },
           ],
           valueExpr: 'name',
-          placeholder: 'Sort by name',
+          placeholder: 'Sort by content',
           displayExpr: 'name',
           onValueChanged: this.onSortValueChanged.bind(this),
         },
@@ -497,31 +451,7 @@ export class EditMessageListComponent implements OnInit, OnDestroy {
     );
   }
 
-  onAddRandom() {
-    this.messageStore
-      .confirmDialog(
-        'This will generate random 100+ items in database. Are you sure'
-      )
-      .then((result: boolean) => {
-        if (result) {
-          this.isFilteringByCategory = false;
-          this.store.setIsLoading(true);
-          this.messageHTTP
-            .generateRandomMessage()
-            .toPromise()
-            .then(() => {
-              this.messageStore.initData(
-                this.dataGrid.instance.pageIndex() + 1,
-                this.pageSize
-              );
-            })
-            .then(() => {
-              this.store.setIsLoading(false);
-              this.store.showNotif('Generated 100+ random items', 'custom');
-            });
-        }
-      });
-  }
+  
 
   exportDataGridToExcel() {
     this.messageStore

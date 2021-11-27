@@ -43,23 +43,6 @@ export class CourseHttpService {
     );
   }
 
-  fetchCourseByLearnerID(
-    page: number,
-    size: number,
-    id: string
-  ): Observable<Course> {
-    const params = new HttpParams()
-      .set('PageNumber', page)
-      .set('PageSize', size)
-      .set('Id', id);
-    console.log(params.toString());
-    return this.http.get<Course>(this.apiUrl + '/byLearnerID', {
-      params: params,
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
   searchCourseByProperty(
     property: string,
     value: string,
@@ -145,17 +128,6 @@ export class CourseHttpService {
       reportProgress: true,
       observe: 'body',
     });
-  }
-
-  generateRandomCourse(): Observable<Course> {
-    return this.http.post<any>(
-      'https://localhost:5001/api/Generate/generate-course-data',
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
   }
 
   deleteCourse(id: Array<string>): Observable<Object> {

@@ -40,7 +40,7 @@ export class EditQuestionListComponent implements OnInit, OnDestroy {
   currentFilterByPropertyValue: string;
   currentSearchByPropertyValue: string;
   currentSortByPropertyValue: string;
-  currentSortProperty: string = 'maxScore';
+  currentSortProperty: string = 'score';
   currentSearchProperty: string = 'name';
   currentFilterProperty: string = 'subjectId';
 
@@ -69,28 +69,8 @@ export class EditQuestionListComponent implements OnInit, OnDestroy {
           onClick: this.onRefresh.bind(this),
         },
       },
-      {
-        location: 'after',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'trash',
-          hint: 'Delete all items',
-          onClick: this.deleteAll.bind(this),
-        },
-      },
-      {
-        location: 'after',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'parentfolder',
-          hint: 'Generate random 100+ items',
-          onClick: this.onAddRandom.bind(this),
-        },
-      },
+      
+      //    
       {
         location: 'after',
         locateInMenu: 'auto',
@@ -112,44 +92,7 @@ export class EditQuestionListComponent implements OnInit, OnDestroy {
           hint: 'Export to Excel',
           onClick: this.exportDataGridToExcel.bind(this),
         },
-      },
-      {
-        location: 'before',
-        widget: 'dxTextBox',
-        options: {
-          valueChangeEvent: 'keyup',
-          showClearButton: true,
-          onKeyUp: this.onSearchKeyupHandler.bind(this),
-          onValueChanged: this.onSearchValueChanged.bind(this),
-          mode: 'search',
-          placeholder: 'Search name',
-        },
-      },
-      {
-        location: 'center',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'filter',
-          disabled: true,
-          hint: 'Filter with subject',
-        },
-      },
-      {
-        location: 'center',
-        locateInMenu: 'auto',
-        widget: 'dxSelectBox',
-        options: {
-          items: this.subjectList,
-          valueExpr: 'id',
-          searchExpr: 'name',
-          displayExpr: 'name',
-          placeholder: 'Filter with subject',
-          searchEnabled: true,
-          onValueChanged: this.onFilterChange.bind(this),
-        },
-      },
+      },           
       {
         location: 'center',
         locateInMenu: 'auto',
@@ -158,7 +101,7 @@ export class EditQuestionListComponent implements OnInit, OnDestroy {
           type: 'normal',
           icon: 'card',
           disabled: true,
-          hint: 'Sort by total cost',
+          hint: 'Sort by score',
         },
       },
       {
@@ -175,36 +118,13 @@ export class EditQuestionListComponent implements OnInit, OnDestroy {
             { id: '1', name: 'desc' },
           ],
           valueExpr: 'name',
-          placeholder: 'Sort by name',
+          placeholder: 'Sort by score',
           displayExpr: 'name',
           onValueChanged: this.onSortValueChanged.bind(this),
         },
       }
     );
-  }
-
-  onSearchKeyupHandler(e: any) {
-    clearTimeout(this.timeout);
-    this.timeout = setTimeout(() => {
-      this.isSearchingByName = true;
-      this.isFilteringByCategory = false;
-      this.isSortingByName = false;
-      console.log(this.currentSearchByPropertyValue);
-      if (this.currentSearchByPropertyValue !== '') {
-        this.questionStore.initSearchByPropertyData(
-          this.currentSearchProperty,
-          this.currentSearchByPropertyValue,
-          this.dataGrid.instance.pageIndex() + 1,
-          this.pageSize
-        );
-      } else {
-        //return to pure editor mode
-        //
-        this.onRefresh();
-      }
-    }, 1250);
-  }
-
+  } 
   onSearchValueChanged(e: any) {
     this.currentSearchByPropertyValue = e.value;
   }
@@ -462,14 +382,7 @@ export class EditQuestionListComponent implements OnInit, OnDestroy {
                     this.pageSize
                   );
                   break;
-                case 'SEARCH':
-                  this.questionStore.initSearchByPropertyData(
-                    this.currentSearchProperty,
-                    this.currentSearchByPropertyValue,
-                    this.dataGrid.instance.pageIndex() + 1,
-                    this.pageSize
-                  );
-                  break;
+                case 'SEARCH':                  
                 default:
                   break;
               }
@@ -497,31 +410,6 @@ export class EditQuestionListComponent implements OnInit, OnDestroy {
     );
   }
 
-  onAddRandom() {
-    this.questionStore
-      .confirmDialog(
-        'This will generate random 100+ items in database. Are you sure'
-      )
-      .then((result: boolean) => {
-        if (result) {
-          this.isFilteringByCategory = false;
-          this.store.setIsLoading(true);
-          this.questionHTTP
-            .generateRandomQuestion()
-            .toPromise()
-            .then(() => {
-              this.questionStore.initData(
-                this.dataGrid.instance.pageIndex() + 1,
-                this.pageSize
-              );
-            })
-            .then(() => {
-              this.store.setIsLoading(false);
-              this.store.showNotif('Generated 100+ random items', 'custom');
-            });
-        }
-      });
-  }
 
   exportDataGridToExcel() {
     this.questionStore

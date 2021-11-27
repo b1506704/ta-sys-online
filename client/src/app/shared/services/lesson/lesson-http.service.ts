@@ -23,23 +23,6 @@ export class LessonHttpService {
     });
   }
 
-  fetchLessonByLearnerID(
-    page: number,
-    size: number,
-    id: string
-  ): Observable<Lesson> {
-    const params = new HttpParams()
-      .set('PageNumber', page)
-      .set('PageSize', size)
-      .set('Id', id);
-    console.log(params.toString());
-    return this.http.get<Lesson>(this.apiUrl + '/byLearnerID', {
-      params: params,
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
   searchLessonByProperty(
     property: string,
     value: string,
@@ -127,17 +110,6 @@ export class LessonHttpService {
     });
   }
 
-  generateRandomLesson(): Observable<Lesson> {
-    return this.http.post<any>(
-      'https://localhost:5001/api/Generate/generate-lesson-data',
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
   deleteLesson(id: Array<string>): Observable<Object> {
     return this.http.post<Object>(this.apiUrl + '/delete', id, {
       reportProgress: true,
@@ -151,14 +123,6 @@ export class LessonHttpService {
       observe: 'body',
     });
   }
-
-  getLesson(id: string): Observable<Lesson> {
-    return this.http.get<Lesson>(this.apiUrl + `/${id}`, {
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
   updateLesson(lesson: Lesson): Observable<Lesson> {
     return this.http.put<Lesson>(this.apiUrl, lesson, {
       reportProgress: true,

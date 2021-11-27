@@ -70,18 +70,9 @@ const initialState: StoreState = {
 export class StoreService extends StateService<StoreState> {
   constructor() {
     super(initialState);
-    this.loadDataAsync();
   }
 
   $isLoading: Observable<boolean> = this.select((state) => state.isLoading);
-
-  $isPreloading: Observable<boolean> = this.select(
-    (state) => state.isPreloading
-  );
-
-  $responseMsg: Observable<string> = this.select((state) => state.responseMsg);
-
-  $notifType: Observable<string> = this.select((state) => state.notifType);
 
   $currentUser: Observable<string> = this.select((state) => state.currentUser);
 
@@ -91,10 +82,6 @@ export class StoreService extends StateService<StoreState> {
 
   $currentCourse: Observable<Course> = this.select(
     (state) => state.currentCourse
-  );
-
-  $currentSubject: Observable<Subject> = this.select(
-    (state) => state.currentSubject
   );
 
   $currentSession: Observable<Session> = this.select(
@@ -107,40 +94,9 @@ export class StoreService extends StateService<StoreState> {
     (state) => state.currentTestHistory
   );
 
-  $savedQuestions: Observable<Array<Question>> = this.select(
-    (state) => state.savedQuestions
-  );
-
-  $blackBoard: Observable<Array<any>> = this.select(
-    (state) => state.blackBoard
-  );
-
-  $assetList: Observable<Array<any>> = this.select((state) => state.assetList);
-
-  $resultBoard: Observable<Array<any>> = this.select(
-    (state) => state.resultBoard
-  );
-
-  $quizList: Observable<Array<any>> = this.select((state) => state.quizList);
-
-  $messageList: Observable<Array<ChatMessage>> = this.select(
-    (state) => state.messageList
-  );
-
-  $operationFlag: Observable<any> = this.select((state) => state.operationFlag);
-
-  $currentRoleId: Observable<string> = this.select(
-    (state) => state.currentRoleId
-  );
-
   $currentRoleName: Observable<string> = this.select(
     (state) => state.currentRoleName
   );
-
-  $responseList: Observable<Object> = this.select(
-    (state) => state.responseList
-  );
-
   $responseProgress: Observable<number> = this.select(
     (state) => state.responseProgress
   );
@@ -156,8 +112,6 @@ export class StoreService extends StateService<StoreState> {
     return confirm(`<b>Are you sure?</b>`, 'Confirm changes');
   }
 
-  loadDataAsync() {}
-
   setIsLoading(_isLoading: boolean) {
     this.setState({ isLoading: _isLoading });
   }
@@ -170,27 +124,8 @@ export class StoreService extends StateService<StoreState> {
     this.setState({ responseMsg: message });
   }
 
-  setNotifType(type: string) {
-    this.setState({ notifType: type });
-  }
-
   setResponseProgress(progress: number) {
     this.setState({ responseProgress: progress });
-  }
-
-  setResponseEventType(eventType: string) {
-    this.setState({ responseEventType: eventType });
-  }
-  //todo: manage response progress array
-
-  addResponse(response: Object) {
-    this.setState({ responseList: this.state.responseList.concat(response) });
-  }
-
-  removeResponse(id: any) {
-    this.setState({
-      responseList: this.state.responseList.filter((e: any) => e?.id === id),
-    });
   }
 
   setCurrentUser(name: string) {
@@ -221,36 +156,12 @@ export class StoreService extends StateService<StoreState> {
     this.setState({ currentTestHistory: test });
   }
 
-  setSavedQuestion(listQuestion: Array<Question>) {
-    this.setState({ savedQuestions: listQuestion });
-  }
-
   setCurrentUserRoleId(id: string) {
     this.setState({ currentRoleId: id });
   }
 
   setCurrentUserRoleName(role: string) {
     this.setState({ currentRoleName: role });
-  }
-
-  setBlackboard(item: any) {
-    this.setState({ blackBoard: item });
-  }
-
-  setResultBoard(item: any) {
-    this.setState({ resultBoard: item });
-  }
-
-  setQuizList(item: any) {
-    this.setState({ quizList: item });
-  }
-
-  setAssetList(item: any) {
-    this.setState({ assetList: item });
-  }
-
-  setMessageList(item: any) {
-    this.setState({ messageList: item });
   }
 
   setOperationFlag(item: any) {

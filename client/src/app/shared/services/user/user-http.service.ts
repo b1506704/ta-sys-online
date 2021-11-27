@@ -25,23 +25,6 @@ export class UserHttpService {
     });
   }
 
-  fetchUserByLearnerID(
-    page: number,
-    size: number,
-    id: string
-  ): Observable<User> {
-    const params = new HttpParams()
-      .set('PageNumber', page)
-      .set('PageSize', size)
-      .set('Id', id);
-    console.log(params.toString());
-    return this.http.get<User>(this.apiUrl + '/byLearnerID', {
-      params: params,
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
   searchUserByProperty(
     property: string,
     value: string,
@@ -151,17 +134,6 @@ export class UserHttpService {
       observe: 'body',
     });
   }
-   
-  generateRandomUser(): Observable<User> {
-    return this.http.post<any>(
-      'https://localhost:5001/api/Generate/generate-user-data',
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
 
   deleteUser(id: Array<string>): Observable<Object> {
     return this.http.post<Object>(this.apiUrl + '/api/UserAccount/delete', id, {
@@ -223,13 +195,6 @@ export class UserHttpService {
         observe: 'body',
       }
     );
-  }
-
-  logoutUser(user: User): Observable<User> {
-    return this.http.post<User>(this.apiUrl + '/logout', user, {
-      reportProgress: true,
-      observe: 'body',
-    });
   }
 
   changePassword(

@@ -6,11 +6,10 @@ import {
   DxButtonModule,
   DxFormModule,
   DxGalleryModule,
+  DxHtmlEditorModule,
   DxPopupModule,
   DxScrollViewModule,
 } from 'devextreme-angular';
-import { InstructorDetailComponent } from './instructor-detail/instructor-detail.component';
-import { CourseDetailComponent } from './course-detail/course-detail.component';
 import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module';
 import { GetDayOfWeekModule } from 'src/app/shared/pipes/getDayOfWeek.module';
 @NgModule({
@@ -20,16 +19,13 @@ import { GetDayOfWeekModule } from 'src/app/shared/pipes/getDayOfWeek.module';
     DxGalleryModule,
     DxButtonModule,
     DxPopupModule,
+    DxHtmlEditorModule,
     FormatCurrencyModule,
     GetDayOfWeekModule,
     DxScrollViewModule,
     DxFormModule,
     DxButtonModule,
   ],
-  declarations: [
-    LandingPageComponent,
-    InstructorDetailComponent,
-    CourseDetailComponent,
-  ],
+  declarations: [LandingPageComponent],
 })
 export class LandingPageModule {}

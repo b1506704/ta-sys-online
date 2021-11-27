@@ -115,79 +115,6 @@ export class CourseStore extends StateService<CourseState> {
     });
   }
 
-  loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
-    this.setIsLoading(true);
-    this.courseService.fetchCourseByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          courseList: this.fillEmpty(
-            page - 1,
-            size,
-            this.state.courseList,
-            data.data
-          ),
-        });
-        console.log('Pure list');
-        console.log(this.state.courseList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
-    return this.courseService
-      .fetchCourseByLearnerID(page, size, learnerID)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          courseList: data.data,
-        });
-        console.log('Current flag: infite list');
-        console.log(this.state.courseList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-      });
-  }
-
-  loadInfiniteDataAsyncByLearnerID(
-    page: number,
-    size: number,
-    learnerID: string
-  ) {
-    this.setIsLoading(true);
-    this.courseService.fetchCourseByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          courseList: this.state.courseList.concat(data.data),
-        });
-        console.log('Infinite list');
-        console.log(this.state.courseList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
   initData(page: number, size: number) {
     this.courseService
       .fetchCourse(page, size)
@@ -419,37 +346,6 @@ export class CourseStore extends StateService<CourseState> {
       },
     });
   }
-
-  refresh(page: number, size: number) {
-    this.setIsLoading(true);
-    this.courseService.fetchCourse(page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          courseList: this.fillEmpty(
-            page - 1,
-            size,
-            this.state.courseList,
-            data.data
-          ),
-        });
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        console.log('Pure list');
-        console.log(this.state.courseList);
-        console.log('Server response');
-        console.log(data);
-        this.store.showNotif('Refresh successfully', 'custom');
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
   setIsLoading(_isLoading: boolean) {
     this.store.setIsLoading(_isLoading);
   }
@@ -462,20 +358,7 @@ export class CourseStore extends StateService<CourseState> {
     (state) => state.courseLearnerList
   );
 
-  $exportData: Observable<Array<Course>> = this.select(
-    (state) => state.exportData
-  );
-
-  $totalPages: Observable<Number> = this.select((state) => state.totalPages);
-
-  $totalItems: Observable<Number> = this.select((state) => state.totalItems);
-
   $currentPage: Observable<Number> = this.select((state) => state.currentPage);
-
-  $selectedCourse: Observable<Object> = this.select(
-    (state) => state.selectedCourse
-  );
-
   $courseInstance: Observable<Course> = this.select(
     (state) => state.courseInstance
   );
@@ -532,33 +415,6 @@ export class CourseStore extends StateService<CourseState> {
     return confirm(`<b>Are you sure?</b>`, 'Confirm changes');
   }
 
-  deleteSelectedCourses(
-    selectedCourses: Array<string>,
-    page: number,
-    size: number
-  ) {
-    this.confirmDialog('').then((confirm: boolean) => {
-      if (confirm) {
-        this.setIsLoading(true);
-        this.courseService.deleteCourse(selectedCourses).subscribe({
-          next: (data: any) => {
-            this.setState({ responseMsg: data });
-            console.log(data);
-            this.loadDataAsync(page, size);
-            console.log(this.state.courseList);
-            this.setIsLoading(false);
-            this.store.showNotif(data.responseMessage, 'custom');
-          },
-          error: (data: any) => {
-            this.setIsLoading(false);
-            this.store.showNotif(data.error.responseMessage, 'error');
-            console.log(data);
-          },
-        });
-      }
-    });
-  }
-
   deleteAll() {
     this.confirmDialog('Delete all items?').then((confirm: boolean) => {
       if (confirm) {
@@ -603,20 +459,8 @@ export class CourseStore extends StateService<CourseState> {
     });
   }
 
-  selectCourse(_course: Course) {
-    this.setState({ selectedCourse: _course });
-  }
-
-  setTotalPages(_totalPages: number) {
-    this.setState({ totalPages: _totalPages });
-  }
-
   setTotalItems(_totalItems: number) {
     this.setState({ totalItems: _totalItems });
-  }
-
-  setCurrentPage(_currentPage: number) {
-    this.setState({ currentPage: _currentPage });
   }
 
   filterCourseByProperty(

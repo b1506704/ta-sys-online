@@ -1,6 +1,6 @@
 <header class="trans-menu">
   <dx-toolbar class="header-toolbar">
-    <ng-container *ngIf="isLoggedIn">
+    <!-- <ng-container *ngIf="isLoggedIn"> -->
       <dxi-item
         *ngIf="menuToggleEnabled"
         location="before"
@@ -13,7 +13,7 @@
         }"
       >
       </dxi-item>
-    </ng-container>
+    <!-- </ng-container> -->
     <dxi-item location="before" *ngIf="title">
       <div *dxTemplate>
         <button class="title-button" (click)="navigateHome()">

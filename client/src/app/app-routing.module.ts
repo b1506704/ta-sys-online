@@ -191,14 +191,6 @@ const routes: Routes = [
     canActivate: [AuthGuardService],
   },
   {
-    path: 'edit_cart_list',
-    loadChildren: () =>
-      import('./pages/admin/edit-cart-list/edit-cart-list.module').then(
-        (m) => m.EditCartListModule
-      ),
-    canActivate: [AuthGuardService],
-  },
-  {
     path: 'edit_post_list',
     loadChildren: () =>
       import('./pages/admin/edit-post-list/edit-post-list.module').then(
@@ -250,13 +242,6 @@ const routes: Routes = [
     loadChildren: () =>
       import('./pages/visitor/course-list/course-list.module').then(
         (m) => m.CourseListModule
-      ),
-  },
-  {
-    path: 'subject_list',
-    loadChildren: () =>
-      import('./pages/visitor/subject-list/subject-list.module').then(
-        (m) => m.SubjectListModule
       ),
   },
   // other

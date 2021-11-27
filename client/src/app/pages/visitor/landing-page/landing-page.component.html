@@ -35,10 +35,7 @@
       </div>
       <div class="title-container box-shadow">
         <div class="feature-title">Online Payment</div>
-        <div class="feature-body">
-          Pay at home. Get courses at ease. Discounts all the way. Quality
-          guaranteed
-        </div>
+        <div class="feature-body">Pay at home. Get courses at ease.</div>
       </div>
     </div>
   </div>
@@ -63,14 +60,13 @@
       <div class="title-container box-shadow">
         <div class="feature-title">Creativity</div>
         <div class="feature-body">
-          Blueprint curriculum crafting, creating lessons, tests with easy drag
-          and drop and autocomplete
+          Creating lessons, tests with easy HTML editor with full of tools
         </div>
       </div>
       <div class="title-container box-shadow">
         <div class="feature-title">Easy Assessment</div>
         <div class="feature-body">
-          Supervise learners' progress with modern design charts
+          Real time lesson interaction with learners and stream management
         </div>
       </div>
       <div class="title-container box-shadow">
@@ -81,113 +77,6 @@
       </div>
     </div>
   </div>
-  <h2 class="feature-heading">Top Courses</h2>
-  <div class="organization-container" #organization1>
-    <div class="organization-img">
-      <dx-gallery
-        [dataSource]="courseList"
-        [loop]="true"
-        [showNavButtons]="true"
-        [showIndicator]="true"
-        (onSelectionChanged)="onCourseSelectionChanged($event)"
-      >
-        <div *dxTemplate="let galleryItem of 'item'">
-          <div
-            style="
-              display: flex;
-              flex-direction: column;
-              justify-content: flex-start;
-              align-items: center;
-            "
-          >
-            <div class="img-container">
-              <img
-                class="gallery-image"
-                [src]="mapFileListToUrl(galleryItem?.id)"
-              />
-            </div>
-            <div class="content-body">
-              <p class="gallery-title">{{ galleryItem?.name }}</p>
-              <!-- <p class="gallery-subtitle">
-                {{ galleryItem?.summary }}
-              </p> -->
-              <dx-button
-                icon="arrowright"
-                type="normal"
-                (onClick)="navigateCourse(galleryItem?.id)"
-                text="Click for more"
-              >
-              </dx-button>
-            </div>
-          </div>
-        </div>
-      </dx-gallery>
-    </div>
-    <div class="organization-content">
-      <div class="title-container">
-        <div class="feature-title">Price: {{ currentMiniCourse?.cost | formatCurrency: "$" }}</div>
-        <div class="feature-body">
-          Length: {{ currentMiniCourse?.duration }} Weeks
-        </div>
-        <div class="feature-body">
-          Available Slot: {{ currentMiniCourse?.availableSlot }}
-        </div>
-        <div class="feature-body">
-          Rating: {{ currentMiniCourse?.rating }}/10
-        </div>
-      </div>
-    </div>
-  </div>
-  <h2 class="feature-heading">Top Instructors</h2>
-  <div class="organization-container" #organization1>
-    <div class="organization-img">
-      <dx-gallery
-        [dataSource]="instructorList"
-        [loop]="true"
-        [showNavButtons]="true"
-        [showIndicator]="true"
-        (onSelectionChanged)="onInstructorSelectionChanged($event)"
-      >
-        <div *dxTemplate="let galleryItem of 'item'">
-          <div
-            style="
-              display: flex;
-              flex-direction: column;
-              justify-content: flex-start;
-              align-items: center;
-            "
-          >
-            <div class="img-container">
-              <img
-                class="gallery-image"
-                [src]="mapFileListToUrl(galleryItem?.id)"
-              />
-            </div>
-            <div class="content-body">
-              <p class="gallery-title">{{ galleryItem?.displayName }}</p>
-              <!-- <p class="gallery-subtitle">{{ galleryItem?.bio }}</p> -->
-              <dx-button
-                icon="arrowright"
-                type="normal"
-                (onClick)="navigateInstructor(galleryItem?.id)"
-                text="Click for more"
-              >
-              </dx-button>
-            </div>
-          </div>
-        </div>
-      </dx-gallery>
-    </div>
-    <div class="organization-content">
-      <div class="feature-title">
-        {{ currentMiniInstructor?.fullName }}
-      </div>
-      <div class="feature-body">Phone: {{ currentMiniInstructor?.phone }}</div>
-      <div class="feature-body">Email: {{ currentMiniInstructor?.email }}</div>
-      <div class="feature-body">Biography: {{ currentMiniInstructor?.bio }}</div>
-    </div>
-  </div>
-
   <h2 class="feature-heading">Organization</h2>
   <div class="organization-container" #organization1>
     <div class="organization-img">
@@ -230,38 +119,3 @@
     <h2>@{{ date }}. T. A. S Online</h2>
   </div>
 </div>
-<dx-popup
-  [(visible)]="isCourseDetailPopupVisible"
-  [height]="'90%'"
-  [width]="'90%'"
-  [showTitle]="true"
-  [shading]="true"
-  [title]="'Course Detail'"
-  [dragEnabled]="true"
-  [closeOnOutsideClick]="false"
-  [showCloseButton]="true"
->
-  <div *dxTemplate="let data of 'content'">
-    <ng-container *ngIf="currentCourse">
-      <app-course-detail [courseID]="currentCourse"> </app-course-detail>
-    </ng-container>
-  </div>
-</dx-popup>
-<dx-popup
-  [(visible)]="isInstructorDetailPopupVisible"
-  [height]="'90%'"
-  [width]="'90%'"
-  [showTitle]="true"
-  [shading]="true"
-  [title]="'Instructor Detail'"
-  [dragEnabled]="true"
-  [closeOnOutsideClick]="false"
-  [showCloseButton]="true"
->
-  <div *dxTemplate="let data of 'content'">
-    <ng-container *ngIf="currentInstructor">
-      <app-instructor-detail [instructorID]="currentInstructor">
-      </app-instructor-detail>
-    </ng-container>
-  </div>
-</dx-popup>

@@ -70,122 +70,6 @@ export class MessageStore extends StateService<MessageState> {
     const sourceIds = sourceIDs.map((e: any) => e.id);
     this.fileStore.getFiles(sourceIds);
   }
-
-  initInfiniteData(page: number, size: number) {
-    return this.messageService
-      .fetchMessage(page, size)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          messageList: data.data,
-        });
-        this.fetchMediaBySourceID(data.data);
-        console.log('Current flag: infite list');
-        console.log(this.state.messageList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-      });
-  }
-
-  loadInfiniteDataAsync(page: number, size: number) {
-    this.setIsLoading(true);
-    this.messageService.fetchMessage(page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          messageList: this.state.messageList.concat(data.data),
-        });
-        this.fetchMediaBySourceID(data.data);
-        console.log('Infinite list');
-        console.log(this.state.messageList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
-    this.setIsLoading(true);
-    this.messageService.fetchMessageByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          messageList: this.fillEmpty(
-            page - 1,
-            size,
-            this.state.messageList,
-            data.data
-          ),
-        });
-        console.log('Pure list');
-        console.log(this.state.messageList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
-    return this.messageService
-      .fetchMessageByLearnerID(page, size, learnerID)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          messageList: data.data,
-        });
-        console.log('Current flag: infite list');
-        console.log(this.state.messageList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-      });
-  }
-
-  loadInfiniteDataAsyncByLearnerID(
-    page: number,
-    size: number,
-    learnerID: string
-  ) {
-    this.setIsLoading(true);
-    this.messageService.fetchMessageByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          messageList: this.state.messageList.concat(data.data),
-        });
-        console.log('Infinite list');
-        console.log(this.state.messageList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
   initData(page: number, size: number) {
     this.messageService
       .fetchMessage(page, size)
@@ -277,70 +161,6 @@ export class MessageStore extends StateService<MessageState> {
         this.searchMessageByProperty(property, value, page, size);
       });
   }
-
-  initInfiniteSearchByPropertyData(
-    property: string,
-    value: string,
-    page: number,
-    size: number
-  ) {
-    //
-    this.messageService
-      .searchMessageByProperty(property, value, page, size)
-      .toPromise()
-      .then((data: any) => {
-        if (data.totalRecords !== 0) {
-          this.setState({
-            messageList: data.data,
-          });
-          this.fetchMediaBySourceID(data.data);
-        } else {
-          this.store.showNotif('No result found!', 'custom');
-        }
-        console.log('Current flag: infitite searched list');
-        console.log(this.state.messageList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-      });
-  }
-
-  initInfiniteFilterSearchByPropertyData(
-    filterProperty: string,
-    filterValue: string,
-    searchProperty: string,
-    searchValue: string,
-    page: number,
-    size: number
-  ) {
-    //
-    this.messageService
-      .filterSearchMessageByProperty(
-        filterProperty,
-        filterValue,
-        searchProperty,
-        searchValue,
-        page,
-        size
-      )
-      .toPromise()
-      .then((data: any) => {
-        if (data.totalRecords !== 0) {
-          this.setState({
-            messageList: data.data,
-          });
-          this.fetchMediaBySourceID(data.data);
-        } else {
-          this.store.showNotif('No result found!', 'custom');
-        }
-        console.log('Current flag: infitite searched list');
-        console.log(this.state.messageList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-      });
-  }
-
   initSortByPropertyData(
     value: string,
     order: string,
@@ -363,29 +183,6 @@ export class MessageStore extends StateService<MessageState> {
       })
       .then(() => {
         this.sortMessageByProperty(value, order, page, size);
-      });
-  }
-
-  initInfiniteSortByPropertyData(
-    value: string,
-    order: string,
-    page: number,
-    size: number
-  ) {
-    //
-    this.messageService
-      .sortMessageByProperty(value, order, page, size)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          messageList: data.data,
-        });
-        this.fetchMediaBySourceID(data.data);
-        console.log('Current flag: sort list');
-        console.log(this.state.messageList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
       });
   }
 
@@ -418,36 +215,6 @@ export class MessageStore extends StateService<MessageState> {
     });
   }
 
-  refresh(page: number, size: number) {
-    this.setIsLoading(true);
-    this.messageService.fetchMessage(page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          messageList: this.fillEmpty(
-            page - 1,
-            size,
-            this.state.messageList,
-            data.data
-          ),
-        });
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        console.log('Pure list');
-        console.log(this.state.messageList);
-        console.log('Server response');
-        console.log(data);
-        this.store.showNotif('Refresh successfully', 'custom');
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
   setIsLoading(_isLoading: boolean) {
     this.store.setIsLoading(_isLoading);
   }
@@ -456,25 +223,7 @@ export class MessageStore extends StateService<MessageState> {
     (state) => state.messageList
   );
 
-  $exportData: Observable<Array<Message>> = this.select(
-    (state) => state.exportData
-  );
-
-  $totalPages: Observable<Number> = this.select((state) => state.totalPages);
-
-  $totalItems: Observable<Number> = this.select((state) => state.totalItems);
-
   $currentPage: Observable<Number> = this.select((state) => state.currentPage);
-
-  $selectedMessage: Observable<Object> = this.select(
-    (state) => state.selectedMessage
-  );
-
-  $isUploading: Observable<boolean> = this.select((state) => state.isUploading);
-
-  $messageInstance: Observable<Message> = this.select(
-    (state) => state.messageInstance
-  );
 
   uploadMessage(message: Message, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
@@ -528,33 +277,6 @@ export class MessageStore extends StateService<MessageState> {
     return confirm(`<b>Are you sure?</b>`, 'Confirm changes');
   }
 
-  deleteSelectedMessages(
-    selectedMessages: Array<string>,
-    page: number,
-    size: number
-  ) {
-    this.confirmDialog('').then((confirm: boolean) => {
-      if (confirm) {
-        this.setIsLoading(true);
-        this.messageService.deleteMessage(selectedMessages).subscribe({
-          next: (data: any) => {
-            this.setState({ responseMsg: data });
-            console.log(data);
-            this.loadDataAsync(page, size);
-            console.log(this.state.messageList);
-            this.setIsLoading(false);
-            this.store.showNotif(data.responseMessage, 'custom');
-          },
-          error: (data: any) => {
-            this.setIsLoading(false);
-            this.store.showNotif(data.error.responseMessage, 'error');
-            console.log(data);
-          },
-        });
-      }
-    });
-  }
-
   deleteAll() {
     this.confirmDialog('Delete all items?').then((confirm: boolean) => {
       if (confirm) {
@@ -598,23 +320,9 @@ export class MessageStore extends StateService<MessageState> {
       }
     });
   }
-
-  selectMessage(_message: Message) {
-    this.setState({ selectedMessage: _message });
-  }
-
-  setTotalPages(_totalPages: number) {
-    this.setState({ totalPages: _totalPages });
-  }
-
   setTotalItems(_totalItems: number) {
     this.setState({ totalItems: _totalItems });
   }
-
-  setCurrentPage(_currentPage: number) {
-    this.setState({ currentPage: _currentPage });
-  }
-
   filterMessageByProperty(
     property: string,
     value: string,
@@ -687,53 +395,6 @@ export class MessageStore extends StateService<MessageState> {
       });
   }
 
-  filterSearchInfiniteMessageByProperty(
-    filterProperty: string,
-    filterValue: string,
-    searchProperty: string,
-    searchValue: string,
-    page: number,
-    size: number
-  ) {
-    this.setIsLoading(true);
-    this.messageService
-      .filterSearchMessageByProperty(
-        filterProperty,
-        filterValue,
-        searchProperty,
-        searchValue,
-        page,
-        size
-      )
-      .subscribe({
-        next: (data: any) => {
-          if (data.totalRecords !== 0) {
-            if (data.data.length) {
-              this.setState({
-                messageList: this.state.messageList.concat(data.data),
-              });
-              this.fetchMediaBySourceID(data.data);
-            }
-          } else {
-            this.store.showNotif('No result found!', 'custom');
-          }
-          console.log('Infite searched list');
-          console.log(this.state.messageList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
-  }
-
   searchMessageByProperty(
     property: string,
     value: string,
@@ -758,44 +419,6 @@ export class MessageStore extends StateService<MessageState> {
             this.store.showNotif('No result found!', 'custom');
           }
           console.log('Searched list');
-          console.log(this.state.messageList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
-  }
-
-  searchInfiniteMessageByProperty(
-    property: string,
-    value: string,
-    page: number,
-    size: number
-  ) {
-    this.setIsLoading(true);
-    this.messageService
-      .searchMessageByProperty(property, value, page, size)
-      .subscribe({
-        next: (data: any) => {
-          if (data.totalRecords !== 0) {
-            if (data.data.length) {
-              this.setState({
-                messageList: this.state.messageList.concat(data.data),
-              });
-              this.fetchMediaBySourceID(data.data);
-            }
-          } else {
-            this.store.showNotif('No result found!', 'custome');
-          }
-          console.log('Infite searched list');
           console.log(this.state.messageList);
           console.log('Server response');
           console.log(data);
@@ -847,56 +470,6 @@ export class MessageStore extends StateService<MessageState> {
           console.log(data);
         },
       });
-  }
-
-  sortInfiniteMessageByProperty(
-    value: string,
-    order: string,
-    page: number,
-    size: number
-  ) {
-    this.setIsLoading(true);
-    this.messageService
-      .sortMessageByProperty(value, order, page, size)
-      .subscribe({
-        next: (data: any) => {
-          if (data.data.length) {
-            this.setState({
-              messageList: this.state.messageList.concat(data.data),
-            });
-            this.fetchMediaBySourceID(data.data);
-          }
-          console.log('Infite sorted list');
-          console.log(this.state.messageList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
-  }
-
-  getMessage(id: string) {
-    this.setIsLoading(true);
-    return this.messageService
-      .getMessage(id)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({ messageInstance: data });
-        console.log(data);
-        this.setIsLoading(false);
-      });
-  }
-
-  setIsUploading(isUploading: boolean) {
-    this.setState({ isUploading: isUploading });
   }
 
   setExportData(array: Array<Message>) {

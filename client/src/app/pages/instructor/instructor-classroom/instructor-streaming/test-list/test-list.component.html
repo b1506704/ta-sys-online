@@ -27,14 +27,14 @@
     <dx-scroll-view
       [direction]="'vertical'"
       [showScrollbar]="true"
-      [scrollByContent]="true"
-      [scrollByThumb]="true"
-      (onPullDown)="updateTopContent($event)"
-      (onReachBottom)="updateBottomContent($event)"
       [bounceEnabled]="false"
       [height]="'92%'"
       [width]="'100%'"
-    >
+      >
+      <!-- [scrollByContent]="true"
+      [scrollByThumb]="true" -->
+      <!-- (onPullDown)="updateTopContent($event)"
+      (onReachBottom)="updateBottomContent($event)" -->
       <div class="card-container">
         <div class="card" *ngFor="let item of testList">
           <div class="card-title">{{ item?.name }}</div>
@@ -56,7 +56,7 @@
               icon="arrowright"
               type="outline"
               text="Select"
-              hint="Click to import to desk"
+              hint="Click to import to questions from this test"
               (onClick)="selectTest(item)"
             ></dx-button>
           </div>
@@ -69,6 +69,7 @@
   [closePopupQuestion]="closePopupQuestion"
   [insertQuiz]="insertQuiz"
   [testId]="currentTestId"
+  [currentQuestionTestId]="currentQuestionTestId"
   [title]="'Question List'"
   [isVisible]="isPopupQuestionVisible"
 ></app-question-list>

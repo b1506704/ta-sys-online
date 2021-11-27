@@ -22,24 +22,6 @@ export class QuestionHttpService {
       observe: 'body',
     });
   }
-
-  fetchQuestionByLearnerID(
-    page: number,
-    size: number,
-    id: string
-  ): Observable<Question> {
-    const params = new HttpParams()
-      .set('PageNumber', page)
-      .set('PageSize', size)
-      .set('Id', id);
-    console.log(params.toString());
-    return this.http.get<Question>(this.apiUrl + '/byLearnerID', {
-      params: params,
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
   searchQuestionByProperty(
     property: string,
     value: string,
@@ -127,17 +109,6 @@ export class QuestionHttpService {
     });
   }
 
-  generateRandomQuestion(): Observable<Question> {
-    return this.http.post<any>(
-      'https://localhost:5001/api/Generate/generate-question-data',
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
   deleteQuestion(id: Array<string>): Observable<Object> {
     return this.http.post<Object>(this.apiUrl + '/delete', id, {
       reportProgress: true,
@@ -151,14 +122,6 @@ export class QuestionHttpService {
       observe: 'body',
     });
   }
-
-  getQuestion(id: string): Observable<Question> {
-    return this.http.get<Question>(this.apiUrl + `/${id}`, {
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
   updateQuestion(question: Question): Observable<Question> {
     return this.http.put<Question>(this.apiUrl, question, {
       reportProgress: true,

@@ -71,28 +71,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
           onClick: this.onRefresh.bind(this),
         },
       },
-      {
-        location: 'after',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'trash',
-          hint: 'Delete all items',
-          onClick: this.deleteAll.bind(this),
-        },
-      },
-      {
-        location: 'after',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'parentfolder',
-          hint: 'Generate random item',
-          onClick: this.onAddRandom.bind(this),
-        },
-      },
+      //     
       {
         location: 'after',
         locateInMenu: 'auto',
@@ -160,7 +139,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
           type: 'normal',
           icon: 'card',
           disabled: true,
-          hint: 'Sort by total cost',
+          hint: 'Sort by name',
         },
       },
       {
@@ -502,33 +481,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
       this.dataGrid.instance.pageIndex() + 1,
       this.pageSize
     );
-  }
-
-  onAddRandom() {
-    this.courseStore
-      .confirmDialog(
-        'This will generate a random item in database. Are you sure'
-      )
-      .then((result: boolean) => {
-        if (result) {
-          this.isFilteringByCategory = false;
-          this.store.setIsLoading(true);
-          this.courseHTTP
-            .generateRandomCourse()
-            .toPromise()
-            .then(() => {
-              this.courseStore.initData(
-                this.dataGrid.instance.pageIndex() + 1,
-                this.pageSize
-              );
-            })
-            .then(() => {
-              this.store.setIsLoading(false);
-              this.store.showNotif('Generated 1 random item', 'custom');
-            });
-        }
-      });
-  }
+  }  
 
   exportDataGridToExcel() {
     this.courseStore

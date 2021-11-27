@@ -22,24 +22,6 @@ export class SessionHttpService {
       observe: 'body',
     });
   }
-
-  fetchSessionByLearnerID(
-    page: number,
-    size: number,
-    id: string
-  ): Observable<Session> {
-    const params = new HttpParams()
-      .set('PageNumber', page)
-      .set('PageSize', size)
-      .set('Id', id);
-    console.log(params.toString());
-    return this.http.get<Session>(this.apiUrl + '/byLearnerID', {
-      params: params,
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
   searchSessionByProperty(
     property: string,
     value: string,
@@ -103,18 +85,6 @@ export class SessionHttpService {
       observe: 'body',
     });
   }
-
-  generateRandomSession(): Observable<Session> {
-    return this.http.post<any>(
-      'https://localhost:5001/api/Generate/generate-stream-data',
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
   deleteSession(id: Array<string>): Observable<Object> {
     return this.http.post<Object>(this.apiUrl + '/delete', id, {
       reportProgress: true,

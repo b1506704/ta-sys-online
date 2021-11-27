@@ -113,83 +113,6 @@ export class SubjectStore extends StateService<SubjectState> {
     });
   }
 
-  loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
-    this.setIsLoading(true);
-    this.subjectService
-      .fetchSubjectByLearnerID(page, size, learnerID)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({
-            subjectList: this.fillEmpty(
-              page - 1,
-              size,
-              this.state.subjectList,
-              data.data
-            ),
-          });
-          console.log('Pure list');
-          console.log(this.state.subjectList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
-  }
-
-  initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
-    return this.subjectService
-      .fetchSubjectByLearnerID(page, size, learnerID)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          subjectList: data.data,
-        });
-        console.log('Current flag: infite list');
-        console.log(this.state.subjectList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-      });
-  }
-
-  loadInfiniteDataAsyncByLearnerID(
-    page: number,
-    size: number,
-    learnerID: string
-  ) {
-    this.setIsLoading(true);
-    this.subjectService
-      .fetchSubjectByLearnerID(page, size, learnerID)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({
-            subjectList: this.state.subjectList.concat(data.data),
-          });
-          console.log('Infinite list');
-          console.log(this.state.subjectList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
-  }
-
   initData(page: number, size: number) {
     this.subjectService
       .fetchSubject(page, size)
@@ -231,31 +154,6 @@ export class SubjectStore extends StateService<SubjectState> {
       })
       .then(() => {
         this.filterSubjectByProperty(property, value, page, size);
-      });
-  }
-
-  initInfiniteFilterByPropertyData(
-    property: string,
-    value: string,
-    page: number,
-    size: number
-  ) {
-    //;
-    this.subjectService
-      .filterSubjectByProperty(property, value, page, size)
-      .toPromise()
-      .then((data: any) => {
-        if (data.data.length) {
-          this.setState({
-            subjectList: this.state.subjectList.concat(data.data),
-          });
-          this.fetchMediaBySourceID(data.data);
-        }
-        console.log('Current flag: infinite filtered list');
-        console.log(this.state.subjectList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
       });
   }
 
@@ -392,36 +290,6 @@ export class SubjectStore extends StateService<SubjectState> {
     });
   }
 
-  refresh(page: number, size: number) {
-    this.setIsLoading(true);
-    this.subjectService.fetchSubject(page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          subjectList: this.fillEmpty(
-            page - 1,
-            size,
-            this.state.subjectList,
-            data.data
-          ),
-        });
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        console.log('Pure list');
-        console.log(this.state.subjectList);
-        console.log('Server response');
-        console.log(data);
-        this.store.showNotif('Refresh successfully', 'custom');
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
   setIsLoading(_isLoading: boolean) {
     this.store.setIsLoading(_isLoading);
   }
@@ -430,23 +298,7 @@ export class SubjectStore extends StateService<SubjectState> {
     (state) => state.subjectList
   );
 
-  $exportData: Observable<Array<Subject>> = this.select(
-    (state) => state.exportData
-  );
-
-  $totalPages: Observable<Number> = this.select((state) => state.totalPages);
-
-  $totalItems: Observable<Number> = this.select((state) => state.totalItems);
-
   $currentPage: Observable<Number> = this.select((state) => state.currentPage);
-
-  $selectedSubject: Observable<Object> = this.select(
-    (state) => state.selectedSubject
-  );
-
-  $subjectInstance: Observable<Subject> = this.select(
-    (state) => state.subjectInstance
-  );
 
   uploadSubject(subject: Subject, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
@@ -500,33 +352,6 @@ export class SubjectStore extends StateService<SubjectState> {
     return confirm(`<b>Are you sure?</b>`, 'Confirm changes');
   }
 
-  deleteSelectedSubjects(
-    selectedSubjects: Array<string>,
-    page: number,
-    size: number
-  ) {
-    this.confirmDialog('').then((confirm: boolean) => {
-      if (confirm) {
-        this.setIsLoading(true);
-        this.subjectService.deleteSelectedSubjects(selectedSubjects).subscribe({
-          next: (data: any) => {
-            this.setState({ responseMsg: data });
-            console.log(data);
-            this.loadDataAsync(page, size);
-            console.log(this.state.subjectList);
-            this.setIsLoading(false);
-            this.store.showNotif(data.responseMessage, 'custom');
-          },
-          error: (data: any) => {
-            this.setIsLoading(false);
-            this.store.showNotif(data.error.responseMessage, 'error');
-            console.log(data);
-          },
-        });
-      }
-    });
-  }
-
   deleteAllSubjects() {
     this.confirmDialog('Delete all items?').then((confirm: boolean) => {
       if (confirm) {
@@ -575,20 +400,8 @@ export class SubjectStore extends StateService<SubjectState> {
     });
   }
 
-  selectSubject(_subject: Subject) {
-    this.setState({ selectedSubject: _subject });
-  }
-
-  setTotalPages(_totalPages: number) {
-    this.setState({ totalPages: _totalPages });
-  }
-
   setTotalItems(_totalItems: number) {
     this.setState({ totalItems: _totalItems });
-  }
-
-  setCurrentPage(_currentPage: number) {
-    this.setState({ currentPage: _currentPage });
   }
 
   filterSubjectByProperty(
@@ -610,40 +423,6 @@ export class SubjectStore extends StateService<SubjectState> {
               data.data
             ),
           });
-          console.log('Filtered list');
-          console.log(this.state.subjectList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
-  }
-
-  filterInfiniteSubjectByProperty(
-    property: string,
-    value: string,
-    page: number,
-    size: number
-  ) {
-    this.setIsLoading(true);
-    this.subjectService
-      .filterSubjectByProperty(property, value, page, size)
-      .subscribe({
-        next: (data: any) => {
-          if (data.data.length) {
-            this.setState({
-              subjectList: this.state.subjectList.concat(data.data),
-            });
-            this.fetchMediaBySourceID(data.data);
-          }
           console.log('Filtered list');
           console.log(this.state.subjectList);
           console.log('Server response');
@@ -807,18 +586,6 @@ export class SubjectStore extends StateService<SubjectState> {
           this.store.showNotif(data.error.responseMessage, 'error');
           console.log(data);
         },
-      });
-  }
-
-  getSubject(id: string) {
-    this.setIsLoading(true);
-    return this.subjectService
-      .getSubject(id)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({ subjectInstance: data });
-        console.log(data);
-        this.setIsLoading(false);
       });
   }
 

@@ -26,10 +26,11 @@ export class QuestionListComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isVisible: boolean;
   @Input() title: string;
   @Input() testId: string;
+  @Input() currentQuestionTestId: string;
   @Input() insertQuiz: (quiz: any, type: string, thumbnail: string) => void;
   @Input() closePopupQuestion: () => void;
   questionList!: Array<Question>;
-  pageSize: number = 20;
+  pageSize: number = 100;
   currentFilterByPropertyValue: string;
   currentFilterProperty: string = 'testId';
   currentSearchByPropertyValue: string;
@@ -111,7 +112,7 @@ export class QuestionListComponent implements OnInit, OnDestroy, OnChanges {
         this.questionList = data;
         for (let i = 0; i < data.length; i++) {
           const e = data[i];
-          this.exportQuestion(e);
+          // this.exportQuestion(e);
         }
       }
     });
@@ -149,7 +150,7 @@ export class QuestionListComponent implements OnInit, OnDestroy, OnChanges {
 
   scrollTop() {
     this.dxScrollView.instance.scrollTo({ top: 0, left: 0 });
-  }
+  }  
 
   initData() {
     this.questionStore.initInfiniteFilterByPropertyDataForStream(
@@ -222,6 +223,7 @@ export class QuestionListComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnChanges() {
     this.currentFilterByPropertyValue = this.testId;
+
     if (this.testId) {
       this.initData();
     }

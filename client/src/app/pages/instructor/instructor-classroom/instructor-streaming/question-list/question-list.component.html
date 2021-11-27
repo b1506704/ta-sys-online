@@ -27,14 +27,14 @@
     <dx-scroll-view
       [direction]="'vertical'"
       [showScrollbar]="true"
-      [scrollByContent]="true"
-      [scrollByThumb]="true"
-      (onPullDown)="updateTopContent($event)"
-      (onReachBottom)="updateBottomContent($event)"
       [bounceEnabled]="false"
       [height]="'92%'"
       [width]="'100%'"
     >
+      <!-- [scrollByContent]="true"
+      [scrollByThumb]="true" -->
+      <!-- (onPullDown)="updateTopContent($event)"
+      (onReachBottom)="updateBottomContent($event)" -->
       <div class="card-container">
         <div class="card" *ngFor="let item of questionList">
           <div class="card-title">

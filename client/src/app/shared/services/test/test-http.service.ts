@@ -26,23 +26,6 @@ export class TestHttpService {
     });
   }
 
-  fetchTestByLearnerID(
-    page: number,
-    size: number,
-    id: string
-  ): Observable<Test> {
-    const params = new HttpParams()
-      .set('PageNumber', page)
-      .set('PageSize', size)
-      .set('Id', id);
-    console.log(params.toString());
-    return this.http.get<Test>(this.apiUrl + '/byLearnerID', {
-      params: params,
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
   searchTestByProperty(
     property: string,
     value: string,
@@ -130,17 +113,6 @@ export class TestHttpService {
     });
   }
 
-  generateRandomTest(): Observable<Test> {
-    return this.http.post<any>(
-      'https://localhost:5001/api/Generate/generate-test-data',
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
   deleteTest(id: Array<string>): Observable<Object> {
     return this.http.post<Object>(this.apiUrl + '/delete', id, {
       reportProgress: true,
@@ -150,13 +122,6 @@ export class TestHttpService {
 
   deleteAll(): Observable<ArrayBuffer> {
     return this.http.delete<ArrayBuffer>(this.apiUrl, {
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
-  getTest(id: string): Observable<Test> {
-    return this.http.get<Test>(this.apiUrl + `/${id}`, {
       reportProgress: true,
       observe: 'body',
     });

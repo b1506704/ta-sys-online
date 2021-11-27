@@ -51,16 +51,6 @@ export const navigationAdmin = [
     ],
   },
   {
-    text: 'Finance',
-    icon: 'money',
-    items: [
-      {
-        text: 'Edit Cart',
-        path: '/edit_cart_list',
-      },
-    ],
-  },
-  {
     text: 'Classroom',
     icon: 'group',
     items: [
@@ -121,7 +111,13 @@ export const navigationAdmin = [
 ];
 export const navigationNonUser = [
   {
-    text: '',
-    path: '',
+    text: 'Instructor List',
+    path: '/visiter_instructor_list',
+    icon: 'user',
+  },
+  {
+    text: 'Course List',
+    path: '/visitor_course_list',
+    icon: 'edit',
   },
 ];

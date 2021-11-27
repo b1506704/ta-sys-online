@@ -74,24 +74,11 @@ export class FileStore extends StateService<FileState> {
       });
   }
 
-  initInfiniteFilterByPropertyData(
-    property: string,
-    value: string,
-    page: number,
-    size: number
-  ) {
-    return this.fileService
-      .filterFileByProperty(property, value, page, size)
-      .toPromise();
-  }
-
   setIsLoading(_isLoading: boolean) {
     this.store.setIsLoading(_isLoading);
   }
 
   $fileList: Observable<Array<File>> = this.select((state) => state.fileList);
-
-  $fileInstance: Observable<File> = this.select((state) => state.fileInstance);
 
   $containerList: Observable<Array<Container>> = this.select(
     (state) => state.containerList
@@ -273,24 +260,7 @@ export class FileStore extends StateService<FileState> {
     return this.fileService.deleteSelectedFiles(selectedFiles).toPromise();
   }
 
-  selectFile(_file: File) {
-    this.setState({ selectedFile: _file });
-  }
-
-  setTotalPages(_totalPages: number) {
-    this.setState({ totalPages: _totalPages });
-  }
-
-  setTotalItems(_totalItems: number) {
-    this.setState({ totalItems: _totalItems });
-  }
-
-  setCurrentPage(_currentPage: number) {
-    this.setState({ currentPage: _currentPage });
-  }
-
   // container functions
-
   initInfiniteContainer() {
     this.setIsLoading(true);
     return this.fileService
@@ -351,10 +321,6 @@ export class FileStore extends StateService<FileState> {
   deleteContainer(container: Array<string>) {
     this.setIsLoading(true);
     return this.fileService.deleteContainer(container).toPromise();
-  }
-
-  setIsUploading(isFetching: boolean) {
-    this.setState({ isUploading: isFetching });
   }
 
   setIsUploadingFiles(isFetching: boolean) {

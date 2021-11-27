@@ -40,7 +40,7 @@ export class EditTestListComponent implements OnInit, OnDestroy {
   currentFilterByPropertyValue: string;
   currentSearchByPropertyValue: string;
   currentSortByPropertyValue: string;
-  currentSortProperty: string = 'maxScore';
+  currentSortProperty: string = 'name';
   currentSearchProperty: string = 'name';
   currentFilterProperty: string = 'subjectId';
 
@@ -70,27 +70,18 @@ export class EditTestListComponent implements OnInit, OnDestroy {
         },
       },
       {
-        location: 'after',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
+        location: 'before',
+        widget: 'dxTextBox',
         options: {
-          type: 'normal',
-          icon: 'trash',
-          hint: 'Delete all items',
-          onClick: this.deleteAll.bind(this),
+          valueChangeEvent: 'keyup',
+          showClearButton: true,
+          onKeyUp: this.onSearchKeyupHandler.bind(this),
+          onValueChanged: this.onSearchValueChanged.bind(this),
+          mode: 'search',
+          placeholder: 'Search name',
         },
       },
-      {
-        location: 'after',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'parentfolder',
-          hint: 'Generate random 100+ items',
-          onClick: this.onAddRandom.bind(this),
-        },
-      },
+      //    
       {
         location: 'after',
         locateInMenu: 'auto',
@@ -113,43 +104,8 @@ export class EditTestListComponent implements OnInit, OnDestroy {
           onClick: this.exportDataGridToExcel.bind(this),
         },
       },
-      {
-        location: 'before',
-        widget: 'dxTextBox',
-        options: {
-          valueChangeEvent: 'keyup',
-          showClearButton: true,
-          onKeyUp: this.onSearchKeyupHandler.bind(this),
-          onValueChanged: this.onSearchValueChanged.bind(this),
-          mode: 'search',
-          placeholder: 'Search name',
-        },
-      },
-      {
-        location: 'center',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'filter',
-          disabled: true,
-          hint: 'Filter with subject',
-        },
-      },
-      {
-        location: 'center',
-        locateInMenu: 'auto',
-        widget: 'dxSelectBox',
-        options: {
-          items: this.subjectList,
-          valueExpr: 'id',
-          searchExpr: 'name',
-          displayExpr: 'name',
-          placeholder: 'Filter with subject',
-          searchEnabled: true,
-          onValueChanged: this.onFilterChange.bind(this),
-        },
-      },
+      //
+      //
       {
         location: 'center',
         locateInMenu: 'auto',
@@ -495,32 +451,6 @@ export class EditTestListComponent implements OnInit, OnDestroy {
       this.dataGrid.instance.pageIndex() + 1,
       this.pageSize
     );
-  }
-
-  onAddRandom() {
-    this.testStore
-      .confirmDialog(
-        'This will generate random 100+ items in database. Are you sure'
-      )
-      .then((result: boolean) => {
-        if (result) {
-          this.isFilteringByCategory = false;
-          this.store.setIsLoading(true);
-          this.testHTTP
-            .generateRandomTest()
-            .toPromise()
-            .then(() => {
-              this.testStore.initData(
-                this.dataGrid.instance.pageIndex() + 1,
-                this.pageSize
-              );
-            })
-            .then(() => {
-              this.store.setIsLoading(false);
-              this.store.showNotif('Generated 100+ random items', 'custom');
-            });
-        }
-      });
   }
 
   exportDataGridToExcel() {

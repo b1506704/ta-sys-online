@@ -121,121 +121,6 @@ export class UserStore extends StateService<UserState> {
     });
   }
 
-  initInfiniteData(page: number, size: number) {
-    this.store.setIsLoading(true);
-    return this.userService
-      .fetchUser(page, size)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          userList: data.data,
-        });
-        console.log('Current flag: infite list');
-        console.log(this.state.userList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.store.setIsLoading(false);
-      });
-  }
-
-  loadInfiniteDataAsync(page: number, size: number) {
-    this.setIsLoading(true);
-    this.userService.fetchUser(page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          userList: this.state.userList.concat(data.data),
-        });
-        console.log('Infinite list');
-        console.log(this.state.userList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  loadDataAsyncByLearnerID(page: number, size: number, learnerID: string) {
-    this.setIsLoading(true);
-    this.userService.fetchUserByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          userList: this.fillEmpty(
-            page - 1,
-            size,
-            this.state.userList,
-            data.data
-          ),
-        });
-        console.log('Pure list');
-        console.log(this.state.userList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  initInfiniteDataByLearnerID(page: number, size: number, learnerID: string) {
-    return this.userService
-      .fetchUserByLearnerID(page, size, learnerID)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          userList: data.data,
-        });
-        console.log('Current flag: infite list');
-        console.log(this.state.userList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-      });
-  }
-
-  loadInfiniteDataAsyncByLearnerID(
-    page: number,
-    size: number,
-    learnerID: string
-  ) {
-    this.setIsLoading(true);
-    this.userService.fetchUserByLearnerID(page, size, learnerID).subscribe({
-      next: (data: any) => {
-        this.setState({
-          userList: this.state.userList.concat(data.data),
-        });
-        console.log('Infinite list');
-        console.log(this.state.userList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
   initData(page: number, size: number) {
     this.store.setIsLoading(true);
     this.userService
@@ -332,34 +217,6 @@ export class UserStore extends StateService<UserState> {
       });
   }
 
-  initInfiniteSearchByPropertyData(
-    property: string,
-    value: string,
-    page: number,
-    size: number
-  ) {
-    //
-    this.store.setIsLoading(true);
-    this.userService
-      .searchUserByProperty(property, value, page, size)
-      .toPromise()
-      .then((data: any) => {
-        if (data.totalRecords !== 0) {
-          this.setState({
-            userList: data.data,
-          });
-        } else {
-          this.store.showNotif('No result found!', 'custom');
-        }
-        console.log('Current flag: infitite searched list');
-        console.log(this.state.userList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.store.setIsLoading(false);
-      });
-  }
-
   initSortByPropertyData(
     value: string,
     order: string,
@@ -383,30 +240,6 @@ export class UserStore extends StateService<UserState> {
       })
       .then(() => {
         this.sortUserByProperty(value, order, page, size);
-      });
-  }
-
-  initInfiniteSortByPropertyData(
-    value: string,
-    order: string,
-    page: number,
-    size: number
-  ) {
-    //
-    this.store.setIsLoading(true);
-    this.userService
-      .sortUserByProperty(value, order, page, size)
-      .toPromise()
-      .then((data: any) => {
-        this.setState({
-          userList: data.data,
-        });
-        console.log('Current flag: sort list');
-        console.log(this.state.userList);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        this.store.setIsLoading(false);
       });
   }
 
@@ -439,36 +272,6 @@ export class UserStore extends StateService<UserState> {
     });
   }
 
-  refresh(page: number, size: number) {
-    this.setIsLoading(true);
-    this.userService.fetchUser(page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          userList: this.fillEmpty(
-            page - 1,
-            size,
-            this.state.userList,
-            data.data
-          ),
-        });
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
-        console.log('Pure list');
-        console.log(this.state.userList);
-        console.log('Server response');
-        console.log(data);
-        this.store.showNotif('Refresh successfully', 'custom');
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
   $isLoggedIn: Observable<boolean> = this.select((state) => state.isLoggedIn);
 
   $isShowLoginPopup: Observable<boolean> = this.select(
@@ -483,19 +286,7 @@ export class UserStore extends StateService<UserState> {
 
   $roleList: Observable<Array<any>> = this.select((state) => state.roleList);
 
-  $exportData: Observable<Array<User>> = this.select(
-    (state) => state.exportData
-  );
-
-  $totalPages: Observable<Number> = this.select((state) => state.totalPages);
-
-  $totalItems: Observable<Number> = this.select((state) => state.totalItems);
-
   $currentPage: Observable<Number> = this.select((state) => state.currentPage);
-
-  $selectedUser: Observable<Object> = this.select(
-    (state) => state.selectedUser
-  );
 
   $userInstance: Observable<User> = this.select((state) => state.userInstance);
 
@@ -551,33 +342,6 @@ export class UserStore extends StateService<UserState> {
     return confirm(`<b>Are you sure?</b>`, 'Confirm changes');
   }
 
-  deleteSelectedUsers(
-    selectedUsers: Array<string>,
-    page: number,
-    size: number
-  ) {
-    this.confirmDialog('').then((confirm: boolean) => {
-      if (confirm) {
-        this.setIsLoading(true);
-        this.userService.deleteUser(selectedUsers).subscribe({
-          next: (data: any) => {
-            this.setState({ responseMsg: data });
-            console.log(data);
-            this.loadDataAsync(page, size);
-            console.log(this.state.userList);
-            this.setIsLoading(false);
-            this.store.showNotif(data.responseMessage, 'custom');
-          },
-          error: (data: any) => {
-            this.setIsLoading(false);
-            this.store.showNotif(data.error.responseMessage, 'error');
-            console.log(data);
-          },
-        });
-      }
-    });
-  }
-
   deleteAll() {
     this.confirmDialog('Delete all items?').then((confirm: boolean) => {
       if (confirm) {
@@ -622,14 +386,6 @@ export class UserStore extends StateService<UserState> {
     });
   }
 
-  selectUser(_user: User) {
-    this.setState({ selectedUser: _user });
-  }
-
-  setTotalPages(_totalPages: number) {
-    this.setState({ totalPages: _totalPages });
-  }
-
   setTotalItems(_totalItems: number) {
     this.setState({ totalItems: _totalItems });
   }
@@ -640,10 +396,6 @@ export class UserStore extends StateService<UserState> {
 
   setIsShowSignupPopup(isShow: boolean) {
     this.setState({ isShowSignupPopup: isShow });
-  }
-
-  setCurrentPage(_currentPage: number) {
-    this.setState({ currentPage: _currentPage });
   }
 
   filterUserByProperty(
@@ -674,37 +426,6 @@ export class UserStore extends StateService<UserState> {
             this.setState({ totalPages: data.totalPages });
             this.setState({ currentPage: data.pageNumber });
           }
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
-  }
-
-  filterInfiniteUserByProperty(
-    property: string,
-    value: string,
-    page: number,
-    size: number
-  ) {
-    this.setIsLoading(true);
-    this.userService
-      .filterUserByProperty(property, value, page, size)
-      .subscribe({
-        next: (data: any) => {
-          this.setState({
-            userList: this.state.userList.concat(data),
-          });
-          console.log('Filtered list');
-          console.log(this.state.userList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
           this.setIsLoading(false);
         },
         error: (data: any) => {
@@ -755,41 +476,6 @@ export class UserStore extends StateService<UserState> {
       });
   }
 
-  searchInfiniteUserByProperty(
-    property: string,
-    value: string,
-    page: number,
-    size: number
-  ) {
-    this.setIsLoading(true);
-    this.userService
-      .searchUserByProperty(property, value, page, size)
-      .subscribe({
-        next: (data: any) => {
-          if (data.totalRecords !== 0) {
-            this.setState({
-              userList: this.state.userList.concat(data),
-            });
-          } else {
-            this.store.showNotif('No result found!', 'custome');
-          }
-          console.log('Infite searched list');
-          console.log(this.state.userList);
-          console.log('Server response');
-          console.log(data);
-          this.setState({ totalItems: data.totalRecords });
-          this.setState({ totalPages: data.totalPages });
-          this.setState({ currentPage: data.pageNumber });
-          this.setIsLoading(false);
-        },
-        error: (data: any) => {
-          this.setIsLoading(false);
-          this.store.showNotif(data.error.responseMessage, 'error');
-          console.log(data);
-        },
-      });
-  }
-
   sortUserByProperty(value: string, order: string, page: number, size: number) {
     this.setIsLoading(true);
     this.userService.sortUserByProperty(value, order, page, size).subscribe({
@@ -810,35 +496,6 @@ export class UserStore extends StateService<UserState> {
         console.log(this.state.userList);
         console.log('Server response');
         console.log(data);
-        this.setIsLoading(false);
-      },
-      error: (data: any) => {
-        this.setIsLoading(false);
-        this.store.showNotif(data.error.responseMessage, 'error');
-        console.log(data);
-      },
-    });
-  }
-
-  sortInfiniteUserByProperty(
-    value: string,
-    order: string,
-    page: number,
-    size: number
-  ) {
-    this.setIsLoading(true);
-    this.userService.sortUserByProperty(value, order, page, size).subscribe({
-      next: (data: any) => {
-        this.setState({
-          userList: this.state.userList.concat(data),
-        });
-        console.log('Infite sorted list');
-        console.log(this.state.userList);
-        console.log('Server response');
-        console.log(data);
-        this.setState({ totalItems: data.totalRecords });
-        this.setState({ totalPages: data.totalPages });
-        this.setState({ currentPage: data.pageNumber });
         this.setIsLoading(false);
       },
       error: (data: any) => {
@@ -889,26 +546,6 @@ export class UserStore extends StateService<UserState> {
 
   getUserId() {
     return localStorage.getItem('id');
-  }
-
-  isLoggedIn() {
-    let authToken = this.getToken();
-    return authToken !== null ? true : false;
-  }
-
-  parseJwt(token: any) {
-    var base64Url = token.split('.')[1];
-    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    var jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map(function (c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        })
-        .join('')
-    );
-
-    return JSON.parse(jsonPayload);
   }
 
   loginUser(user: any) {

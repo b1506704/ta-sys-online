@@ -85,8 +85,18 @@ export class SignUpComponent implements OnInit, OnDestroy {
   }
 
   roleDataListener() {
-    this.userStore.$roleList.subscribe((data: any) => {
-      this.roleList = data;
+    return this.userStore.$roleList.subscribe((data: Array<any>) => {
+      if (data) {
+        const learnerRole = data.find((e: any) => e?.name === 'Learner');
+        this.roleList = data;
+        this.user = {
+          username: '',
+          password: '',
+          displayName: '',
+          roleId: learnerRole?.id,
+        };
+        console.log(learnerRole);
+      }
     });
   }
 
@@ -102,22 +112,17 @@ export class SignUpComponent implements OnInit, OnDestroy {
     this.userStore.getRole().then(() => {
       this.roleDataListener();
     });
-    this.checkBoxOptions = {
-      text: 'Additional Information',
-      value: false,
-      onValueChanged: (e: any) => {
-        this.isLearnerInfoVisible = e.component.option('value');
-      },
-    };
-    this.user = {
-      username: '',
-      password: '',
-      displayName: '',
-      roleId: this.roleList[0],
-    };
+    // this.checkBoxOptions = {
+    //   text: 'Additional Information',
+    //   value: false,
+    //   onValueChanged: (e: any) => {
+    //     this.isLearnerInfoVisible = e.component.option('value');
+    //   },
+    // };
   }
   ngOnDestroy(): void {
     this.isLoadingListener().unsubscribe();
+    this.roleDataListener().unsubscribe();
     this.checkIsSignupPopupVisible().unsubscribe();
   }
 }

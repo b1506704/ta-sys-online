@@ -15,31 +15,34 @@
     >
       <dxi-item itemType="group">
         <dxi-item itemType="group" caption="Account Information">
-          <dxi-item
-            dataField="username"
-            [label]="{ text: 'Username' }"
-            editorType="dxTextBox"
-            [editorOptions]="{ disabled: true }"
-          >
-          </dxi-item>
-          <dxi-item
-            dataField="displayName"
-            [label]="{ text: 'Display Name' }"
-            editorType="dxTextBox"
-          >
-            <dxi-validation-rule
-              type="required"
-              message="Display name is required"
+          <dxi-item itemType="group" colCount="2">
+            <dxi-item
+              dataField="username"
+              [label]="{ text: 'Username' }"
+              editorType="dxTextBox"
+              [editorOptions]="{ disabled: true }"
             >
-            </dxi-validation-rule>
-            <dxi-validation-rule
-              type="stringLength"
-              message="Display name cannot contain more than 12 letters!"
-              [min]="1"
-              [max]="25"
+            </dxi-item>
+            <dxi-item
+              dataField="displayName"
+              [label]="{ text: 'Display Name' }"
+              editorType="dxTextBox"
             >
-            </dxi-validation-rule>
+              <dxi-validation-rule
+                type="required"
+                message="Display name is required"
+              >
+              </dxi-validation-rule>
+              <dxi-validation-rule
+                type="stringLength"
+                message="Display name cannot contain more than 12 letters!"
+                [min]="1"
+                [max]="25"
+              >
+              </dxi-validation-rule>
+            </dxi-item>
           </dxi-item>
+
           <dxi-item itemType="group" [colCount]="2" [cssClass]="'buttonGroup'">
             <dxi-item
               itemType="button"
@@ -71,41 +74,43 @@
     >
       <dxi-item itemType="group">
         <dxi-item itemType="group" caption="Password Modification">
-          <dxi-item
-            dataField="oldPassword"
-            [label]="{ text: 'Current Password' }"
-            editorType="dxTextBox"
-            [editorOptions]="{ mode: 'password' }"
-          >
-            <dxi-validation-rule
-              type="required"
-              message="Current password is required"
+          <dxi-item itemType="group" colCount="2">
+            <dxi-item
+              dataField="oldPassword"
+              [label]="{ text: 'Current Password' }"
+              editorType="dxTextBox"
+              [editorOptions]="{ mode: 'password' }"
             >
-            </dxi-validation-rule>
-            <dxi-validation-rule
-              type="stringLength"
-              message="Current password cannot contain more than 12 letters!"
-              [min]="1"
+              <dxi-validation-rule
+                type="required"
+                message="Current password is required"
+              >
+              </dxi-validation-rule>
+              <dxi-validation-rule
+                type="stringLength"
+                message="Current password cannot contain more than 12 letters!"
+                [min]="1"
+              >
+              </dxi-validation-rule>
+            </dxi-item>
+            <dxi-item
+              dataField="newPassword"
+              [label]="{ text: 'New Password' }"
+              editorType="dxTextBox"
+              [editorOptions]="{ mode: 'password' }"
             >
-            </dxi-validation-rule>
-          </dxi-item>
-          <dxi-item
-            dataField="newPassword"
-            [label]="{ text: 'New Password' }"
-            editorType="dxTextBox"
-            [editorOptions]="{ mode: 'password' }"
-          >
-            <dxi-validation-rule
-              type="required"
-              message="New password is required"
-            >
-            </dxi-validation-rule>
-            <dxi-validation-rule
-              type="stringLength"
-              message="New password cannot contain more than 12 letters!"
-              [min]="1"
-            >
-            </dxi-validation-rule>
+              <dxi-validation-rule
+                type="required"
+                message="New password is required"
+              >
+              </dxi-validation-rule>
+              <dxi-validation-rule
+                type="stringLength"
+                message="New password cannot contain more than 12 letters!"
+                [min]="1"
+              >
+              </dxi-validation-rule>
+            </dxi-item>
           </dxi-item>
           <dxi-item itemType="group" [colCount]="2" [cssClass]="'buttonGroup'">
             <dxi-item

@@ -69,28 +69,7 @@ export class EditPostListComponent implements OnInit, OnDestroy {
           onClick: this.onRefresh.bind(this),
         },
       },
-      {
-        location: 'after',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'trash',
-          hint: 'Delete all items',
-          onClick: this.deleteAll.bind(this),
-        },
-      },
-      {
-        location: 'after',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'parentfolder',
-          hint: 'Generate random 100+ items',
-          onClick: this.onAddRandom.bind(this),
-        },
-      },
+      //     
       {
         location: 'after',
         locateInMenu: 'auto',
@@ -124,32 +103,7 @@ export class EditPostListComponent implements OnInit, OnDestroy {
           mode: 'search',
           placeholder: 'Search title',
         },
-      },
-      {
-        location: 'center',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'filter',
-          disabled: true,
-          hint: 'Filter with subject',
-        },
-      },
-      {
-        location: 'center',
-        locateInMenu: 'auto',
-        widget: 'dxSelectBox',
-        options: {
-          items: this.subjectList,
-          valueExpr: 'id',
-          searchExpr: 'name',
-          displayExpr: 'name',
-          placeholder: 'Filter with subject',
-          searchEnabled: true,
-          onValueChanged: this.onFilterChange.bind(this),
-        },
-      },
+      },      
       {
         location: 'center',
         locateInMenu: 'auto',
@@ -175,7 +129,7 @@ export class EditPostListComponent implements OnInit, OnDestroy {
             { id: '1', name: 'desc' },
           ],
           valueExpr: 'name',
-          placeholder: 'Sort by name',
+          placeholder: 'Sort by title',
           displayExpr: 'name',
           onValueChanged: this.onSortValueChanged.bind(this),
         },
@@ -496,32 +450,7 @@ export class EditPostListComponent implements OnInit, OnDestroy {
       this.pageSize
     );
   }
-
-  onAddRandom() {
-    this.postStore
-      .confirmDialog(
-        'This will generate random 100+ items in database. Are you sure'
-      )
-      .then((result: boolean) => {
-        if (result) {
-          this.isFilteringByCategory = false;
-          this.store.setIsLoading(true);
-          this.postHTTP
-            .generateRandomPost()
-            .toPromise()
-            .then(() => {
-              this.postStore.initData(
-                this.dataGrid.instance.pageIndex() + 1,
-                this.pageSize
-              );
-            })
-            .then(() => {
-              this.store.setIsLoading(false);
-              this.store.showNotif('Generated 100+ random items', 'custom');
-            });
-        }
-      });
-  }
+  
 
   exportDataGridToExcel() {
     this.postStore

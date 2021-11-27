@@ -23,23 +23,6 @@ export class SubjectHttpService {
     });
   }
 
-  fetchSubjectByLearnerID(
-    page: number,
-    size: number,
-    id: string
-  ): Observable<Subject> {
-    const params = new HttpParams()
-      .set('PageNumber', page)
-      .set('PageSize', size)
-      .set('Id', id);
-    console.log(params.toString());
-    return this.http.get<Subject>(this.apiUrl + '/byLearnerID', {
-      params: params,
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
   searchSubjectByProperty(
     property: string,
     value: string,
@@ -104,17 +87,6 @@ export class SubjectHttpService {
     });
   }
 
-  generateRandomSubject(): Observable<Subject> {
-    return this.http.post<any>(
-      'https://localhost:5001/api/Generate/generate-subject-data',
-      {},
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
-  }
-
   deleteAllSubjects(): Observable<Subject> {
     return this.http.post<Subject>(this.apiUrl + '/deleteAll', {
       reportProgress: true,
@@ -130,14 +102,6 @@ export class SubjectHttpService {
       observe: 'body',
     });
   }
-
-  getSubject(id: string): Observable<Subject> {
-    return this.http.get<Subject>(this.apiUrl + `/${id}`, {
-      reportProgress: true,
-      observe: 'body',
-    });
-  }
-
   deleteSelectedSubjects(
     selectedItems: Array<string>
   ): Observable<Array<string>> {
