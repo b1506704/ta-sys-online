@@ -69,15 +69,15 @@
     </dxo-pager>
     <dxo-load-panel [enabled]="true"></dxo-load-panel>
 
-    <dxi-column dataField="postId">
+    <!-- <dxi-column dataField="postId">
       <dxi-validation-rule type="required"></dxi-validation-rule>
-    </dxi-column>
+    </dxi-column> -->
     <dxi-column dataField="content">
       <dxi-validation-rule type="required"></dxi-validation-rule>
     </dxi-column>
-    <dxi-column dataField="userAccountId">
+    <!-- <dxi-column dataField="userAccountId">
       <dxi-validation-rule type="required"></dxi-validation-rule>
-    </dxi-column>
+    </dxi-column> -->
     <div *dxTemplate="let data of 'totalCommentCount'">
       <span>Total Comment: {{ commentList.length }} </span>
     </div>
