@@ -810,8 +810,8 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
     this.getDisplayName().unsubscribe();
     this.getMetaData().unsubscribe();
     clearInterval(this.timerInterval);
-    // if (this.signaling.isConnected()) {
-    this.hangup();
-    // }
+    if (this.chatUserList.length) {
+      this.hangup();
+    }
   }
 }

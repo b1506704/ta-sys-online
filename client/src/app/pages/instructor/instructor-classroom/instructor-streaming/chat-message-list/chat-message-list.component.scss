@@ -7,6 +7,16 @@
   padding-right: 10px;
 }
 
+.private-message-list {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  flex-direction: column;
+  background-color: rgba(190, 190, 252, 0.644);
+  margin-bottom: 15px;
+  padding-right: 10px;
+}
+
 .neon {
   text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #9dd7e6,
     0 0 20px rgb(123, 163, 204);

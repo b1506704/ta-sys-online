@@ -19,7 +19,13 @@
       [height]="'92%'"
       [width]="'100%'"
     >
-      <div class="message-list" *ngFor="let item of chatMessageList">
+      <div
+        [ngClass]="{
+          'message-list': item?.isPrivate === false || undefined,
+          'private-message-list': item?.isPrivate === true
+        }"
+        *ngFor="let item of chatMessageList"
+      >
         <div class="neon">{{ item?.userEntry.displayName }}</div>
         <div class="message-body">
           <dx-html-editor
@@ -35,6 +41,15 @@
       </div>
     </dx-scroll-view>
     <div class="chat-input-container">
+      <dx-select-box
+        *ngIf="chatUserList"
+        (onValueChanged)="onReceiverChanged($event)"
+        [displayExpr]="'displayName'"
+        [valueExpr]="'id'"
+        [dataSource]="chatUserList"
+        [value]="chatUserList[0]"
+      >
+      </dx-select-box>
       <dx-text-box
         (onValueChanged)="onChatInputChanged($event)"
         [showClearButton]="true"

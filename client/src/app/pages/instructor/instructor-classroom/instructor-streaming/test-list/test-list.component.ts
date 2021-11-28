@@ -75,7 +75,7 @@ export class TestListComponent implements OnInit, OnDestroy, OnChanges {
 
   selectTest(e: any) {
     this.currentTestId = e.id;
-    // this.openPopupQuestion();
+    this.openPopupQuestion();
   }  
 
   checkEditorMode() {

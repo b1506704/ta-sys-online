@@ -13,6 +13,11 @@ import { CourseStore } from 'src/app/shared/services/course/course-store.service
 import { StoreService } from 'src/app/shared/services/store.service';
 import { SubjectStore } from 'src/app/shared/services/subject/subject-store.service';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
+import { convertToPureName } from 'src/app/utils/convertToNonAccent';
+import { User } from 'src/app/shared/models/user';
+import { Subject } from 'src/app/shared/models/subject';
+import { InstructorStore } from 'src/app/shared/services/instructor/instructor-store.service';
+import { UserStore } from 'src/app/shared/services/user/user-store.service';
 
 @Component({
   selector: 'app-edit-course-list',
@@ -23,7 +28,9 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
   @ViewChild(DxDataGridComponent, { static: false })
   dataGrid: DxDataGridComponent;
   courseList!: Array<Course>;
-  subjectList: Array<Object> = [];
+  subjectList: Array<Subject> = [];
+
+  instructorList: Array<User> = [];
   selectedRows: string[];
   isSelectInfoVisible: boolean = false;
   selectInfoText: string;
@@ -50,7 +57,9 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
     private store: StoreService,
     private courseHTTP: CourseHttpService,
     private subjectStore: SubjectStore,
+    private instructorStore: InstructorStore,
     private fileStore: FileStore,
+    private userStore: UserStore,
     private router: Router
   ) {}
 
@@ -71,7 +80,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
           onClick: this.onRefresh.bind(this),
         },
       },
-      //     
+      //
       {
         location: 'after',
         locateInMenu: 'auto',
@@ -106,31 +115,31 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
           placeholder: 'Search name',
         },
       },
-      {
-        location: 'center',
-        locateInMenu: 'auto',
-        widget: 'dxButton',
-        options: {
-          type: 'normal',
-          icon: 'filter',
-          disabled: true,
-          hint: 'Filter with subject',
-        },
-      },
-      {
-        location: 'center',
-        locateInMenu: 'auto',
-        widget: 'dxSelectBox',
-        options: {
-          items: this.subjectList,
-          valueExpr: 'id',
-          searchExpr: 'name',
-          displayExpr: 'name',
-          placeholder: 'Filter with subject',
-          searchEnabled: true,
-          onValueChanged: this.onFilterChange.bind(this),
-        },
-      },
+      // {
+      //   location: 'center',
+      //   locateInMenu: 'auto',
+      //   widget: 'dxButton',
+      //   options: {
+      //     type: 'normal',
+      //     icon: 'filter',
+      //     disabled: true,
+      //     hint: 'Filter with subject',
+      //   },
+      // },
+      // {
+      //   location: 'center',
+      //   locateInMenu: 'auto',
+      //   widget: 'dxSelectBox',
+      //   options: {
+      //     items: this.subjectList,
+      //     valueExpr: 'id',
+      //     searchExpr: 'name',
+      //     displayExpr: 'name',
+      //     placeholder: 'Filter with subject',
+      //     searchEnabled: true,
+      //     onValueChanged: this.onFilterChange.bind(this),
+      //   },
+      // },
       {
         location: 'center',
         locateInMenu: 'auto',
@@ -357,10 +366,11 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
             this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
+          const containerName = convertToPureName(e.changes[0].data.name);
           const containerData: any = {
-            name: e.changes[0].data.name.replace(/\s/g, '').toLowerCase(),
+            name: containerName,
           };
-          console.log(e.changes[0].data.name.replace(/\s/g, '').toLowerCase());
+          console.log(containerName);
           this.fileStore.uploadContainer(containerData);
           break;
         case 'update':
@@ -481,7 +491,7 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
       this.dataGrid.instance.pageIndex() + 1,
       this.pageSize
     );
-  }  
+  }
 
   exportDataGridToExcel() {
     this.courseStore
@@ -562,26 +572,45 @@ export class EditCourseListComponent implements OnInit, OnDestroy {
     });
   }
 
+  instructorDataListener() {
+    return this.instructorStore.$instructorList.subscribe((data: any) => {
+      this.instructorList = data;
+    });
+  }
+
   currentPageListener() {
     return this.courseStore.$currentPage.subscribe((data: any) => {
       this.currentIndexFromServer = data;
     });
   }
 
-  ngOnInit(): void {
-    this.sourceDataListener();
-    this.currentPageListener();
+  initData() {
     this.subjectStore.fetchAll().then((data: any) => {
       if (data.length !== 0) {
         console.log('FILTER DATA: ');
         console.log(data);
         this.subjectList = data;
-        this.subjectList.unshift({ id: '(NONE)', name: '(NONE)' });
-        setTimeout(() => {
-          this.onRefresh();
-        }, 150);
+        this.userStore.$roleList.subscribe((data: Array<any>) => {
+          const instructorRoleId = data.find(
+            (e: any) => e.name === 'Instructor'
+          )?.id;
+          this.instructorStore
+            .initInfiniteData('roleId', instructorRoleId, 1, 100)
+            .then(() => {
+              this.instructorDataListener();
+              setTimeout(() => {
+                this.onRefresh();
+              }, 150);
+            });
+        });
       }
     });
+  }
+
+  ngOnInit(): void {
+    this.sourceDataListener();
+    this.currentPageListener();
+    this.initData();
   }
 
   ngOnDestroy(): void {

@@ -19,17 +19,8 @@ interface StoreState {
   currentTest: Test;
 
   currentTestHistory: Test;
-  messageList: Array<ChatMessage>;
-  assetList: Array<any>;
-  quizList: Array<any>;
+  chatUserList: Array<any>;
 
-  blackBoard: Array<any>;
-  resultBoard: Array<any>;
-
-  operationFlag: any;
-
-  savedQuestions: Array<Question>;
-  responseList: Array<Object>;
   responseEventType: string;
   responseProgress: number;
   currentRoleId: string;
@@ -41,7 +32,7 @@ interface StoreState {
 }
 const initialState: StoreState = {
   isPreloading: true,
-  responseList: [],
+  chatUserList: undefined,
   responseProgress: undefined,
   responseEventType: undefined,
   currentUser: undefined,
@@ -51,13 +42,7 @@ const initialState: StoreState = {
   currentSession: undefined,
   currentTest: undefined,
   currentTestHistory: undefined,
-  savedQuestions: undefined,
-  messageList: undefined,
-  assetList: undefined,
-  quizList: undefined,
-  blackBoard: undefined,
-  resultBoard: undefined,
-  operationFlag: undefined,
+
   currentRoleId: undefined,
   currentRoleName: undefined,
   isLoading: false,
@@ -92,6 +77,10 @@ export class StoreService extends StateService<StoreState> {
 
   $currentTestHistory: Observable<Test> = this.select(
     (state) => state.currentTestHistory
+  );
+
+  $chatUserList: Observable<Array<any>> = this.select(
+    (state) => state.chatUserList
   );
 
   $currentRoleName: Observable<string> = this.select(
@@ -164,8 +153,8 @@ export class StoreService extends StateService<StoreState> {
     this.setState({ currentRoleName: role });
   }
 
-  setOperationFlag(item: any) {
-    this.setState({ operationFlag: item });
+  setChatUserList(list: Array<any>) {
+    this.setState({ chatUserList: list });
   }
 
   showNotif(message: string, type: string) {

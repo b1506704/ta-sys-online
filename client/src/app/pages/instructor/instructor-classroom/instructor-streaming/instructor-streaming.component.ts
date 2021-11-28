@@ -61,8 +61,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   isPresenting: boolean = false;
   selectedPresenter!: UserEntry;
   selectedTestId: string = '';
-  selectedQuestion!: any;
-  receiveChatUserEntry!: UserEntry;
+  selectedQuestion!: any;  
 
   userEntry: UserEntry = {
     id: '',
@@ -378,10 +377,11 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     );
   };
 
-  sendPrivateMessage = (message: string) => {
-    const newMessage = {
+  sendPrivateMessage = (message: string, receiveUserEntry: UserEntry) => {
+    const newMessage: ChatMessage = {
       userEntry: this.userEntry,
       message: message,
+      isPrivate: true,
       date: new Date().toLocaleTimeString(),
     };
     this.messageList = this.messageList.concat(newMessage);
@@ -389,24 +389,10 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       'SendPrivateMessage',
       this.room.name,
       this.userEntry,
-      this.receiveChatUserEntry,
+      receiveUserEntry,
       message
     );
   };
-
-  privateMessage(receiveUserEntry: UserEntry) {
-    this.store.showNotif(
-      `Invited ${receiveUserEntry.displayName} for private chat`,
-      'custom'
-    );
-    this.signaling.invoke(
-      'SendPrivateMessage',
-      this.room.name,
-      this.userEntry,
-      receiveUserEntry,
-      'test message'
-    );
-  }
 
   ngOnInit(): void {
     this.getMetaData();
@@ -460,6 +446,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       console.log(userEntryList);
       this.chatUserList = userEntryList;
       this.isInitiator = true;
+      this.store.setChatUserList(this.chatUserList);
       this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
 
@@ -468,6 +455,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       console.log(userEntryList);
       this.chatUserList = userEntryList;
       this.isChannelReady = true;
+      this.store.setChatUserList(this.chatUserList);
       this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
 
@@ -475,6 +463,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       console.log('CURRENT USER ENTRY LIST');
       console.log(userEntryList);
       this.chatUserList = userEntryList;
+      this.store.setChatUserList(this.chatUserList);
       this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
 
@@ -522,6 +511,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       this.isShowingAnswer = false;
       this.isShowingCorrectAnswer = false;
       this.isShowingResult = false;
+      this.resultBoard = [];
       console.log(question);
       this.clearBoard();
 
@@ -540,8 +530,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
           date: date,
         };
         // console.log(message);
-        this.messageList = this.messageList.concat(message);
-        this.isPopupChatVisible = true;
+
         // console.log(this.messageList);
         if (chatMessage == 'got user media') {
           this.initiateCall();
@@ -561,6 +550,9 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
           this.addIceCandidate(chatMessage);
         } else if (chatMessage == 'bye' && this.isStarted) {
           this.handleRemoteHangup();
+        } else {
+          this.messageList = this.messageList.concat(message);
+          this.isPopupChatVisible = true;
         }
       }
     );
@@ -596,12 +588,9 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
             userEntry: sendUserEntry,
             message: chatMessage,
             date: date,
+            isPrivate: true,
           };
           this.store.showNotif(chatMessage, 'custom');
-          // console.log(message);
-          // this.messageList = this.messageList.concat(message);
-          // this.isPopupChatVisible = true;
-          // console.log(this.messageList);
         }
       }
     );
@@ -820,7 +809,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     this.getDisplayName().unsubscribe();
     this.getMetaData().unsubscribe();
     clearInterval(this.timerInterval);
-    if (this.signaling.isConnected()) {
+    if (this.chatUserList.length) {
       this.hangup();
     }
   }

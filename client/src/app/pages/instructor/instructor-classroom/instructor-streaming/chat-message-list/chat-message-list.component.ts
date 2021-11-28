@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { DxScrollViewComponent, DxTextBoxComponent } from 'devextreme-angular';
 import { UserEntry } from 'src/app/shared/models/user-entry';
+import { StoreService } from 'src/app/shared/services/store.service';
 
 @Component({
   selector: 'app-chat-message-list',
@@ -27,27 +28,43 @@ export class ChatMessageListComponent implements OnInit, OnDestroy, OnChanges {
     displayName: '',
   };
   @Input() sendMessage: (message: string) => void;
+
+  @Input() sendPrivateMessage: (message: string, receiveUserEntry: UserEntry) => void;
   @Input() closePopupChat: () => void;
   currentChatInput: string = '';
- 
-  constructor() {}
+
+  receiveUserEntry: UserEntry = {
+    id: '',
+    displayName: '',
+  };
+
+  chatUserList: Array<any> = [];
+
+  constructor(private store: StoreService) {}
 
   onEnterKey() {
     this.sendChatMessage();
   }
   onChatInputChanged(e: any) {
-    // console.log(e);
     this.currentChatInput = e.value;
+  }
+
+  onReceiverChanged(e: any) {
+    this.receiveUserEntry.id = e.value;
+    console.log(this.receiveUserEntry);
+  }
+
+  chatUserListenerListener() {
+    return this.store.$chatUserList.subscribe((data: any) => {
+      if (data) {
+        this.chatUserList = data;
+      }
+    });
   }
 
   sendChatMessage() {
     if (this.currentChatInput.trim() !== '') {
-      // const message = {
-      //   userEntry: this.userEntry,
-      //   message: this.currentChatInput,
-      //   date: new Date().toLocaleTimeString(),
-      // };
-      // this.chatMessageList = this.chatMessageList.concat(message);
+      if (this.sendPrivateMessage)
       this.sendMessage(this.currentChatInput);
       this.dxTextBox.instance.reset();
       this.dxScrollView.instance.scrollBy(
@@ -57,15 +74,16 @@ export class ChatMessageListComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit() {
-    // this.sen
+    this.chatUserListenerListener();
   }
 
   ngOnChanges() {
-    // this.sendMessage()
     console.log(this.chatMessageList);
   }
 
-  ngOnDestroy() {}
+  ngOnDestroy() {
+    this.chatUserListenerListener().unsubscribe();
+  }
 }
 
 export class ChatMessageListModule {}

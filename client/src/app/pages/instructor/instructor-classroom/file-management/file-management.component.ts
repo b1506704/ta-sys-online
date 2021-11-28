@@ -5,6 +5,7 @@ import { StoreService } from 'src/app/shared/services/store.service';
 import { FileStore } from 'src/app/shared/services/file/file-store.service';
 import { Container } from 'src/app/shared/models/container';
 import { Course } from 'src/app/shared/models/course';
+import { convertToPureName } from 'src/app/utils/convertToNonAccent';
 @Component({
   selector: 'app-file-management',
   templateUrl: './file-management.component.html',
@@ -553,9 +554,8 @@ export class FileManagementComponent implements OnInit {
   containerDataListener() {
     return this.fileStore.$containerList.subscribe((data: Array<any>) => {
       if (data?.length !== 0) {
-        const courseFolder = data.find(
-          (c: any) => c?.name === this.courseData?.name.toLocaleLowerCase()
-        );
+        const containerName = convertToPureName(this.courseData?.name);
+        const courseFolder = data.find((c: any) => c?.name === containerName);
         this.containerList = [courseFolder];
         // setTimeout(() => {
         this.mapContainerToFolder();
