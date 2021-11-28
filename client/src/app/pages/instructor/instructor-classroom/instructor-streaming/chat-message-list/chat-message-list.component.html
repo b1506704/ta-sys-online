@@ -24,9 +24,15 @@
           'message-list': item?.isPrivate === false || undefined,
           'private-message-list': item?.isPrivate === true
         }"
-        *ngFor="let item of chatMessageList"
+        *ngFor="let item of chatMessageList | removeFilterUser"
       >
-        <div class="neon">{{ item?.userEntry.displayName }}</div>
+        <div class="neon">
+          {{
+            item?.receiveUserEntry
+              ? "Sent to " + item?.receiveUserEntry.displayName
+              : "From " + item?.userEntry.displayName
+          }}
+        </div>
         <div class="message-body">
           <dx-html-editor
             readOnly="true"
@@ -41,22 +47,28 @@
       </div>
     </dx-scroll-view>
     <div class="chat-input-container">
-      <dx-select-box
-        *ngIf="chatUserList"
-        (onValueChanged)="onReceiverChanged($event)"
-        [displayExpr]="'displayName'"
-        [valueExpr]="'id'"
-        [dataSource]="chatUserList"
-        [value]="chatUserList[0]"
-      >
-      </dx-select-box>
       <dx-text-box
         (onValueChanged)="onChatInputChanged($event)"
         [showClearButton]="true"
         (onEnterKey)="onEnterKey()"
-        [placeholder]="'Enter message...'"
+        [placeholder]="'Enter a message'"
       >
+        <!-- [placeholder]="
+          userEntry.id === receiveUserEntry.id ? 'To All' : 'To Private'
+        " -->
       </dx-text-box>
+      <dx-select-box
+        *ngIf="receiverFilterList"
+        (onValueChanged)="onReceiverChanged($event)"
+        [displayExpr]="'displayName'"
+        [valueExpr]="'id'"
+        [dataSource]="receiverFilterList"
+        [placeholder]="'Select receiver'"
+        [value]="receiverFilterList[0]?.id"
+        style="width: 35%"
+      >
+        <!-- [value]="chatUserList[0]" -->
+      </dx-select-box>
       <dx-button
         (onClick)="sendChatMessage()"
         [icon]="'arrowright'"

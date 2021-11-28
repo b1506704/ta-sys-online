@@ -25,12 +25,14 @@
         [showNavButtons]="true"
         [showIndicator]="false"
       >
-        <div class="participant shadow" *dxTemplate="let item of 'item'">
-          <div class="participant-img">
-            <img [src]="mapFileListToUrl(item?.id)" alt="..." />
-          </div>
-          <div class="display-name">
-            {{ item?.displayName }}
+        <div *dxTemplate="let item of 'item'">
+          <div class="participant shadow" *ngIf="item.id !== '-1'">
+            <div class="participant-img">
+              <img [src]="mapFileListToUrl(item?.id)" alt="..." />
+            </div>
+            <div class="display-name">
+              {{ item?.displayName }}
+            </div>
           </div>
         </div>
       </dx-gallery>
@@ -229,33 +231,10 @@
               </div>
             </div>
           </div>
-          <div class="asset-button">
-            <dx-button
-              icon="upload"
-              type="normal"
-              hint="Click to invite for presenting"
-              (onClick)="
-                invitePresenting(
-                  {
-                    id: item?.userAccountResponse.id,
-                    displayName: item?.userAccountResponse.displayName
-                  },
-                  !isPresenting
-                )
-              "
-            ></dx-button>
-            <dx-button
-              icon="arrowright"
-              type="normal"
-              hint="Click to send private message"
-              (onClick)="
-                privateMessage({
-                  id: item?.userAccountResponse.id,
-                  displayName: item?.userAccountResponse.displayName
-                })
-              "
-            ></dx-button>
-          </div>
+          <!-- <div class="asset-button">
+            
+            
+          </div> -->
         </div>
       </dx-scroll-view>
     </div>
@@ -394,6 +373,10 @@
         <dx-button
           [icon]="localStream?.getAudioTracks()[0].enabled ? 'todo' : 'remove'"
         ></dx-button>
+        <dx-button (onClick)="invitePresenting(userEntry, !isPresenting)"
+          >On/Off Present</dx-button
+        >
+        <dx-button [icon]="isPresenting ? 'todo' : 'remove'"></dx-button>
       </div>
     </div>
   </div>
@@ -417,6 +400,7 @@
 <app-chat-message-list
   [chatMessageList]="messageList"
   [sendMessage]="sendMessage"
+  [sendPrivateMessage]="sendPrivateMessage"
   [closePopupChat]="closePopupChat"
   [title]="room.name"
   [userEntry]="userEntry"

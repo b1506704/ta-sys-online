@@ -20,6 +20,7 @@ import { DxiToolbarItemModule } from 'devextreme-angular/ui/nested';
 import { LessonListComponent } from './lesson-list/lesson-list.component';
 import { QuestionListComponent } from './question-list/question-list.component';
 import { TestListComponent } from './test-list/test-list.component';
+import { RemoveFilterUserModule } from 'src/app/shared/pipes/removeFilterUser.module';
 
 @NgModule({
   imports: [
@@ -31,6 +32,7 @@ import { TestListComponent } from './test-list/test-list.component';
     DxFormModule,
     DxHtmlEditorModule,
     DxSelectBoxModule,
+    RemoveFilterUserModule,
     DxPopupModule,
     DxGalleryModule,
     DxToolbarModule,

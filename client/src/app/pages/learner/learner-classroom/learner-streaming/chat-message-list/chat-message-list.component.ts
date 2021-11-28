@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { DxScrollViewComponent, DxTextBoxComponent } from 'devextreme-angular';
 import { UserEntry } from 'src/app/shared/models/user-entry';
+import { StoreService } from 'src/app/shared/services/store.service';
 
 @Component({
   selector: 'app-chat-message-list',
@@ -27,28 +28,68 @@ export class ChatMessageListComponent implements OnInit, OnDestroy, OnChanges {
     displayName: '',
   };
   @Input() sendMessage: (message: string) => void;
+
+  @Input() sendPrivateMessage: (
+    message: string,
+    receiveUserEntry: UserEntry
+  ) => void;
   @Input() closePopupChat: () => void;
   currentChatInput: string = '';
- 
-  constructor() {}
+
+  receiveUserEntry: UserEntry = {
+    id: '-1',
+    displayName: '',
+  };
+
+  chatUserList: Array<any> = [];
+
+  receiverFilterList: Array<any> = [];
+
+  constructor(private store: StoreService) {}
 
   onEnterKey() {
     this.sendChatMessage();
   }
   onChatInputChanged(e: any) {
-    // console.log(e);
     this.currentChatInput = e.value;
+  }
+
+  onReceiverChanged(e: any) {
+    this.receiveUserEntry.id = e.value;
+    const targetEntry = this.chatUserList.find(
+      (e: any) => e.id == this.receiveUserEntry.id
+    );
+    this.receiveUserEntry.displayName = targetEntry?.displayName;
+    console.log(this.receiveUserEntry);
+  }
+
+  chatUserListenerListener() {
+    return this.store.$chatUserList.subscribe((data: any) => {
+      if (data) {
+        this.chatUserList = data;
+        this.receiverFilterList = data;
+        if (!this.receiverFilterList.find((e: any) => e.id == '-1')) {
+          this.receiverFilterList.unshift({ id: '-1', displayName: 'ALL' });
+        }
+      }
+    });
+  }
+
+  getUserID() {
+    return this.store.$currentUserId.subscribe((data: string) => {
+      if (data) {
+        this.userEntry.id = data;
+      }
+    });
   }
 
   sendChatMessage() {
     if (this.currentChatInput.trim() !== '') {
-      // const message = {
-      //   userEntry: this.userEntry,
-      //   message: this.currentChatInput,
-      //   date: new Date().toLocaleTimeString(),
-      // };
-      // this.chatMessageList = this.chatMessageList.concat(message);
-      this.sendMessage(this.currentChatInput);
+      if (this.receiveUserEntry.id == '-1') {
+        this.sendMessage(this.currentChatInput);
+      } else {
+        this.sendPrivateMessage(this.currentChatInput, this.receiveUserEntry);
+      }
       this.dxTextBox.instance.reset();
       this.dxScrollView.instance.scrollBy(
         this.dxScrollView.instance.scrollHeight() + 100
@@ -57,15 +98,18 @@ export class ChatMessageListComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit() {
-    // this.sen
+    this.chatUserListenerListener();
+    this.getUserID();
   }
 
   ngOnChanges() {
-    // this.sendMessage()
     console.log(this.chatMessageList);
   }
 
-  ngOnDestroy() {}
+  ngOnDestroy() {
+    this.getUserID().unsubscribe();
+    this.chatUserListenerListener().unsubscribe();
+  }
 }
 
 export class ChatMessageListModule {}

@@ -10,12 +10,14 @@ import {
   DxListModule,
   DxPopupModule,
   DxScrollViewModule,
+  DxSelectBoxModule,
   DxSpeedDialActionModule,
   DxTextBoxModule,
   DxToolbarModule,
 } from 'devextreme-angular';
 import { ChatMessageListComponent } from './chat-message-list/chat-message-list.component';
 import { DxiToolbarItemModule } from 'devextreme-angular/ui/nested';
+import { RemoveFilterUserModule } from 'src/app/shared/pipes/removeFilterUser.module';
 
 @NgModule({
   imports: [
@@ -27,8 +29,10 @@ import { DxiToolbarItemModule } from 'devextreme-angular/ui/nested';
     DxFormModule,
     DxHtmlEditorModule,
     DxPopupModule,
+    RemoveFilterUserModule,
     DxGalleryModule,
     DxToolbarModule,
+    DxSelectBoxModule,
     DxiToolbarItemModule,
     DxSpeedDialActionModule,
     DxTextBoxModule,

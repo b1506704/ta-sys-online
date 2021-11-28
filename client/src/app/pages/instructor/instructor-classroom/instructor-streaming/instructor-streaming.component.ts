@@ -61,7 +61,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   isPresenting: boolean = false;
   selectedPresenter!: UserEntry;
   selectedTestId: string = '';
-  selectedQuestion!: any;  
+  selectedQuestion!: any;
 
   userEntry: UserEntry = {
     id: '',
@@ -360,6 +360,11 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       userEntry,
       isPresenting
     );
+    if (isPresenting === false) {
+      this.getUserMedia();
+    } else {
+      this.getDisplayMedia();
+    }
   }
 
   sendMessage = (message: any) => {
@@ -378,8 +383,9 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   };
 
   sendPrivateMessage = (message: string, receiveUserEntry: UserEntry) => {
-    const newMessage: ChatMessage = {
+    const newMessage = {
       userEntry: this.userEntry,
+      receiveUserEntry: receiveUserEntry,
       message: message,
       isPrivate: true,
       date: new Date().toLocaleTimeString(),
@@ -529,6 +535,8 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
           message: chatMessage,
           date: date,
         };
+        this.messageList = this.messageList.concat(message);
+        this.isPopupChatVisible = true;
         // console.log(message);
 
         // console.log(this.messageList);
@@ -550,9 +558,6 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
           this.addIceCandidate(chatMessage);
         } else if (chatMessage == 'bye' && this.isStarted) {
           this.handleRemoteHangup();
-        } else {
-          this.messageList = this.messageList.concat(message);
-          this.isPopupChatVisible = true;
         }
       }
     );
@@ -566,7 +571,6 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
           `${userEntry.displayName} is presenting`,
           'custom'
         );
-        this.getDisplayMedia();
       } else {
         this.store.showNotif(
           `${userEntry.displayName} has stopped presenting`,
@@ -590,7 +594,9 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
             date: date,
             isPrivate: true,
           };
-          this.store.showNotif(chatMessage, 'custom');
+          this.messageList = this.messageList.concat(message);
+          this.isPopupChatVisible = true;
+          // this.store.showNotif(chatMessage, 'custom');
         }
       }
     );
@@ -620,10 +626,18 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       .getDisplayMedia({ audio: true, video: true })
       .then((stream: MediaStream) => {
         this.addLocalStream(stream);
-        this.sendMessage('got user media');
-        if (this.isInitiator) {
-          this.initiateCall();
-        }
+        // this.sendMessage('got user media');
+        this.peerConnection.addTrack(
+          this.localStream.getVideoTracks()[0],
+          this.localStream
+        );
+        this.peerConnection.addTrack(
+          this.localStream.getAudioTracks()[0],
+          this.localStream
+        );
+        // if (this.isInitiator) {
+        //   this.initiateCall();
+        // }
       })
       .catch((e: any) => {
         alert('getUserMedia() error: ' + e.name + ': ' + e.message);

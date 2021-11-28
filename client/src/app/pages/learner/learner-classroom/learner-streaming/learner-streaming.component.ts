@@ -352,6 +352,11 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
       userEntry,
       isPresenting
     );
+    if (isPresenting === false) {
+      this.getUserMedia();
+    } else {
+      this.getDisplayMedia();
+    }
   }
 
   sendMessage = (message: any) => {
@@ -369,10 +374,12 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
     );
   };
 
-  sendPrivateMessage = (message: string) => {
+  sendPrivateMessage = (message: string, receiveUserEntry: UserEntry) => {
     const newMessage = {
       userEntry: this.userEntry,
+      receiveUserEntry: receiveUserEntry,
       message: message,
+      isPrivate: true,
       date: new Date().toLocaleTimeString(),
     };
     this.messageList = this.messageList.concat(newMessage);
@@ -380,24 +387,10 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
       'SendPrivateMessage',
       this.room.name,
       this.userEntry,
-      this.receiveChatUserEntry,
+      receiveUserEntry,
       message
     );
   };
-
-  privateMessage(receiveUserEntry: UserEntry) {
-    this.store.showNotif(
-      `Invited ${receiveUserEntry.displayName} for private chat`,
-      'custom'
-    );
-    this.signaling.invoke(
-      'SendPrivateMessage',
-      this.room.name,
-      this.userEntry,
-      receiveUserEntry,
-      'test message'
-    );
-  }
 
   ngOnInit(): void {
     this.getMetaData();
@@ -450,6 +443,7 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
       console.log('CURRENT USER ENTRY LIST');
       console.log(userEntryList);
       this.chatUserList = userEntryList;
+      this.store.setChatUserList(userEntryList);
       // this.isInitiator = true;
       this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
@@ -458,6 +452,7 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
       console.log('CURRENT USER ENTRY LIST');
       console.log(userEntryList);
       this.chatUserList = userEntryList;
+      this.store.setChatUserList(userEntryList);
       this.isChannelReady = true;
       this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
@@ -466,6 +461,7 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
       console.log('CURRENT USER ENTRY LIST');
       console.log(userEntryList);
       this.chatUserList = userEntryList;
+      this.store.setChatUserList(userEntryList);
       this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
 
@@ -586,12 +582,10 @@ export class LearnerStreamingComponent implements OnInit, OnDestroy {
             userEntry: sendUserEntry,
             message: chatMessage,
             date: date,
+            isPrivate: true,
           };
-          this.store.showNotif(chatMessage, 'custom');
-          // console.log(message);
-          // this.messageList = this.messageList.concat(message);
-          // this.isPopupChatVisible = true;
-          // console.log(this.messageList);
+          this.messageList = this.messageList.concat(message);
+          this.isPopupChatVisible = true;
         }
       }
     );
