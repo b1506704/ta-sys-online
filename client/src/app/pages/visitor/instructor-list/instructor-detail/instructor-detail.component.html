@@ -21,7 +21,7 @@
           <dxo-label text="Birthdate"></dxo-label>
           <div *dxTemplate>
             <div class="responsive-field">
-              {{ instructorData?.dateOfBirth | date: "dd/mm/yyyy" }}
+              {{ instructorData?.dateOfBirth | date:'dd-MM-yyyy' }}
             </div>
           </div>
         </dxi-item>

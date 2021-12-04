@@ -13,9 +13,16 @@ import { UserStore } from '../../services/user/user-store.service';
 export class SignUpComponent implements OnInit, OnDestroy {
   @ViewChild(DxFormComponent, { static: false }) form: DxFormComponent;
   password = '';
+
+  rePassword = '';
   passwordOptions: any = {
     mode: 'password',
     value: this.password,
+  };
+
+  rePasswordOptions: any = {
+    mode: 'password',
+    value: this.rePassword,
   };
   user: any;
   roleList: Array<any> = [];
@@ -44,6 +51,8 @@ export class SignUpComponent implements OnInit, OnDestroy {
   isLoading!: boolean;
   isSignupPopupVisible: boolean;
 
+  
+
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -51,6 +60,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     private userStore: UserStore
   ) {}
 
+  passwordComparison = () => this.form.instance.option('formData').password;
   onFormShown(e: any) {
     setTimeout(() => {
       this.form.instance.getEditor('username').focus();
