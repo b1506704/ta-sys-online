@@ -48,11 +48,11 @@
     font-size: large;
     font-weight: bold;
   "
-  *ngIf="!testList"
+  *ngIf="!testList.length"
 >
   There is no test at the moment. Please add tests to the course.
 </div>
-<div *ngIf="testList?.length">
+<div *ngIf="testList.length">
   <dx-scroll-view
     [direction]="'vertical'"
     [showScrollbar]="true"

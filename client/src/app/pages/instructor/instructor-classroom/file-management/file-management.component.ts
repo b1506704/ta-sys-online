@@ -87,56 +87,56 @@ export class FileManagementComponent implements OnInit {
     ],
     onItemClick: this.downloadZip.bind(this),
   };
-  copyMenuOptions = {
-    items: [
-      {
-        text: 'Copy',
-        icon: 'copy',
-        hint: 'Copy selected items',
-      },
-    ],
-    onItemClick: this.copyFiles.bind(this),
-  };
-  pasteMenuOptions = {
-    items: [
-      {
-        text: 'Paste',
-        icon: 'paste',
-        hint: 'Paste selected items',
-      },
-    ],
-    onItemClick: this.pasteFiles.bind(this),
-  };
-  clearClipboardMenuOptions = {
-    items: [
-      {
-        text: 'Clear Clipboard',
-        icon: 'clear',
-        hint: 'Clear memory of clipboard',
-      },
-    ],
-    onItemClick: this.clearClipboard.bind(this),
-  };
-  moveMenuOptions = {
-    items: [
-      {
-        text: 'Cut',
-        icon: 'cut',
-        hint: 'Cut selected items',
-      },
-    ],
-    onItemClick: this.moveFiles.bind(this),
-  };
-  updateMenuOptions = {
-    items: [
-      {
-        text: 'Link Source',
-        icon: 'link',
-        hint: 'Edit current file',
-      },
-    ],
-    onItemClick: this.updateFile.bind(this),
-  };
+  // copyMenuOptions = {
+  //   items: [
+  //     {
+  //       text: 'Copy',
+  //       icon: 'copy',
+  //       hint: 'Copy selected items',
+  //     },
+  //   ],
+  //   onItemClick: this.copyFiles.bind(this),
+  // };
+  // pasteMenuOptions = {
+  //   items: [
+  //     {
+  //       text: 'Paste',
+  //       icon: 'paste',
+  //       hint: 'Paste selected items',
+  //     },
+  //   ],
+  //   onItemClick: this.pasteFiles.bind(this),
+  // };
+  // clearClipboardMenuOptions = {
+  //   items: [
+  //     {
+  //       text: 'Clear Clipboard',
+  //       icon: 'clear',
+  //       hint: 'Clear memory of clipboard',
+  //     },
+  //   ],
+  //   onItemClick: this.clearClipboard.bind(this),
+  // };
+  // moveMenuOptions = {
+  //   items: [
+  //     {
+  //       text: 'Cut',
+  //       icon: 'cut',
+  //       hint: 'Cut selected items',
+  //     },
+  //   ],
+  //   onItemClick: this.moveFiles.bind(this),
+  // };
+  // updateMenuOptions = {
+  //   items: [
+  //     {
+  //       text: 'Link Source',
+  //       icon: 'link',
+  //       hint: 'Edit current file',
+  //     },
+  //   ],
+  //   onItemClick: this.updateFile.bind(this),
+  // };
   containerList: Array<Container> = [];
 
   courseData: Course;

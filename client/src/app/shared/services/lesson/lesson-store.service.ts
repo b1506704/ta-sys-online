@@ -129,7 +129,7 @@ export class LessonStore extends StateService<LessonState> {
         this.setState({
           lessonList: data.data,
         });
-        this.fetchMediaBySourceID(data.data);
+        // this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infinite filtered list');
         console.log(this.state.lessonList);
         this.setState({ totalItems: data.totalRecords });

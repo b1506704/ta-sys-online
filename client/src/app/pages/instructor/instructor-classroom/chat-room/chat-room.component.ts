@@ -306,6 +306,11 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.defineSignaling();
   }
 
+  fetchMediaBySourceID(sourceIDs: Array<any>) {
+    const sourceIds = sourceIDs.map((e: any) => e.id);
+    this.fileStore.getFiles(sourceIds);
+  }
+
   defineSignaling(): void {
     this.signaling.define('log', (message: any) => {
       console.log(message);
@@ -315,18 +320,21 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
       console.log('CURRENT USER ENTRY LIST');
       console.log(userEntryList);
       this.chatUserList = userEntryList;
+      this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
 
     this.signaling.define('joined', (userEntryList: any) => {
       console.log('CURRENT USER ENTRY LIST');
       console.log(userEntryList);
       this.chatUserList = userEntryList;
+      this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
 
     this.signaling.define('left', (userEntryList: any) => {
       console.log('CURRENT USER ENTRY LIST');
       console.log(userEntryList);
       this.chatUserList = userEntryList;
+      this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
 
     this.signaling.define('message', (userEntry: any, chatMessage: any) => {

@@ -11,9 +11,9 @@ import { CartStore } from 'src/app/shared/services/cart/cart-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
 import { DxScrollViewComponent } from 'devextreme-angular';
 import { Course } from 'src/app/shared/models/course';
+import { PayCheck } from 'src/app/shared/models/pay-check';
 import { ICreateOrderRequest, IPayPalConfig } from 'ngx-paypal';
-import { Bill } from 'src/app/shared/models/bill';
-import { BillStore } from 'src/app/shared/services/bill/bill-store.service';
+import { UserHttpService } from 'src/app/shared/services/user/user-http.service';
 
 @Component({
   selector: 'app-cart-list',
@@ -38,7 +38,7 @@ export class CartListComponent implements OnInit, OnDestroy, AfterViewInit {
     private cartStore: CartStore,
     private store: StoreService,
     private router: Router,
-    private billStore: BillStore
+    private userHTTP: UserHttpService
   ) {}
 
   getUserID() {
@@ -91,16 +91,12 @@ export class CartListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.scrollView.instance.scrollTo({ top: 0, left: 0 });
   }
 
-  submitBill() {
-    const date = new Date();
-    const bill: Bill = {
-      description: `Payment succeeded on ${date}`,
-      userAccountId: this.cartList.userAccountId,
-      courseRequests: this.cartList.courses,
-      totalCost: this.cartList.totalCost,
-      totalItem: this.cartList.totalCourse,
+  submitBill() {   
+    const payCheck: PayCheck = {
+      userId: this.cartList.userAccountId,
+      courseIds: this.cartList.courses.map((e: any) => e.id),
     };
-    this.billStore.uploadBill(bill).then((data: any) => {
+    this.userHTTP.AddToCourse(payCheck).subscribe((data: any) => {
       this.store.showNotif(data.responseMessage, 'custom');
       this.store
         .confirmDialog('Visit classroom now?')

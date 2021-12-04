@@ -13,24 +13,38 @@
   >
   </dxi-item>
 </dx-toolbar>
-<dx-scroll-view
-  [direction]="'vertical'"
-  [showScrollbar]="true"
-  [scrollByContent]="true"
-  [scrollByThumb]="true"
-  [height]="'69vh'"
-  [bounceEnabled]="false"
+<div
+  style="
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    font-size: large;
+    font-weight: bold;
+  "
+  *ngIf="!courseList.length"
+>
+  You have not registered a course yet. Please purchase one at course list.
+</div>
+<div *ngIf="courseList.length">
+  <dx-scroll-view
+    [direction]="'vertical'"
+    [showScrollbar]="true"
+    [scrollByContent]="true"
+    [scrollByThumb]="true"
+    [height]="'69vh'"
+    [bounceEnabled]="false"
   >
-  <!-- (onPullDown)="updateTopContent($event)"
-  (onReachBottom)="updateBottomContent($event)" -->
-  <ng-container *ngIf="courseList">
+    <!-- (onPullDown)="updateTopContent($event)"
+    (onReachBottom)="updateBottomContent($event)" -->
     <div class="card-container">
       <div class="card" *ngFor="let item of courseList">
         <div class="card-title">{{ item?.name }}</div>
         <div class="card-body">
           <!-- <div class="card-text">
-            Price: {{ item?.cost | formatCurrency: currency }}
-          </div> -->
+              Price: {{ item?.cost | formatCurrency: currency }}
+            </div> -->
         </div>
         <div class="card-img">
           <img
@@ -50,8 +64,8 @@
         </div>
       </div>
     </div>
-  </ng-container>
-</dx-scroll-view>
+  </dx-scroll-view>
+</div>
 <dx-speed-dial-action
   icon="arrowup"
   label=""

@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
-import { Course } from '../../models/course';
+import { PayCheck } from '../../models/pay-check';
 import { User } from '../../models/user';
 
 @Injectable({
@@ -205,6 +205,17 @@ export class UserHttpService {
     return this.http.post<any>(
       this.apiUrl + `/api/UserAccount/${userId}/password`,
       { oldPassword: oldPassword, newPassword: newPassword },
+      {
+        reportProgress: true,
+        observe: 'body',
+      }
+    );
+  }
+
+  AddToCourse(payCheck: PayCheck): Observable<any> {
+    return this.http.post<any>(
+      this.apiUrl + '/api/UserAccount/add-to-course',
+      payCheck,
       {
         reportProgress: true,
         observe: 'body',

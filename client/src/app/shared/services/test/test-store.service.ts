@@ -115,7 +115,7 @@ export class TestStore extends StateService<TestState> {
         this.setState({
           testList: data.data,
         });
-        this.fetchMediaBySourceID(data.data);
+        // this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infinite filtered list');
         console.log(this.state.testList);
         this.setState({ totalItems: data.totalRecords });
