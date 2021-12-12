@@ -340,7 +340,7 @@ export class TestListComponent implements OnInit, OnDestroy {
           this.pageSize
         );
         this.testDataListener();
-        this.fileDataListener();
+        // this.fileDataListener();
       }
     });
   }

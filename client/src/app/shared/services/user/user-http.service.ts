@@ -212,7 +212,7 @@ export class UserHttpService {
     );
   }
 
-  AddToCourse(payCheck: PayCheck): Observable<any> {
+  addToCourse(payCheck: PayCheck): Observable<any> {
     return this.http.post<any>(
       this.apiUrl + '/api/UserAccount/add-to-course',
       payCheck,

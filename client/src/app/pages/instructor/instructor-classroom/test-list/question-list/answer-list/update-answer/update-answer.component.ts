@@ -76,7 +76,8 @@ export class UpdateAnswerComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnChanges(): void {
     this.answerData = this.answer;
-    console.log(this.answer);
+    console.log('UPDATED ANSWER');
+    console.log(this.answerData);
   }
 
   ngOnInit() {}

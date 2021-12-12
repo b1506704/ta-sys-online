@@ -96,7 +96,7 @@ export class CartListComponent implements OnInit, OnDestroy, AfterViewInit {
       userId: this.cartList.userAccountId,
       courseIds: this.cartList.courses.map((e: any) => e.id),
     };
-    this.userHTTP.AddToCourse(payCheck).subscribe((data: any) => {
+    this.userHTTP.addToCourse(payCheck).subscribe((data: any) => {
       this.store.showNotif(data.responseMessage, 'custom');
       this.store
         .confirmDialog('Visit classroom now?')

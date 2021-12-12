@@ -20,52 +20,68 @@
 
   <!--  -->
 </dx-toolbar>
-<dx-scroll-view
-  [direction]="'vertical'"
-  [showScrollbar]="true"
-  [scrollByContent]="true"
-  [scrollByThumb]="true"
-  [height]="'69vh'"
-  (onPullDown)="updateTopContent($event)"
-  (onReachBottom)="updateBottomContent($event)"
-  [bounceEnabled]="false"
+<div
+  style="
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    font-size: large;
+    font-weight: bold;
+  "
+  *ngIf="!sessionList"
 >
-  <ng-container *ngIf="sessionList">
-    <div class="card-container">
-      <div class="card" *ngFor="let item of sessionList">
-        <div class="card-title">
-          R{{ item?.courseTable.name[0] }}{{ item?.creator.displayName[0]
-          }}{{ item?.id[0] + item?.id[1] | uppercase }}
-        </div>
-        <div class="card-body">
-          <div class="card-text">Course: {{ item?.courseTable.name }}</div>
-          <div class="card-text">
-            Start Time: {{ item?.startTime | date: "dd/MM, hh:mm a" }}
+  There is no session at the moment. Please add sessions to the course.
+</div>
+<div *ngIf="sessionList">
+  <dx-scroll-view
+    [direction]="'vertical'"
+    [showScrollbar]="true"
+    [scrollByContent]="true"
+    [scrollByThumb]="true"
+    [height]="'69vh'"
+    (onPullDown)="updateTopContent($event)"
+    (onReachBottom)="updateBottomContent($event)"
+    [bounceEnabled]="false"
+  >
+    <ng-container *ngIf="sessionList">
+      <div class="card-container">
+        <div class="card" *ngFor="let item of sessionList">
+          <div class="card-title">
+            R{{ item?.courseTable.name[0] }}{{ item?.creator.displayName[0]
+            }}{{ item?.id[0] + item?.id[1] | uppercase }}
           </div>
-          <div class="card-text">
-            End Time: {{ item?.endTime | date: "dd/MM, hh:mm a" }}
+          <div class="card-body">
+            <div class="card-text">Course: {{ item?.courseTable.name }}</div>
+            <div class="card-text">
+              Start Time: {{ item?.startTime | date: "dd/MM, hh:mm a" }}
+            </div>
+            <div class="card-text">
+              End Time: {{ item?.endTime | date: "dd/MM, hh:mm a" }}
+            </div>
           </div>
-        </div>
-        <div class="card-img">
-          <img
-            [src]="mapFileListToUrl(item?.id)"
-            alt="..."
-            style="height: 100%; width: 100%"
-          />
-        </div>
-        <div>
-          <dx-button
-            icon="arrowright"
-            type="outline"
-            text="Join"
-            hint="Click to see session detail"
-            (onClick)="selectSession(item)"
-          ></dx-button>
+          <div class="card-img">
+            <img
+              [src]="mapFileListToUrl(item?.id)"
+              alt="..."
+              style="height: 100%; width: 100%"
+            />
+          </div>
+          <div>
+            <dx-button
+              icon="arrowright"
+              type="outline"
+              text="Join"
+              hint="Click to see session detail"
+              (onClick)="selectSession(item)"
+            ></dx-button>
+          </div>
         </div>
       </div>
-    </div>
-  </ng-container>
-</dx-scroll-view>
+    </ng-container>
+  </dx-scroll-view>
+</div>
 <dx-speed-dial-action
   icon="arrowup"
   label=""

@@ -11,8 +11,8 @@ import { AnswerHttpService } from 'src/app/shared/services/answer/answer-http.se
   templateUrl: './answer-list.component.html',
   styleUrls: ['./answer-list.component.scss'],
 })
-export class AnswerListComponent implements OnInit, OnDestroy, OnChanges {
-  @Input() questionId: string;
+export class AnswerListComponent implements OnInit, OnDestroy {
+  // @Input() questionId: string;
   answerList: Array<Answer> = [];
   pageSize: number = 100;
   currentFilterByPropertyValue: string;
@@ -114,37 +114,55 @@ export class AnswerListComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   initData() {
-    if (this.questionId) {
-      console.log('CURRENT POST ID');
-      console.log(this.questionId);
+    if (this.currentFilterByPropertyValue) {
+      console.log('CURRENT QUESTION ID');
+      console.log(this.currentFilterByPropertyValue);
       this.answerStore
         .initInfiniteFilterByPropertyData(
           this.currentFilterProperty,
-          this.questionId,
+          this.currentFilterByPropertyValue,
           1,
           this.pageSize
         )
         .then((data: any) => {
           if (data.data) {
             this.answerList = data.data;
-            this.answerStore.fetchMediaBySourceID(data.data);
+            // this.answerStore.fetchMediaBySourceID(data.data);
             this.getAnswerCount();
-            this.fileDataListener();
+            // this.fileDataListener();
+          } else {
+            this.answerList = [];
           }
         });
     }
   }
 
-  ngOnChanges(): void {
-    this.initData();
+  questionIdListener() {
+    return this.store.$currentQuestionId.subscribe((data: any) => {
+      if (data) {
+        this.answerList = [];
+        this.currentFilterByPropertyValue = data;
+        this.initData();
+      }
+    });
   }
 
+  // ngOnChanges(): void {
+  // this.currentFilterByPropertyValue = this.questionId;
+  // this.answerList = [];
+  // setTimeout(() => {
+  // this.initData();
+  // }, 200);
+  // }
+
   ngOnInit(): void {
-    this.fileDataListener();
+    // this.fileDataListener();
+    this.questionIdListener();
     this.isUploadingListener();
   }
 
   ngOnDestroy(): void {
+    this.questionIdListener().unsubscribe();
     this.fileDataListener().unsubscribe();
     this.isUploadingListener();
   }

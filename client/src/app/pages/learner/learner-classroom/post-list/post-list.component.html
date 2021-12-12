@@ -7,7 +7,7 @@
   <dxi-item
     [location]="'before'"
     [text]="'Activity'"
-    style="padding-right: 15px; margin-right: 15px;"
+    style="padding-right: 15px; margin-right: 15px"
   >
   </dxi-item>
   <dxi-item widget="dxTextBox" [options]="searchBoxOptions" location="before">
@@ -38,96 +38,112 @@
   >
   </dxi-item>
 </dx-toolbar>
-<dx-scroll-view
-  [direction]="'vertical'"
-  [showScrollbar]="true"
-  [scrollByContent]="true"
-  [scrollByThumb]="true"
-  [width]="'100%'"
-  [height]="'73vh'"
-  (onPullDown)="updateTopContent($event)"
-  (onReachBottom)="updateBottomContent($event)"
-  [bounceEnabled]="false"
+<div
+  style="
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    font-size: large;
+    font-weight: bold;
+  "
+  *ngIf="!postList"
 >
-  <ng-container *ngIf="postList.length">
-    <div class="card-container">
-      <div class="card" *ngFor="let item of postList">
-        <div class="card-header">
-          <div class="avatar">
-            <img
-              [src]="mapFileListToUrl(item?.userAccountResponse.id)"
-              alt="..."
-              style="height: 50px; width: 50px; border-radius: 50px"
-            />
-            <div class="user-name">
-              {{ item?.userAccountResponse.displayName }}
+  There is no post at the moment. Please add posts to the course.
+</div>
+<div *ngIf="postList">
+  <dx-scroll-view
+    [direction]="'vertical'"
+    [showScrollbar]="true"
+    [scrollByContent]="true"
+    [scrollByThumb]="true"
+    [width]="'100%'"
+    [height]="'73vh'"
+    (onPullDown)="updateTopContent($event)"
+    (onReachBottom)="updateBottomContent($event)"
+    [bounceEnabled]="false"
+  >
+    <ng-container *ngIf="postList.length">
+      <div class="card-container">
+        <div class="card" *ngFor="let item of postList">
+          <div class="card-header">
+            <div class="avatar">
+              <img
+                [src]="mapFileListToUrl(item?.userAccountResponse.id)"
+                alt="..."
+                style="height: 50px; width: 50px; border-radius: 50px"
+              />
+              <div class="user-name">
+                {{ item?.userAccountResponse.displayName }}
+              </div>
+              <div class="post-date">
+                {{ item?.createdDate | date: "dd/MM, hh:mm aa" }}
+              </div>
             </div>
-            <div class="post-date">
-              {{ item?.createdDate | date: "dd/MM, hh:mm aa" }}
+            <div class="card-title">{{ item?.title }}</div>
+            <div class="post-util">
+              <div class="button-group">
+                <dx-button
+                  icon="like"
+                  type="normal"
+                  hint="Click to like post"
+                  (onClick)="likePost(item)"
+                ></dx-button>
+                <div class="like-count">- {{ item?.countPostLike }} -</div>
+                <dx-button
+                  icon="fullscreen"
+                  type="normal"
+                  hint="Click to see post detail"
+                  (onClick)="showDetail(item)"
+                ></dx-button>
+              </div>
+              <div
+                class="button-group"
+                *ngIf="item.userAccountResponse.id === currentUserId"
+              >
+                <dx-button
+                  icon="trash"
+                  type="normal"
+                  hint="Click to delete post"
+                  (onClick)="deletePost(item)"
+                ></dx-button>
+                <div class="like-count">-</div>
+                <dx-button
+                  icon="edit"
+                  type="normal"
+                  hint="Click to edit post"
+                  (onClick)="updatePost(item)"
+                ></dx-button>
+              </div>
             </div>
           </div>
-          <div class="card-title">{{ item?.title }}</div>
-          <div class="post-util">
-            <div class="button-group">
-              <dx-button
-                icon="like"
-                type="normal"
-                hint="Click to like post"
-                (onClick)="likePost(item)"
-              ></dx-button>
-              <div class="like-count">- {{ item?.countPostLike }} -</div>
-              <dx-button
-                icon="fullscreen"
-                type="normal"
-                hint="Click to see post detail"
-                (onClick)="showDetail(item)"
-              ></dx-button>
+          <div class="card-body">
+            <div class="post-content">
+              <dx-scroll-view
+                [showScrollbar]="true"
+                [scrollByContent]="true"
+                [scrollByThumb]="true"
+                [height]="300"
+              >
+                <dx-html-editor readOnly="true" [value]="item?.content">
+                  <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+                </dx-html-editor>
+              </dx-scroll-view>
             </div>
-            <div
-              class="button-group"
-              *ngIf="item.userAccountResponse.id === currentUserId"
-            >
-              <dx-button
-                icon="trash"
-                type="normal"
-                hint="Click to delete post"
-                (onClick)="deletePost(item)"
-              ></dx-button>
-              <div class="like-count">-</div>
-              <dx-button
-                icon="edit"
-                type="normal"
-                hint="Click to edit post"
-                (onClick)="updatePost(item)"
-              ></dx-button>
+            <div class="post-comment">
+              <app-comment-list
+                [postId]="item.id"
+                [currentUserId]="currentUserId"
+                [currentUserDisplayname]="currentUserDisplayname"
+              ></app-comment-list>
             </div>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="post-content">
-            <dx-scroll-view
-              [showScrollbar]="true"
-              [scrollByContent]="true"
-              [scrollByThumb]="true"
-              [height]="300"
-            >
-              <dx-html-editor readOnly="true" [value]="item?.content">
-                <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
-              </dx-html-editor>
-            </dx-scroll-view>
-          </div>
-          <div class="post-comment">
-            <app-comment-list
-              [postId]="item.id"
-              [currentUserId]="currentUserId"
-              [currentUserDisplayname]="currentUserDisplayname"
-            ></app-comment-list>
           </div>
         </div>
       </div>
-    </div>
-  </ng-container>
-</dx-scroll-view>
+    </ng-container>
+  </dx-scroll-view>
+</div>
 <ng-container *ngIf="currentFilterByPropertyValue">
   <app-upload-post
     [closePopupUpload]="closePopupUpload"

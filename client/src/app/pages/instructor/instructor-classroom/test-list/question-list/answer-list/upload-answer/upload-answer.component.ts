@@ -17,6 +17,8 @@ export class UploadAnswerComponent implements OnInit, OnDestroy {
   @ViewChild(DxFormComponent, { static: false })
   dxForm: DxFormComponent;
 
+  currentQuestionId: string;
+
   @Input() questionId: string;
   @Input() title: string;
   @Input() isVisible: boolean;
@@ -57,11 +59,13 @@ export class UploadAnswerComponent implements OnInit, OnDestroy {
           this.store.showNotif(`${data.responseMessage}`, 'custom');
           this.store.setIsLoading(false);
           this.answerStore.setIsUploading(false);
-          this.answerData = {
-            isCorrect: false,
-            questionId: this.questionId,
-            content: '',
-          };
+          this.answerData.isCorrect = false;
+          this.answerData.content = '';
+          // this.answerData = {
+          //   isCorrect: false,
+          //   questionId: '',
+          //   content: '',
+          // };
           this.closePopupUpload();
         });
       }
@@ -73,13 +77,24 @@ export class UploadAnswerComponent implements OnInit, OnDestroy {
     console.log(e.value);
   }
 
+  questionIdListener() {
+    return this.store.$currentQuestionId.subscribe((data: any) => {
+      if (data) {
+        this.answerData.questionId = data;
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.answerData = {
       isCorrect: false,
-      questionId: this.questionId,
+      questionId: '',
       content: '',
     };
+    this.questionIdListener();
   }
 
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    this.questionIdListener().unsubscribe();
+  }
 }

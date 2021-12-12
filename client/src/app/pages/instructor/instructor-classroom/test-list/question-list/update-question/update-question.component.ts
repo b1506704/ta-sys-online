@@ -83,6 +83,13 @@ export class UpdateQuestionComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(): void {
+    // this.questionData = {
+    //   content: '',
+    //   score: 0,
+    //   testId: '',
+    //   answerRequests: [],
+    //   id: '',
+    // };
     this.questionData = this.question;
     console.log(this.question);
   }

@@ -156,8 +156,9 @@
           </div>
         </dx-scroll-view>
       </div>
-      <div class="test-question">
-        <app-answer-list [questionId]="question?.id"></app-answer-list>
+      <div class="test-question" *ngIf="questionData?.id">
+        <!-- <app-answer-list [questionId]="questionData?.id"></app-answer-list> -->
+        <app-answer-list></app-answer-list>
       </div>
     </div>
   </div>

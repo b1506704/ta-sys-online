@@ -25,6 +25,20 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     displayName: '',
   };
   messageList: Array<any> = [];
+
+  // chatUserList: Array<UserEntry> = [
+  //   { id: '0d0ea585-e59f-4a79-76a4-08d9abdd6f9a', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  //   { id: '1', displayName: 'N.H.Hoa' },
+  // ];
+
   chatUserList: Array<UserEntry> = [];
 
   message: Message;
@@ -196,18 +210,13 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   }
 
   messageDataListener() {
-    return this.messageStore.$messageList.subscribe((data: any) => {
+    return this.messageStore.$messageList.subscribe((data: Array<any>) => {
       if (data) {
         this.messageList = data.reverse();
       }
       console.log('LESSON VALUE');
       console.log(data);
     });
-  }
-
-  fetchMediaBySourceID(sourceIDs: Array<any>) {
-    const sourceIds = sourceIDs.map((e: any) => e.id);
-    this.fileStore.getFiles(sourceIds);
   }
 
   mapFileListToUrl(_id: string) {
@@ -295,6 +304,11 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
       }
     });
     this.defineSignaling();
+  }
+
+  fetchMediaBySourceID(sourceIDs: Array<any>) {
+    const sourceIds = sourceIDs.map((e: any) => e.id);
+    this.fileStore.getFiles(sourceIds);
   }
 
   defineSignaling(): void {

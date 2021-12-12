@@ -17,6 +17,7 @@ interface StoreState {
   currentSubject: Subject;
   currentSession: Session;
   currentTest: Test;
+  currentQuestionId: string;
 
   currentTestHistory: Test;
   chatUserList: Array<any>;
@@ -42,7 +43,7 @@ const initialState: StoreState = {
   currentSession: undefined,
   currentTest: undefined,
   currentTestHistory: undefined,
-
+  currentQuestionId: undefined,
   currentRoleId: undefined,
   currentRoleName: undefined,
   isLoading: false,
@@ -81,6 +82,10 @@ export class StoreService extends StateService<StoreState> {
 
   $chatUserList: Observable<Array<any>> = this.select(
     (state) => state.chatUserList
+  );
+
+  $currentQuestionId: Observable<string> = this.select(
+    (state) => state.currentQuestionId
   );
 
   $currentRoleName: Observable<string> = this.select(
@@ -143,6 +148,10 @@ export class StoreService extends StateService<StoreState> {
 
   setCurrentTestHistory(test: Test) {
     this.setState({ currentTestHistory: test });
+  }
+
+  setCurrentQuestionId(id: string) {
+    this.setState({ currentQuestionId: id });
   }
 
   setCurrentUserRoleId(id: string) {

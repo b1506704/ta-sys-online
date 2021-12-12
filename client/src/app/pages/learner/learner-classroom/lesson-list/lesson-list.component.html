@@ -30,86 +30,102 @@
   >
   </dxi-item>
 </dx-toolbar>
-<dx-scroll-view
-  [direction]="'vertical'"
-  [showScrollbar]="true"
-  [scrollByContent]="true"
-  [scrollByThumb]="true"
-  [width]="'100%'"
-  [height]="'73vh'"
-  (onPullDown)="updateTopContent($event)"
-  (onReachBottom)="updateBottomContent($event)"
-  [bounceEnabled]="false"
+<div
+  style="
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    font-size: large;
+    font-weight: bold;
+  "
+  *ngIf="!lessonList"
 >
-  <ng-container *ngIf="lessonList.length">
-    <div class="card-container">
-      <div class="card" *ngFor="let item of lessonList; index as i">
-        <div class="card-header">
-          <div class="avatar">
-            <img
-              src="../../../../../assets/imgs/pencil.png"
-              alt="..."
-              style="height: 50px; width: 50px; border-radius: 50px"
-            />
-            <div class="user-name">Interactive Lesson</div>
-            <div class="lesson-date">
-              {{ item?.createdDate | date: "dd/MM, hh:mm aa" }}
+  There is no lesson at the moment.
+</div>
+<div *ngIf="lessonList">
+  <dx-scroll-view
+    [direction]="'vertical'"
+    [showScrollbar]="true"
+    [scrollByContent]="true"
+    [scrollByThumb]="true"
+    [width]="'100%'"
+    [height]="'73vh'"
+    (onPullDown)="updateTopContent($event)"
+    (onReachBottom)="updateBottomContent($event)"
+    [bounceEnabled]="false"
+  >
+    <ng-container *ngIf="lessonList.length">
+      <div class="card-container">
+        <div class="card" *ngFor="let item of lessonList; index as i">
+          <div class="card-header">
+            <div class="avatar">
+              <img
+                src="../../../../../assets/imgs/pencil.png"
+                alt="..."
+                style="height: 50px; width: 50px; border-radius: 50px"
+              />
+              <div class="user-name">Interactive Lesson</div>
+              <div class="lesson-date">
+                {{ item?.createdDate | date: "dd/MM, hh:mm aa" }}
+              </div>
+            </div>
+            <div class="card-title">{{ item?.name }}</div>
+            <div class="lesson-util">
+              <div class="button-group">
+                <dx-button
+                  icon="fullscreen"
+                  type="normal"
+                  hint="Click to see lesson detail"
+                  (onClick)="showDetail(item)"
+                ></dx-button>
+              </div>
             </div>
           </div>
-          <div class="card-title">{{ item?.name }}</div>
-          <div class="lesson-util">
-            <div class="button-group">
-              <dx-button
-                icon="fullscreen"
-                type="normal"
-                hint="Click to see lesson detail"
-                (onClick)="showDetail(item)"
-              ></dx-button>
-            </div>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="lesson-content">
-            <dx-scroll-view
-              [showScrollbar]="true"
-              [scrollByContent]="true"
-              [scrollByThumb]="true"
-              [height]="300"
-            >
-              <dx-html-editor readOnly="true" [value]="item?.description">
-                <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
-              </dx-html-editor>
-            </dx-scroll-view>
-          </div>
-          <!-- <div class="lesson-comment">
-            <div class="front-container">
-              <div class="front-text">Front Text</div>
-              <dx-html-editor
-                readOnly="true"
-                [value]="item?.frontText"
-                [height]="'90%'"
-                [width]="'100%'"
+          <div class="card-body">
+            <div class="lesson-content">
+              <dx-scroll-view
+                [showScrollbar]="true"
+                [scrollByContent]="true"
+                [scrollByThumb]="true"
+                [height]="300"
               >
-                <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
-              </dx-html-editor>
+                <dx-html-editor readOnly="true" [value]="item?.description">
+                  <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+                </dx-html-editor>
+              </dx-scroll-view>
             </div>
-            <div class="back-container">
-              <div class="back-text">Back Text</div>
-              <dx-html-editor
-                readOnly="true"
-                [value]="item?.backText"
-                [height]="'90%'"
-                [width]="'100%'"
-              >
-                <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
-              </dx-html-editor>
-            </div>
-          </div> -->
+            <!-- <div class="lesson-comment">
+              <div class="front-container">
+                <div class="front-text">Front Text</div>
+                <dx-html-editor
+                  readOnly="true"
+                  [value]="item?.frontText"
+                  [height]="'90%'"
+                  [width]="'100%'"
+                >
+                  <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+                </dx-html-editor>
+              </div>
+              <div class="back-container">
+                <div class="back-text">Back Text</div>
+                <dx-html-editor
+                  readOnly="true"
+                  [value]="item?.backText"
+                  [height]="'90%'"
+                  [width]="'100%'"
+                >
+                  <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+                </dx-html-editor>
+              </div>
+            </div> -->
+          </div>
         </div>
       </div>
-    </div>
-  </ng-container>
-</dx-scroll-view>
+    </ng-container>
+  </dx-scroll-view>
+</div>
 
 <ng-container *ngIf="currentSelectedLesson">
   <app-lesson-detail

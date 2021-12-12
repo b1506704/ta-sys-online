@@ -51,7 +51,12 @@ export class QuestionListComponent implements OnInit, OnDestroy, OnChanges {
 
   updateQuestion(question: Question) {
     this.currentUpdatedQuestion = question;
-    this.isUpdatePopupVisible = true;
+    this.store.setCurrentQuestionId(question.id);
+    console.log('UPDATED QUESTION');
+    console.log('UPDATED QUESTION');
+    setTimeout(() => {
+      this.isUpdatePopupVisible = true;
+    }, 200);
   }
 
   deleteQuestion(question: Question) {
@@ -131,9 +136,9 @@ export class QuestionListComponent implements OnInit, OnDestroy, OnChanges {
         .then((data: any) => {
           if (data.data) {
             this.questionList = data.data;
-            this.questionStore.fetchMediaBySourceID(data.data);
+            // this.questionStore.fetchMediaBySourceID(data.data);
             this.getQuestionCount();
-            this.fileDataListener();
+            // this.fileDataListener();
           }
         });
     }

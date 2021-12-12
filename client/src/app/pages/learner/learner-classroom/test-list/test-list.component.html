@@ -30,69 +30,85 @@
   >
   </dxi-item>
 </dx-toolbar>
-<dx-scroll-view
-  [direction]="'vertical'"
-  [showScrollbar]="true"
-  [scrollByContent]="true"
-  [scrollByThumb]="true"
-  [width]="'100%'"
-  [height]="'73vh'"
-  (onPullDown)="updateTopContent($event)"
-  (onReachBottom)="updateBottomContent($event)"
-  [bounceEnabled]="false"
+<div
+  style="
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    font-size: large;
+    font-weight: bold;
+  "
+  *ngIf="!testList.length"
 >
-  <ng-container *ngIf="testList.length">
-    <div class="card-container">
-      <div class="card" *ngFor="let item of testList">
-        <div class="card-header">
-          <div class="avatar">
-            <img
-              src="../../../../../assets/imgs/test.jpg"
-              alt="..."
-              style="height: 50px; width: 50px; border-radius: 50px"
-            />
-            <div class="user-name">{{ item?.allocatedTime }} minutes</div>
-            <div class="test-date">
-              {{ item?.deadline | date: "dd/MM, hh:mm aa" }}
+  There is no test at the moment. Please add tests to the course.
+</div>
+<div *ngIf="testList.length">
+  <dx-scroll-view
+    [direction]="'vertical'"
+    [showScrollbar]="true"
+    [scrollByContent]="true"
+    [scrollByThumb]="true"
+    [width]="'100%'"
+    [height]="'73vh'"
+    (onPullDown)="updateTopContent($event)"
+    (onReachBottom)="updateBottomContent($event)"
+    [bounceEnabled]="false"
+  >
+    <ng-container *ngIf="testList.length">
+      <div class="card-container">
+        <div class="card" *ngFor="let item of testList">
+          <div class="card-header">
+            <div class="avatar">
+              <img
+                src="../../../../../assets/imgs/test.jpg"
+                alt="..."
+                style="height: 50px; width: 50px; border-radius: 50px"
+              />
+              <div class="user-name">{{ item?.allocatedTime }} minutes</div>
+              <div class="test-date">
+                {{ item?.deadline | date: "dd/MM, hh:mm aa" }}
+              </div>
+            </div>
+            <div class="card-title">{{ item?.name }}</div>
+            <div class="test-util">
+              <div class="button-group">
+                <dx-button
+                  icon="arrowright"
+                  type="normal"
+                  hint="Click to take test"
+                  (onClick)="takeTest(item)"
+                ></dx-button>
+                <div class="like-count">-</div>
+                <dx-button
+                  icon="clock"
+                  type="normal"
+                  hint="Click to see history of this test"
+                  (onClick)="viewHistory(item)"
+                ></dx-button>
+              </div>
             </div>
           </div>
-          <div class="card-title">{{ item?.name }}</div>
-          <div class="test-util">
-            <div class="button-group">
-              <dx-button
-                icon="arrowright"
-                type="normal"
-                hint="Click to take test"
-                (onClick)="takeTest(item)"
-              ></dx-button>
-              <div class="like-count">-</div>
-              <dx-button
-                icon="clock"
-                type="normal"
-                hint="Click to see history of this test"
-                (onClick)="viewHistory(item)"
-              ></dx-button>
+          <div class="card-body">
+            <div class="test-content">
+              <dx-scroll-view
+                [showScrollbar]="true"
+                [scrollByContent]="true"
+                [scrollByThumb]="true"
+                [height]="300"
+              >
+                <dx-html-editor readOnly="true" [value]="item?.description">
+                  <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
+                </dx-html-editor>
+              </dx-scroll-view>
             </div>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="test-content">
-            <dx-scroll-view
-              [showScrollbar]="true"
-              [scrollByContent]="true"
-              [scrollByThumb]="true"
-              [height]="300"
-            >
-              <dx-html-editor readOnly="true" [value]="item?.description">
-                <dxo-media-resizing [enabled]="true"> </dxo-media-resizing>
-              </dx-html-editor>
-            </dx-scroll-view>
           </div>
         </div>
       </div>
-    </div>
-  </ng-container>
-</dx-scroll-view>
+    </ng-container>
+  </dx-scroll-view>
+</div>
 
 <ng-container *ngIf="currentSelectedTest">
   <app-test-detail

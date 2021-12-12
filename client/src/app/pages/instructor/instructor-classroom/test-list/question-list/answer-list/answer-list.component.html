@@ -67,13 +67,14 @@
     </div>
   </dx-scroll-view>
 </ng-container>
-
-<app-upload-answer
-  [closePopupUpload]="closePopupUpload"
-  [questionId]="questionId"
-  [title]="'Upload Answer Editor'"
-  [isVisible]="isUploadPopupVisible"
-></app-upload-answer>
+<ng-container *ngIf="currentFilterByPropertyValue">
+  <app-upload-answer
+    [closePopupUpload]="closePopupUpload"
+    [questionId]="currentFilterByPropertyValue"
+    [title]="'Upload Answer Editor'"
+    [isVisible]="isUploadPopupVisible"
+  ></app-upload-answer>
+</ng-container>
 
 <ng-container *ngIf="currentUpdatedAnswer">
   <app-update-answer
