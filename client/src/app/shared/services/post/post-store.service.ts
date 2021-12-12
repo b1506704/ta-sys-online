@@ -15,7 +15,7 @@ interface PostState {
   totalPages: number;
   currentPage: number;
   totalItems: number;
-  isUploading: boolean;
+  isCreating: boolean;
   responseMsg: string;
 }
 const initialState: PostState = {
@@ -26,7 +26,7 @@ const initialState: PostState = {
   totalPages: 0,
   currentPage: 0,
   totalItems: 0,
-  isUploading: undefined,
+  isCreating: undefined,
   responseMsg: '',
 };
 @Injectable({
@@ -280,7 +280,7 @@ export class PostStore extends StateService<PostState> {
 
   $currentPage: Observable<Number> = this.select((state) => state.currentPage);
 
-  $isUploading: Observable<boolean> = this.select((state) => state.isUploading);
+  $isCreating: Observable<boolean> = this.select((state) => state.isCreating);
 
   uploadPost(post: Post, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
@@ -613,8 +613,8 @@ export class PostStore extends StateService<PostState> {
     this.setState({ postList: array });
   }
 
-  setIsUploading(isUploading: boolean) {
-    this.setState({ isUploading: isUploading });
+  setIsCreating(isCreating: boolean) {
+    this.setState({ isCreating: isCreating });
   }
 
   resetState() {

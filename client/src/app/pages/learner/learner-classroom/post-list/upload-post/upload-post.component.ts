@@ -10,7 +10,7 @@ import { StoreService } from 'src/app/shared/services/store.service';
   templateUrl: 'upload-post.component.html',
   styleUrls: ['./upload-post.component.scss'],
 })
-export class UploadPostComponent implements OnInit, OnDestroy {
+export class CreatePostComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   dxScrollView: DxScrollViewComponent;
   @ViewChild(DxFormComponent, { static: false })
@@ -21,7 +21,7 @@ export class UploadPostComponent implements OnInit, OnDestroy {
   @Input() post: Post;
   @Input() title: string;
   @Input() isVisible: boolean;
-  @Input() closePopupUpload: () => void;
+  @Input() closePopupCreate: () => void;
   valueType: string = 'string';
   currentTabList: any;
   selectedIndex: any;
@@ -55,12 +55,12 @@ export class UploadPostComponent implements OnInit, OnDestroy {
     this.postStore.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.store.setIsLoading(true);
-        this.postStore.setIsUploading(true);
+        this.postStore.setIsCreating(true);
         this.postHTTP.uploadPost(this.postData).subscribe((data: any) => {
           this.store.showNotif(`${data.responseMessage}`, 'custom');
           this.store.setIsLoading(false);
-          this.postStore.setIsUploading(false);
-          this.closePopupUpload();
+          this.postStore.setIsCreating(false);
+          this.closePopupCreate();
         });
       }
     });

@@ -11,7 +11,7 @@ interface TestResultState {
   testResultList: Array<TestResult>;
   exportData: Array<TestResult>;
   selectedTestResult: Object;
-  isUploading: boolean;
+  isCreating: boolean;
   testResultInstance: TestResult;
   totalPages: number;
   savedAnswerIds: Array<string>;
@@ -23,7 +23,7 @@ const initialState: TestResultState = {
   testResultList: [],
   savedAnswerIds: [],
   selectedTestResult: {},
-  isUploading: undefined,
+  isCreating: undefined,
   testResultInstance: undefined,
   exportData: [],
   totalPages: 0,

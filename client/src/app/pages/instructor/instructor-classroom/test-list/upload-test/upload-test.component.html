@@ -7,7 +7,7 @@
   [showCloseButton]="true"
   [dragEnabled]="false"
   [height]="'95%'"
-  (onHiding)="closePopupUpload()"
+  (onHiding)="closePopupCreate()"
   [width]="'95%'"
   [visible]="isVisible"
 >
@@ -30,7 +30,7 @@
           <dx-form
             [formData]="testData"
             [showValidationSummary]="true"
-            validationGroup="testUploadData"
+            validationGroup="testCreateData"
           >
             <dxi-item itemType="group" [colCount]="2">
               <dxi-item

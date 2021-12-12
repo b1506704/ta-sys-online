@@ -30,7 +30,7 @@ export class TestListComponent implements OnInit, OnDestroy {
   isFilteringByPrice: boolean;
   isSortingByName: boolean;
   isSortingByPrice: boolean;
-  isUploadPopupVisible: boolean = false;
+  isCreatePopupVisible: boolean = false;
   isUpdatePopupVisible: boolean = false;
   isDetailPopupVisible: boolean = false;
 
@@ -95,7 +95,7 @@ export class TestListComponent implements OnInit, OnDestroy {
   ) {}
 
   uploadTest() {
-    this.isUploadPopupVisible = true;
+    this.isCreatePopupVisible = true;
   }
 
   updateTest(test: Test) {
@@ -126,8 +126,8 @@ export class TestListComponent implements OnInit, OnDestroy {
     this.router.navigate(['instructor_test_history']);
   }
 
-  closePopupUpload = () => {
-    this.isUploadPopupVisible = false;
+  closePopupCreate = () => {
+    this.isCreatePopupVisible = false;
   };
 
   closePopupUpdate = () => {
@@ -317,8 +317,8 @@ export class TestListComponent implements OnInit, OnDestroy {
     });
   }
 
-  isUploadingListener() {
-    return this.testStore.$isUploading.subscribe((data: boolean) => {
+  isCreatingListener() {
+    return this.testStore.$isCreating.subscribe((data: boolean) => {
       if (data === false) {
         this.initData();
       }
@@ -346,7 +346,7 @@ export class TestListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.isUploadingListener();
+    this.isCreatingListener();
     this.initData();
     this.currentPageListener();
   }
@@ -356,6 +356,6 @@ export class TestListComponent implements OnInit, OnDestroy {
     this.testDataListener().unsubscribe();
     this.currentPageListener().unsubscribe();
     this.fileDataListener().unsubscribe();
-    this.isUploadingListener().unsubscribe();
+    this.isCreatingListener().unsubscribe();
   }
 }

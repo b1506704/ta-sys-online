@@ -144,18 +144,18 @@
 </div>
 <ng-container *ngIf="currentFilterByPropertyValue">
   <app-upload-post
-    [closePopupUpload]="closePopupUpload"
+    [closePopupCreate]="closePopupCreate"
     [courseId]="currentFilterByPropertyValue"
     [userAccountId]="currentUserId"
-    [title]="'Upload Post Editor'"
-    [isVisible]="isUploadPopupVisible"
+    [title]="'Create Post Tool'"
+    [isVisible]="isCreatePopupVisible"
   ></app-upload-post>
 </ng-container>
 <ng-container *ngIf="currentUpdatedPost">
   <app-update-post
     [closePopupUpdate]="closePopupUpdate"
     [post]="currentUpdatedPost"
-    [title]="'Update Post Editor'"
+    [title]="'Update Post Tool'"
     [isVisible]="isUpdatePopupVisible"
   ></app-update-post>
 </ng-container>

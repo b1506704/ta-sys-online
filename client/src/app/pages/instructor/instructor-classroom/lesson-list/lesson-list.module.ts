@@ -15,7 +15,7 @@ import {
   DxTextAreaModule,
 } from 'devextreme-angular';
 import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module';
-import { UploadLessonComponent } from './upload-lesson/upload-lesson.component';
+import { CreateLessonComponent } from './upload-lesson/upload-lesson.component';
 import { LessonDetailComponent } from './lesson-detail/lesson-detail.component';
 import { UpdateLessonComponent } from './update-lesson/update-lesson.component';
 
@@ -37,7 +37,7 @@ import { UpdateLessonComponent } from './update-lesson/update-lesson.component';
   ],
   declarations: [
     LessonListComponent,
-    UploadLessonComponent,
+    CreateLessonComponent,
     UpdateLessonComponent,
     LessonDetailComponent,
   ],

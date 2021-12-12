@@ -29,7 +29,7 @@ export class PostListComponent implements OnInit, OnDestroy {
   isFilteringByPrice: boolean;
   isSortingByName: boolean;
   isSortingByPrice: boolean;
-  isUploadPopupVisible: boolean = false;
+  isCreatePopupVisible: boolean = false;
   isUpdatePopupVisible: boolean = false;
   isDetailPopupVisible: boolean = false;
 
@@ -122,7 +122,7 @@ export class PostListComponent implements OnInit, OnDestroy {
   }
 
   uploadPost() {
-    this.isUploadPopupVisible = true;
+    this.isCreatePopupVisible = true;
   }
 
   updatePost(post: Post) {
@@ -148,8 +148,8 @@ export class PostListComponent implements OnInit, OnDestroy {
     this.isDetailPopupVisible = true;
   }
 
-  closePopupUpload = () => {
-    this.isUploadPopupVisible = false;
+  closePopupCreate = () => {
+    this.isCreatePopupVisible = false;
   };
 
   closePopupUpdate = () => {
@@ -337,8 +337,8 @@ export class PostListComponent implements OnInit, OnDestroy {
     });
   }
 
-  isUploadingListener() {
-    return this.postStore.$isUploading.subscribe((data: boolean) => {
+  isCreatingListener() {
+    return this.postStore.$isCreating.subscribe((data: boolean) => {
       if (data === false) {
         this.initData();
       }
@@ -368,7 +368,7 @@ export class PostListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getUserID();
     this.getUserDisplayName();
-    this.isUploadingListener();
+    this.isCreatingListener();
     this.initData();
     this.currentPageListener();
   }
@@ -380,6 +380,6 @@ export class PostListComponent implements OnInit, OnDestroy {
     this.postDataListener().unsubscribe();
     this.currentPageListener().unsubscribe();
     this.fileDataListener().unsubscribe();
-    this.isUploadingListener().unsubscribe();
+    this.isCreatingListener().unsubscribe();
   }
 }

@@ -10,7 +10,7 @@ import { StoreService } from 'src/app/shared/services/store.service';
   templateUrl: 'upload-lesson.component.html',
   styleUrls: ['./upload-lesson.component.scss'],
 })
-export class UploadLessonComponent implements OnInit, OnDestroy {
+export class CreateLessonComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   dxScrollView: DxScrollViewComponent;
   @ViewChild(DxFormComponent, { static: false })
@@ -19,7 +19,7 @@ export class UploadLessonComponent implements OnInit, OnDestroy {
   @Input() courseId: string;
   @Input() title: string;
   @Input() isVisible: boolean;
-  @Input() closePopupUpload: () => void;
+  @Input() closePopupCreate: () => void;
   valueType: string = 'string';
   currentTabList: any;
   selectedIndex: any;
@@ -55,12 +55,12 @@ export class UploadLessonComponent implements OnInit, OnDestroy {
     this.lessonStore.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.store.setIsLoading(true);
-        this.lessonStore.setIsUploading(true);
+        this.lessonStore.setIsCreating(true);
         this.lessonHTTP.uploadLesson(this.lessonData).subscribe((data: any) => {
           this.store.showNotif(`${data.responseMessage}`, 'custom');
           this.store.setIsLoading(false);
-          this.lessonStore.setIsUploading(false);
-          this.closePopupUpload();
+          this.lessonStore.setIsCreating(false);
+          this.closePopupCreate();
         });
       }
     });

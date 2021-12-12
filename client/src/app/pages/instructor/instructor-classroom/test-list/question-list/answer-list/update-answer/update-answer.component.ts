@@ -60,13 +60,31 @@ export class UpdateAnswerComponent implements OnInit, OnDestroy, OnChanges {
     this.answerStore.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.store.setIsLoading(true);
-        this.answerHTTP.updateAnswer(this.answerData).subscribe((data: any) => {
-          this.store.showNotif(`${data.responseMessage}`, 'custom');
-          this.store.setIsLoading(false);
-          this.closePopupUpdate();
+        this.answerStore.setIsCreating(true);
+        this.answerHTTP.updateAnswer(this.answerData).subscribe({
+          next: (data: any) => {
+            this.store.showNotif(`${data.responseMessage}`, 'custom');
+            this.store.setIsLoading(false);
+            this.closePopupUpdate();
+          },
+          error: (data: any) => {
+            this.store.setIsLoading(false);
+            this.store.showNotif(data.error.responseMessage, 'error');
+            console.log(data);
+          },
         });
       }
     });
+    // this.answerStore.confirmDialog('').then((confirm: boolean) => {
+    //   if (confirm) {
+    //     this.store.setIsLoading(true);
+    //     this.answerHTTP.updateAnswer(this.answerData).subscribe((data: any) => {
+    //       this.store.showNotif(`${data.responseMessage}`, 'custom');
+    //       this.store.setIsLoading(false);
+    //       this.closePopupUpdate();
+    //     });
+    //   }
+    // });
   };
 
   onEditorValueChanged(e: any) {

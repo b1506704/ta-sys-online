@@ -52,7 +52,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   isFilteringByPrice: boolean;
   isSortingByName: boolean;
   isSortingByPrice: boolean;
-  isUploadPopupVisible: boolean = false;
+  isCreatePopupVisible: boolean = false;
   isUpdatePopupVisible: boolean = false;
   isDetailPopupVisible: boolean = false;
 

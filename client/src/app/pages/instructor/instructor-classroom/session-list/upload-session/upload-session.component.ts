@@ -17,7 +17,7 @@ import { SessionHttpService } from 'src/app/shared/services/session/session-http
   templateUrl: 'upload-session.component.html',
   styleUrls: ['./upload-session.component.scss'],
 })
-export class UploadSessionComponent implements OnInit, OnDestroy, OnChanges {
+export class CreateSessionComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild(DxScrollViewComponent, { static: false })
   dxScrollView: DxScrollViewComponent;
   @ViewChild(DxFormComponent, { static: false })

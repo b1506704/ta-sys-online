@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Answer } from 'src/app/shared/models/answer';
 import { AnswerStore } from 'src/app/shared/services/answer/answer-store.service';
 import { File } from 'src/app/shared/models/file';
@@ -20,9 +20,9 @@ export class AnswerListComponent implements OnInit, OnDestroy {
   currentUpdatedAnswer!: Answer;
   currentSelectedAnswer!: Answer;
   answerCount: number = 0;
-  isUploading: boolean = false;
+  isCreating: boolean = false;
 
-  isUploadPopupVisible: boolean = false;
+  isCreatePopupVisible: boolean = false;
   isUpdatePopupVisible: boolean = false;
 
   fileData: File = {
@@ -52,8 +52,8 @@ export class AnswerListComponent implements OnInit, OnDestroy {
     this.currentUpdatedAnswer = answer;
     this.isUpdatePopupVisible = true;
   }
-  isUploadingListener() {
-    return this.answerStore.$isUploading.subscribe((data: any) => {
+  isCreatingListener() {
+    return this.answerStore.$isCreating.subscribe((data: any) => {
       if (data === false) {
         this.initData();
       }
@@ -74,7 +74,7 @@ export class AnswerListComponent implements OnInit, OnDestroy {
   }
 
   uploadAnswer() {
-    this.isUploadPopupVisible = true;
+    this.isCreatePopupVisible = true;
   }
 
   mapFileListToUrl(_id: string) {
@@ -101,8 +101,8 @@ export class AnswerListComponent implements OnInit, OnDestroy {
     });
   }
 
-  closePopupUpload = () => {
-    this.isUploadPopupVisible = false;
+  closePopupCreate = () => {
+    this.isCreatePopupVisible = false;
   };
 
   closePopupUpdate = () => {
@@ -158,12 +158,12 @@ export class AnswerListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // this.fileDataListener();
     this.questionIdListener();
-    this.isUploadingListener();
+    this.isCreatingListener();
   }
 
   ngOnDestroy(): void {
     this.questionIdListener().unsubscribe();
     this.fileDataListener().unsubscribe();
-    this.isUploadingListener();
+    this.isCreatingListener();
   }
 }

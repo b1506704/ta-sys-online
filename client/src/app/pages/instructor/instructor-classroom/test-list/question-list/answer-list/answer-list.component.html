@@ -69,10 +69,10 @@
 </ng-container>
 <ng-container *ngIf="currentFilterByPropertyValue">
   <app-upload-answer
-    [closePopupUpload]="closePopupUpload"
+    [closePopupCreate]="closePopupCreate"
     [questionId]="currentFilterByPropertyValue"
-    [title]="'Upload Answer Editor'"
-    [isVisible]="isUploadPopupVisible"
+    [title]="'Create Answer Tool'"
+    [isVisible]="isCreatePopupVisible"
   ></app-upload-answer>
 </ng-container>
 
@@ -80,7 +80,7 @@
   <app-update-answer
     [closePopupUpdate]="closePopupUpdate"
     [answer]="currentUpdatedAnswer"
-    [title]="'Update Answer Editor'"
+    [title]="'Update Answer Tool'"
     [isVisible]="isUpdatePopupVisible"
   ></app-update-answer>
 </ng-container>

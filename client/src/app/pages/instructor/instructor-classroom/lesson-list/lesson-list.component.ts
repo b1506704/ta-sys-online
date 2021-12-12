@@ -29,7 +29,7 @@ export class LessonListComponent implements OnInit, OnDestroy {
   isFilteringByPrice: boolean;
   isSortingByName: boolean;
   isSortingByPrice: boolean;
-  isUploadPopupVisible: boolean = false;
+  isCreatePopupVisible: boolean = false;
   isUpdatePopupVisible: boolean = false;
   isDetailPopupVisible: boolean = false;
 
@@ -92,7 +92,7 @@ export class LessonListComponent implements OnInit, OnDestroy {
   ) {}
 
   uploadLesson() {
-    this.isUploadPopupVisible = true;
+    this.isCreatePopupVisible = true;
   }
 
   updateLesson(lesson: Lesson) {
@@ -118,8 +118,8 @@ export class LessonListComponent implements OnInit, OnDestroy {
     this.isDetailPopupVisible = true;
   }
 
-  closePopupUpload = () => {
-    this.isUploadPopupVisible = false;
+  closePopupCreate = () => {
+    this.isCreatePopupVisible = false;
   };
 
   closePopupUpdate = () => {
@@ -309,8 +309,8 @@ export class LessonListComponent implements OnInit, OnDestroy {
     });
   }
 
-  isUploadingListener() {
-    return this.lessonStore.$isUploading.subscribe((data: boolean) => {
+  isCreatingListener() {
+    return this.lessonStore.$isCreating.subscribe((data: boolean) => {
       if (data === false) {
         this.initData();
       }
@@ -338,7 +338,7 @@ export class LessonListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.isUploadingListener();
+    this.isCreatingListener();
     this.initData();
     this.currentPageListener();
   }
@@ -348,6 +348,6 @@ export class LessonListComponent implements OnInit, OnDestroy {
     this.lessonDataListener().unsubscribe();
     this.currentPageListener().unsubscribe();
     this.fileDataListener().unsubscribe();
-    this.isUploadingListener().unsubscribe();
+    this.isCreatingListener().unsubscribe();
   }
 }

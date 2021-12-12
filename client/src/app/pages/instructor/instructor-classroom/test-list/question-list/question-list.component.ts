@@ -21,10 +21,10 @@ export class QuestionListComponent implements OnInit, OnDestroy, OnChanges {
   currentSelectedQuestion!: Question;
   questionCount: number = 0;
 
-  isUploadPopupVisible: boolean = false;
+  isCreatePopupVisible: boolean = false;
 
   isUpdatePopupVisible: boolean = false;
-  isUploading: boolean = false;
+  isCreating: boolean = false;
 
   fileData: File = {
     sourceID: '',
@@ -75,11 +75,11 @@ export class QuestionListComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   uploadQuestion() {
-    this.isUploadPopupVisible = true;
+    this.isCreatePopupVisible = true;
   }
 
-  isUploadingListener() {
-    return this.questionStore.$isUploading.subscribe((data: any) => {
+  isCreatingListener() {
+    return this.questionStore.$isCreating.subscribe((data: any) => {
       if (data === false) {
         this.initData();
       }
@@ -110,8 +110,8 @@ export class QuestionListComponent implements OnInit, OnDestroy, OnChanges {
     });
   }
 
-  closePopupUpload = () => {
-    this.isUploadPopupVisible = false;
+  closePopupCreate = () => {
+    this.isCreatePopupVisible = false;
   };
 
   closePopupUpdate = () => {
@@ -150,11 +150,11 @@ export class QuestionListComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnInit(): void {
     this.fileDataListener();
-    this.isUploadingListener();
+    this.isCreatingListener();
   }
 
   ngOnDestroy(): void {
     this.fileDataListener().unsubscribe();
-    this.isUploadingListener().unsubscribe();
+    this.isCreatingListener().unsubscribe();
   }
 }

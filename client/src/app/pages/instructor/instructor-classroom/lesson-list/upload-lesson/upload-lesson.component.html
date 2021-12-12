@@ -7,7 +7,7 @@
   [showCloseButton]="true"
   [dragEnabled]="false"
   [height]="'95%'"
-  (onHiding)="closePopupUpload()"
+  (onHiding)="closePopupCreate()"
   [width]="'95%'"
   [visible]="isVisible"
 >
@@ -32,7 +32,7 @@
               <dx-form
                 [formData]="lessonData"
                 [showValidationSummary]="true"
-                validationGroup="lessonUploadData"
+                validationGroup="lessonCreateData"
               >
                 <dxi-item itemType="group">
                   <dxi-item itemType="group">

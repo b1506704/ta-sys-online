@@ -11,7 +11,7 @@ import { StoreService } from 'src/app/shared/services/store.service';
   styleUrls: ['./upload-question.component.scss'],
 })
 // logic to add/update/remove answers within component
-export class UploadQuestionComponent implements OnInit, OnDestroy {
+export class CreateQuestionComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   dxScrollView: DxScrollViewComponent;
   @ViewChild(DxFormComponent, { static: false })
@@ -20,7 +20,7 @@ export class UploadQuestionComponent implements OnInit, OnDestroy {
   @Input() testId: string;
   @Input() title: string;
   @Input() isVisible: boolean;
-  @Input() closePopupUpload: () => void;
+  @Input() closePopupCreate: () => void;
   valueType: string = 'string';
   currentTabList: any;
   selectedIndex: any;
@@ -54,13 +54,13 @@ export class UploadQuestionComponent implements OnInit, OnDestroy {
     this.questionStore.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.store.setIsLoading(true);
-        this.questionStore.setIsUploading(true);
+        this.questionStore.setIsCreating(true);
         this.questionHTTP
           .uploadQuestion(this.questionData)
           .subscribe((data: any) => {
             this.store.showNotif(`${data.responseMessage}`, 'custom');
             this.store.setIsLoading(false);
-            this.questionStore.setIsUploading(false);
+            this.questionStore.setIsCreating(false);
             this.questionData = {
               answerRequests: [],
               score: 0,
@@ -68,7 +68,7 @@ export class UploadQuestionComponent implements OnInit, OnDestroy {
               totalCorrectAnswer: 0,
               content: '',
             };
-            this.closePopupUpload();
+            this.closePopupCreate();
           });
       }
     });

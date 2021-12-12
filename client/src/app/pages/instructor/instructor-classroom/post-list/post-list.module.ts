@@ -16,7 +16,7 @@ import {
 } from 'devextreme-angular';
 import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module';
 import { CommentListComponent } from './comment-list/comment-list.component';
-import { UploadPostComponent } from './upload-post/upload-post.component';
+import { CreatePostComponent } from './upload-post/upload-post.component';
 import { PostDetailComponent } from './post-detail/post-detail.component';
 import { UpdatePostComponent } from './update-post/update-post.component';
 
@@ -39,7 +39,7 @@ import { UpdatePostComponent } from './update-post/update-post.component';
   declarations: [
     PostListComponent,
     CommentListComponent,
-    UploadPostComponent,
+    CreatePostComponent,
     UpdatePostComponent,
     PostDetailComponent,
   ],

@@ -135,17 +135,17 @@
 </div>
 <ng-container *ngIf="currentFilterByPropertyValue">
   <app-upload-test
-    [closePopupUpload]="closePopupUpload"
+    [closePopupCreate]="closePopupCreate"
     [courseId]="currentFilterByPropertyValue"
-    [title]="'Upload Test Editor'"
-    [isVisible]="isUploadPopupVisible"
+    [title]="'Create Test Tool'"
+    [isVisible]="isCreatePopupVisible"
   ></app-upload-test>
 </ng-container>
 <ng-container *ngIf="currentUpdatedTest">
   <app-update-test
     [closePopupUpdate]="closePopupUpdate"
     [test]="currentUpdatedTest"
-    [title]="'Update Test Editor'"
+    [title]="'Update Test Tool'"
     [isVisible]="isUpdatePopupVisible"
   ></app-update-test>
 </ng-container>

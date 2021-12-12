@@ -14,7 +14,7 @@ interface TestState {
   testRequest: TestRequest;
   exportData: Array<Test>;
   selectedTest: Object;
-  isUploading: boolean;
+  isCreating: boolean;
   testInstance: Test;
   totalPages: number;
   savedAnswerIds: Array<string>;
@@ -32,7 +32,7 @@ const initialState: TestState = {
   },
   savedAnswerIds: [],
   selectedTest: {},
-  isUploading: undefined,
+  isCreating: undefined,
   testInstance: undefined,
   exportData: [],
   totalPages: 0,
@@ -302,7 +302,7 @@ export class TestStore extends StateService<TestState> {
 
   $currentPage: Observable<Number> = this.select((state) => state.currentPage);
 
-  $isUploading: Observable<boolean> = this.select((state) => state.isUploading);
+  $isCreating: Observable<boolean> = this.select((state) => state.isCreating);
 
   uploadTest(test: Test, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
@@ -670,8 +670,8 @@ export class TestStore extends StateService<TestState> {
     this.setState({ testRequest: currentTestRequest });
   }
 
-  setIsUploading(isUploading: boolean) {
-    this.setState({ isUploading: isUploading });
+  setIsCreating(isCreating: boolean) {
+    this.setState({ isCreating: isCreating });
   }
 
   setExportData(array: Array<Test>) {

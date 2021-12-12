@@ -12,7 +12,7 @@ interface MessageState {
   exportData: Array<Message>;
   selectedMessage: Object;
   messageInstance: Message;
-  isUploading: boolean;
+  isCreating: boolean;
   totalPages: number;
   currentPage: number;
   totalItems: number;
@@ -22,7 +22,7 @@ const initialState: MessageState = {
   messageList: [],
   selectedMessage: {},
   messageInstance: undefined,
-  isUploading: undefined,
+  isCreating: undefined,
   exportData: [],
   totalPages: 0,
   currentPage: 0,

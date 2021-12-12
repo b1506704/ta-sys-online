@@ -11,7 +11,7 @@ import { StoreService } from 'src/app/shared/services/store.service';
   styleUrls: ['./upload-answer.component.scss'],
 })
 // logic to add/update/remove answers within component
-export class UploadAnswerComponent implements OnInit, OnDestroy {
+export class CreateAnswerComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   dxScrollView: DxScrollViewComponent;
   @ViewChild(DxFormComponent, { static: false })
@@ -22,7 +22,7 @@ export class UploadAnswerComponent implements OnInit, OnDestroy {
   @Input() questionId: string;
   @Input() title: string;
   @Input() isVisible: boolean;
-  @Input() closePopupUpload: () => void;
+  @Input() closePopupCreate: () => void;
   valueType: string = 'string';
   submitButtonOptions: any = {
     text: 'Submit',
@@ -54,19 +54,21 @@ export class UploadAnswerComponent implements OnInit, OnDestroy {
     this.answerStore.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.store.setIsLoading(true);
-        this.answerStore.setIsUploading(true);
-        this.answerHTTP.uploadAnswer(this.answerData).subscribe((data: any) => {
-          this.store.showNotif(`${data.responseMessage}`, 'custom');
-          this.store.setIsLoading(false);
-          this.answerStore.setIsUploading(false);
-          this.answerData.isCorrect = false;
-          this.answerData.content = '';
-          // this.answerData = {
-          //   isCorrect: false,
-          //   questionId: '',
-          //   content: '',
-          // };
-          this.closePopupUpload();
+        this.answerStore.setIsCreating(true);
+        this.answerHTTP.uploadAnswer(this.answerData).subscribe({
+          next: (data: any) => {
+            this.store.showNotif(`${data.responseMessage}`, 'custom');
+            this.store.setIsLoading(false);
+            this.answerStore.setIsCreating(false);
+            this.answerData.isCorrect = false;
+            this.answerData.content = '';
+            this.closePopupCreate();
+          },
+          error: (data: any) => {
+            this.store.setIsLoading(false);
+            this.store.showNotif(data.error.responseMessage, 'error');
+            console.log(data);
+          },
         });
       }
     });

@@ -10,7 +10,7 @@ import { StoreService } from 'src/app/shared/services/store.service';
   templateUrl: 'upload-test.component.html',
   styleUrls: ['./upload-test.component.scss'],
 })
-export class UploadTestComponent implements OnInit, OnDestroy {
+export class CreateTestComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   dxScrollView: DxScrollViewComponent;
   @ViewChild(DxFormComponent, { static: false })
@@ -19,7 +19,7 @@ export class UploadTestComponent implements OnInit, OnDestroy {
   @Input() courseId: string;
   @Input() title: string;
   @Input() isVisible: boolean;
-  @Input() closePopupUpload: () => void;
+  @Input() closePopupCreate: () => void;
   valueType: string = 'string';
   submitButtonOptions: any = {
     text: 'Submit',
@@ -51,12 +51,12 @@ export class UploadTestComponent implements OnInit, OnDestroy {
     this.testStore.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.store.setIsLoading(true);
-        this.testStore.setIsUploading(true);
+        this.testStore.setIsCreating(true);
         this.testHTTP.uploadTest(this.testData).subscribe((data: any) => {
           this.store.showNotif(`${data.responseMessage}`, 'custom');
           this.store.setIsLoading(false);
-          this.testStore.setIsUploading(false);
-          this.closePopupUpload();
+          this.testStore.setIsCreating(false);
+          this.closePopupCreate();
         });
       }
     });

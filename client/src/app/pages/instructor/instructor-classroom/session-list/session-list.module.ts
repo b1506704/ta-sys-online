@@ -14,7 +14,7 @@ import {
 } from 'devextreme-angular';
 import { FormatCurrencyModule } from 'src/app/shared/pipes/formatCurrency.module';
 import { EditSessionComponent } from './edit-session/edit-session.component';
-import { UploadSessionComponent } from './upload-session/upload-session.component';
+import { CreateSessionComponent } from './upload-session/upload-session.component';
 
 @NgModule({
   imports: [
@@ -33,7 +33,7 @@ import { UploadSessionComponent } from './upload-session/upload-session.componen
   declarations: [
     SessionListComponent,
     EditSessionComponent,
-    UploadSessionComponent,
+    CreateSessionComponent,
   ],
 })
 export class SessionListModule {}

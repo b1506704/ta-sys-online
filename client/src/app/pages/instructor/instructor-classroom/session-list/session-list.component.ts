@@ -34,7 +34,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
 
   isUpdatePopupVisible: boolean = false;
 
-  isUploadPopupVisible: boolean = false;
+  isCreatePopupVisible: boolean = false;
 
   currentCategoryFilterValue: string;
   timeout: any;
@@ -76,7 +76,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
   }
 
   uploadPost() {
-    this.isUploadPopupVisible = true;
+    this.isCreatePopupVisible = true;
   }
 
   selectSession(session: Session) {
@@ -87,7 +87,7 @@ export class SessionListComponent implements OnInit, OnDestroy {
   }
 
   uploadSession() {
-    this.isUploadPopupVisible = true;
+    this.isCreatePopupVisible = true;
   }
 
   deleteSession(session: Session) {

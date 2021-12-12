@@ -33,10 +33,10 @@ export class QuestionListComponent implements OnInit, OnDestroy, OnChanges {
   currentSelectedQuestion!: Question;
   questionCount: number = 0;
 
-  isUploadPopupVisible: boolean = false;
+  isCreatePopupVisible: boolean = false;
 
   isUpdatePopupVisible: boolean = false;
-  isUploading: boolean = false;
+  isCreating: boolean = false;
 
   fileData: File = {
     sourceID: '',

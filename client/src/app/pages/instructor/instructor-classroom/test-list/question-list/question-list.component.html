@@ -65,17 +65,17 @@
 </ng-container>
 <ng-container *ngIf="testId">
   <app-upload-question
-    [closePopupUpload]="closePopupUpload"
+    [closePopupCreate]="closePopupCreate"
     [testId]="testId"
-    [title]="'Upload Question Editor'"
-    [isVisible]="isUploadPopupVisible"
+    [title]="'Create Question Tool'"
+    [isVisible]="isCreatePopupVisible"
   ></app-upload-question>
 </ng-container>
 <ng-container *ngIf="currentUpdatedQuestion">
   <app-update-question
     [closePopupUpdate]="closePopupUpdate"
     [question]="currentUpdatedQuestion"
-    [title]="'Update Question Editor'"
+    [title]="'Update Question Tool'"
     [isVisible]="isUpdatePopupVisible"
   ></app-update-question>
 </ng-container>

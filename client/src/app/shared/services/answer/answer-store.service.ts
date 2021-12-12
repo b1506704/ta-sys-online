@@ -12,7 +12,7 @@ interface AnswerState {
   exportData: Array<Answer>;
   selectedAnswer: Object;
   answerInstance: Answer;
-  isUploading: boolean;
+  isCreating: boolean;
   totalPages: number;
   currentPage: number;
   totalItems: number;
@@ -22,7 +22,7 @@ const initialState: AnswerState = {
   answerList: [],
   selectedAnswer: {},
   answerInstance: undefined,
-  isUploading: undefined,
+  isCreating: undefined,
   exportData: [],
   totalPages: 0,
   currentPage: 0,
@@ -214,7 +214,7 @@ export class AnswerStore extends StateService<AnswerState> {
   );
   $currentPage: Observable<Number> = this.select((state) => state.currentPage);
 
-  $isUploading: Observable<boolean> = this.select((state) => state.isUploading);
+  $isCreating: Observable<boolean> = this.select((state) => state.isCreating);
 
   uploadAnswer(answer: Answer, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
@@ -431,8 +431,8 @@ export class AnswerStore extends StateService<AnswerState> {
       });
   }
 
-  setIsUploading(isUploading: boolean) {
-    this.setState({ isUploading: isUploading });
+  setIsCreating(isCreating: boolean) {
+    this.setState({ isCreating: isCreating });
   }
 
   setExportData(array: Array<Answer>) {

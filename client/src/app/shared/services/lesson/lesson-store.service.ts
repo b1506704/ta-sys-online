@@ -12,7 +12,7 @@ interface LessonState {
   exportData: Array<Lesson>;
   selectedLesson: Object;
   lessonInstance: Lesson;
-  isUploading: boolean;
+  isCreating: boolean;
   totalPages: number;
   currentPage: number;
   totalItems: number;
@@ -22,7 +22,7 @@ const initialState: LessonState = {
   lessonList: [],
   selectedLesson: {},
   lessonInstance: undefined,
-  isUploading: undefined,
+  isCreating: undefined,
   exportData: [],
   totalPages: 0,
   currentPage: 0,
@@ -312,7 +312,7 @@ export class LessonStore extends StateService<LessonState> {
 
   $currentPage: Observable<Number> = this.select((state) => state.currentPage);
 
-  $isUploading: Observable<boolean> = this.select((state) => state.isUploading);
+  $isCreating: Observable<boolean> = this.select((state) => state.isCreating);
 
   $lessonInstance: Observable<Lesson> = this.select(
     (state) => state.lessonInstance
@@ -647,8 +647,8 @@ export class LessonStore extends StateService<LessonState> {
       });
   }
 
-  setIsUploading(isUploading: boolean) {
-    this.setState({ isUploading: isUploading });
+  setIsCreating(isCreating: boolean) {
+    this.setState({ isCreating: isCreating });
   }
 
   setExportData(array: Array<Lesson>) {

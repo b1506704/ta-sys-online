@@ -156,17 +156,17 @@
 </div>
 <ng-container *ngIf="currentFilterByPropertyValue">
   <app-upload-lesson
-    [closePopupUpload]="closePopupUpload"
+    [closePopupCreate]="closePopupCreate"
     [courseId]="currentFilterByPropertyValue"
-    [title]="'Upload Lesson Editor'"
-    [isVisible]="isUploadPopupVisible"
+    [title]="'Create Lesson Tool'"
+    [isVisible]="isCreatePopupVisible"
   ></app-upload-lesson>
 </ng-container>
 <ng-container *ngIf="currentUpdatedLesson">
   <app-update-lesson
     [closePopupUpdate]="closePopupUpdate"
     [lesson]="currentUpdatedLesson"
-    [title]="'Update Lesson Editor'"
+    [title]="'Update Lesson Tool'"
     [isVisible]="isUpdatePopupVisible"
   ></app-update-lesson>
 </ng-container>
