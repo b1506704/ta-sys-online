@@ -3,17 +3,16 @@ import { Test } from 'src/app/shared/models/test';
 import { TestStore } from 'src/app/shared/services/test/test-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
 import { QuestionStore } from 'src/app/shared/services/question/question-store.service';
-import { Question } from 'src/app/shared/models/question';
 import { DxScrollViewComponent } from 'devextreme-angular';
 import { TestRequest } from 'src/app/shared/models/testRequest';
 import { TestHttpService } from 'src/app/shared/services/test/test-http.service';
-import { FindValueSubscriber } from 'rxjs/internal/operators/find';
 
 @Component({
   selector: 'app-current-test',
   templateUrl: './current-test.component.html',
   styleUrls: ['./current-test.component.scss'],
 })
+//implement confirm dialog here when out
 export class CurrentTestComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: false })
   scrollView: DxScrollViewComponent;
@@ -48,32 +47,43 @@ export class CurrentTestComponent implements OnInit, OnDestroy {
       }
     });
   }
-  submitTest() {
-    this.store.confirmDialog('').then((confirm: boolean) => {
-      if (confirm) {
-        this.store.setIsLoading(true);
-        const newTestRequest: TestRequest = {
-          testId: this.testRequest.testId,
-          userId: this.currentUserId,
-          isPractice: false,
-          questionRequest: this.testRequest.questionRequest,
-        };
-        console.log(newTestRequest);
-        this.testHTTP
-          .doTest(newTestRequest)
-          .toPromise()
-          .then((data: any) => {
-            this.store.setIsLoading(false);
-            console.log(data);
-            this.testResult = data;
-            this.store.showNotif(`${data.responseMessage}`, 'custom');
-            this.isShowTestResult = true;
-          })
-          .catch((error: any) => {
-            this.store.showNotif(`${error.error.responseMessage}`, 'custom');
-          });
-      }
-    });
+
+  callApiDoTest() {
+    const newTestRequest: TestRequest = {
+      testId: this.testRequest.testId,
+      userId: this.currentUserId,
+      isPractice: false,
+      questionRequest: this.testRequest.questionRequest,
+    };
+    console.log(newTestRequest);
+    this.testHTTP
+      .doTest(newTestRequest)
+      .toPromise()
+      .then((data: any) => {
+        this.store.setIsLoading(false);
+        console.log(data);
+        this.testResult = data;
+        this.store.showNotif(`${data.responseMessage}`, 'custom');
+        this.isShowTestResult = true;
+        clearInterval(this.timeCounterInterval);
+      })
+      .catch((data: any) => {
+        this.store.showNotif(`${data.error.responseMessage}`, 'custom');
+      });
+  }
+
+  submitTest(isAuto: boolean = false) {
+    if (isAuto) {
+      this.store.confirmDialog('').then((confirm: boolean) => {
+        if (confirm) {
+          this.store.setIsLoading(true);
+          this.callApiDoTest();
+        }
+      });
+    } else {
+      this.store.setIsLoading(true);
+      this.callApiDoTest();
+    }
   }
 
   testRequestListener() {
@@ -100,16 +110,15 @@ export class CurrentTestComponent implements OnInit, OnDestroy {
       if (totalSeconds === 0) {
         this.store.showNotif('The test is ended', 'custom');
         this.submitTest();
-        clearInterval(totalSeconds);
       }
     }, 1000);
   }
 
   getMetaData() {
     return this.store.$currentTest.subscribe((data: Test) => {
-      if (data) {
+      if (data !== undefined) {
         this.testData = data;
-        this.testStore.setTestRequestId(this.testData.id);
+        this.testStore.setTestRequestId(data?.id);
         this.questionStore
           .initInfiniteFilterByPropertyData(
             'testId',
@@ -142,6 +151,7 @@ export class CurrentTestComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     clearInterval(this.timeCounterInterval);
+    this.testStore.resetTestRequest();
     this.testRequestListener().unsubscribe();
   }
 }

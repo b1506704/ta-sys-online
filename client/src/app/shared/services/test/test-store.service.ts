@@ -9,6 +9,10 @@ import { FileStore } from '../file/file-store.service';
 import { TestRequest } from '../../models/testRequest';
 import { Question } from '../../models/question';
 
+interface Dictionary<T> {
+  [Key: string]: T;
+}
+
 interface TestState {
   testList: Array<Test>;
   testRequest: TestRequest;
@@ -17,7 +21,7 @@ interface TestState {
   isCreating: boolean;
   testInstance: Test;
   totalPages: number;
-  savedAnswerIds: Array<string>;
+  savedAnswerIds: Dictionary<string>;
   currentPage: number;
   totalItems: number;
   responseMsg: string;
@@ -30,7 +34,7 @@ const initialState: TestState = {
     isPractice: false,
     questionRequest: [],
   },
-  savedAnswerIds: [],
+  savedAnswerIds: {},
   selectedTest: {},
   isCreating: undefined,
   testInstance: undefined,
@@ -296,7 +300,11 @@ export class TestStore extends StateService<TestState> {
     (state) => state.testRequest
   );
 
-  $saveAnswerIds: Observable<Array<string>> = this.select(
+  // $saveAnswerIds: Observable<Array<string>> = this.select(
+  //   (state) => state.savedAnswerIds
+  // );
+
+  $saveAnswerIds: Observable<Dictionary<string>> = this.select(
     (state) => state.savedAnswerIds
   );
 
@@ -650,17 +658,11 @@ export class TestStore extends StateService<TestState> {
     console.log(this.state.testRequest);
   }
 
-  addAnswerIds(id: string) {
-    const currentAnswerIds = this.state.savedAnswerIds;
-    var updatedIndex = this.state.savedAnswerIds.findIndex(
-      (e: string) => e === id
-    );
-    if (updatedIndex > -1) {
-      currentAnswerIds[updatedIndex] = id;
-    } else {
-      currentAnswerIds.push(id);
-    }
+  addAnswerIds(id: string, questionId: string) {
+    let currentAnswerIds = this.state.savedAnswerIds;
+    currentAnswerIds[questionId] = id;
     this.setState({ savedAnswerIds: currentAnswerIds });
+    console.log('Selected answer list:');
     console.log(this.state.savedAnswerIds);
   }
 
@@ -676,6 +678,13 @@ export class TestStore extends StateService<TestState> {
 
   setExportData(array: Array<Test>) {
     this.setState({ testList: array });
+  }
+
+  resetTestRequest() {
+    const currentTestRequest = this.state.testRequest;
+    currentTestRequest.questionRequest = [];
+    this.setState({ testRequest: currentTestRequest });
+    this.setState({ savedAnswerIds: {} });
   }
 
   resetState() {

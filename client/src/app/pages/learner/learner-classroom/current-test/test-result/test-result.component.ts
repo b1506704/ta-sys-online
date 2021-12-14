@@ -8,7 +8,6 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { DxScrollViewComponent } from 'devextreme-angular';
-import { TestRequest } from 'src/app/shared/models/testRequest';
 
 @Component({
   selector: 'app-test-result',
@@ -22,7 +21,7 @@ export class TestResultDetailComponent implements OnInit, OnDestroy, OnChanges {
   @Input() testResult: any;
 
   @Input() maxScore: any;
-  
+
   @Input() isVisible: boolean;
   testResultData: any;
 

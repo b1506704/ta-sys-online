@@ -4,6 +4,9 @@ import { Question } from 'src/app/shared/models/question';
 import { AnswerStore } from 'src/app/shared/services/answer/answer-store.service';
 import { StoreService } from 'src/app/shared/services/store.service';
 import { TestStore } from 'src/app/shared/services/test/test-store.service';
+interface Dictionary<T> {
+  [Key: string]: T;
+}
 
 @Component({
   selector: 'app-answer-list',
@@ -16,7 +19,8 @@ export class AnswerListComponent implements OnInit, OnDestroy, OnChanges {
   @Input() question: Question;
   answerList: Array<Answer> = [];
 
-  answerIds: Array<string> = [];
+  // answerIds: Array<string> = [];
+  answerIds: Dictionary<string> = {};
   pageSize: number = 100;
   currentFilterByPropertyValue: string;
   currentFilterProperty: string = 'questionId';
@@ -25,17 +29,18 @@ export class AnswerListComponent implements OnInit, OnDestroy, OnChanges {
     private answerStore: AnswerStore,
     private store: StoreService,
     private testStore: TestStore
-  ) {} 
+  ) {}
 
   submitAnswer(answer: Answer) {
     const question = this.question;
     question.answerRequests = [answer];
-    this.testStore.addAnswerIds(answer.id);
+    this.testStore.addAnswerIds(answer.id, question.id);
     this.testStore.addQuestionToTestRequest(question);
   }
 
   findSelectedAnswerId(id: String) {
-    return this.answerIds.find((e: any) => e === id);
+    // return this.answerIds.find((e: any) => e === id);
+    return this.answerIds[this.question.id] === id;
   }
 
   answerIdsListener() {
