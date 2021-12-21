@@ -39,7 +39,7 @@
     (onEditCanceled)="onEditCanceled()"
     (onToolbarPreparing)="onToolbarPreparing($event)"
   >
-  <!-- [allowDeleting]="true" -->
+    <!-- [allowDeleting]="true" -->
     <dxo-editing
       [allowUpdating]="true"
       [allowAdding]="true"
@@ -74,6 +74,15 @@
       caption="Username"
       [allowEditing]="isAddingNewRow"
     >
+      <dxi-validation-rule type="required" message="Username is required">
+      </dxi-validation-rule>
+      <dxi-validation-rule
+        type="stringLength"
+        message="Username must be from 6 to 12 letters"
+        [min]="6"
+        [max]="12"
+      >
+      </dxi-validation-rule>
     </dxi-column>
     <ng-container>
       <dxi-column
@@ -82,9 +91,28 @@
         caption="Password"
         [allowEditing]="isAddingNewRow"
       >
+        <dxi-validation-rule type="required" message="Password is required">
+        </dxi-validation-rule>
+        <dxi-validation-rule
+          type="stringLength"
+          message="Password must be from 6 to 16 letters"
+          [min]="6"
+          [max]="16"
+        >
+        </dxi-validation-rule>
       </dxi-column>
     </ng-container>
-    <dxi-column dataField="displayName" caption="Display Name"> </dxi-column>
+    <dxi-column dataField="displayName" caption="Display Name">
+      <dxi-validation-rule type="required" message="Display name is required">
+      </dxi-validation-rule>
+      <dxi-validation-rule
+        type="stringLength"
+        message="Display name must be from 6 to 20 letters"
+        [min]="6"
+        [max]="20"
+      >
+      </dxi-validation-rule>
+    </dxi-column>
     <dxi-column dataField="roleId" [caption]="'Role'">
       <dxi-validation-rule type="required"></dxi-validation-rule>
       <dxo-lookup [dataSource]="roleList" displayExpr="name" valueExpr="id">

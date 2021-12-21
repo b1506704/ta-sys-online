@@ -377,7 +377,7 @@ export class SubjectStore extends StateService<SubjectState> {
     });
   }
 
-  deleteSubject(id: string, page: number, size: number) {
+  deleteSubject(id: Array<string>, page: number, size: number) {
     this.confirmDialog('').then((confirm: boolean) => {
       if (confirm) {
         this.setIsLoading(true);

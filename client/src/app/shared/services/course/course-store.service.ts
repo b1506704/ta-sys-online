@@ -705,6 +705,7 @@ export class CourseStore extends StateService<CourseState> {
         this.setState({
           courseLearnerList: data.data,
         });
+        this.fetchMediaBySourceID(data.data);
         console.log('Current flag: infinite filtered list');
         console.log(this.state.courseLearnerList);
         this.setState({ totalItems: data.totalRecords });

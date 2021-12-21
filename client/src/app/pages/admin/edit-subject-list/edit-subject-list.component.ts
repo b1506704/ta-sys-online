@@ -344,7 +344,7 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
           break;
         case 'remove':
           this.subjectStore.deleteSubject(
-            e.changes[0].key,
+            [e.changes[0].key],
             this.dataGrid.instance.pageIndex() + 1,
             this.pageSize
           );
@@ -388,7 +388,7 @@ export class EditSubjectListComponent implements OnInit, OnDestroy {
       this.subjectStore.confirmDialog('').then((result: boolean) => {
         if (result) {
           this.subjectHTTP
-            .deleteSelectedSubjects(this.selectedRows)
+            .deleteSubject(this.selectedRows)
             .toPromise()
             .then(() => {
               this.store.showNotif(

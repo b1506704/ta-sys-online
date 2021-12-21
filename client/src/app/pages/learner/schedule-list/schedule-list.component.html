@@ -25,7 +25,7 @@
   ]"
   [showAllDayPanel]="false"
   [currentDate]="currentDate"
-  [startDayHour]="7"
+  [startDayHour]="0"
   [endDayHour]="24"
   textExpr="courseTable.name"
   [startDateExpr]="'startTime'"
@@ -35,9 +35,9 @@
   dateSerializationFormat="yyyy-MM-ddTHH:mm:ssZ"
   [editing]="false"
   [height]="550"
-  (onOptionChanged)="onOptionChanged($event)"
   (onAppointmentClick)="onAppointmentClick($event)"
   (onAppointmentDblClick)="onAppointmentDblClick($event)"
->
+  >
+  <!-- (onOptionChanged)="onOptionChanged($event)" -->
   <dxo-editing [allowUpdating]="false"> </dxo-editing>
 </dx-scheduler>

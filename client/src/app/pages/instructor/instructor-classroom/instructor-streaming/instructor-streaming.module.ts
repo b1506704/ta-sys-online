@@ -44,7 +44,7 @@ import { RemoveFilterUserModule } from 'src/app/shared/pipes/removeFilterUser.mo
   declarations: [
     InstructorStreamingComponent,
     ChatMessageListComponent,
-    LessonListComponent,
+    LessonListComponent,    
     QuestionListComponent,
     TestListComponent,
   ],

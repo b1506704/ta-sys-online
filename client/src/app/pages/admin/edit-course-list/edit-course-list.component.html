@@ -87,12 +87,32 @@
     </dxi-column>
     <dxi-column dataField="availableSlot" dataType="number">
       <dxi-validation-rule type="required"></dxi-validation-rule>
+      <dxi-validation-rule
+        type="range"
+        message="Available slot must be from 1 to 10"
+        [min]="1"
+        [max]="10"
+      >
+      </dxi-validation-rule>
     </dxi-column>
     <dxi-column dataField="maxSlot" dataType="number">
       <dxi-validation-rule type="required"></dxi-validation-rule>
+      <dxi-validation-rule
+        type="range"
+        message="Max slot must be from 1 to 10"
+        [min]="1"
+        [max]="10"
+      >
+      </dxi-validation-rule>
     </dxi-column>
     <dxi-column dataField="cost" dataType="number" [caption]="'Cost ($)'">
       <dxi-validation-rule type="required"></dxi-validation-rule>
+      <dxi-validation-rule
+        type="range"
+        message="Cost must be higher than 1"
+        [min]="1"
+      >
+      </dxi-validation-rule>
     </dxi-column>
     <dxi-column dataField="subjectId" [caption]="'Subject'">
       <dxi-validation-rule type="required"></dxi-validation-rule>
@@ -108,12 +128,7 @@
       >
       </dxo-lookup>
     </dxi-column>
-    <!-- <dxi-column dataField="subjectId">
-      <dxi-validation-rule type="required"></dxi-validation-rule>
-    </dxi-column>
-    <dxi-column dataField="instructorId">
-      <dxi-validation-rule type="required"></dxi-validation-rule>
-    </dxi-column> -->
+
     <div *dxTemplate="let data of 'totalCourseCount'">
       <span>Total Course: {{ courseList.length }} </span>
     </div>

@@ -15,11 +15,14 @@ import { File } from 'src/app/shared/models/file';
 import { Question } from 'src/app/shared/models/question';
 import { Answer } from 'src/app/shared/models/answer';
 import { DxScrollViewComponent } from 'devextreme-angular';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { Course } from 'src/app/shared/models/course';
 import { Subject } from 'src/app/shared/models/subject';
 import { Session } from 'src/app/shared/models/session';
+import { WebrtcUtils } from 'src/app/shared/services/streaming/webrtc-utils.service';
+import { ThrowStmt } from '@angular/compiler';
 
+const useWebrtcUtils = true;
 @Component({
   templateUrl: 'instructor-streaming.component.html',
   styleUrls: ['./instructor-streaming.component.scss'],
@@ -45,6 +48,8 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   };
   peerConnection: RTCPeerConnection;
 
+  isReceiver: boolean = false;
+
   isInitiator: boolean;
   isChannelReady: boolean;
   isStarted: boolean;
@@ -68,6 +73,11 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     displayName: '',
   };
   currentCourseId: string;
+
+  currentCalledUser: UserEntry = {
+    id: '',
+    displayName: '',
+  };
 
   chatUserList: Array<UserEntry> = [];
 
@@ -118,7 +128,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   totalSeconds = 0;
 
   timerInterval: any;
-  lastingTime: string | number;
+  lastingTime?: string;
 
   constructor(
     private signaling: SignalrService,
@@ -129,15 +139,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
   timeCounter() {
     this.timerInterval = setInterval(() => {
-      this.totalSeconds++;
-      if (this.totalSeconds >= 0) {
-        var time = new Date(this.totalSeconds * 1000);
-        var m: number | string = time.getMinutes();
-        m = m < 10 ? '0' + m : m;
-        var s: number | string = time.getSeconds();
-        s = s < 10 ? `0${s}` : s;
-        this.lastingTime = m + ':' + s;
-      }
+      this.getTime();
     }, 1000);
   }
   setOperationFlag() {
@@ -301,6 +303,10 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     // this.setOperationFlag();
   }
 
+  getTime() {
+    this.signaling.invoke('GetTime', this.room.name);
+  }
+
   clearBoard() {
     this.blackBoard = [];
   }
@@ -353,18 +359,20 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     this.isShowingQuestion = false;
   }
 
-  invitePresenting(userEntry: UserEntry, isPresenting: boolean) {
-    this.signaling.invoke(
-      'InviteForPresenting',
-      this.room.name,
-      userEntry,
-      isPresenting
-    );
-    if (isPresenting === false) {
-      this.getUserMedia();
-    } else {
-      this.getDisplayMedia();
-    }
+  privateCall(e: any) {
+    this.getUserMedia();
+    this.openPopupSetting();
+    this.currentCalledUser = e;
+    this.signaling.invoke('PrivateCall', this.room.name, e);
+    console.log('CALLED ID:');
+    console.log(e);
+  }
+
+  endCall() {
+    this.isInitiator = true;
+    this.signaling.invoke('EndCall', this.room.name, this.currentCalledUser);
+    console.log('ENDED USED:');
+    console.log(this.currentCalledUser);
   }
 
   sendMessage = (message: any) => {
@@ -436,15 +444,15 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     // #2 define signaling communication
     this.defineSignaling();
 
-    this.openPopupSetting();
+    // this.openPopupSetting();
 
     // #3 get media from current client
-    this.getUserMedia();
+    // this.getUserMedia();
   }
 
   defineSignaling(): void {
     this.signaling.define('log', (message: any) => {
-      console.log(message);
+      // console.log(message);
     });
 
     this.signaling.define('created', (userEntryList: any) => {
@@ -457,10 +465,10 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     });
 
     this.signaling.define('joined', (userEntryList: any) => {
+      this.isChannelReady = true;
       console.log('CURRENT USER ENTRY LIST');
       console.log(userEntryList);
       this.chatUserList = userEntryList;
-      this.isChannelReady = true;
       this.store.setChatUserList(this.chatUserList);
       this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
@@ -473,6 +481,11 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       this.fetchMediaBySourceID(userEntryList.map((e: any) => e.id));
     });
 
+    this.signaling.define('time', (time: any) => {
+      this.lastingTime = time;
+      // this.setOperationFlag();
+    });
+
     this.signaling.define('isShowAnswerChoice', (isShow: boolean) => {
       this.isShowingAnswer = isShow;
       // this.setOperationFlag();
@@ -481,6 +494,22 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     this.signaling.define('isShowCorrectAnswer', (isShow: boolean) => {
       this.isShowingCorrectAnswer = isShow;
       // this.setOperationFlag();
+    });
+
+    this.signaling.define('privateCall', (userEntry: any) => {
+      console.log(userEntry);
+      if (this.userEntry.id == userEntry.id) {
+        console.log(this.isReceiver);
+        this.isReceiver = true;
+      } else {
+        this.isReceiver = false;
+      }
+    });
+
+    this.signaling.define('endCall', (userEntry: any) => {
+      console.log(userEntry);
+      console.log(this.isReceiver);
+      this.handleRemoteHangup();
     });
 
     this.signaling.define('lesson', (list: any) => {
@@ -492,7 +521,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       this.blackBoard = list;
       this.setOperationFlag();
       console.log(this.blackBoard);
-      this.fetchMediaBySourceID(list);
+      // this.fetchMediaBySourceID(list);
     });
 
     this.signaling.define('test', (list: Array<any>) => {
@@ -507,7 +536,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       const displayName = list[list.length].userAccountResponse.displayName;
       this.store.showNotif(`${displayName} has submitted an answer`, 'custom');
 
-      this.fetchMediaBySourceID(list.map((e: any) => e.userAccountResponse.id));
+      // this.fetchMediaBySourceID(list.map((e: any) => e.userAccountResponse.id));
       this.dxScrollView.instance.scrollBy(150);
     });
 
@@ -524,7 +553,7 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       this.blackBoard.push(question);
       console.log(this.blackBoard);
       this.setOperationFlag();
-      this.fetchMediaBySourceID([question]);
+      // this.fetchMediaBySourceID([question]);
     });
 
     this.signaling.define(
@@ -537,9 +566,6 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
         };
         this.messageList = this.messageList.concat(message);
         this.isPopupChatVisible = true;
-        // console.log(message);
-
-        // console.log(this.messageList);
         if (chatMessage == 'got user media') {
           this.initiateCall();
         } else if (chatMessage.type == 'offer') {
@@ -556,8 +582,6 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
           );
         } else if (chatMessage.type == 'candidate' && this.isStarted) {
           this.addIceCandidate(chatMessage);
-        } else if (chatMessage == 'bye' && this.isStarted) {
-          this.handleRemoteHangup();
         }
       }
     );
@@ -620,36 +644,11 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       });
   }
 
-  getDisplayMedia(): void {
-    const mediaDevices = navigator.mediaDevices as any;
-    const stream = mediaDevices
-      .getDisplayMedia({ audio: true, video: true })
-      .then((stream: MediaStream) => {
-        this.addLocalStream(stream);
-        // this.sendMessage('got user media');
-        this.peerConnection.addTrack(
-          this.localStream.getVideoTracks()[0],
-          this.localStream
-        );
-        this.peerConnection.addTrack(
-          this.localStream.getAudioTracks()[0],
-          this.localStream
-        );
-        // if (this.isInitiator) {
-        //   this.initiateCall();
-        // }
-      })
-      .catch((e: any) => {
-        alert('getUserMedia() error: ' + e.name + ': ' + e.message);
-      });
-  }
-
   initiateCall(): void {
     this.store.showNotif('Initiating a call', 'custom');
     console.log('Initiating a call.');
-    if (!this.isStarted && this.localStream && this.isChannelReady) {
+    if (!this.isStarted) {
       this.createPeerConnection();
-
       this.peerConnection.addTrack(
         this.localStream.getVideoTracks()[0],
         this.localStream
@@ -658,11 +657,11 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
         this.localStream.getAudioTracks()[0],
         this.localStream
       );
-
       this.isStarted = true;
-      if (this.isInitiator) {
-        this.sendOffer();
-      }
+    }
+
+    if (this.isInitiator) {
+      this.sendOffer();
     }
   }
 
@@ -670,10 +669,23 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     console.log('Creating peer connection.');
     this.store.showNotif('Creating peer connection.', 'custom');
     try {
-      this.peerConnection = new RTCPeerConnection({
-        iceServers: signalRConfig.iceServers,
-        sdpSemantics: 'unified-plan',
-      } as RTCConfiguration);
+      if (useWebrtcUtils) {
+        this.peerConnection = WebrtcUtils.createPeerConnection(
+          signalRConfig.iceServers,
+          'unified-plan',
+          'balanced',
+          'all',
+          'require',
+          null,
+          [],
+          0
+        );
+      } else {
+        this.peerConnection = new RTCPeerConnection({
+          iceServers: signalRConfig.iceServers,
+          sdpSemantics: 'unified-plan',
+        } as RTCConfiguration);
+      }
 
       this.peerConnection.onicecandidate = (
         event: RTCPeerConnectionIceEvent
@@ -688,8 +700,19 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
       this.peerConnection.ontrack = (event: RTCTrackEvent) => {
         if (event.streams[0]) {
           this.addRemoteStream(event.streams[0]);
+          this.store.showNotif('NEW USER HAS JOINED', 'custom');
         }
       };
+
+      if (useWebrtcUtils) {
+        this.peerConnection.oniceconnectionstatechange = () => {
+          if (this.peerConnection?.iceConnectionState === 'connected') {
+            WebrtcUtils.logStats(this.peerConnection, 'all');
+          } else if (this.peerConnection?.iceConnectionState === 'failed') {
+            WebrtcUtils.doIceRestart(this.peerConnection, this);
+          }
+        };
+      }
     } catch (e) {
       console.log('Failed to create PeerConnection.', e.message);
       return;
@@ -698,16 +721,34 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
   sendOffer(): void {
     console.log('Sending offer to peer.');
-    this.addTransceivers();
+    // this.addTransceivers();
     this.peerConnection.createOffer().then((sdp: RTCSessionDescriptionInit) => {
-      this.peerConnection.setLocalDescription(sdp);
+      let finalSdp = sdp;
+      if (useWebrtcUtils) {
+        finalSdp = WebrtcUtils.changeBitrate(sdp, '1000', '500', '6000');
+        if (
+          WebrtcUtils.getCodecs('audio').find(
+            (c) => c.indexOf(WebrtcUtils.OPUS) !== -1
+          )
+        ) {
+          finalSdp = WebrtcUtils.setCodecs(finalSdp, 'audio', WebrtcUtils.OPUS);
+        }
+        if (
+          WebrtcUtils.getCodecs('video').find(
+            (c) => c.indexOf(WebrtcUtils.H264) !== -1
+          )
+        ) {
+          finalSdp = WebrtcUtils.setCodecs(finalSdp, 'video', WebrtcUtils.H264);
+        }
+      }
+      this.peerConnection.setLocalDescription(finalSdp);
       this.sendMessage(sdp);
     });
   }
 
   sendAnswer(): void {
     console.log('Sending answer to peer.');
-    this.addTransceivers();
+    // this.addTransceivers();
     this.peerConnection.createAnswer().then((sdp: RTCSessionDescription) => {
       this.peerConnection.setLocalDescription(sdp);
       this.sendMessage(sdp);
@@ -733,16 +774,16 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     });
   }
 
-  addTransceivers(): void {
-    console.log('Adding transceivers.');
-    const init = {
-      direction: 'recvonly',
-      streams: [],
-      sendEncodings: [],
-    } as RTCRtpTransceiverInit;
-    this.peerConnection.addTransceiver('audio', init);
-    this.peerConnection.addTransceiver('video', init);
-  }
+  // addTransceivers(): void {
+  //   console.log('Adding transceivers.');
+  //   const init = {
+  //     direction: 'recvonly',
+  //     streams: [],
+  //     sendEncodings: [],
+  //   } as RTCRtpTransceiverInit;
+  //   this.peerConnection.addTransceiver('audio', init);
+  //   this.peerConnection.addTransceiver('video', init);
+  // }
 
   addLocalStream(stream: MediaStream): void {
     console.log('Local stream added.');
@@ -754,6 +795,10 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
   addRemoteStream(stream: MediaStream): void {
     console.log('Remote stream added.');
     this.remoteStream.push(stream);
+    this.remoteStream = this.remoteStream.filter(
+      (v, i, a) => a.findIndex((t) => t.id === v.id) === i
+    );
+    console.log(this.remoteStream);
   }
 
   adjustLocalVideoStream() {
@@ -772,40 +817,32 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
 
   hangup(): void {
     this.store
-      .confirmDialog('Do you want to disconnect?')
+      .confirmDialog('Do you want to end call?')
       .then((confirm: boolean) => {
         if (confirm) {
-          if (this.localStream && this.localStream.active) {
-            this.localStream.getTracks().forEach((track) => {
-              track.stop();
-            });
-          }
-          if (this.remoteStream) {
-            this.remoteStream.forEach((stream: MediaStream) => {
-              if (stream.active) {
-                stream.getTracks().forEach((track) => {
-                  track.stop();
-                });
-              }
-            });
-          }
-          console.log('Hanging up.');
-          this.stopPeerConnection();
-          console.log(this.room.name);
-          console.log(this.userEntry);
-          this.signaling
-            .invoke('LeaveRoom', this.room.name, this.userEntry)
-            .then(() => {
-              this.signaling.disconnect();
-            });
-          this.router.navigate(['instructor_classroom']);
+          this.endCall();
         }
       });
   }
 
   handleRemoteHangup(): void {
-    console.log('Session terminated by remote peer.');
+    if (this.localStream && this.localStream.active) {
+      this.localStream.getTracks().forEach((track) => {
+        track.stop();
+      });
+    }
+    if (this.remoteStream) {
+      this.remoteStream.forEach((stream: MediaStream) => {
+        if (stream.active) {
+          stream.getTracks().forEach((track) => {
+            track.stop();
+          });
+        }
+      });
+    }
+    console.log('Hanging up.');
     this.stopPeerConnection();
+    this.remoteStream = [];
     this.isInitiator = true;
   }
 
@@ -814,17 +851,57 @@ export class InstructorStreamingComponent implements OnInit, OnDestroy {
     this.isChannelReady = false;
     if (this.peerConnection) {
       this.peerConnection.close();
-      this.peerConnection = null;
+      // this.peerConnection = null;
     }
   }
 
+  stopAllConnection() {
+    if (this.localStream && this.localStream.active) {
+      this.localStream.getTracks().forEach((track) => {
+        track.stop();
+      });
+    }
+    if (this.remoteStream) {
+      this.remoteStream.forEach((stream: MediaStream) => {
+        if (stream.active) {
+          stream.getTracks().forEach((track) => {
+            track.stop();
+          });
+        }
+      });
+    }
+    console.log('Hanging up.');
+    this.stopPeerConnection();
+    console.log(this.room.name);
+    console.log(this.userEntry);
+    this.signaling
+      .invoke('LeaveRoom', this.room.name, this.userEntry)
+      .then(() => {
+        this.signaling.disconnect();
+      });
+    this.router.navigate(['instructor_classroom']);
+  }
+
+  disconnect(isForce = false) {
+    if (isForce) {
+      this.stopAllConnection();
+    } else {
+      this.store
+        .confirmDialog('Do you want to disconnect?')
+        .then((confirm: boolean) => {
+          if (confirm) {
+            this.stopAllConnection();
+          }
+        });
+    }
+  }
   ngOnDestroy(): void {
     this.getUserID().unsubscribe();
     this.getDisplayName().unsubscribe();
     this.getMetaData().unsubscribe();
     clearInterval(this.timerInterval);
     if (this.chatUserList.length) {
-      this.hangup();
+      this.disconnect(true);
     }
   }
 }

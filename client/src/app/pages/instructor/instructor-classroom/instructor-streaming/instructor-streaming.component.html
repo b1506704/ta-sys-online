@@ -33,6 +33,9 @@
             <div class="display-name">
               {{ item?.displayName }}
             </div>
+            <div class="overlay-button" *ngIf="item.id !== userEntry.id && !isStarted">
+              <dx-button icon="tel" (onClick)="privateCall(item)"></dx-button>
+            </div>
           </div>
         </div>
       </dx-gallery>
@@ -231,10 +234,6 @@
               </div>
             </div>
           </div>
-          <!-- <div class="asset-button">
-            
-            
-          </div> -->
         </div>
       </dx-scroll-view>
     </div>
@@ -326,12 +325,6 @@
                       hint="Click to import to desk"
                       (onClick)="writeBoard(item)"
                     ></dx-button>
-                    <!-- <dx-button
-                      icon="trash"
-                      type="normal"
-                      hint="Click to remove quiz from desk"
-                      (onClick)="removeQuiz(item)"
-                    ></dx-button> -->
                   </div>
                 </div>
               </div>
@@ -373,10 +366,6 @@
         <dx-button
           [icon]="localStream?.getAudioTracks()[0].enabled ? 'todo' : 'remove'"
         ></dx-button>
-        <dx-button (onClick)="invitePresenting(userEntry, !isPresenting)"
-          >On/Off Present</dx-button
-        >
-        <dx-button [icon]="isPresenting ? 'todo' : 'remove'"></dx-button>
       </div>
     </div>
   </div>
@@ -387,12 +376,18 @@
       [scrollByContent]="true"
       [scrollByThumb]="true"
       bounceEnabled="true"
-      [height]="340"
+      [height]="140"
       [width]="130"
     >
-      <!-- controls -->
       <div class="video-container" *ngFor="let item of remoteStream">
         <video class="remote-video" autoplay [srcObject]="item"></video>
+        <div style="width: 100%; text-align: center">
+          {{ currentCalledUser?.displayName }}
+        </div>
+        <ng-container *ngIf="isStarted">
+          <dx-button icon="clear" text="End Call" (onClick)="hangup()">
+          </dx-button>
+        </ng-container>
       </div>
     </dx-scroll-view>
   </div>
@@ -424,35 +419,36 @@
 <dx-speed-dial-action
   icon="tags"
   label="Add Lesson"
-  [index]="1"
+  [index]="0"
   (onClick)="openPopupLesson()"
 >
 </dx-speed-dial-action>
 <dx-speed-dial-action
   icon="edit"
   label="Add Question"
-  [index]="2"
+  [index]="1"
   (onClick)="openPopupTest()"
 >
 </dx-speed-dial-action>
 <dx-speed-dial-action
   icon="comment"
   label="Show Chat"
-  [index]="3"
+  [index]="2"
   (onClick)="openPopupChat()"
 >
 </dx-speed-dial-action>
 <dx-speed-dial-action
   icon="tel"
   label="Check Media"
-  [index]="4"
+  [index]="3"
   (onClick)="openPopupSetting()"
 >
 </dx-speed-dial-action>
+
 <dx-speed-dial-action
   icon="runner"
   label="Leave Room"
   [index]="5"
-  (onClick)="hangup()"
+  (onClick)="disconnect()"
 >
 </dx-speed-dial-action>

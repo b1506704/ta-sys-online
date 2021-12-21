@@ -94,25 +94,11 @@ export class SubjectHttpService {
     });
   }
 
-  deleteSubject(subjectId: string): Observable<ArrayBuffer> {
-    const params = new HttpParams().set('subjectId', subjectId);
-    return this.http.delete<ArrayBuffer>(this.apiUrl, {
+  deleteSubject(subjectId: Array<string>): Observable<Object> {
+    return this.http.post<Object>(this.apiUrl + '/delete', subjectId, {
       reportProgress: true,
-      params: params,
       observe: 'body',
     });
-  }
-  deleteSelectedSubjects(
-    selectedItems: Array<string>
-  ): Observable<Array<string>> {
-    return this.http.post<Array<string>>(
-      this.apiUrl + '/batch',
-      selectedItems,
-      {
-        reportProgress: true,
-        observe: 'body',
-      }
-    );
   }
 
   updateSubject(subject: Subject): Observable<Subject> {

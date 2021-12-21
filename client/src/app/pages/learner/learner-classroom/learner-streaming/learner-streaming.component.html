@@ -33,6 +33,9 @@
             <div class="display-name">
               {{ item?.displayName }}
             </div>
+            <!-- <div class="overlay-button">
+              <dx-button icon="tel" (onClick)="privateCall(item)"></dx-button>
+            </div> -->
           </div>
         </div>
       </dx-gallery>
@@ -231,10 +234,6 @@
         <dx-button
           [icon]="localStream?.getAudioTracks()[0].enabled ? 'todo' : 'remove'"
         ></dx-button>
-        <dx-button (onClick)="invitePresenting(userEntry, !isPresenting)"
-          >On/Off Present</dx-button
-        >
-        <dx-button [icon]="isPresenting ? 'todo' : 'remove'"></dx-button>
       </div>
     </div>
   </div>
@@ -245,11 +244,16 @@
       [scrollByContent]="true"
       [scrollByThumb]="true"
       bounceEnabled="true"
-      [height]="340"
+      [height]="140"
       [width]="130"
     >
       <div class="video-container" *ngFor="let item of remoteStream">
         <video class="remote-video" autoplay [srcObject]="item"></video>
+        <div style="width: 100%; text-align: center">Instructor</div>
+        <ng-container *ngIf="isStarted">
+          <dx-button icon="clear" text="End Call" (onClick)="hangup()">
+          </dx-button>
+        </ng-container>
       </div>
     </dx-scroll-view>
   </div>
@@ -278,10 +282,19 @@
   (onClick)="openPopupSetting()"
 >
 </dx-speed-dial-action>
+<ng-container *ngIf="isStarted">
+  <dx-speed-dial-action
+    icon="clear"
+    label="End call"
+    [index]="5"
+    (onClick)="hangup()"
+  >
+  </dx-speed-dial-action>
+</ng-container>
 <dx-speed-dial-action
   icon="runner"
   label="Leave Room"
-  [index]="5"
-  (onClick)="hangup()"
+  [index]="6"
+  (onClick)="disconnect()"
 >
 </dx-speed-dial-action>

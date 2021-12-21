@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { SignalrService } from 'src/app/shared/services/streaming/signalr.service';
 import { StoreService } from 'src/app/shared/services/store.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Course } from 'src/app/shared/models/course';
@@ -10,7 +9,6 @@ import { Course } from 'src/app/shared/models/course';
 })
 export class InstructorClassroomComponent implements OnInit, OnDestroy {
   constructor(
-    private signaling: SignalrService,
     private store: StoreService,
     private router: Router,
     private route: ActivatedRoute
@@ -19,7 +17,6 @@ export class InstructorClassroomComponent implements OnInit, OnDestroy {
   classroomName: string;
   courseId: string;
   currentUserId: string;
-  notificationList: Array<any> = [];
   courseData: Course;
 
   navigatePostOptions: any = {
@@ -79,9 +76,6 @@ export class InstructorClassroomComponent implements OnInit, OnDestroy {
   }
 
   navigateCurrentSession() {
-    // const outlet = {
-    //   outlets: { conditionOutlet: ['course_streaming'] },
-    // };
     this.router.navigate(['course_streaming']);
   }
 
@@ -97,7 +91,7 @@ export class InstructorClassroomComponent implements OnInit, OnDestroy {
       outlets: { conditionOutlet: ['chat_room'] },
     };
     this.router.navigate([outlet], { relativeTo: this.route.parent });
-  } 
+  }
 
   navigateToScheduleList() {
     this.router.navigate(['/schedule_list']);
@@ -134,65 +128,10 @@ export class InstructorClassroomComponent implements OnInit, OnDestroy {
     this.getMetaData();
     this.getUserID();
     this.navigatePost();
-    // this.signaling.connect('/auth', false).then(() => {
-    //   if (this.signaling.isConnected()) {
-    //     this.signaling.invoke('Authorize').then((token: string) => {
-    //       if (token) {
-    //         sessionStorage.setItem('token', token);
-    //         this.start();
-    //       }
-    //     });
-    //   }
-    // });
-  }
-
-  start(): void {
-    // #1 connect to signaling server
-    this.signaling.connect('/streaming', true).then(() => {
-      if (this.signaling.isConnected()) {
-        this.signaling.invoke(
-          'CreateOrJoinRoom',
-          this.classroomName,
-          this.currentUserId
-        );
-      }
-    });
-    this.defineSignaling();
-  }
-
-  defineSignaling(): void {
-    this.signaling.define('log', (message: any) => {
-      console.log(message);
-    });
-
-    this.signaling.define('created', (userEntryList: any) => {
-      console.log('CURRENT USER ENTRY LIST');
-      console.log(userEntryList);
-    });
-
-    this.signaling.define('joined', (userEntryList: any) => {
-      console.log('CURRENT USER ENTRY LIST');
-      console.log(userEntryList);
-    });
-
-    this.signaling.define('left', (userEntryList: any) => {
-      console.log('CURRENT USER ENTRY LIST');
-      console.log(userEntryList);
-    });
-  }
-
-  hangup(): void {
-    console.log('Hanging up.');
-    this.signaling
-      .invoke('LeaveRoom', this.classroomName, this.currentUserId)
-      .then(() => {
-        this.signaling.disconnect();
-      });
   }
 
   ngOnDestroy(): void {
     this.getUserID().unsubscribe();
     this.getMetaData().unsubscribe();
-    this.hangup();
   }
 }

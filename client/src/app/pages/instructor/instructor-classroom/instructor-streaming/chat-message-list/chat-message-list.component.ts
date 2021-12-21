@@ -103,7 +103,7 @@ export class ChatMessageListComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges() {
-    console.log(this.chatMessageList);
+    // console.log(this.chatMessageList);
   }
 
   ngOnDestroy() {
